@@ -1,0 +1,19 @@
+{
+  "description":  "Apps. A sample schema.",
+  "id":           "schema/app",
+  "title":        "App",
+  "type":         ["object"],
+  "definitions": {
+  },
+  "links": [
+    {
+      "description":  "List apps.",
+      "href":         "/apps",
+      "method":       "GET",
+      "rel":          "instances",
+      "title":        "List"
+    }
+  ],
+  "properties": {
+  }
+}
