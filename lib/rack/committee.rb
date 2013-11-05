@@ -2,6 +2,25 @@ require "multi_json"
 
 module Rack
   class Committee
+    class RoutesBuilder
+      def initialize(schemata)
+        @schemata = schemata
+      end
+
+      def call
+        routes = {}
+        @schemata.each do |_, schema|
+          schema["links"].each do |link|
+            routes[link["method"]] ||= []
+            # /apps/{id} --> /apps/([^/]+)
+            pattern = link["href"].gsub(/\{(.*)\}/, "([^/]+)")
+            routes[link["method"]] << [Regexp.new(pattern), link]
+          end
+        end
+        routes
+      end
+    end
+
     def initialize(app, options={})
       @app = app
 
@@ -12,7 +31,7 @@ module Rack
       blobs.map { |b| MultiJson.decode(b) }.each do |schema|
         @schemata[schema["id"]] = schema
       end
-      @routes = build_routes
+      @routes = RoutesBuilder.new(@schemata).call
     end
 
     def call(env)
@@ -24,21 +43,6 @@ module Rack
         end
       end
       @app.call(env)
-    end
-
-    private
-
-    def build_routes
-      routes = {}
-      @schemata.each do |_, schema|
-        schema["links"].each do |link|
-          routes[link["method"]] ||= []
-          # /apps/{id} --> /apps/([^/]+)
-          pattern = link["href"].gsub(/\{(.*)\}/, "([^/]+)")
-          routes[link["method"]] << [Regexp.new(pattern), link]
-        end
-      end
-      routes
     end
   end
 end

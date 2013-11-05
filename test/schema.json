@@ -7,11 +7,52 @@
   },
   "links": [
     {
+      "description":  "Create a new app.",
+      "href":         "/apps",
+      "method":       "POST",
+      "rel":          "create",
+      "schema":       {
+        "properties": {
+          "name":   { "$ref": "/schema/app#/definitions/name" },
+          "region": { "$ref": "/schema/region#/definitions/identity" },
+          "stack":  { "$ref": "/schema/stack#/definitions/identity" }
+        }
+      },
+      "title":        "Create"
+    },
+    {
+      "description":  "Delete an existing app.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}",
+      "method":       "DELETE",
+      "rel":          "destroy",
+      "title":        "Delete"
+    },
+    {
+      "description":  "Info for existing app.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}",
+      "method":       "GET",
+      "rel":          "self",
+      "title":        "Info"
+    },
+    {
       "description":  "List apps.",
       "href":         "/apps",
       "method":       "GET",
       "rel":          "instances",
       "title":        "List"
+    },
+    {
+      "description":  "Update an existing app.",
+      "href":         "/apps/{(%2Fschema%2Fapp%23%2Fdefinitions%2Fidentity)}",
+      "method":       "PATCH",
+      "rel":          "update",
+      "schema":       {
+        "properties": {
+          "maintenance":  { "$ref": "/schema/app#/definitions/maintenance" },
+          "name":         { "$ref": "/schema/app#/definitions/name" }
+        }
+      },
+      "title":        "Update"
     }
   ],
   "properties": {
