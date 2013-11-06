@@ -16,6 +16,10 @@ module Rack
         return nil
       end
 
+      def routes_request?(request)
+        routes?(request.request_method, request.path_info)
+      end
+
       private
 
       def build_routes(schemata)
