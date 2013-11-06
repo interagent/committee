@@ -22,14 +22,16 @@ module Rack
       private
 
       def detect_extra!
-        extra = @params.keys - @link_schema["schema"]["properties"].keys
+        properties = @link_schema["schema"]["properties"] || []
+        extra = @params.keys - properties.keys
         if extra.count > 0
           raise InvalidParams.new("Unknown params: #{missing.join(', ')}.")
         end
       end
 
       def detect_missing!
-        missing = @link_schema["schema"]["required"] - @params.keys
+        required = @link_schema["schema"]["required"] || []
+        missing = required - @params.keys
         if missing.count > 0
           raise InvalidParams.new("Require params: #{missing.join(', ')}.")
         end
