@@ -7,12 +7,10 @@ describe Rack::Committee::Router do
   end
 
   it "builds routes without parameters" do
-    #assert_equal %r{/apps}.to_s, @routes["GET"][1][0].to_s
     assert @router.routes?("GET", "/apps")
   end
 
   it "builds routes with parameters" do
-    #assert_equal %r{/apps/([^\/]+)}.to_s, @routes["GET"][0][0].to_s
     assert @router.routes?("GET", "/apps/123")
   end
 end
