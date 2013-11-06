@@ -1,4 +1,5 @@
 require "multi_json"
+require "rack"
 
 module Rack
   class Committee
