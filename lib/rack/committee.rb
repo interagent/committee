@@ -28,6 +28,10 @@ module Rack
           else
             {}
           end
+        elsif @request.content_type == "application/x-www-form-urlencoded"
+          # Actually, POST means anything in the request body, could be from
+          # PUT or PATCH too. Silly Rack.
+          indifferent_params(@request.POST)
         else
           raise BadRequest, "Unsupported Content-Type: #{@request.content_type}."
         end
@@ -98,13 +102,14 @@ module Rack
         method_routes.each do |pattern, link|
           if env["PATH_INFO"] =~ pattern
             puts "COMMITTEE"
+p link
           end
         end
       end
       @app.call(env)
     rescue BadRequest
       [400, { "Content-Type" => "application/json; charset=utf-8" },
-        [MultiJson.encode(id: :bad_request, error: $1.message)]]
+        [MultiJson.encode(id: :bad_request, error: $!.message)]]
     end
   end
 end

@@ -15,6 +15,7 @@ describe Rack::Committee do
   end
 
   it "x" do
-    get "/apps"
+    post "/apps"
+p last_response.body
   end
 end
