@@ -1,8 +1,8 @@
 module Rack
   class Committee
     class RequestUnpacker
-      def initialize(env)
-        @request = Rack::Request.new(env)
+      def initialize(request)
+        @request = request
       end
 
       def call

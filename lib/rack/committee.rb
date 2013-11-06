@@ -23,7 +23,8 @@ module Rack
     end
 
     def call(env)
-      env[@params_key] = RequestUnpacker.new(env).call
+      request = Rack::Request.new(env)
+      env[@params_key] = RequestUnpacker.new(request).call
       if link = @router.routes?(env["REQUEST_METHOD"], env["PATH_INFO"])
         ParamValidator.new(env[@params_key], link).call
       end

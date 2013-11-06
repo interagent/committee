@@ -6,7 +6,8 @@ describe Rack::Committee::RequestUnpacker do
       "CONTENT_TYPE" => "application/json",
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
-    params = Rack::Committee::RequestUnpacker.new(env).call
+    request = Rack::Request.new(env)
+    params = Rack::Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -14,7 +15,8 @@ describe Rack::Committee::RequestUnpacker do
     env = {
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
-    params = Rack::Committee::RequestUnpacker.new(env).call
+    request = Rack::Request.new(env)
+    params = Rack::Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -23,7 +25,8 @@ describe Rack::Committee::RequestUnpacker do
       "CONTENT_TYPE" => "application/json",
       "rack.input"   => StringIO.new(""),
     }
-    params = Rack::Committee::RequestUnpacker.new(env).call
+    request = Rack::Request.new(env)
+    params = Rack::Committee::RequestUnpacker.new(request).call
     assert_equal({}, params)
   end
 
@@ -32,7 +35,8 @@ describe Rack::Committee::RequestUnpacker do
       "CONTENT_TYPE" => "application/x-www-form-urlencoded",
       "rack.input"   => StringIO.new("x=y"),
     }
-    params = Rack::Committee::RequestUnpacker.new(env).call
+    request = Rack::Request.new(env)
+    params = Rack::Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -41,8 +45,9 @@ describe Rack::Committee::RequestUnpacker do
       "CONTENT_TYPE" => "application/json",
       "rack.input"   => StringIO.new('[2]'),
     }
+    request = Rack::Request.new(env)
     assert_raises(Rack::Committee::BadRequest) do
-      Rack::Committee::RequestUnpacker.new(env).call
+      Rack::Committee::RequestUnpacker.new(request).call
     end
   end
 
@@ -51,8 +56,9 @@ describe Rack::Committee::RequestUnpacker do
       "CONTENT_TYPE" => "application/whats-this",
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
+    request = Rack::Request.new(env)
     assert_raises(Rack::Committee::BadRequest) do
-      Rack::Committee::RequestUnpacker.new(env).call
+      Rack::Committee::RequestUnpacker.new(request).call
     end
   end
 end
