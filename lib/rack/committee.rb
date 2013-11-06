@@ -33,8 +33,16 @@ module Rack
       end
       @app.call(env)
     rescue BadRequest
-      [400, { "Content-Type" => "application/json; charset=utf-8" },
-        [MultiJson.encode(id: :bad_request, error: $!.message)]]
+      render_error(400, :bad_request, message)
+    rescue InvalidParams
+      render_error(422, :invalid_params, message)
+    end
+
+    private
+
+    def render_error(status, id, message)
+      [status, { "Content-Type" => "application/json; charset=utf-8" },
+        [MultiJson.encode(id: id, error: message)]]
     end
   end
 end
