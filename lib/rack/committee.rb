@@ -33,9 +33,9 @@ module Rack
       end
       @app.call(env)
     rescue BadRequest
-      render_error(400, :bad_request, message)
+      render_error(400, :bad_request, $!.message)
     rescue InvalidParams
-      render_error(422, :invalid_params, message)
+      render_error(422, :invalid_params, $!.message)
     end
 
     private
