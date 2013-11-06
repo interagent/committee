@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.files         = Dir["{lib,test}/**/*.rb"]
 
   s.add_dependency "multi_json", "> 0.0"
+  s.add_dependency "rack", "> 0.0"
 
-  s.add_development_dependency "rack"
   s.add_development_dependency "rack-test"
 end

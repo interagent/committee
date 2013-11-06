@@ -2,6 +2,63 @@ require "multi_json"
 
 module Rack
   class Committee
+    class BadRequest < StandardError
+    end
+
+    class RequestUnpacker
+      def initialize(env)
+        @request = Rack::Request.new(env)
+      end
+
+      def call
+        if !@request.content_type || @request.content_type == "application/json"
+          # if Content-Type is empty or JSON, and there was a request body, try
+          # to interpret it as JSON
+          if (body = @request.body.read).length != 0
+            @request.body.rewind
+            hash = MultiJson.decode(body)
+            # We want a hash specifically. '42', 42, and [42] will all be
+            # decoded properly, but we can't use them here.
+            if !hash.is_a?(Hash)
+              raise BadRequest,
+                "Invalid JSON input. Require object with parameters as keys."
+            end
+            indifferent_params(hash)
+          # if request body is empty, we just have empty params
+          else
+            {}
+          end
+        else
+          raise BadRequest, "Unsupported Content-Type: #{@request.content_type}."
+        end
+      end
+
+      private
+
+      # Creates a Hash with indifferent access.
+      #
+      # (Copied from Sinatra)
+      def indifferent_hash
+        Hash.new { |hash,key| hash[key.to_s] if Symbol === key }
+      end
+
+      # Enable string or symbol key access to the nested params hash.
+      #
+      # (Copied from Sinatra)
+      def indifferent_params(object)
+        case object
+        when Hash
+          new_hash = indifferent_hash
+          object.each { |key, value| new_hash[key] = indifferent_params(value) }
+          new_hash
+        when Array
+          object.map { |item| indifferent_params(item) }
+        else
+          object
+        end
+      end
+    end
+
     class RoutesBuilder
       def initialize(schemata)
         @schemata = schemata
@@ -26,6 +83,7 @@ module Rack
 
       blobs = options[:schema] || raise("need option `schema`")
       blobs = [blobs] if !blobs.is_a?(Array)
+      @params_key = options[:params_key] || "committee.params"
 
       @schemata = {}
       blobs.map { |b| MultiJson.decode(b) }.each do |schema|
@@ -35,6 +93,7 @@ module Rack
     end
 
     def call(env)
+      env[@params_key] = RequestUnpacker.new(env).call
       if method_routes = @routes[env["REQUEST_METHOD"]]
         method_routes.each do |pattern, link|
           if env["PATH_INFO"] =~ pattern
@@ -43,6 +102,9 @@ module Rack
         end
       end
       @app.call(env)
+    rescue BadRequest
+      [400, { "Content-Type" => "application/json; charset=utf-8" },
+        [MultiJson.encode(id: :bad_request, error: $1.message)]]
     end
   end
 end

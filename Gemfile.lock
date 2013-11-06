@@ -3,6 +3,7 @@ PATH
   specs:
     rack-committee (0.1)
       multi_json (> 0.0)
+      rack (> 0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -16,6 +17,5 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  rack
   rack-committee!
   rack-test
