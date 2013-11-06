@@ -5,6 +5,37 @@ module Rack
     class BadRequest < StandardError
     end
 
+    class InvalidParams < StandardError
+    end
+
+    class ParamValidator
+      def initialize(params, link_schema)
+        @params = params
+        @link_schema = link_schema
+      end
+
+      def call
+        detect_missing!
+        detect_extra!
+      end
+
+      private
+
+      def detect_extra!
+        extra = @params.keys - @link_schema["schema"]["properties"].keys
+        if extra.count > 0
+          raise InvalidParams.new("Unknown params: #{missing.join(', ')}.")
+        end
+      end
+
+      def detect_missing!
+        missing = @link_schema["schema"]["required"] - @params.keys
+        if missing.count > 0
+          raise InvalidParams.new("Require params: #{missing.join(', ')}.")
+        end
+      end
+    end
+
     class RequestUnpacker
       def initialize(env)
         @request = Rack::Request.new(env)
@@ -101,8 +132,7 @@ module Rack
       if method_routes = @routes[env["REQUEST_METHOD"]]
         method_routes.each do |pattern, link|
           if env["PATH_INFO"] =~ pattern
-            puts "COMMITTEE"
-p link
+            ParamValidator.new(env[@params_key], link).call
           end
         end
       end

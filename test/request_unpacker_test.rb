@@ -27,6 +27,15 @@ describe Rack::Committee::RequestUnpacker do
     assert_equal({}, params)
   end
 
+  it "unpacks params on Content-Type: application/x-www-form-urlencoded" do
+    env = {
+      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+      "rack.input"   => StringIO.new("x=y"),
+    }
+    params = Rack::Committee::RequestUnpacker.new(env).call
+    assert_equal({ "x" => "y" }, params)
+  end
+
   it "errors if JSON is not an object" do
     env = {
       "CONTENT_TYPE" => "application/json",
