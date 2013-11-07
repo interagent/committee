@@ -4,6 +4,96 @@
   "title":        "App",
   "type":         ["object"],
   "definitions": {
+    "archived_at": {
+      "description":  "when app was archived",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["null", "string"]
+    },
+    "buildpack_provided_description": {
+      "description":  "description from buildpack of app",
+      "example":      "Ruby/Rack",
+      "readOnly":     true,
+      "type":         ["null", "string"]
+    },
+    "created_at": {
+      "description":  "when app was created",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "git_url": {
+      "description":  "git repo URL of app",
+      "example":      "git@heroku.com/example.git",
+      "format":       "uri",
+      "pattern":      "^git@heroku\\.com/[a-z][a-z0-9-]{3,30}\\.git$",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "id": {
+      "description":  "unique identifier of app",
+      "example":      "01234567-89ab-cdef-0123-456789abcdef",
+      "format":       "uuid",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "identity": {
+      "anyOf": [
+        { "$ref": "/schema/app#/definitions/id" },
+        { "$ref": "/schema/app#/definitions/name" }
+      ]
+    },
+    "maintenance": {
+      "default":      false,
+      "description":  "maintenance status of app",
+      "example":      false,
+      "type":         ["boolean"]
+    },
+    "name": {
+      "description":  "unique name of app",
+      "example":      "example",
+      "pattern":      "^[a-z][a-z0-9-]{3,30}$",
+      "type":         ["string"]
+    },
+    "released_at": {
+      "default":      null,
+      "description":  "when app was released",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["null", "string"]
+    },
+    "repo_size": {
+      "default":      null,
+      "description":  "git repo size in bytes of app",
+      "example":      0,
+      "readOnly":     true,
+      "type":         ["integer", "null"]
+    },
+    "slug_size": {
+      "default":      null,
+      "description":  "slug size in bytes of app",
+      "example":      0,
+      "readOnly":     true,
+      "type":         ["integer", "null"]
+    },
+    "updated_at": {
+      "description":  "when app was updated",
+      "example":      "2012-01-01T12:00:00Z",
+      "format":       "date-time",
+      "readOnly":     true,
+      "type":         ["string"]
+    },
+    "web_url": {
+      "description":  "web URL of app",
+      "example":      "http://example.herokuapp.com",
+      "format":       "uri",
+      "pattern":      "^http://[a-z][a-z0-9-]{3,30}\\.herokuapp\\.com$",
+      "readOnly":     true,
+      "type":         ["string"]
+    }
   },
   "links": [
     {
@@ -56,5 +146,41 @@
     }
   ],
   "properties": {
+    "archived_at":                    { "$ref": "/schema/app#/definitions/archived_at" },
+    "buildpack_provided_description": { "$ref": "/schema/app#/definitions/buildpack_provided_description" },
+    "created_at":                     { "$ref": "/schema/app#/definitions/created_at" },
+    "git_url":                        { "$ref": "/schema/app#/definitions/git_url" },
+    "id":                             { "$ref": "/schema/app#/definitions/id" },
+    "maintenance":                    { "$ref": "/schema/app#/definitions/maintenance" },
+    "name":                           { "$ref": "/schema/app#/definitions/name" },
+    "owner": {
+      "description":  "identity of app owner",
+      "properties": {
+        "email":  { "$ref": "/schema/account#/definitions/email" },
+        "id":     { "$ref": "/schema/account#/definitions/id" }
+      },
+      "type":         ["object"]
+    },
+    "region": {
+      "description":  "identity of app region",
+      "properties": {
+        "id":   { "$ref":  "/schema/region#/definitions/id" },
+        "name": { "$ref":  "/schema/region#/definitions/name" }
+      },
+      "type":         ["object"]
+    },
+    "released_at":                    { "$ref": "/schema/app#/definitions/released_at" },
+    "repo_size":                      { "$ref": "/schema/app#/definitions/repo_size" },
+    "slug_size":                      { "$ref": "/schema/app#/definitions/slug_size" },
+    "stack": {
+      "description": "identity of app stack",
+      "properties": {
+        "id":   { "$ref":  "/schema/stack#/definitions/id" },
+        "name": { "$ref":  "/schema/stack#/definitions/name" }
+      },
+      "type":         ["object"]
+    },
+    "updated_at":                     { "$ref": "/schema/app#/definitions/updated_at" },
+    "web_url":                        { "$ref": "/schema/app#/definitions/web_url" }
   }
 }

@@ -6,13 +6,13 @@ module Rack::Committee
 
     def routes?(method, path)
       if method_routes = @routes[method]
-        method_routes.each do |pattern, link|
+        method_routes.each do |pattern, link, schema|
           if path =~ pattern
-            return link
+            return link, schema
           end
         end
       end
-      return nil
+      [nil, nil]
     end
 
     def routes_request?(request)
@@ -28,7 +28,7 @@ module Rack::Committee
           routes[link["method"]] ||= []
           # /apps/{id} --> /apps/([^/]+)
           pattern = link["href"].gsub(/\{(.*)\}/, "([^/]+)")
-          routes[link["method"]] << [Regexp.new(pattern), link]
+          routes[link["method"]] << [Regexp.new(pattern), link, schema]
         end
       end
       routes

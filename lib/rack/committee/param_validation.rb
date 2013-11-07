@@ -1,19 +1,5 @@
 module Rack::Committee
-  class ParamValidation
-    def initialize(app, options={})
-      @app = app
-
-      blobs = options[:schema] || raise("need option `schema`")
-      blobs = [blobs] if !blobs.is_a?(Array)
-      @params_key = options[:params_key] || "committee.params"
-
-      @schemata = {}
-      blobs.map { |b| MultiJson.decode(b) }.each do |schema|
-        @schemata[schema["id"]] = schema
-      end
-      @router = Router.new(@schemata)
-    end
-
+  class ParamValidation < Base
     def call(env)
       request = Rack::Request.new(env)
       env[@params_key] = RequestUnpacker.new(request).call
