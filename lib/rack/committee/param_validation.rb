@@ -3,7 +3,8 @@ module Rack::Committee
     def call(env)
       request = Rack::Request.new(env)
       env[@params_key] = RequestUnpacker.new(request).call
-      if link = @router.routes_request?(request)
+      link, _ = @router.routes_request?(request)
+      if link
         ParamValidator.new(env[@params_key], link).call
       end
       @app.call(env)

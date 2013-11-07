@@ -2,18 +2,19 @@ require_relative "test_helper"
 
 describe Rack::Committee::ResponseValidator do
   before do
-    @schema = MultiJson.decode(File.read("./test/schema.json"))
+    data = MultiJson.decode(File.read("./test/schema.json"))
+    @type_schema = data["definitions"]["app"]
   end
 
   it "passes through a valid response" do
-    Rack::Committee::ResponseValidator.new(valid_data, @schema).call
+    Rack::Committee::ResponseValidator.new(valid_data, @type_schema).call
   end
 
   it "detects missing keys in response" do
     data = valid_data
     data.delete("name")
     assert_raises(Rack::Committee::ResponseError) do
-      Rack::Committee::ResponseValidator.new(data, @schema).call
+      Rack::Committee::ResponseValidator.new(data, @type_schema).call
     end
   end
 
@@ -21,7 +22,7 @@ describe Rack::Committee::ResponseValidator do
     data = valid_data
     data.merge!("tier" => "important")
     assert_raises(Rack::Committee::ResponseError) do
-      Rack::Committee::ResponseValidator.new(data, @schema).call
+      Rack::Committee::ResponseValidator.new(data, @type_schema).call
     end
   end
 

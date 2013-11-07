@@ -1,8 +1,8 @@
 module Rack::Committee
   class ResponseValidator
-    def initialize(data, schema)
+    def initialize(data, type_schema)
       @data = data
-      @schema = schema
+      @type_schema = type_schema
     end
 
     def call
@@ -37,7 +37,7 @@ module Rack::Committee
 
     def build_schema_keys
       keys = []
-      @schema["properties"].each do |key, info|
+      @type_schema["properties"].each do |key, info|
         if info["properties"]
           keys += info["properties"].keys.map { |k| "#{key}:#{k}" }
         else

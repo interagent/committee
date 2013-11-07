@@ -3,15 +3,10 @@ module Rack::Committee
     def initialize(app, options={})
       @app = app
 
-      blobs = options[:schema] || raise("need option `schema`")
-      blobs = [blobs] if !blobs.is_a?(Array)
       @params_key = options[:params_key] || "committee.params"
-
-      @schemata = {}
-      blobs.map { |b| MultiJson.decode(b) }.each do |schema|
-        @schemata[schema["id"]] = schema
-      end
-      @router = Router.new(@schemata)
+      data = options[:schema] || raise("need option `schema`")
+      @schema = Schema.new(data)
+      @router = Router.new(@schema)
     end
 
     private

@@ -1,7 +1,7 @@
 module Rack::Committee
   class Router
-    def initialize(schemata)
-      @routes = build_routes(schemata)
+    def initialize(schema)
+      @routes = build_routes(schema)
     end
 
     def routes?(method, path)
@@ -21,14 +21,15 @@ module Rack::Committee
 
     private
 
-    def build_routes(schemata)
+    def build_routes(schema)
       routes = {}
-      schemata.each do |_, schema|
-        schema["links"].each do |link|
+      schema.each do |_, type_schema|
+        type_schema["links"].each do |link|
           routes[link["method"]] ||= []
           # /apps/{id} --> /apps/([^/]+)
           pattern = link["href"].gsub(/\{(.*)\}/, "([^/]+)")
-          routes[link["method"]] << [Regexp.new(pattern), link, schema]
+          routes[link["method"]] <<
+            [Regexp.new(pattern), link, type_schema]
         end
       end
       routes

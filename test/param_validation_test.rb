@@ -16,6 +16,5 @@ describe Rack::Committee::ParamValidation do
 
   it "x" do
     post "/apps"
-p last_response.body
   end
 end

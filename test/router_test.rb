@@ -2,8 +2,9 @@ require_relative "test_helper"
 
 describe Rack::Committee::Router do
   before do
-    @schemata = { "schema/app" => MultiJson.decode(File.read("./test/schema.json")) }
-    @router = Rack::Committee::Router.new(@schemata)
+    data = File.read("./test/schema.json")
+    schema = Rack::Committee::Schema.new(data)
+    @router = Rack::Committee::Router.new(schema)
   end
 
   it "builds routes without parameters" do
