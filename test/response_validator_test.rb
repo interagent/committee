@@ -7,11 +7,11 @@ describe Rack::Committee::ResponseValidator do
   end
 
   it "passes through a valid response" do
-    Rack::Committee::ResponseValidator.new(valid_data, @type_schema).call
+    Rack::Committee::ResponseValidator.new(valid_app, @type_schema).call
   end
 
   it "detects missing keys in response" do
-    data = valid_data
+    data = valid_app
     data.delete("name")
     message = "Missing keys in response: name."
     assert_raises(Rack::Committee::InvalidResponse, message) do
@@ -20,7 +20,7 @@ describe Rack::Committee::ResponseValidator do
   end
 
   it "detects extra keys in response" do
-    data = valid_data
+    data = valid_app
     data.merge!("tier" => "important")
     message = "Extra keys in response: tier."
     assert_raises(Rack::Committee::InvalidResponse, message) do
@@ -28,7 +28,7 @@ describe Rack::Committee::ResponseValidator do
     end
   end
 
-  def valid_data
+  def valid_app
     {
       "archived_at"                    => "",
       "buildpack_provided_description" => "",
