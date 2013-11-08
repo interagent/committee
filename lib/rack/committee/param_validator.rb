@@ -13,19 +13,26 @@ module Rack::Committee
     private
 
     def detect_extra!
-      properties = @link_schema["schema"]["properties"] || []
-      extra = @params.keys - properties.keys
+      extra = @params.keys - all_keys
       if extra.count > 0
         raise InvalidParams.new("Unknown params: #{missing.join(', ')}.")
       end
     end
 
     def detect_missing!
-      required = @link_schema["schema"]["required"] || []
-      missing = required - @params.keys
+      missing = required_keys - @params.keys
       if missing.count > 0
         raise InvalidParams.new("Require params: #{missing.join(', ')}.")
       end
+    end
+
+    def all_keys
+      properties = @link_schema["schema"] && @link_schema["schema"]["properties"]
+      properties && properties.keys || []
+    end
+
+    def required_keys
+      (@link_schema["schema"] && @link_schema["schema"]["required"]) || []
     end
   end
 end

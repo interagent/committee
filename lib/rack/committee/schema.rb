@@ -18,10 +18,7 @@ module Rack::Committee
 
     def find(ref)
       parts = ref.split("/")
-      parts.shift if parts.first == ""
-      parts.shift if parts.first == "schema"
-      parts.each { |p| p.chomp!("#") }
-      parts.unshift("definitions")
+      parts.shift if parts.first == "#"
       pointer = @schema
       parts.each { |p|
         next unless pointer

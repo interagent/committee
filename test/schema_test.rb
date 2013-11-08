@@ -20,7 +20,7 @@ describe Rack::Committee::Schema do
       "readOnly"    => true,
       "type"        => ["integer", "null"]
     }
-    assert_equal expected, @schema.find("/schema/app#/definitions/slug_size")
+    assert_equal expected, @schema.find("#/definitions/app/definitions/slug_size")
   end
 
   it "raises error on a non-existent definition" do
