@@ -4,6 +4,7 @@ module Rack::Committee
 
     def initialize(data)
       @schema = MultiJson.decode(data)
+      manifest_regex
     end
 
     def [](type)
@@ -26,6 +27,18 @@ module Rack::Committee
       }
       raise ReferenceNotFound, "Reference not found: #{ref}." if !pointer
       pointer
+    end
+
+    private
+
+    def manifest_regex
+      @schema["definitions"].each do |_, type_schema|
+        type_schema["definitions"].each do |_, property_schema|
+          if pattern = property_schema["pattern"]
+            property_schema["pattern"] = Regexp.new(pattern)
+          end
+        end
+      end
     end
   end
 end

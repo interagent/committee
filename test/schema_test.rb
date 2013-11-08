@@ -28,4 +28,9 @@ describe Rack::Committee::Schema do
       @schema.find("/schema/app#/definitions/bad_field")
     end
   end
+
+  it "materializes regexes" do
+    definition = @schema.find("#/definitions/app/definitions/git_url")
+    assert definition["pattern"].is_a?(Regexp)
+  end
 end

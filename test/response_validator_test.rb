@@ -35,4 +35,13 @@ describe Rack::Committee::ResponseValidator do
       Rack::Committee::ResponseValidator.new(data, @schema, @schema["app"]).call
     end
   end
+
+  it "detects bad patterns" do
+    data = ValidApp.dup
+    data.merge!("name" => "%@!")
+    message = %{Invalid pattern at "name": expected %@! to match (?-mix:^[a-z][a-z0-9-]{3,30}$).}
+    assert_raises(Rack::Committee::InvalidResponse, message) do
+      Rack::Committee::ResponseValidator.new(data, @schema, @schema["app"]).call
+    end
+  end
 end

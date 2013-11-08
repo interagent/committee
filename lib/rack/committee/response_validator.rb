@@ -31,7 +31,15 @@ module Rack::Committee
         else
           definition = @schema.find(value["$ref"])
           check_type!(definition["type"], data[key], path + [key])
+          check_pattern!(definition["pattern"], data[key], path + [key])
         end
+      end
+    end
+
+    def check_pattern!(pattern, value, path)
+      if pattern && !(value =~ pattern)
+        raise InvalidResponse,
+          %{Invalid pattern at "#{path.join(":")}": expected #{value} to match #{pattern}.}
       end
     end
 
