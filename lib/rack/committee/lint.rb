@@ -1,17 +1,19 @@
 module Rack::Committee
   class Lint < Base
     def call(env)
-      status, headers, response = @app.call
+      status, headers, response = @app.call(env)
+      request = Rack::Request.new(env)
       _, schema = @router.routes_request?(request)
       if schema
-        data = MultiJson.decode(response)
-        ResponseValidator.new(data, schema).call
+        str = ""
+        response.each { |s| str << s }
+        ResponseValidator.new(MultiJson.decode(str), schema).call
       end
       [status, headers, response]
- #  rescue BadRequest
- #    render_error(400, :bad_request, $!.message)
- #  rescue InvalidParams
- #    render_error(422, :invalid_params, $!.message)
+    rescue MultiJson::LoadError
+      render_error(500, :invalid_response, "Response wasn't valid JSON.")
+    rescue InvalidResponse
+      render_error(500, :invalid_response, $!.message)
     end
 
     private

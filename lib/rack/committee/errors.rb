@@ -5,6 +5,6 @@ module Rack::Committee
   class InvalidParams < StandardError
   end
 
-  class ResponseError < StandardError
+  class InvalidResponse < StandardError
   end
 end

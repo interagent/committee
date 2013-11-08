@@ -9,15 +9,15 @@ module Rack::Committee
       data_keys = build_data_keys
       schema_keys = build_schema_keys
 
-      missing = schema_keys - data_keys
       extra = data_keys - schema_keys
-
-      if missing.count > 0
-        raise ResponseError.new("Missing keys in response: #{extra.join(', ')}.")
-      end
+      missing = schema_keys - data_keys
 
       if extra.count > 0
-        raise ResponseError.new("Extra keys in response: #{extra.join(', ')}.")
+        raise InvalidResponse.new("Extra keys in response: #{extra.join(', ')}.")
+      end
+
+      if missing.count > 0
+        raise InvalidResponse.new("Missing keys in response: #{missing.join(', ')}.")
       end
     end
 
