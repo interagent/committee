@@ -1,6 +1,212 @@
 {
   "description": "The platform API empowers developers to automate, extend and combine Heroku with other services.",
   "definitions": {
+    "account": {
+      "description": "An account represents an individual signed up to use the Heroku platform.",
+      "id": "schema/account",
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "title": "Heroku Platform API - Account",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "allow_tracking": {
+          "default": true,
+          "description": "whether to allow third party web activity tracking",
+          "example": true,
+          "type": [
+            "boolean"
+          ]
+        },
+        "beta": {
+          "default": false,
+          "description": "whether to utilize beta Heroku features",
+          "example": false,
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "created_at": {
+          "description": "when account was created",
+          "example": "2012-01-01T12:00:00Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "email": {
+          "description": "unique email address of account",
+          "example": "username@example.com",
+          "format": "email",
+          "type": [
+            "string"
+          ]
+        },
+        "id": {
+          "description": "unique identifier of an account",
+          "example": "01234567-89ab-cdef-0123-456789abcdef",
+          "format": "uuid",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "identity": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/account/definitions/email"
+            },
+            {
+              "$ref": "#/definitions/account/definitions/id"
+            }
+          ]
+        },
+        "last_login": {
+          "description": "when account last authorized with Heroku",
+          "example": "2012-01-01T12:00:00Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "new_password": {
+          "description": "the new password for the account when changing the password",
+          "example": "newpassword",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "password": {
+          "description": "current password on the account",
+          "example": "currentpassword",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "updated_at": {
+          "description": "when account was updated",
+          "example": "2012-01-01T12:00:00Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "verified": {
+          "default": false,
+          "description": "whether account has been verified with billing information",
+          "example": false,
+          "type": [
+            "boolean"
+          ]
+        }
+      },
+      "links": [
+        {
+          "description": "Info for account.",
+          "href": "/account",
+          "method": "GET",
+          "rel": "self",
+          "title": "Info"
+        },
+        {
+          "description": "Update account.",
+          "href": "/account",
+          "method": "PATCH",
+          "rel": "update",
+          "schema": {
+            "properties": {
+              "allow_tracking": {
+                "$ref": "#/definitions/account/definitions/allow_tracking"
+              },
+              "beta": {
+                "$ref": "#/definitions/account/definitions/beta"
+              },
+              "password": {
+                "$ref": "#/definitions/account/definitions/password"
+              }
+            },
+            "required": [
+              "password"
+            ]
+          },
+          "title": "Update"
+        },
+        {
+          "description": "Change Email for account.",
+          "href": "/account",
+          "method": "PATCH",
+          "rel": "update",
+          "schema": {
+            "properties": {
+              "email": {
+                "$ref": "#/definitions/account/definitions/email"
+              },
+              "password": {
+                "$ref": "#/definitions/account/definitions/password"
+              }
+            },
+            "required": [
+              "password",
+              "email"
+            ]
+          },
+          "title": "Change Email"
+        },
+        {
+          "description": "Change Password for account.",
+          "href": "/account",
+          "method": "PATCH",
+          "rel": "update",
+          "schema": {
+            "properties": {
+              "new_password": {
+                "$ref": "#/definitions/account/definitions/new_password"
+              },
+              "password": {
+                "$ref": "#/definitions/account/definitions/password"
+              }
+            },
+            "required": [
+              "new_password",
+              "password"
+            ]
+          },
+          "title": "Change Password"
+        }
+      ],
+      "properties": {
+        "allow_tracking": {
+          "$ref": "#/definitions/account/definitions/allow_tracking"
+        },
+        "beta": {
+          "$ref": "#/definitions/account/definitions/beta"
+        },
+        "created_at": {
+          "$ref": "#/definitions/account/definitions/created_at"
+        },
+        "email": {
+          "$ref": "#/definitions/account/definitions/email"
+        },
+        "id": {
+          "$ref": "#/definitions/account/definitions/id"
+        },
+        "last_login": {
+          "$ref": "#/definitions/account/definitions/last_login"
+        },
+        "updated_at": {
+          "$ref": "#/definitions/account/definitions/updated_at"
+        },
+        "verified": {
+          "$ref": "#/definitions/account/definitions/verified"
+        }
+      }
+    },
     "app": {
       "description":  "Apps. A sample schema.",
       "id":           "schema/app",
@@ -358,6 +564,198 @@
         },
         "updated_at": {
           "$ref": "#/definitions/app-transfer/definitions/updated_at"
+        }
+      }
+    },
+    "region": {
+      "description": "A region represents a geographic location in which your application may run.",
+      "id": "schema/region",
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "title": "Heroku Platform API - Region",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "created_at": {
+          "description": "when region was created",
+          "example": "2012-01-01T12:00:00Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "description": {
+          "description": "description of region",
+          "example": "United States",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "id": {
+          "description": "unique identifier of region",
+          "example": "01234567-89ab-cdef-0123-456789abcdef",
+          "format": "uuid",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "identity": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/region/definitions/id"
+            },
+            {
+              "$ref": "#/definitions/region/definitions/name"
+            }
+          ]
+        },
+        "name": {
+          "description": "unique name of region",
+          "example": "us",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "updated_at": {
+          "description": "when region was updated",
+          "example": "2012-01-01T12:00:00Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        }
+      },
+      "links": [
+        {
+          "description": "Info for existing region.",
+          "href": "/regions/{(%23%2Fdefinitions%2Fregion%2Fdefinitions%2Fidentity)}",
+          "method": "GET",
+          "rel": "self",
+          "title": "Info"
+        },
+        {
+          "description": "List existing regions.",
+          "href": "/regions",
+          "method": "GET",
+          "rel": "instances",
+          "title": "List"
+        }
+      ],
+      "properties": {
+        "created_at": {
+          "$ref": "#/definitions/region/definitions/created_at"
+        },
+        "description": {
+          "$ref": "#/definitions/region/definitions/description"
+        },
+        "id": {
+          "$ref": "#/definitions/region/definitions/id"
+        },
+        "name": {
+          "$ref": "#/definitions/region/definitions/name"
+        },
+        "updated_at": {
+          "$ref": "#/definitions/region/definitions/updated_at"
+        }
+      }
+    },
+    "stack": {
+      "description": "Stacks are the different application execution environment available in the Heroku platform.",
+      "id": "schema/stack",
+      "$schema": "http://json-schema.org/draft-04/hyper-schema",
+      "title": "Heroku Platform API - Stack",
+      "type": [
+        "object"
+      ],
+      "definitions": {
+        "created_at": {
+          "description": "when stack was introduced",
+          "example": "2012-01-01T12:00:00Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "id": {
+          "description": "unique identifier of stack",
+          "example": "01234567-89ab-cdef-0123-456789abcdef",
+          "format": "uuid",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        },
+        "identity": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/stack/definitions/name"
+            },
+            {
+              "$ref": "#/definitions/stack/definitions/id"
+            }
+          ]
+        },
+        "name": {
+          "description": "unique name of stack",
+          "example": "cedar",
+          "type": [
+            "string"
+          ]
+        },
+        "state": {
+          "description": "availability of this stack: beta, deprecated or public",
+          "example": "public",
+          "type": [
+            "string"
+          ]
+        },
+        "updated_at": {
+          "description": "when stack was last modified",
+          "example": "2012-01-01T12:00:00Z",
+          "format": "date-time",
+          "readOnly": true,
+          "type": [
+            "string"
+          ]
+        }
+      },
+      "links": [
+        {
+          "description": "Stack info.",
+          "href": "/stacks/{(%23%2Fdefinitions%2Fstack%2Fdefinitions%2Fidentity)}",
+          "method": "GET",
+          "rel": "self",
+          "title": "Info"
+        },
+        {
+          "description": "List available stacks.",
+          "href": "/stacks",
+          "method": "GET",
+          "rel": "instances",
+          "title": "List"
+        }
+      ],
+      "properties": {
+        "created_at": {
+          "$ref": "#/definitions/stack/definitions/created_at"
+        },
+        "id": {
+          "$ref": "#/definitions/stack/definitions/id"
+        },
+        "name": {
+          "$ref": "#/definitions/stack/definitions/name"
+        },
+        "state": {
+          "$ref": "#/definitions/stack/definitions/state"
+        },
+        "updated_at": {
+          "$ref": "#/definitions/stack/definitions/updated_at"
         }
       }
     }

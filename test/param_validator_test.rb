@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 describe Rack::Committee::ParamValidator do
   before do
-    data = MultiJson.decode(File.read("./test/schema.json"))
+    data = MultiJson.decode(File.read("./test/data/schema.json"))
     @link_schema = data["definitions"]["app-transfer"]["links"][0]
   end
 

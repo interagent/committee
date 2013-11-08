@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 describe Rack::Committee::Router do
   before do
-    data = File.read("./test/schema.json")
+    data = File.read("./test/data/schema.json")
     schema = Rack::Committee::Schema.new(data)
     @router = Rack::Committee::Router.new(schema)
   end

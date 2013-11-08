@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 describe Rack::Committee::Schema do
   before do
-    data = File.read("./test/schema.json")
+    data = File.read("./test/data/schema.json")
     @schema = Rack::Committee::Schema.new(data)
   end
 
@@ -21,5 +21,11 @@ describe Rack::Committee::Schema do
       "type"        => ["integer", "null"]
     }
     assert_equal expected, @schema.find("/schema/app#/definitions/slug_size")
+  end
+
+  it "raises error on a non-existent definition" do
+    assert_raises(Rack::Committee::ReferenceNotFound) do
+      @schema.find("/schema/app#/definitions/bad_field")
+    end
   end
 end

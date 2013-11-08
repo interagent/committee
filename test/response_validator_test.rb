@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 describe Rack::Committee::ResponseValidator do
   before do
-    data = MultiJson.decode(File.read("./test/schema.json"))
+    data = MultiJson.decode(File.read("./test/data/schema.json"))
     @type_schema = data["definitions"]["app"]
   end
 

@@ -1,6 +1,7 @@
 module Rack::Committee
   class ResponseGenerator
-    def initialize(type_schema)
+    def initialize(schema, type_schema)
+      @schema = schema
       @type_schema = type_schema
     end
 
@@ -16,7 +17,8 @@ module Rack::Committee
         data[name] = if value["properties"]
           generate_properties(value)
         else
-          "abc"
+          definition = @schema.find(value["$ref"])
+          definition["example"]
         end
       end
       data

@@ -6,6 +6,10 @@ module Rack::Committee
       @schema = MultiJson.decode(data)
     end
 
+    def [](type)
+      @schema["definitions"][type]
+    end
+
     def each
       @schema["definitions"].each do |type, type_schema|
         yield(type, type_schema)
@@ -19,7 +23,11 @@ module Rack::Committee
       parts.each { |p| p.chomp!("#") }
       parts.unshift("definitions")
       pointer = @schema
-      parts.each { |p| pointer = pointer[p] }
+      parts.each { |p|
+        next unless pointer
+        pointer = pointer[p]
+      }
+      raise ReferenceNotFound, "Reference not found: #{ref}." if !pointer
       pointer
     end
   end

@@ -7,4 +7,7 @@ module Rack::Committee
 
   class InvalidResponse < StandardError
   end
+
+  class ReferenceNotFound < StandardError
+  end
 end

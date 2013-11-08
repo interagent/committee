@@ -1,7 +1,7 @@
 require_relative "test_helper"
 
 App = Rack::Builder.new {
-  use Rack::Committee::ParamValidation, schema: File.read("./test/schema.json")
+  use Rack::Committee::ParamValidation, schema: File.read("./test/data/schema.json")
   run lambda { |_|
     [200, {}, []]
   }
