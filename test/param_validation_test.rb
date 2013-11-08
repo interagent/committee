@@ -26,7 +26,7 @@ describe Rack::Committee::ParamValidation do
 
   it "passes through a valid request" do
     params = {
-      "app" => "www",
+      "app" => "heroku-api",
       "recipient" => "owner@heroku.com",
     }
     post "/account/app-transfers", MultiJson.encode(params)

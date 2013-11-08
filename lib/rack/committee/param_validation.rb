@@ -5,7 +5,7 @@ module Rack::Committee
       env[@params_key] = RequestUnpacker.new(request).call
       link, _ = @router.routes_request?(request)
       if link
-        ParamValidator.new(env[@params_key], schema, link).call
+        ParamValidator.new(env[@params_key], @schema, link).call
       end
       @app.call(env)
     rescue BadRequest
