@@ -1,0 +1,43 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+
+require_relative "../lib/rack/committee"
+
+args = ARGV.dup
+options = { Port: 9292 }
+opt_parser = OptionParser.new do |opts|
+  opts.banner = "Usage: rackup [options] [JSON Schema file]"
+
+  opts.separator ""
+  opts.separator "Options:"
+
+  opts.on_tail("-h", "-?", "--help", "Show this message") {
+    puts opts
+    exit
+  }
+
+  opts.on("-p", "--port PORT", "use PORT (default: 9292)") { |port|
+    options[:Port] = port
+  }
+end
+opt_parser.parse!(args)
+
+unless args.count == 1
+  puts opt_parser.to_s
+  exit
+end
+
+schema = File.read(args[0])
+
+app = Rack::Builder.new {
+  use Rack::Committee::ParamValidation, schema: schema
+  use Rack::Committee::Stub, schema: schema
+  use Rack::Committee::Lint, schema: schema
+  run lambda { |_|
+    [404, {}, []]
+  }
+}
+
+options[:app] = app
+Rack::Server.start(options)
