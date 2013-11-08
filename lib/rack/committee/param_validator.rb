@@ -14,6 +14,11 @@ module Rack::Committee
 
     private
 
+    def all_keys
+      properties = @link_schema["schema"] && @link_schema["schema"]["properties"]
+      properties && properties.keys || []
+    end
+
     def check_data!
       @link_schema["schema"]["properties"].each do |key, value|
         # don't try to check this unless it was actually specificed
@@ -41,17 +46,6 @@ module Rack::Committee
       end
     end
 
-    def check_pattern(pattern, value, key)
-      !pattern || value =~ pattern
-    end
-
-    def check_pattern!(pattern, value, key)
-      unless check_pattern(pattern, value, key)
-        raise InvalidParams,
-          %{Invalid pattern for key "#{key}": expected #{value} to match #{pattern}.}
-      end
-    end
-
     def check_format(format, value, key)
       case format
       when "date-time"
@@ -69,6 +63,17 @@ module Rack::Committee
       unless check_format(format, value, key)
         raise InvalidParams,
           %{Invalid format for key "#{key}": expected "#{value}" to be "#{format}".}
+      end
+    end
+
+    def check_pattern(pattern, value, key)
+      !pattern || value =~ pattern
+    end
+
+    def check_pattern!(pattern, value, key)
+      unless check_pattern(pattern, value, key)
+        raise InvalidParams,
+          %{Invalid pattern for key "#{key}": expected #{value} to match #{pattern}.}
       end
     end
 
@@ -116,11 +121,6 @@ module Rack::Committee
       else
         [definition]
       end
-    end
-
-    def all_keys
-      properties = @link_schema["schema"] && @link_schema["schema"]["properties"]
-      properties && properties.keys || []
     end
 
     def required_keys
