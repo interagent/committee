@@ -27,7 +27,7 @@ module Rack::Committee
         type_schema["links"].each do |link|
           routes[link["method"]] ||= []
           # /apps/{id} --> /apps/([^/]+)
-          pattern = link["href"].gsub(/\{(.*)\}/, "([^/]+)")
+          pattern = link["href"].gsub(/\{(.*?)\}/, "[^/]+")
           routes[link["method"]] <<
             [Regexp.new(pattern), link, type_schema]
         end
