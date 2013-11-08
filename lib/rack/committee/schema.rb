@@ -23,10 +23,10 @@ module Rack::Committee
         parts = ref.split("/")
         parts.shift if parts.first == "#"
         pointer = @schema
-        parts.each { |p|
+        parts.each do |p|
           next unless pointer
           pointer = pointer[p]
-        }
+        end
         raise ReferenceNotFound, "Reference not found: #{ref}." if !pointer
         pointer
       end
