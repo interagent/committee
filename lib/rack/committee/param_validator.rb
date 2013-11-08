@@ -20,6 +20,8 @@ module Rack::Committee
     end
 
     def check_data!
+      return if !@link_schema["schema"] || !@link_schema["schema"]["properties"]
+
       @link_schema["schema"]["properties"].each do |key, value|
         # don't try to check this unless it was actually specificed
         next unless @params.key?(key)
