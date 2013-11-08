@@ -11,4 +11,15 @@ describe Rack::Committee::Schema do
     assert_equal "app", arr[0][0]
     assert arr[0][1].is_a?(Hash)
   end
+
+  it "can lookup definitions" do
+    expected = {
+      "default"     => nil,
+      "description" => "slug size in bytes of app",
+      "example"     => 0,
+      "readOnly"    => true,
+      "type"        => ["integer", "null"]
+    }
+    assert_equal expected, @schema.find("/schema/app#/definitions/slug_size")
+  end
 end
