@@ -15,7 +15,7 @@ describe Rack::Committee::Lint do
   end
 
   it "detects missing keys in response" do
-    data = valid_app
+    data = ValidApp.dup
     data.delete("name")
     @app = new_rack_app(MultiJson.encode(data))
     get "/apps"
@@ -24,7 +24,7 @@ describe Rack::Committee::Lint do
   end
 
   it "detects extra keys in response" do
-    data = valid_app
+    data = ValidApp.dup
     data.merge!("tier" => "important")
     @app = new_rack_app(MultiJson.encode(data))
     get "/apps"
@@ -38,35 +38,6 @@ describe Rack::Committee::Lint do
       run lambda { |_|
         [200, {}, [response]]
       }
-    }
-  end
-
-  def valid_app
-    {
-      "archived_at"                    => "",
-      "buildpack_provided_description" => "",
-      "created_at"                     => "",
-      "id"                             => "",
-      "git_url"                        => "",
-      "maintenance"                    => "",
-      "name"                           => "",
-      "owner"                          => {
-        "email"                        => "",
-        "id"                           => "",
-      },
-      "region"                         => {
-        "id"                           => "",
-        "name"                         => "",
-      },
-      "released_at"                    => "",
-      "repo_size"                      => "",
-      "slug_size"                      => "",
-      "stack"                          => {
-        "id"                           => "",
-        "name"                         => "",
-      },
-      "updated_at"                     => "",
-      "web_url"                        => "",
     }
   end
 end
