@@ -3,11 +3,11 @@ module Rack::Committee
     def call(env)
       status, headers, response = @app.call(env)
       request = Rack::Request.new(env)
-      _, schema = @router.routes_request?(request)
-      if schema
+      _, type_schema = @router.routes_request?(request)
+      if type_schema
         str = ""
         response.each { |s| str << s }
-        ResponseValidator.new(MultiJson.decode(str), schema).call
+        ResponseValidator.new(MultiJson.decode(str), @schema, type_schema).call
       end
       [status, headers, response]
     rescue MultiJson::LoadError

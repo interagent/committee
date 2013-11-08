@@ -1,7 +1,8 @@
 module Rack::Committee
   class ResponseValidator
-    def initialize(data, type_schema)
+    def initialize(data, schema, type_schema)
       @data = data
+      @schema = schema
       @type_schema = type_schema
     end
 
@@ -18,6 +19,51 @@ module Rack::Committee
 
       if missing.count > 0
         raise InvalidResponse.new("Missing keys in response: #{missing.join(', ')}.")
+      end
+
+      check_data!(@type_schema, @data, [])
+    end
+
+    def check_data!(schema, data, path)
+      schema["properties"].each do |key, value|
+        if value["properties"]
+          check_data!(value, data[key], path + [key])
+        else
+          definition = @schema.find(value["$ref"])
+          check_type!(definition["type"], data[key], path + [key])
+        end
+      end
+    end
+
+    def check_type!(types, value, path)
+      type = if value.class == NilClass
+        "null"
+      elsif value.class == TrueClass || value.class == FalseClass
+        "boolean"
+      elsif value.class == Fixnum
+        "integer"
+      elsif value.class == String
+        "string"
+      else
+        "unknown"
+      end
+=begin
+      type = case value.class
+      when NilClass
+        "null"
+      when TrueClass, FalseClass
+        "boolean"
+      when Fixnum
+        "integer"
+      when String
+        "string"
+      else
+        "unknown"
+      end
+=end
+      unless types.include?(type)
+        raise InvalidResponse,
+          %{Invalid type at "#{path.join(":")}": expected #{value} to be #{types} (was: #{type}).}
       end
     end
 

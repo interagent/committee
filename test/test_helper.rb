@@ -9,28 +9,28 @@ Bundler.require(:development)
 require_relative "../lib/rack/committee"
 
 ValidApp = {
-  "archived_at"                    => "",
-  "buildpack_provided_description" => "",
-  "created_at"                     => "",
-  "id"                             => "",
-  "git_url"                        => "",
-  "maintenance"                    => "",
-  "name"                           => "",
+  "archived_at"                    => "2012-01-01T12:00:00Z",
+  "buildpack_provided_description" => "Ruby/Rack",
+  "created_at"                     => "2012-01-01T12:00:00Z",
+  "git_url"                        => "git@heroku.com/example.git",
+  "id"                             => "01234567-89ab-cdef-0123-456789abcdef",
+  "maintenance"                    => false,
+  "name"                           => "example",
   "owner"                          => {
-    "email"                        => "",
-    "id"                           => "",
+    "email"                        => "username@example.com",
+    "id"                           => "01234567-89ab-cdef-0123-456789abcdef"
   },
   "region"                         => {
-    "id"                           => "",
-    "name"                         => "",
+    "id"                           => "01234567-89ab-cdef-0123-456789abcdef",
+    "name"                         => "us"
   },
-  "released_at"                    => "",
-  "repo_size"                      => "",
-  "slug_size"                      => "",
+  "released_at"                    => "2012-01-01T12:00:00Z",
+  "repo_size"                      => 0,
+  "slug_size"                      => 0,
   "stack"                          => {
-    "id"                           => "",
-    "name"                         => "",
+    "id"                           => "01234567-89ab-cdef-0123-456789abcdef",
+    "name"                         => "cedar"
   },
-  "updated_at"                     => "",
-  "web_url"                        => "",
+  "updated_at"                     => "2012-01-01T12:00:00Z",
+  "web_url"                        => "http://example.herokuapp.com"
 }.freeze
