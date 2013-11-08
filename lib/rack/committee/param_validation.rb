@@ -13,12 +13,5 @@ module Rack::Committee
     rescue InvalidParams
       render_error(422, :invalid_params, $!.message)
     end
-
-    private
-
-    def render_error(status, id, message)
-      [status, { "Content-Type" => "application/json; charset=utf-8" },
-        [MultiJson.encode(id: id, error: message)]]
-    end
   end
 end

@@ -15,12 +15,5 @@ module Rack::Committee
     rescue InvalidResponse
       render_error(500, :invalid_response, $!.message)
     end
-
-    private
-
-    def render_error(status, id, message)
-      [status, { "Content-Type" => "application/json; charset=utf-8" },
-        [MultiJson.encode(id: id, error: message)]]
-    end
   end
 end
