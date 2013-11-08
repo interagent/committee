@@ -1,17 +1,17 @@
 require_relative "test_helper"
 
-App = Rack::Builder.new {
-  use Rack::Committee::ParamValidation, schema: File.read("./test/data/schema.json")
-  run lambda { |_|
-    [200, {}, []]
-  }
-}
-
 describe Rack::Committee::ParamValidation do
   include Rack::Test::Methods
 
+  StubApp = Rack::Builder.new {
+    use Rack::Committee::ParamValidation, schema: File.read("./test/data/schema.json")
+    run lambda { |_|
+      [200, {}, []]
+    }
+  }
+
   def app
-    App
+    StubApp
   end
 
   before do

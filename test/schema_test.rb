@@ -8,7 +8,7 @@ describe Rack::Committee::Schema do
 
   it "is enumerable" do
     arr = @schema.to_a
-    assert_equal "app", arr[0][0]
+    assert_equal "account", arr[0][0]
     assert arr[0][1].is_a?(Hash)
   end
 

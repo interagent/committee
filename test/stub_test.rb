@@ -1,17 +1,17 @@
 require_relative "test_helper"
 
-App = Rack::Builder.new {
-  use Rack::Committee::Stub, schema: File.read("./test/data/schema.json")
-  run lambda { |_|
-    [200, {}, []]
-  }
-}
-
 describe Rack::Committee::ParamValidation do
   include Rack::Test::Methods
 
+  ParamValidationApp = Rack::Builder.new {
+    use Rack::Committee::Stub, schema: File.read("./test/data/schema.json")
+    run lambda { |_|
+      [200, {}, []]
+    }
+  }
+
   def app
-    App
+    ParamValidationApp
   end
 
   it "responds with a stubbed response" do
