@@ -15,20 +15,24 @@ describe Rack::Committee::ParamValidator do
   end
 
   it "detects a missing parameter" do
-    message = "Missing params: app, recipient."
-    assert_raises(Rack::Committee::InvalidParams, message) do
+    e = assert_raises(Rack::Committee::InvalidParams) do
       Rack::Committee::ParamValidator.new({}, @schema, @link_schema).call
     end
+    message = "Require params: app, recipient."
+    assert_equal message, e.message
   end
 
   it "detects an extraneous parameter" do
     params = {
-      "cloud" => "production"
+      "app" => "heroku-api",
+      "cloud" => "production",
+      "recipient" => "owner@heroku.com",
     }
-    message = "Unknown params: cloud."
-    assert_raises(Rack::Committee::InvalidParams, message) do
+    e = assert_raises(Rack::Committee::InvalidParams) do
       Rack::Committee::ParamValidator.new(params, @schema, @link_schema).call
     end
+    message = "Unknown params: cloud."
+    assert_equal message, e.message
   end
 
   it "detects a parameter of the wrong type" do
@@ -36,10 +40,11 @@ describe Rack::Committee::ParamValidator do
       "app" => "heroku-api",
       "recipient" => 123,
     }
-    message = %{Invalid type for key "recipient": expected 123 to be ["string"].}
-    assert_raises(Rack::Committee::InvalidParams, message) do
+    e = assert_raises(Rack::Committee::InvalidParams) do
       Rack::Committee::ParamValidator.new(params, @schema, @link_schema).call
     end
+    message = %{Invalid type for key "recipient": expected 123 to be ["string"].}
+    assert_equal message, e.message
   end
 
   it "detects a parameter of the wrong format" do
@@ -47,20 +52,22 @@ describe Rack::Committee::ParamValidator do
       "app" => "heroku-api",
       "recipient" => "not-email",
     }
-    message = %{Invalid format for key "recipient": expected "not-email" to be "email".}
-    assert_raises(Rack::Committee::InvalidParams, message) do
+    e = assert_raises(Rack::Committee::InvalidParams) do
       Rack::Committee::ParamValidator.new(params, @schema, @link_schema).call
     end
+    message = %{Invalid format for key "recipient": expected "not-email" to be "email".}
+    assert_equal message, e.message
   end
 
   it "detects a parameter of the wrong pattern" do
     params = {
       "name" => "%@!"
     }
-    message = %{Invalid pattern for key "name": expected %@! to match (?-mix:^[a-z][a-z0-9-]{3,30}$).}
     link_schema = @schema["app"]["links"][0]
-    assert_raises(Rack::Committee::InvalidParams, message) do
+    e = assert_raises(Rack::Committee::InvalidParams) do
       Rack::Committee::ParamValidator.new(params, @schema, link_schema).call
     end
+    message = %{Invalid pattern for key "name": expected %@! to match "(?-mix:^[a-z][a-z0-9-]{3,30}$)".}
+    assert_equal message, e.message
   end
 end

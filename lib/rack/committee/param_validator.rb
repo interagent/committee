@@ -103,7 +103,7 @@ module Rack::Committee
     def detect_extra!
       extra = @params.keys - all_keys
       if extra.count > 0
-        raise InvalidParams.new("Unknown params: #{missing.join(', ')}.")
+        raise InvalidParams.new("Unknown params: #{extra.join(', ')}.")
       end
     end
 
