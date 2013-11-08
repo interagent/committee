@@ -13,7 +13,8 @@ describe Rack::Committee::ResponseValidator do
   it "detects missing keys in response" do
     data = valid_data
     data.delete("name")
-    assert_raises(Rack::Committee::InvalidResponse) do
+    message = "Missing keys in response: name."
+    assert_raises(Rack::Committee::InvalidResponse, message) do
       Rack::Committee::ResponseValidator.new(data, @type_schema).call
     end
   end
@@ -21,7 +22,8 @@ describe Rack::Committee::ResponseValidator do
   it "detects extra keys in response" do
     data = valid_data
     data.merge!("tier" => "important")
-    assert_raises(Rack::Committee::InvalidResponse) do
+    message = "Extra keys in response: tier."
+    assert_raises(Rack::Committee::InvalidResponse, message) do
       Rack::Committee::ResponseValidator.new(data, @type_schema).call
     end
   end
