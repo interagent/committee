@@ -36,19 +36,7 @@ module Rack::Committee
     end
 
     def check_type!(types, value, path)
-      type = if value.class == NilClass
-        "null"
-      elsif value.class == TrueClass || value.class == FalseClass
-        "boolean"
-      elsif value.class == Fixnum
-        "integer"
-      elsif value.class == String
-        "string"
-      else
-        "unknown"
-      end
-=begin
-      type = case value.class
+      type = case value
       when NilClass
         "null"
       when TrueClass, FalseClass
@@ -60,7 +48,6 @@ module Rack::Committee
       else
         "unknown"
       end
-=end
       unless types.include?(type)
         raise InvalidResponse,
           %{Invalid type at "#{path.join(":")}": expected #{value} to be #{types} (was: #{type}).}
