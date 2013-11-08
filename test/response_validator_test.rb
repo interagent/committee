@@ -36,6 +36,15 @@ describe Rack::Committee::ResponseValidator do
     end
   end
 
+  it "detects bad formats" do
+    data = ValidApp.dup
+    data.merge!("id" => "123")
+    message = %{Invalid format at "id": expected "123" to be "uuid".}
+    assert_raises(Rack::Committee::InvalidResponse, message) do
+      Rack::Committee::ResponseValidator.new(data, @schema, @schema["app"]).call
+    end
+  end
+
   it "detects bad patterns" do
     data = ValidApp.dup
     data.merge!("name" => "%@!")
