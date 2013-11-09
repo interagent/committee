@@ -15,7 +15,7 @@ describe Rack::Committee::ParamValidation do
   end
 
   it "responds with a stubbed response" do
-    get "/apps"
+    get "/apps/heroku-api"
     assert_equal 200, last_response.status
     data = MultiJson.decode(last_response.body)
     assert_equal ValidApp.keys.sort, data.keys.sort
