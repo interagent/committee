@@ -1,10 +1,11 @@
-require_relative "test_helper"
+require_relative "../test_helper"
 
-describe Committee::RequestValidation do
+describe Committee::Middleware::RequestValidation do
   include Rack::Test::Methods
 
   StubApp = Rack::Builder.new {
-    use Committee::RequestValidation, schema: File.read("./test/data/schema.json")
+    use Committee::Middleware::RequestValidation,
+      schema: File.read("./test/data/schema.json")
     run lambda { |_|
       [200, {}, []]
     }

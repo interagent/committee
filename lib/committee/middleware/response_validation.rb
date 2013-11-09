@@ -1,4 +1,4 @@
-module Committee
+module Committee::Middleware
   class ResponseValidation < Base
     def call(env)
       status, headers, response = @app.call(env)
@@ -7,13 +7,13 @@ module Committee
       if type_schema
         str = ""
         response.each { |s| str << s }
-        ResponseValidator.new(MultiJson.decode(str), @schema, type_schema).call
+        Committee::ResponseValidator.new(MultiJson.decode(str), @schema, type_schema).call
       end
       [status, headers, response]
+    rescue Committee::InvalidResponse
+      render_error(500, :invalid_response, $!.message)
     rescue MultiJson::LoadError
       render_error(500, :invalid_response, "Response wasn't valid JSON.")
-    rescue InvalidResponse
-      render_error(500, :invalid_response, $!.message)
     end
   end
 end

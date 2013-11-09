@@ -1,6 +1,6 @@
-require_relative "test_helper"
+require_relative "../test_helper"
 
-describe Committee::ResponseValidation do
+describe Committee::Middleware::ResponseValidation do
   include Rack::Test::Methods
 
   def app
@@ -34,7 +34,8 @@ describe Committee::ResponseValidation do
 
   def new_rack_app(response)
     Rack::Builder.new {
-      use Committee::ResponseValidation, schema: File.read("./test/data/schema.json")
+      use Committee::Middleware::ResponseValidation,
+        schema: File.read("./test/data/schema.json")
       run lambda { |_|
         [200, {}, [response]]
       }

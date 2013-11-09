@@ -1,16 +1,16 @@
-module Committee
+module Committee::Middleware
   class RequestValidation < Base
     def call(env)
       request = Rack::Request.new(env)
-      env[@params_key] = RequestUnpacker.new(request).call
+      env[@params_key] = Committee::RequestUnpacker.new(request).call
       link, _ = @router.routes_request?(request)
       if link
-        ParamValidator.new(env[@params_key], @schema, link).call
+        Committee::ParamValidator.new(env[@params_key], @schema, link).call
       end
       @app.call(env)
-    rescue BadRequest
+    rescue Committee::BadRequest
       render_error(400, :bad_request, $!.message)
-    rescue InvalidParams
+    rescue Committee::InvalidParams
       render_error(422, :invalid_params, $!.message)
     end
   end

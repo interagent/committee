@@ -1,12 +1,12 @@
-module Committee
+module Committee::Middleware
   class Base
     def initialize(app, options={})
       @app = app
 
       @params_key = options[:params_key] || "committee.params"
       data = options[:schema] || raise("need option `schema`")
-      @schema = Schema.new(data)
-      @router = Router.new(@schema)
+      @schema = Committee::Schema.new(data)
+      @router = Committee::Router.new(@schema)
     end
 
     private

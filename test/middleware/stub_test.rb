@@ -1,10 +1,11 @@
-require_relative "test_helper"
+require_relative "../test_helper"
 
-describe Committee::Stub do
+describe Committee::Middleware::Stub do
   include Rack::Test::Methods
 
   ParamValidationApp = Rack::Builder.new {
-    use Committee::Stub, schema: File.read("./test/data/schema.json")
+    use Committee::Middleware::Stub,
+      schema: File.read("./test/data/schema.json")
     run lambda { |_|
       [200, {}, []]
     }
