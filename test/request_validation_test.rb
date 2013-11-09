@@ -1,10 +1,10 @@
 require_relative "test_helper"
 
-describe Committee::ParamValidation do
+describe Committee::RequestValidation do
   include Rack::Test::Methods
 
   StubApp = Rack::Builder.new {
-    use Committee::ParamValidation, schema: File.read("./test/data/schema.json")
+    use Committee::RequestValidation, schema: File.read("./test/data/schema.json")
     run lambda { |_|
       [200, {}, []]
     }

@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-describe Committee::ParamValidation do
+describe Committee::Stub do
   include Rack::Test::Methods
 
   ParamValidationApp = Rack::Builder.new {

@@ -1,5 +1,5 @@
 module Committee
-  class ParamValidation < Base
+  class RequestValidation < Base
     def call(env)
       request = Rack::Request.new(env)
       env[@params_key] = RequestUnpacker.new(request).call

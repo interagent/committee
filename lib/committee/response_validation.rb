@@ -1,5 +1,5 @@
 module Committee
-  class Lint < Base
+  class ResponseValidation < Base
     def call(env)
       status, headers, response = @app.call(env)
       request = Rack::Request.new(env)

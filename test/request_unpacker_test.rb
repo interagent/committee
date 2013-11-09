@@ -1,5 +1,7 @@
 require_relative "test_helper"
 
+require "stringio"
+
 describe Committee::RequestUnpacker do
   it "unpacks JSON on Content-Type: application/json" do
     env = {

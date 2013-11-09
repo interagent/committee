@@ -10,6 +10,6 @@ require_relative "committee/router"
 require_relative "committee/schema"
 
 require_relative "committee/base"
-require_relative "committee/lint"
-require_relative "committee/param_validation"
+require_relative "committee/request_validation"
+require_relative "committee/response_validation"
 require_relative "committee/stub"
