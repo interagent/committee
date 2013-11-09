@@ -13,7 +13,7 @@ module Rack::Committee
           data = ResponseGenerator.new(@schema, type_schema, link_schema).call
           MultiJson.encode(data, pretty: true)
         end
-        [200, {"Content-Type" => "application/json"}, [str]]
+        [200, { "Content-Type" => "application/json" }, [str]]
       else
         @app.call(env)
       end
