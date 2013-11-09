@@ -1,9 +1,9 @@
 require_relative "test_helper"
 
-describe Rack::Committee::Schema do
+describe Committee::Schema do
   before do
     data = File.read("./test/data/schema.json")
-    @schema = Rack::Committee::Schema.new(data)
+    @schema = Committee::Schema.new(data)
   end
 
   it "is enumerable" do
@@ -24,7 +24,7 @@ describe Rack::Committee::Schema do
   end
 
   it "raises error on a non-existent definition" do
-    assert_raises(Rack::Committee::ReferenceNotFound) do
+    assert_raises(Committee::ReferenceNotFound) do
       @schema.find("/schema/app#/definitions/bad_field")
     end
   end

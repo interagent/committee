@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class ParamValidator
     def initialize(params, schema, link_schema)
       @params = params

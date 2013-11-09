@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class RequestUnpacker
     def initialize(request)
       @request = request

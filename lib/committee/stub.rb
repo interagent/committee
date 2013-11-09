@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class Stub < Base
     def initialize(app, options={})
       super

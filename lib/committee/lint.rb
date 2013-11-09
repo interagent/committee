@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class Lint < Base
     def call(env)
       status, headers, response = @app.call(env)

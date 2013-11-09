@@ -1,10 +1,10 @@
 require_relative "test_helper"
 
-describe Rack::Committee::Router do
+describe Committee::Router do
   before do
     data = File.read("./test/data/schema.json")
-    schema = Rack::Committee::Schema.new(data)
-    @router = Rack::Committee::Router.new(schema)
+    schema = Committee::Schema.new(data)
+    @router = Committee::Router.new(schema)
   end
 
   it "builds routes without parameters" do

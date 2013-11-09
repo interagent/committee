@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class ResponseGenerator
     def initialize(schema, type_schema, link_schema)
       @schema = schema

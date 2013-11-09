@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class ParamValidation < Base
     def call(env)
       request = Rack::Request.new(env)

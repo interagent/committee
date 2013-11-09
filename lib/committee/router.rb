@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class Router
     def initialize(schema)
       @routes = build_routes(schema)

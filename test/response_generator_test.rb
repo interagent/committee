@@ -1,9 +1,9 @@
 require_relative "test_helper"
 
-describe Rack::Committee::ResponseGenerator do
+describe Committee::ResponseGenerator do
   before do
-    @schema = Rack::Committee::Schema.new(File.read("./test/data/schema.json"))
-    @generator = Rack::Committee::ResponseGenerator.new(
+    @schema = Committee::Schema.new(File.read("./test/data/schema.json"))
+    @generator = Committee::ResponseGenerator.new(
       @schema,
       @schema["app"],
       @schema["app"]["links"][0]
@@ -21,7 +21,7 @@ describe Rack::Committee::ResponseGenerator do
   end
 
   it "wraps list data in an array" do
-    @generator = Rack::Committee::ResponseGenerator.new(
+    @generator = Committee::ResponseGenerator.new(
       @schema,
       @schema["app"],
       @schema["app"]["links"][3]

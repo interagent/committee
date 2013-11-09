@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class Base
     def initialize(app, options={})
       @app = app

@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-describe Rack::Committee::Lint do
+describe Committee::Lint do
   include Rack::Test::Methods
 
   def app
@@ -34,7 +34,7 @@ describe Rack::Committee::Lint do
 
   def new_rack_app(response)
     Rack::Builder.new {
-      use Rack::Committee::Lint, schema: File.read("./test/data/schema.json")
+      use Committee::Lint, schema: File.read("./test/data/schema.json")
       run lambda { |_|
         [200, {}, [response]]
       }

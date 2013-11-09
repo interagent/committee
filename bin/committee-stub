@@ -2,7 +2,7 @@
 
 require 'optparse'
 
-require_relative "../lib/rack/committee"
+require_relative "../lib/committee"
 
 args = ARGV.dup
 options = { Port: 9292 }
@@ -31,9 +31,9 @@ end
 schema = File.read(args[0])
 
 app = Rack::Builder.new {
-  use Rack::Committee::ParamValidation, schema: schema
-  use Rack::Committee::Stub, schema: schema
-  use Rack::Committee::Lint, schema: schema
+  use Committee::ParamValidation, schema: schema
+  use Committee::Stub, schema: schema
+  use Committee::Lint, schema: schema
   run lambda { |_|
     [404, {}, []]
   }

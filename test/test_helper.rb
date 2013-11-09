@@ -6,7 +6,7 @@ require "minitest/autorun"
 require "bundler/setup"
 Bundler.require(:development)
 
-require_relative "../lib/rack/committee"
+require_relative "../lib/committee"
 
 ValidApp = {
   "archived_at"                    => "2012-01-01T12:00:00Z",

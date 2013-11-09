@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class ResponseValidator
     def initialize(data, schema, type_schema)
       @data = data

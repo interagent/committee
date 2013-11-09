@@ -1,4 +1,4 @@
-module Rack::Committee
+module Committee
   class BadRequest < StandardError
   end
 

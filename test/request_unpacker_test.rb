@@ -1,13 +1,13 @@
 require_relative "test_helper"
 
-describe Rack::Committee::RequestUnpacker do
+describe Committee::RequestUnpacker do
   it "unpacks JSON on Content-Type: application/json" do
     env = {
       "CONTENT_TYPE" => "application/json",
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params = Rack::Committee::RequestUnpacker.new(request).call
+    params = Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -16,7 +16,7 @@ describe Rack::Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params = Rack::Committee::RequestUnpacker.new(request).call
+    params = Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -26,7 +26,7 @@ describe Rack::Committee::RequestUnpacker do
       "rack.input"   => StringIO.new(""),
     }
     request = Rack::Request.new(env)
-    params = Rack::Committee::RequestUnpacker.new(request).call
+    params = Committee::RequestUnpacker.new(request).call
     assert_equal({}, params)
   end
 
@@ -36,7 +36,7 @@ describe Rack::Committee::RequestUnpacker do
       "rack.input"   => StringIO.new("x=y"),
     }
     request = Rack::Request.new(env)
-    params = Rack::Committee::RequestUnpacker.new(request).call
+    params = Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -46,8 +46,8 @@ describe Rack::Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('[2]'),
     }
     request = Rack::Request.new(env)
-    assert_raises(Rack::Committee::BadRequest) do
-      Rack::Committee::RequestUnpacker.new(request).call
+    assert_raises(Committee::BadRequest) do
+      Committee::RequestUnpacker.new(request).call
     end
   end
 
@@ -57,8 +57,8 @@ describe Rack::Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    assert_raises(Rack::Committee::BadRequest) do
-      Rack::Committee::RequestUnpacker.new(request).call
+    assert_raises(Committee::BadRequest) do
+      Committee::RequestUnpacker.new(request).call
     end
   end
 end
