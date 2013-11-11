@@ -37,18 +37,23 @@ describe Committee::Middleware::RequestValidation do
   it "detects a missing parameter" do
     post "/account/app-transfers", "{}"
     assert_equal 422, last_response.status
+    assert_match /require params/i, last_response.body
   end
 
   it "detects an extra parameter" do
     params = {
-      "cloud" => "production"
+      "app" => "heroku-api",
+      "cloud" => "production",
+      "recipient" => "owner@heroku.com",
     }
     post "/account/app-transfers", MultiJson.encode(params)
     assert_equal 422, last_response.status
+    assert_match /unknown params/i, last_response.body
   end
 
   it "rescues JSON errors" do
     post "/account/app-transfers", "{x:y}"
     assert_equal 400, last_response.status
+    assert_match /valid json/i, last_response.body
   end
 end
