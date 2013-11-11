@@ -46,4 +46,9 @@ describe Committee::Middleware::RequestValidation do
     post "/account/app-transfers", MultiJson.encode(params)
     assert_equal 422, last_response.status
   end
+
+  it "rescues JSON errors" do
+    post "/account/app-transfers", "{x:y}"
+    assert_equal 400, last_response.status
+  end
 end

@@ -13,7 +13,7 @@ module Committee::Middleware
     rescue Committee::InvalidParams
       render_error(422, :invalid_params, $!.message)
     rescue MultiJson::LoadError
-      render_error(500, :invalid_params, "Request body wasn't valid JSON.")
+      render_error(400, :invalid_params, "Request body wasn't valid JSON.")
     end
   end
 end
