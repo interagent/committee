@@ -32,12 +32,19 @@ describe Committee::Middleware::ResponseValidation do
     assert_match /extra keys/i, last_response.body
   end
 
+  it "rescues JSON errors" do
+    @app = new_rack_app("{x:y}")
+    get "/apps"
+    assert_equal 500, last_response.status
+    assert_match /valid json/i, last_response.body
+  end
+
   def new_rack_app(response)
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation,
         schema: File.read("./test/data/schema.json")
       run lambda { |_|
-        [200, {}, [response]]
+        [200, { "Content-Type" => "application/json" }, [response]]
       }
     }
   end
