@@ -3,6 +3,7 @@ require_relative "test_helper"
 describe Committee::ParamValidator do
   before do
     @schema = Committee::Schema.new(File.read("./test/data/schema.json"))
+    # POST /account/app-transfers
     @link_schema = @schema["app-transfer"]["links"][0]
   end
 

@@ -1,27 +1,38 @@
 module Committee
   class ResponseValidator
-    def initialize(data, schema, type_schema)
+    def initialize(data, schema, link_schema, type_schema)
       @data = data
       @schema = schema
+      @link_schema = link_schema
       @type_schema = type_schema
     end
 
     def call
-      data_keys = build_data_keys
+      data = if @link_schema["title"] == "List"
+        if !@data.is_a?(Array)
+          raise InvalidResponse, "List endpoints must return an array of objects."
+        end
+        # only consider the first object during the validation from here on
+        @data[0]
+      else
+        @data
+      end
+
+      data_keys = build_data_keys(data)
       schema_keys = build_schema_keys
 
       extra = data_keys - schema_keys
       missing = schema_keys - data_keys
 
       if extra.count > 0
-        raise InvalidResponse.new("Extra keys in response: #{extra.join(', ')}.")
+        raise InvalidResponse, "Extra keys in response: #{extra.join(', ')}."
       end
 
       if missing.count > 0
-        raise InvalidResponse.new("Missing keys in response: #{missing.join(', ')}.")
+        raise InvalidResponse, "Missing keys in response: #{missing.join(', ')}."
       end
 
-      check_data!(@type_schema, @data, [])
+      check_data!(@type_schema, data, [])
     end
 
     def check_data!(schema, data, path)
@@ -83,9 +94,9 @@ module Committee
 
     private
 
-    def build_data_keys
+    def build_data_keys(data)
       keys = []
-      @data.each do |key, value|
+      data.each do |key, value|
         if value.is_a?(Hash)
           keys += value.keys.map { |k| "#{key}:#{k}" }
         else
