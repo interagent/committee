@@ -80,6 +80,14 @@ $ curl -X GET http://localhost:9292/apps
 ]
 ```
 
+### committee-stub
+
+A bundled executable is also available to easily start up a server that will serve the stub for some particular JSON Schema file:
+
+``` bash
+committee-stub -p <port> <path to JSON schema>
+```
+
 ## Committee::Middleware::ResponseValidation
 
 ``` ruby
