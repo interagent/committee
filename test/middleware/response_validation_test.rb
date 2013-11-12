@@ -7,6 +7,12 @@ describe Committee::Middleware::ResponseValidation do
     @app
   end
 
+  it "passes through a valid response" do
+    @app = new_rack_app(MultiJson.encode(ValidApp))
+    get "/apps"
+    assert_equal 200, last_response.status
+  end
+
   it "detects an invalid response" do
     @app = new_rack_app("")
     get "/apps"
