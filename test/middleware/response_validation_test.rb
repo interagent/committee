@@ -13,6 +13,13 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "detects an invalid response Content-Type" do
+    @app = new_rack_app(MultiJson.encode(ValidApp), {})
+    get "/apps"
+    assert_equal 500, last_response.status
+    assert_match /response header must be set to/i, last_response.body
+  end
+
   it "detects an invalid response" do
     @app = new_rack_app("")
     get "/apps"
@@ -45,12 +52,12 @@ describe Committee::Middleware::ResponseValidation do
     assert_match /valid json/i, last_response.body
   end
 
-  def new_rack_app(response)
+  def new_rack_app(response, headers={ "Content-Type" => "application/json" })
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation,
         schema: File.read("./test/data/schema.json")
       run lambda { |_|
-        [200, { "Content-Type" => "application/json" }, [response]]
+        [200, headers, [response]]
       }
     }
   end

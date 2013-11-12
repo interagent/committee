@@ -5,6 +5,7 @@ module Committee::Middleware
       request = Rack::Request.new(env)
       _, type_schema = @router.routes_request?(request)
       if type_schema
+        check_content_type!(headers)
         str = ""
         response.each { |s| str << s }
         Committee::ResponseValidator.new(MultiJson.decode(str), @schema, type_schema).call
@@ -14,6 +15,15 @@ module Committee::Middleware
       render_error(500, :invalid_response, $!.message)
     rescue MultiJson::LoadError
       render_error(500, :invalid_response, "Response wasn't valid JSON.")
+    end
+
+    private
+
+    def check_content_type!(headers)
+      unless headers["Content-Type"] == "application/json"
+        raise Committee::InvalidResponse,
+          %{"Content-Type" response header must be set to "application/json".}
+      end
     end
   end
 end
