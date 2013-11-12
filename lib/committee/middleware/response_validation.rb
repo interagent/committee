@@ -25,7 +25,7 @@ module Committee::Middleware
     private
 
     def check_content_type!(headers)
-      unless headers["Content-Type"] == "application/json"
+      unless headers["Content-Type"] =~ %r{application/json}
         raise Committee::InvalidResponse,
           %{"Content-Type" response header must be set to "application/json".}
       end
