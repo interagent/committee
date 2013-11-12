@@ -22,54 +22,42 @@ describe Committee::ResponseValidator do
   it "detects an improperly formatted list response" do
     # GET /apps
     @link_schema = @schema["app"]["links"][3]
-    e = assert_raises(Committee::InvalidResponse) do
-      call
-    end
+    e = assert_raises(Committee::InvalidResponse) { call }
     message = "List endpoints must return an array of objects."
     assert_equal message, e.message
   end
 
   it "detects missing keys in response" do
     @data.delete("name")
-    e = assert_raises(Committee::InvalidResponse) do
-      call
-    end
+    e = assert_raises(Committee::InvalidResponse) { call }
     message = "Missing keys in response: name."
     assert_equal message, e.message
   end
 
   it "detects extra keys in response" do
     @data.merge!("tier" => "important")
-    e = assert_raises(Committee::InvalidResponse) do
-      call
-    end
+    e = assert_raises(Committee::InvalidResponse) { call }
     message = "Extra keys in response: tier."
     assert_equal message, e.message
   end
 
   it "detects mismatched types" do
     @data.merge!("maintenance" => "not-bool")
-    e = assert_raises(Committee::InvalidResponse) do
-      call
-    end
+    e = assert_raises(Committee::InvalidResponse) { call }
     message = %{Invalid type at "maintenance": expected not-bool to be ["boolean"] (was: string).}
     assert_equal message, e.message
   end
 
   it "detects bad formats" do
     @data.merge!("id" => "123")
-    e = assert_raises(Committee::InvalidResponse) do
-      call
-    end
+    e = assert_raises(Committee::InvalidResponse) { call }
     message = %{Invalid format at "id": expected "123" to be "uuid".}
     assert_equal message, e.message
   end
 
   it "detects bad patterns" do
     @data.merge!("name" => "%@!")
-    e = assert_raises(Committee::InvalidResponse) do
-      call
-    end
+    e = assert_raises(Committee::InvalidResponse) { call }
     message = %{Invalid pattern at "name": expected %@! to match "(?-mix:^[a-z][a-z0-9-]{3,30}$)".}
     assert_equal message, e.message
   end
