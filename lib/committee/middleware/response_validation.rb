@@ -6,8 +6,7 @@ module Committee::Middleware
       link_schema, type_schema = @router.routes_request?(request)
       if type_schema
         check_content_type!(headers)
-        str = ""
-        response.each { |s| str << s }
+        str = response.reduce("") { |str, s| str << s }
         Committee::ResponseValidator.new(
           MultiJson.decode(str),
           @schema,
