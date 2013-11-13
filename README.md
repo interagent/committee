@@ -5,7 +5,7 @@ A collection of middleware to help build services with JSON Schema.
 ## Committee::Middleware::RequestValidation
 
 ``` ruby
-use Committee::Middleware::RequestValidation
+use Committee::Middleware::RequestValidation, schema: File.read(...)
 ```
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
@@ -37,7 +37,7 @@ $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d
 ## Committee::Middleware::Stub
 
 ``` ruby
-use Committee::Middleware::Stub
+use Committee::Middleware::Stub, schema: File.read(...)
 ```
 
 This piece of middleware intercepts any routes that are in the JSON Schema, then builds and returns an appropriate an appropriate response for them.
@@ -91,7 +91,7 @@ committee-stub -p <port> <path to JSON schema>
 ## Committee::Middleware::ResponseValidation
 
 ``` ruby
-use Committee::Middleware::ResponseValidation
+use Committee::Middleware::ResponseValidation, schema: File.read(...)
 ```
 
 This piece of middleware validates the contents of the response received from up the stack for any route that matches the JSON Schema.
