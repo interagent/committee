@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name          = "rack-committee"
+  s.name          = "committee"
   s.version       = "0.1"
 
   s.summary       = "A collection of middleware to support JSON Schema."
