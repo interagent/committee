@@ -24,12 +24,18 @@ module Committee
       extra = data_keys - schema_keys
       missing = schema_keys - data_keys
 
+      errors = []
+
       if extra.count > 0
-        raise InvalidResponse, "Extra keys in response: #{extra.join(', ')}."
+        errors << "Extra keys in response: #{extra.join(', ')}."
       end
 
       if missing.count > 0
-        raise InvalidResponse, "Missing keys in response: #{missing.join(', ')}."
+        errors << "Missing keys in response: #{missing.join(', ')}."
+      end
+
+      unless errors.empty?
+        raise InvalidResponse, errors.join(' ')
       end
 
       check_data!(@type_schema, data, [])
