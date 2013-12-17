@@ -5,7 +5,7 @@ module Committee
     end
 
     def call
-      if !@request.content_type || @request.content_type == "application/json"
+      if !@request.content_type || @request.content_type =~ %r{application/json}
         # if Content-Type is empty or JSON, and there was a request body, try
         # to interpret it as JSON
         if (body = @request.body.read).length != 0
