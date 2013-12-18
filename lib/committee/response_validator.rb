@@ -35,7 +35,7 @@ module Committee
       end
 
       unless errors.empty?
-        raise InvalidResponse, errors.join(' ')
+        raise InvalidResponse, ["`#{@link_schema['method']} #{@link_schema['href']}` deviates from schema.", *errors].join(' ')
       end
 
       check_data!(@type_schema, data, [])
