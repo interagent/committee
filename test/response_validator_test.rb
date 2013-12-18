@@ -30,15 +30,15 @@ describe Committee::ResponseValidator do
   it "detects missing keys in response" do
     @data.delete("name")
     e = assert_raises(Committee::InvalidResponse) { call }
-    message = "Missing keys in response: name."
-    assert_equal message, e.message
+    message = %r{Missing keys in response: name.}
+    assert_match message, e.message
   end
 
   it "detects extra keys in response" do
     @data.merge!("tier" => "important")
     e = assert_raises(Committee::InvalidResponse) { call }
-    message = "Extra keys in response: tier."
-    assert_equal message, e.message
+    message = %r{Extra keys in response: tier.}
+    assert_match message, e.message
   end
 
   it "detects mismatched types" do
