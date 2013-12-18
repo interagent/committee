@@ -1,21 +1,25 @@
 PATH
   remote: .
   specs:
-    rack-committee (0.1)
+    committee (0.1)
       multi_json (> 0.0)
       rack (> 0.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    multi_json (1.8.1)
+    minitest (5.0.8)
+    multi_json (1.8.2)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
+    rake (10.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  rack-committee!
+  committee!
+  minitest
   rack-test
+  rake
