@@ -48,8 +48,10 @@ module Committee
         else
           definition = @schema.find(value["$ref"])
           check_type!(definition["type"], data[key], path + [key])
-          check_format!(definition["format"], data[key], path + [key])
-          check_pattern!(definition["pattern"], data[key], path + [key])
+          unless definition["type"].include?("null") && data[key].nil?
+            check_format!(definition["format"], data[key], path + [key])
+            check_pattern!(definition["pattern"], data[key], path + [key])
+          end
         end
       end
     end
