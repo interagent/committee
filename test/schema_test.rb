@@ -18,7 +18,7 @@ describe Committee::Schema do
       "description" => "slug size in bytes of app",
       "example"     => 0,
       "readOnly"    => true,
-      "type"        => ["integer", "null"]
+      "type"        => ["number", "null"]
     }
     assert_equal expected, @schema.find("#/definitions/app/definitions/slug_size")
   end

@@ -85,8 +85,8 @@ module Committee
         "null"
       when TrueClass, FalseClass
         "boolean"
-      when Fixnum
-        "integer"
+      when Bignum, Fixnum, Float
+        "number"
       when String
         "string"
       else
