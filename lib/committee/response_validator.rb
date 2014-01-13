@@ -115,8 +115,13 @@ module Committee
     def build_schema_keys
       keys = []
       @type_schema["properties"].each do |key, info|
-        if info["properties"]
-          keys += info["properties"].keys.map { |k| "#{key}:#{k}" }
+        data = if info["properties"]
+          info
+        elsif info["$ref"]
+          @schema.find(info["$ref"])
+        end
+        if data["properties"]
+          keys += data["properties"].keys.map { |k| "#{key}:#{k}" }
         else
           keys << key
         end
