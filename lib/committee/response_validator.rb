@@ -93,6 +93,8 @@ module Committee
         "string"
       when Hash
         "object"
+      when Array
+        "array"
       else
         "unknown"
       end
