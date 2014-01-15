@@ -91,6 +91,10 @@ module Committee
         "number"
       when String
         "string"
+      when Hash
+        "object"
+      when Array
+        "array"
       else
         "unknown"
       end
