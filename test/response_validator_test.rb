@@ -19,6 +19,13 @@ describe Committee::ResponseValidator do
     call
   end
 
+  it "passes through a valid empty response" do
+    @data = {}
+    # POST /apps/:id/actions/archive
+    @link_schema = @schema["app"]["links"][5]
+    call
+  end
+
   it "detects an improperly formatted list response" do
     # GET /apps
     @link_schema = @schema["app"]["links"][3]

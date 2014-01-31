@@ -38,7 +38,9 @@ module Committee
         raise InvalidResponse, ["`#{@link_schema['method']} #{@link_schema['href']}` deviates from schema.", *errors].join(' ')
       end
 
-      check_data!(@type_schema, data, [])
+      unless @link_schema["rel"] == "empty"
+        check_data!(@type_schema, data, [])
+      end
     end
 
     def check_data!(schema, data, path)
@@ -119,6 +121,9 @@ module Committee
     end
 
     def build_schema_keys
+      if @link_schema["rel"] == "empty"
+        return []
+      end
       keys = []
       @type_schema["properties"].each do |key, info|
         data = if info["properties"]
