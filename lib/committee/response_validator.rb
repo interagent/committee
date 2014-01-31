@@ -125,9 +125,6 @@ module Committee
     end
 
     def build_schema_keys
-      if @link_schema["rel"] == "empty"
-        return []
-      end
       keys = []
       @type_schema["properties"].each do |key, info|
         data = if info["properties"]
