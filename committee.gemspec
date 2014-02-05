@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.authors       = ["Brandur", "geemus (Wesley Beary)"]
   s.email         = ["brandur@mutelight.org", "geemus+github@gmail.com"]
-  s.homepage      = "https://github.com/brandur/rack-committee"
+  s.homepage      = "https://github.com/heroku/rack-committee"
   s.license       = "MIT"
 
   s.executables   << "committee-stub"
