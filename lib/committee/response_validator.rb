@@ -18,27 +18,33 @@ module Committee
         @data
       end
 
-      data_keys = build_data_keys(data)
-      schema_keys = build_schema_keys
+      if @link_schema["rel"] == "empty"
+        unless @data == {}
+          raise InvalidResponse, "`#{@link_schema['method']} #{@link_schema['href']}` deviates from schema. Expected an empty response."
+        end
+      else
+        data_keys = build_data_keys(data)
+        schema_keys = build_schema_keys
 
-      extra = data_keys - schema_keys
-      missing = schema_keys - data_keys
+        extra = data_keys - schema_keys
+        missing = schema_keys - data_keys
 
-      errors = []
+        errors = []
 
-      if extra.count > 0
-        errors << "Extra keys in response: #{extra.join(', ')}."
+        if extra.count > 0
+          errors << "Extra keys in response: #{extra.join(', ')}."
+        end
+
+        if missing.count > 0
+          errors << "Missing keys in response: #{missing.join(', ')}."
+        end
+
+        unless errors.empty?
+          raise InvalidResponse, ["`#{@link_schema['method']} #{@link_schema['href']}` deviates from schema.", *errors].join(' ')
+        end
+
+        check_data!(@type_schema, data, [])
       end
-
-      if missing.count > 0
-        errors << "Missing keys in response: #{missing.join(', ')}."
-      end
-
-      unless errors.empty?
-        raise InvalidResponse, ["`#{@link_schema['method']} #{@link_schema['href']}` deviates from schema.", *errors].join(' ')
-      end
-
-      check_data!(@type_schema, data, [])
     end
 
     def check_data!(schema, data, path)

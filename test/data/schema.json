@@ -398,6 +398,13 @@
             }
           },
           "title": "Update"
+        },
+        {
+          "description": "Archive an app.",
+          "href": "/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fidentity)}/actions/archive",
+          "method": "POST",
+          "rel": "empty",
+          "title": "Archive App"
         }
       ],
       "properties": {

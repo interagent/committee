@@ -19,6 +19,30 @@ describe Committee::ResponseValidator do
     call
   end
 
+  it "passes through a valid empty response" do
+    @data = {}
+    # POST /apps/:id/actions/archive
+    @link_schema = @schema["app"]["links"][5]
+    call
+  end
+
+  it "detects unexpected non-empty response" do
+    @data = {"id" => "123"}
+    # POST /apps/:id/actions/archive
+    @link_schema = @schema["app"]["links"][5]
+    e = assert_raises(Committee::InvalidResponse) { call }
+    message = %r{Expected an empty response.}
+    assert_match message, e.message
+  end
+
+  it "detects unexpected null response" do
+    @data = {"id" => "123"}
+    # POST /apps/:id/actions/archive
+    @link_schema = @schema["app"]["links"][5]
+    e = assert_raises(Committee::InvalidResponse) { call }
+    message = %r{Expected an empty response.}
+  end
+
   it "detects an improperly formatted list response" do
     # GET /apps
     @link_schema = @schema["app"]["links"][3]
