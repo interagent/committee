@@ -44,7 +44,7 @@ describe Committee::ResponseValidator do
   it "detects mismatched types" do
     @data.merge!("maintenance" => "not-bool")
     e = assert_raises(Committee::InvalidResponse) { call }
-    message = %{Invalid type at "maintenance": expected not-bool to be ["boolean"] (was: string).}
+    message = %{Invalid type at "maintenance": expected not-bool to be ["boolean"] (was: ["string"]).}
     assert_equal message, e.message
   end
 

@@ -79,24 +79,22 @@ module Committee
       end
     end
 
-    def check_type(types, value, key)
-      type = case value
+    def check_type(allowed_types, value, key)
+      types = case value
       when NilClass
-        "null"
+        ["null"]
       when TrueClass, FalseClass
-        "boolean"
-      when Bignum, Fixnum, Float
-        "number"
+        ["boolean"]
+      when Bignum, Fixnum
+        ["integer", "number"]
+      when Float
+        ["number"]
       when String
-        "string"
-      when Hash
-        "object"
-      when Array
-        "array"
+        ["string"]
       else
-        "unknown"
+        ["unknown"]
       end
-      types.include?(type)
+      !(allowed_types & types).empty?
     end
 
     def check_type!(types, value, key)
