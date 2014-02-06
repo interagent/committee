@@ -91,6 +91,8 @@ module Committee
         ["integer", "number"]
       when Float
         ["number"]
+      when Hash
+        ["object"]
       when String
         ["string"]
       else
