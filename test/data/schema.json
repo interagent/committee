@@ -803,6 +803,15 @@
             "string"
           ]
         },
+        "update": {
+          "additionalProperties" : false,
+          "properties": {
+            "name":  { "$ref": "#/definitions/stack/definitions/name" },
+            "state": { "$ref": "#/definitions/stack/definitions/state" }
+          },
+          "required":     ["name"],
+          "type":         ["object"]
+        },
         "updated_at": {
           "description": "when stack was last modified",
           "example": "2012-01-01T12:00:00Z",
@@ -827,6 +836,24 @@
           "method": "GET",
           "rel": "instances",
           "title": "List"
+        },
+        {
+          "description":  "Batch update stacks.",
+          "href":         "/stacks",
+          "method":       "PATCH",
+          "rel":          "update",
+          "schema":       {
+            "properties": {
+              "updates": {
+                "type":        ["array"],
+                "items":       { "$ref": "#/definitions/stack/definitions/update" },
+                "description": "Array with stack updates.",
+                "example":     {"updates": [{ "name": "cedar", "state": "public" }]}
+              }
+            },
+            "required": ["updates"]
+          },
+          "title":        "Batch update"
         }
       ],
       "properties": {

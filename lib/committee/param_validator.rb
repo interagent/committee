@@ -26,24 +26,22 @@ module Committee
         # don't try to check this unless it was actually specificed
         next unless @params.key?(key)
 
-        match = false
-        definitions = find_definitions(value["$ref"])
+        if value["type"] != ["array"]
+          definitions = find_definitions(value["$ref"])
+          try_match(key, @params[key], definitions)
+        else
+          # only assume one possible array definition for now
+          array_definition = find_definitions(value["items"]["$ref"])[0]
+          @params[key].each do |item|
+            array_definition["properties"].each do |array_key, array_value|
+              return unless item.key?(array_key)
 
-        # try to match data against any possible definition
-        definitions.each do |definition|
-          if check_type(definition["type"], @params[key], key) &&
-            check_format(definition["format"], @params[key], key) &&
-            check_pattern(definition["pattern"], @params[key], key)
-            match = true
-            next
+              # @todo: this should really be recursive; only one array level is
+              # supported for now
+              definitions = find_definitions(array_value["$ref"])
+              try_match(array_key, item[array_key], definitions)
+            end
           end
-        end
-
-        # if nothing was matched, throw error according to first definition
-        if !match && definition = definitions.first
-          check_type!(definition["type"], @params[key], key)
-          check_format!(definition["format"], @params[key], key)
-          check_pattern!(definition["pattern"], @params[key], key)
         end
       end
     end
@@ -89,6 +87,8 @@ module Committee
         ["integer", "number"]
       when Float
         ["number"]
+      when Hash
+        ["object"]
       when String
         ["string"]
       else
@@ -129,6 +129,27 @@ module Committee
 
     def required_keys
       (@link_schema["schema"] && @link_schema["schema"]["required"]) || []
+    end
+
+    def try_match(key, value, definitions)
+      match = false
+
+      # try to match data against any possible definition
+      definitions.each do |definition|
+        if check_type(definition["type"], value, key) &&
+          check_format(definition["format"], value, key) &&
+          check_pattern(definition["pattern"], value, key)
+          match = true
+          next
+        end
+      end
+
+      # if nothing was matched, throw error according to first definition
+      if !match && definition = definitions.first
+        check_type!(definition["type"], value, key)
+        check_format!(definition["format"], value, key)
+        check_pattern!(definition["pattern"], value, key)
+      end
     end
   end
 end

@@ -1,12 +1,12 @@
 Gem::Specification.new do |s|
   s.name          = "committee"
-  s.version       = "0.4"
+  s.version       = "0.4.1"
 
   s.summary       = "A collection of middleware to support JSON Schema."
 
   s.authors       = ["Brandur", "geemus (Wesley Beary)"]
   s.email         = ["brandur@mutelight.org", "geemus+github@gmail.com"]
-  s.homepage      = "https://github.com/brandur/rack-committee"
+  s.homepage      = "https://github.com/heroku/rack-committee"
   s.license       = "MIT"
 
   s.executables   << "committee-stub"
