@@ -83,6 +83,8 @@ module Committee
 
     def check_type!(allowed_types, value, path)
       types = case value
+      when Array
+        ["array"]
       when NilClass
         ["null"]
       when TrueClass, FalseClass
