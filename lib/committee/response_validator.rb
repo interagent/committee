@@ -93,6 +93,8 @@ module Committee
         ["number"]
       when Hash
         ["object"]
+      when Array
+        ["array"]
       when String
         ["string"]
       else
