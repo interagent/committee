@@ -62,6 +62,28 @@ describe Committee::ResponseValidator do
     assert_equal message, e.message
   end
 
+  it "accepts date-time format without milliseconds" do
+    validator = Committee::ResponseValidator.new(
+      @data,
+      @schema,
+      @link_schema,
+      @schema["app"])
+
+    value = "2014-03-10T00:00:00Z"
+    assert_nil validator.check_format!("date-time", value, ["example"])
+  end
+
+  it "accepts date-time format with milliseconds" do
+    validator = Committee::ResponseValidator.new(
+      @data,
+      @schema,
+      @link_schema,
+      @schema["app"])
+
+    value = "2014-03-10T00:00:00.123Z"
+    assert_nil validator.check_format!("date-time", value, ["example"])
+  end
+
   private
 
   def call
