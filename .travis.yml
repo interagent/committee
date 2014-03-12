@@ -1,0 +1,6 @@
+language: ruby
+notifications:
+  email: false
+rvm:
+  - 2.0.0
+script: rake test
