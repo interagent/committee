@@ -72,28 +72,54 @@ describe Committee::ParamValidator do
     assert_equal message, e.message
   end
 
-  it "passes an array parameter" do
-    params = {
-      "updates" => [
-        { "name" => "bamboo", "state" => "private" },
-        { "name" => "cedar", "state" => "public" },
-      ]
-    }
-    link_schema = @schema["stack"]["links"][2]
-    Committee::ParamValidator.new(params, @schema, link_schema).call
-  end
-
-  it "detects an array item with a parameter of the wrong type" do
-    params = {
-      "updates" => [
-        { "name" => "bamboo", "state" => 123 },
-      ]
-    }
-    link_schema = @schema["stack"]["links"][2]
-    e = assert_raises(Committee::InvalidParams) do
+  describe "complex arrays" do
+    it "passes an array parameter" do
+      params = {
+        "updates" => [
+          { "name" => "bamboo", "state" => "private" },
+          { "name" => "cedar", "state" => "public" },
+        ]
+      }
+      link_schema = @schema["stack"]["links"][2]
       Committee::ParamValidator.new(params, @schema, link_schema).call
     end
-    message = %{Invalid type for key "state": expected 123 to be ["string"].}
-    assert_equal message, e.message
+
+    it "detects an array item with a parameter of the wrong type" do
+      params = {
+        "updates" => [
+          { "name" => "bamboo", "state" => 123 },
+        ]
+      }
+      link_schema = @schema["stack"]["links"][2]
+      e = assert_raises(Committee::InvalidParams) do
+        Committee::ParamValidator.new(params, @schema, link_schema).call
+      end
+      message = %{Invalid type for key "state": expected 123 to be ["string"].}
+      assert_equal message, e.message
+    end
+  end
+
+  describe "simple arrays" do
+    it "passes an array parameter" do
+      params = {
+        "password" => "1234",
+        "flags" => [ "vip", "customer" ]
+      }
+      link_schema = @schema["account"]["links"][1]
+      Committee::ParamValidator.new(params, @schema, link_schema).call
+    end
+
+    it "detects an array item with a parameter of the wrong type" do
+      params = {
+        "password" => "1234",
+        "flags" => [ "vip", "customer", 999 ]
+      }
+      link_schema = @schema["account"]["links"][1]
+      e = assert_raises(Committee::InvalidParams) do
+        Committee::ParamValidator.new(params, @schema, link_schema).call
+      end
+      message = %{Invalid type for key "flags": expected 999 to be ["string"].}
+      assert_equal message, e.message
+    end
   end
 end
