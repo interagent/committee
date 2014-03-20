@@ -18,6 +18,14 @@
             "boolean"
           ]
         },
+        "flag" : {
+          "description": "freeform flags on an account",
+          "type": [
+            "string"
+          ],
+          "example": "vip",
+          "readOnly": false
+        },
         "beta": {
           "default": false,
           "description": "whether to utilize beta Heroku features",
@@ -126,6 +134,11 @@
               },
               "beta": {
                 "$ref": "#/definitions/account/definitions/beta"
+              },
+              "flags": {
+                "description": "Flags for an account",
+                "type": ["array"],
+                "items" : { "$ref": "#/definitions/account/definitions/flag" }
               },
               "password": {
                 "$ref": "#/definitions/account/definitions/password"

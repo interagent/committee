@@ -31,15 +31,21 @@ module Committee
           try_match(key, @params[key], definitions)
         else
           # only assume one possible array definition for now
-          array_definition = find_definitions(value["items"]["$ref"])[0]
+          definitions = find_definitions(value["items"]["$ref"])
+          array_definition = definitions[0]
           @params[key].each do |item|
-            array_definition["properties"].each do |array_key, array_value|
-              return unless item.key?(array_key)
+            # separate logic for a complex object that includes properties
+            if array_definition.key?("properties")
+              array_definition["properties"].each do |array_key, array_value|
+                return unless item.key?(array_key)
 
-              # @todo: this should really be recursive; only one array level is
-              # supported for now
-              definitions = find_definitions(array_value["$ref"])
-              try_match(array_key, item[array_key], definitions)
+                # @todo: this should really be recursive; only one array level is
+                # supported for now
+                item_definitions = find_definitions(array_value["$ref"])
+                try_match(array_key, item[array_key], item_definitions)
+              end
+            else
+              try_match(key, item, definitions)
             end
           end
         end
