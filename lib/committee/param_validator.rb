@@ -41,8 +41,8 @@ module Committee
 
                 # @todo: this should really be recursive; only one array level is
                 # supported for now
-                definitions = find_definitions(array_value["$ref"])
-                try_match(array_key, item[array_key], definitions)
+                item_definitions = find_definitions(array_value["$ref"])
+                try_match(array_key, item[array_key], item_definitions)
               end
             else
               try_match(key, item, definitions)
