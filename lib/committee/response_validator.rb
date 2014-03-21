@@ -65,31 +65,6 @@ module Committee
       end
     end
 
-    def check_type!(allowed_types, value, path)
-      types = case value
-      when Array
-        ["array"]
-      when NilClass
-        ["null"]
-      when TrueClass, FalseClass
-        ["boolean"]
-      when Bignum, Fixnum
-        ["integer", "number"]
-      when Float
-        ["number"]
-      when Hash
-        ["object"]
-      when String
-        ["string"]
-      else
-        ["unknown"]
-      end
-      if (allowed_types & types).empty?
-        raise InvalidResponse,
-          %{Invalid type at "#{path.join(":")}": expected #{value} to be #{allowed_types} (was: #{types}).}
-      end
-    end
-
     private
 
     def build_data_keys(data)
