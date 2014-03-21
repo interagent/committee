@@ -47,9 +47,10 @@ module Committee
         ["unknown"]
       end
       if (allowed_types & types).empty?
-        raise InvalidResponse,
+        raise InvalidType,
           %{Invalid type at "#{path.join(":")}": expected #{value} to be #{allowed_types} (was: #{types}).}
       end
+
     end
   end
 end

@@ -5,6 +5,9 @@ module Committee
   class InvalidFormat < StandardError
   end
 
+  class InvalidType < StandardError
+  end
+
   class InvalidParams < StandardError
   end
 
