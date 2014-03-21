@@ -1,5 +1,7 @@
 module Committee
   class ResponseValidator
+    include Validation
+
     def initialize(data, schema, link_schema, type_schema)
       @data = data
       @schema = schema
@@ -53,24 +55,6 @@ module Committee
             check_pattern!(definition["pattern"], data[key], path + [key])
           end
         end
-      end
-    end
-
-    def check_format!(format, value, path)
-      return if !format
-      valid = case format
-      when "date-time"
-        value =~ /^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})(\.\d{1,})?(Z|[+-](\d{2})\:(\d{2}))$/
-      when "email"
-        value =~ /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i
-      when "uuid"
-        value =~ /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
-      else
-        true
-      end
-      unless valid
-        raise InvalidResponse,
-          %{Invalid format at "#{path.join(":")}": expected "#{value}" to be "#{format}".}
       end
     end
 
