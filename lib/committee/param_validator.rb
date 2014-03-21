@@ -65,33 +65,6 @@ module Committee
       end
     end
 
-    def check_type(allowed_types, value, key)
-      types = case value
-      when NilClass
-        ["null"]
-      when TrueClass, FalseClass
-        ["boolean"]
-      when Bignum, Fixnum
-        ["integer", "number"]
-      when Float
-        ["number"]
-      when Hash
-        ["object"]
-      when String
-        ["string"]
-      else
-        ["unknown"]
-      end
-      !(allowed_types & types).empty?
-    end
-
-    def check_type!(types, value, key)
-      unless check_type(types, value, key)
-        raise InvalidParams,
-          %{Invalid type for key "#{key}": expected #{value} to be #{types}.}
-      end
-    end
-
     def detect_extra!
       extra = @params.keys - all_keys
       if extra.count > 0

@@ -41,7 +41,7 @@ describe Committee::ParamValidator do
       "app" => "heroku-api",
       "recipient" => 123,
     }
-    e = assert_raises(Committee::InvalidParams) do
+    e = assert_raises(Committee::InvalidType) do
       Committee::ParamValidator.new(params, @schema, @link_schema).call
     end
     message = %{Invalid type for key "recipient": expected 123 to be ["string"].}
@@ -91,7 +91,7 @@ describe Committee::ParamValidator do
         ]
       }
       link_schema = @schema["stack"]["links"][2]
-      e = assert_raises(Committee::InvalidParams) do
+      e = assert_raises(Committee::InvalidType) do
         Committee::ParamValidator.new(params, @schema, link_schema).call
       end
       message = %{Invalid type for key "state": expected 123 to be ["string"].}
@@ -115,7 +115,7 @@ describe Committee::ParamValidator do
         "flags" => [ "vip", "customer", 999 ]
       }
       link_schema = @schema["account"]["links"][1]
-      e = assert_raises(Committee::InvalidParams) do
+      e = assert_raises(Committee::InvalidType) do
         Committee::ParamValidator.new(params, @schema, link_schema).call
       end
       message = %{Invalid type for key "flags": expected 999 to be ["string"].}
