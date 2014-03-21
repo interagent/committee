@@ -60,5 +60,16 @@ module Committee
 
       !(allowed_types & types).empty?
     end
+
+    def check_pattern(pattern, value, key)
+      !pattern || value =~ pattern
+    end
+
+    def check_pattern!(pattern, value, key)
+      unless check_pattern(pattern, value, key)
+        raise InvalidParams,
+          %{Invalid pattern for key "#{key}": expected #{value} to match "#{pattern}".}
+      end
+    end
   end
 end

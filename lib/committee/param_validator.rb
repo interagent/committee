@@ -54,17 +54,6 @@ module Committee
       end
     end
 
-    def check_pattern(pattern, value, key)
-      !pattern || value =~ pattern
-    end
-
-    def check_pattern!(pattern, value, key)
-      unless check_pattern(pattern, value, key)
-        raise InvalidParams,
-          %{Invalid pattern for key "#{key}": expected #{value} to match "#{pattern}".}
-      end
-    end
-
     def detect_extra!
       extra = @params.keys - all_keys
       if extra.count > 0
