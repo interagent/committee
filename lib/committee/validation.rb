@@ -27,10 +27,21 @@ module Committee
       end
     end
 
-    def check_type!(allowed_types, value, path)
-      types = case value
+    def check_type!(allowed_types, value, identifier)
+      return if check_type(allowed_types, value, identifier)
+
+      description = case identifier
+      when String
+        %{Invalid type for key "#{identifier}": expected #{value} to be #{allowed_types}.}
       when Array
-        ["array"]
+        %{Invalid type at "#{identifier.join(":")}": expected #{value} to be #{allowed_types}.}
+      end
+
+      raise InvalidType, description
+    end
+
+    def check_type(allowed_types, value, identifier)
+      types = case value
       when NilClass
         ["null"]
       when TrueClass, FalseClass
@@ -46,11 +57,8 @@ module Committee
       else
         ["unknown"]
       end
-      if (allowed_types & types).empty?
-        raise InvalidType,
-          %{Invalid type at "#{path.join(":")}": expected #{value} to be #{allowed_types} (was: #{types}).}
-      end
 
+      !(allowed_types & types).empty?
     end
   end
 end
