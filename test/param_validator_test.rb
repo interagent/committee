@@ -65,7 +65,7 @@ describe Committee::ParamValidator do
       "name" => "%@!"
     }
     link_schema = @schema["app"]["links"][0]
-    e = assert_raises(Committee::InvalidParams) do
+    e = assert_raises(Committee::InvalidPattern) do
       Committee::ParamValidator.new(params, @schema, link_schema).call
     end
     message = %{Invalid pattern for key "name": expected %@! to match "(?-mix:^[a-z][a-z0-9-]{3,30}$)".}

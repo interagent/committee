@@ -61,15 +61,21 @@ module Committee
       !(allowed_types & types).empty?
     end
 
-    def check_pattern(pattern, value, key)
-      !pattern || value =~ pattern
+    def check_pattern!(pattern, value, identifier)
+      return if check_pattern(pattern, value, identifier)
+
+      description = case identifier
+      when String
+        %{Invalid pattern for key "#{identifier}": expected #{value} to match "#{pattern}".}
+      when Array
+          %{Invalid pattern at "#{identifier.join(":")}": expected #{value} to match "#{pattern}".}
+      end
+
+      raise InvalidPattern, description
     end
 
-    def check_pattern!(pattern, value, key)
-      unless check_pattern(pattern, value, key)
-        raise InvalidParams,
-          %{Invalid pattern for key "#{key}": expected #{value} to match "#{pattern}".}
-      end
+    def check_pattern(pattern, value, identifier)
+      !pattern || value =~ pattern
     end
   end
 end

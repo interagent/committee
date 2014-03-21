@@ -63,7 +63,7 @@ describe Committee::ResponseValidator do
 
   it "detects bad patterns" do
     @data.merge!("name" => "%@!")
-    e = assert_raises(Committee::InvalidResponse) { call }
+    e = assert_raises(Committee::InvalidPattern) { call }
     message = %{Invalid pattern at "name": expected %@! to match "(?-mix:^[a-z][a-z0-9-]{3,30}$)".}
     assert_equal message, e.message
   end

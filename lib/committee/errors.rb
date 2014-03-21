@@ -2,6 +2,9 @@ module Committee
   class BadRequest < StandardError
   end
 
+  class InvalidPattern < StandardError
+  end
+
   class InvalidFormat < StandardError
   end
 
