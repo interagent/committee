@@ -1,14 +1,20 @@
 module Committee
   module Validation
-    def check_format!(format, value, path)
+    def check_format!(format, value, identifier)
       return if !format
-      return if check_format(format, value, path)
+      return if check_format(format, value, identifier)
 
-      raise InvalidFormat,
-        %{Invalid format at "#{path.join(":")}": expected "#{value}" to be "#{format}".}
+      description = case identifier
+      when String
+        %{Invalid format for key "#{identifier}": expected "#{value}" to be "#{format}".}
+      when Array
+        %{Invalid format at "#{identifier.join(":")}": expected "#{value}" to be "#{format}".}
+      end
+
+      raise InvalidFormat, description
     end
 
-    def check_format(format, value, path)
+    def check_format(format, value, identifier)
       case format
       when "date-time"
         value =~ /^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})(\.\d{1,})?(Z|[+-](\d{2})\:(\d{2}))$/
