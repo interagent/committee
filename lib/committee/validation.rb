@@ -4,7 +4,7 @@ module Committee
       return if !format
       return if check_format(format, value, path)
 
-      raise InvalidResponse,
+      raise InvalidFormat,
         %{Invalid format at "#{path.join(":")}": expected "#{value}" to be "#{format}".}
     end
 

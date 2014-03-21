@@ -56,7 +56,7 @@ describe Committee::ResponseValidator do
 
   it "detects bad formats" do
     @data.merge!("id" => "123")
-    e = assert_raises(Committee::InvalidResponse) { call }
+    e = assert_raises(Committee::InvalidFormat) { call }
     message = %{Invalid format at "id": expected "123" to be "uuid".}
     assert_equal message, e.message
   end
