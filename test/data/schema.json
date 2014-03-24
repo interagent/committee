@@ -396,6 +396,13 @@
           "title": "List"
         },
         {
+          "description": "List archived apps.",
+          "href": "/apps/archived",
+          "method": "GET",
+          "rel": "instances",
+          "title": "List archived"
+        },
+        {
           "description": "Update an existing app.",
           "href": "/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fidentity)}",
           "method": "PATCH",

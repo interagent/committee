@@ -19,6 +19,12 @@ describe Committee::ResponseValidator do
     call
   end
 
+  it "passes through a valid list response with non-default title" do
+    @data = [@data]
+    @link_schema = @schema["app"]["links"][4]
+    call
+  end
+
   it "detects an improperly formatted list response" do
     # GET /apps
     @link_schema = @schema["app"]["links"][3]
