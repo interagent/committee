@@ -8,7 +8,7 @@ module Committee
     end
 
     def call
-      data = if @link_schema["title"] == "List"
+      data = if @link_schema["rel"] == "instances"
         if !@data.is_a?(Array)
           raise InvalidResponse, "List endpoints must return an array of objects."
         end
