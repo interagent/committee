@@ -3,6 +3,7 @@ module Committee
     include Validation
 
     def initialize(data, schema, link_schema, type_schema)
+
       @data = data
       @schema = schema
       @link_schema = link_schema
@@ -47,6 +48,16 @@ module Committee
       schema["properties"].each do |key, value|
         if value["properties"]
           check_data!(value, data[key], path + [key])
+        elsif value["type"] == ["array"]
+          definition = @schema.find(value["items"]["$ref"])
+          data[key].each do |datum|
+            check_type!(definition["type"], datum, path + [key])
+            unless definition["type"].include?("null") && datum.nil?
+              check_format!(definition["format"], datum, path + [key])
+              check_pattern!(definition["pattern"], datum, path + [key])
+            end
+          end
+
         else
           definition = @schema.find(value["$ref"])
           check_type!(definition["type"], data[key], path + [key])
@@ -77,6 +88,8 @@ module Committee
       @type_schema["properties"].each do |key, info|
         data = if info["properties"]
           info
+        elsif info["type"] == ["array"]
+          @schema.find(info["items"]["$ref"])
         elsif info["$ref"]
           @schema.find(info["$ref"])
         end
