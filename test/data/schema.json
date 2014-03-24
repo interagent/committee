@@ -217,6 +217,10 @@
         },
         "verified": {
           "$ref": "#/definitions/account/definitions/verified"
+        },
+        "flags": {
+          "type": ["array"],
+          "items": { "$ref": "#/definitions/account/definitions/flag" }
         }
       }
     },
