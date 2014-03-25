@@ -34,3 +34,15 @@ ValidApp = {
   "updated_at"                     => "2012-01-01T12:00:00Z",
   "web_url"                        => "http://example.herokuapp.com"
 }.freeze
+
+ValidAccount = {
+  "allow_tracking" => true,
+  "beta"           => true,
+  "created_at"     => "2012-01-01T12:00:00Z",
+  "email"          => "username@example.com",
+  "id"             => "01234567-89ab-cdef-0123-456789abcdef",
+  "last_login"     => "2012-01-01T12:00:00Z",
+  "updated_at"     => "2012-01-01T12:00:00Z",
+  "verified"       => true,
+  "flags"          => ["foo", "bar"]
+}.freeze

@@ -1,5 +1,7 @@
 module Committee
   class ParamValidator
+    include Validation
+
     def initialize(params, schema, link_schema)
       @params = params
       @schema = schema
@@ -49,64 +51,6 @@ module Committee
             end
           end
         end
-      end
-    end
-
-    def check_format(format, value, key)
-      case format
-      when "date-time"
-        value =~ /^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})(\.\d{1,})?(Z|[+-](\d{2})\:(\d{2}))$/
-      when "email"
-        value =~ /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i
-      when "uuid"
-        value =~ /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
-      else
-        true
-      end
-    end
-
-    def check_format!(format, value, key)
-      unless check_format(format, value, key)
-        raise InvalidParams,
-          %{Invalid format for key "#{key}": expected "#{value}" to be "#{format}".}
-      end
-    end
-
-    def check_pattern(pattern, value, key)
-      !pattern || value =~ pattern
-    end
-
-    def check_pattern!(pattern, value, key)
-      unless check_pattern(pattern, value, key)
-        raise InvalidParams,
-          %{Invalid pattern for key "#{key}": expected #{value} to match "#{pattern}".}
-      end
-    end
-
-    def check_type(allowed_types, value, key)
-      types = case value
-      when NilClass
-        ["null"]
-      when TrueClass, FalseClass
-        ["boolean"]
-      when Bignum, Fixnum
-        ["integer", "number"]
-      when Float
-        ["number"]
-      when Hash
-        ["object"]
-      when String
-        ["string"]
-      else
-        ["unknown"]
-      end
-      !(allowed_types & types).empty?
-    end
-
-    def check_type!(types, value, key)
-      unless check_type(types, value, key)
-        raise InvalidParams,
-          %{Invalid type for key "#{key}": expected #{value} to be #{types}.}
       end
     end
 

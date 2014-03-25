@@ -1,6 +1,9 @@
 module Committee
   class ResponseValidator
+    include Validation
+
     def initialize(data, schema, link_schema, type_schema)
+
       @data = data
       @schema = schema
       @link_schema = link_schema
@@ -45,6 +48,16 @@ module Committee
       schema["properties"].each do |key, value|
         if value["properties"]
           check_data!(value, data[key], path + [key])
+        elsif value["type"] == ["array"]
+          definition = @schema.find(value["items"]["$ref"])
+          data[key].each do |datum|
+            check_type!(definition["type"], datum, path + [key])
+            unless definition["type"].include?("null") && datum.nil?
+              check_format!(definition["format"], datum, path + [key])
+              check_pattern!(definition["pattern"], datum, path + [key])
+            end
+          end
+
         else
           definition = @schema.find(value["$ref"])
           check_type!(definition["type"], data[key], path + [key])
@@ -53,56 +66,6 @@ module Committee
             check_pattern!(definition["pattern"], data[key], path + [key])
           end
         end
-      end
-    end
-
-    def check_format!(format, value, path)
-      return if !format
-      valid = case format
-      when "date-time"
-        value =~ /^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})(\.\d{1,})?(Z|[+-](\d{2})\:(\d{2}))$/
-      when "email"
-        value =~ /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i
-      when "uuid"
-        value =~ /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/
-      else
-        true
-      end
-      unless valid
-        raise InvalidResponse,
-          %{Invalid format at "#{path.join(":")}": expected "#{value}" to be "#{format}".}
-      end
-    end
-
-    def check_pattern!(pattern, value, path)
-      if pattern && !(value =~ pattern)
-        raise InvalidResponse,
-          %{Invalid pattern at "#{path.join(":")}": expected #{value} to match "#{pattern}".}
-      end
-    end
-
-    def check_type!(allowed_types, value, path)
-      types = case value
-      when Array
-        ["array"]
-      when NilClass
-        ["null"]
-      when TrueClass, FalseClass
-        ["boolean"]
-      when Bignum, Fixnum
-        ["integer", "number"]
-      when Float
-        ["number"]
-      when Hash
-        ["object"]
-      when String
-        ["string"]
-      else
-        ["unknown"]
-      end
-      if (allowed_types & types).empty?
-        raise InvalidResponse,
-          %{Invalid type at "#{path.join(":")}": expected #{value} to be #{allowed_types} (was: #{types}).}
       end
     end
 
@@ -125,6 +88,8 @@ module Committee
       @type_schema["properties"].each do |key, info|
         data = if info["properties"]
           info
+        elsif info["type"] == ["array"]
+          @schema.find(info["items"]["$ref"])
         elsif info["$ref"]
           @schema.find(info["$ref"])
         end
