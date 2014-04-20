@@ -14,3 +14,5 @@ require_relative "committee/middleware/base"
 require_relative "committee/middleware/request_validation"
 require_relative "committee/middleware/response_validation"
 require_relative "committee/middleware/stub"
+
+require_relative "committee/test/methods"
