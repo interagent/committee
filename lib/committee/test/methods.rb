@@ -1,9 +1,5 @@
 module Committee::Test
   module Methods
-    def self.included(klass)
-      klass.send(:include, Rack::Test::Methods)
-    end
-
     def assert_schema_conform
       assert_schema_content_type
 
