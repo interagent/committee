@@ -117,3 +117,34 @@ The middleware will raise an error to indicate what the problems are:
 $ curl -X GET http://localhost:9292/apps
 {"id":"invalid_response","error":"Missing keys in response: archived_at, buildpack_provided_description, created_at, git_url, id, maintenance, name, owner:email, owner:id, region:id, region:name, released_at, repo_size, slug_size, stack:id, stack:name, updated_at, web_url."}
 ```
+
+## Test Assertions
+
+Committee ships with a small set of schema validation test assertions designed to be used along with `rack-test`.
+
+Here's a simple test to demonstrate:
+
+``` ruby
+describe Committee::Middleware::Stub do
+  include Committee::Test::Methods
+  include Rack::Test::Methods
+
+  def app
+    Sinatra.new do
+      get "/" do
+        content_type :json
+        MultiJson.encode({ "foo" => "bar" })
+      end
+    end
+  end
+
+  def schema_path
+    "./my-schema.json"
+  end
+
+  describe "GET /" do
+    it "conforms to schema" do
+      assert_schema_confirm
+    end
+   end
+end
