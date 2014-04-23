@@ -6,7 +6,8 @@ module Committee::Test
       @schema ||= Committee::Schema.new(File.read(schema_path))
       @router ||= Committee::Router.new(@schema)
 
-      link_schema, type_schema = @router.routes_request?(last_request)
+      link_schema, type_schema =
+        @router.routes_request?(last_request, prefix: schema_url_prefix)
 
       unless link_schema
         response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
@@ -31,6 +32,10 @@ module Committee::Test
 
     def schema_path
       raise "Please override #schema_path."
+    end
+
+    def schema_url_prefix
+      nil
     end
   end
 end

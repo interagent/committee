@@ -4,7 +4,8 @@ module Committee
       @routes = build_routes(schema)
     end
 
-    def routes?(method, path)
+    def routes?(method, path, options = {})
+      path = options[:prefix] + path if options[:prefix]
       if method_routes = @routes[method]
         method_routes.each do |pattern, link, schema|
           if path =~ pattern
@@ -15,8 +16,8 @@ module Committee
       [nil, nil]
     end
 
-    def routes_request?(request)
-      routes?(request.request_method, request.path_info)
+    def routes_request?(request, options = {})
+      routes?(request.request_method, request.path_info, options)
     end
 
     private
