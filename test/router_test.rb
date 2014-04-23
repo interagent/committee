@@ -17,6 +17,6 @@ describe Committee::Router do
 
   it "takes a prefix" do
     # this is a sociopathic example
-    assert @router.routes?("GET", "123", prefix: "/apps")
+    assert @router.routes?("GET", "/kpi/apps/123", prefix: "/kpi")
   end
 end

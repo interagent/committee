@@ -5,7 +5,7 @@ module Committee
     end
 
     def routes?(method, path, options = {})
-      path = options[:prefix] + path if options[:prefix]
+      path = path.gsub(/^#{options[:prefix]}/, "") if options[:prefix]
       if method_routes = @routes[method]
         method_routes.each do |pattern, link, schema|
           if path =~ pattern
