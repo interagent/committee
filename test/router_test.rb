@@ -14,4 +14,9 @@ describe Committee::Router do
   it "builds routes with parameters" do
     assert @router.routes?("GET", "/apps/123")
   end
+
+  it "takes a prefix" do
+    # this is a sociopathic example
+    assert @router.routes?("GET", "123", prefix: "/apps")
+  end
 end
