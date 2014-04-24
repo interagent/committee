@@ -43,5 +43,6 @@ ValidAccount = {
   "last_login"     => "2012-01-01T12:00:00Z",
   "updated_at"     => "2012-01-01T12:00:00Z",
   "verified"       => true,
-  "flags"          => ["foo", "bar"]
+  "flags"          => ["foo", "bar"],
+  "credit_cards"   => [{"account_number" => "1234-1234-1234-1234", "name" => "Rodney Mullen", "security_code" => 123}]
 }.freeze

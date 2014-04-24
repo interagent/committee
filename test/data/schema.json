@@ -44,6 +44,28 @@
             "string"
           ]
         },
+        "credit_card": {
+          "description": "credit card",
+          "example": {"account_number": "1234-1234-1234-1234", "name": "Rodney Mullen", "security_code": 123},
+          "type": ["object"],
+          "definitions": {
+            "account_number": {
+              "type": ["string"],
+              "pattern": "[0-9]{4}\\-[0-9]{4}\\-[0-9]{4}\\-[0-9]{4}$"
+            },
+            "name": {
+              "type": ["string"]
+            },
+            "security_code": {
+              "type": ["integer"]
+            }
+          },
+          "properties": {
+            "account_number": { "$ref": "#/definitions/account/definitions/credit_card/definitions/account_number"},
+            "name": { "$ref": "#/definitions/account/definitions/credit_card/definitions/name"},
+            "security_code": { "$ref": "#/definitions/account/definitions/credit_card/definitions/security_code"}
+          }
+        },
         "email": {
           "description": "unique email address of account",
           "example": "username@example.com",
@@ -221,6 +243,10 @@
         "flags": {
           "type": ["array"],
           "items": { "$ref": "#/definitions/account/definitions/flag" }
+        },
+        "credit_cards": {
+          "type": ["array"],
+          "items": { "$ref": "#/definitions/account/definitions/credit_card" }
         }
       }
     },

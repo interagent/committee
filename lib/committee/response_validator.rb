@@ -52,6 +52,7 @@ module Committee
           definition = @schema.find(value["items"]["$ref"])
           data[key].each do |datum|
             check_type!(definition["type"], datum, path + [key])
+            check_data!(definition, datum, path + [key]) if definition["type"] == ["object"]
             unless definition["type"].include?("null") && datum.nil?
               check_format!(definition["format"], datum, path + [key])
               check_pattern!(definition["pattern"], datum, path + [key])
@@ -89,7 +90,12 @@ module Committee
         data = if info["properties"]
           info
         elsif info["type"] == ["array"]
-          @schema.find(info["items"]["$ref"])
+          array_schema = @schema.find(info["items"]["$ref"])
+          unless array_schema["type"] == ["object"]
+            array_schema
+          else
+            {} # satisfy data['properties'] check below
+          end
         elsif info["$ref"]
           @schema.find(info["$ref"])
         end

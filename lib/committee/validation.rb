@@ -54,6 +54,8 @@ module Committee
         ["object"]
       when String
         ["string"]
+      when Array
+        ["array"]
       else
         ["unknown"]
       end
