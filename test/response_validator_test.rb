@@ -100,6 +100,15 @@ describe Committee::ResponseValidator do
     call
   end
 
+  it "validates an array of objects" do
+    @data = ValidAccount.dup
+    @data["credit_cards"] = @data["credit_cards"].dup
+    @link_schema = @schema["account"]["links"][0]
+    @type_schema = @schema["account"]
+
+    call
+  end
+
   it "detects a simple array with an item of the wrong type" do
     @data = ValidAccount.dup
     @data["flags"] = @data["flags"].dup
@@ -109,6 +118,17 @@ describe Committee::ResponseValidator do
 
     e = assert_raises(Committee::InvalidType) { call }
     message = %{Invalid type at "flags": expected false to be ["string"].}
+    assert_equal message, e.message
+  end
+
+  it "rejects an invalid pattern match" do
+    @data = InvalidCreditCard.dup
+    @data["credit_cards"] = @data["credit_cards"].dup
+    @link_schema = @schema["account"]["links"][0]
+    @type_schema = @schema["account"]
+
+    e = assert_raises(Committee::InvalidPattern) { call }
+    message = %{Invalid pattern at "credit_cards:account_number": expected 1234-1234-1234-HUGZ to match "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$".}
     assert_equal message, e.message
   end
 
