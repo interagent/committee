@@ -77,7 +77,7 @@ module Committee
     end
 
     def check_pattern(pattern, value, identifier)
-      !pattern || value.match(pattern)
+      !pattern || value =~ pattern
     end
   end
 end

@@ -129,7 +129,7 @@ describe Committee::ResponseValidator do
     @type_schema = @schema["account"]
 
     e = assert_raises(Committee::InvalidPattern) { call }
-    message = %{Invalid pattern at "credit_cards:account_number": expected 1234-1234-1234-HUGZ to match "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$".}
+    message = %{Invalid pattern at "credit_cards:account_number": expected 1234-1234-1234-HUGZ to match "(?-mix:[0-9]{4}\\-[0-9]{4}\\-[0-9]{4}\\-[0-9]{4}$)".}
     assert_equal message, e.message
   end
 

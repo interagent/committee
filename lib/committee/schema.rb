@@ -5,7 +5,7 @@ module Committee
     def initialize(data)
       @cache = {}
       @schema = MultiJson.decode(data)
-      manifest_regex
+      manifest_regex(@schema)
     end
 
     def [](type)
@@ -42,12 +42,13 @@ module Committee
       end
     end
 
-    def manifest_regex
-      @schema["definitions"].each do |_, type_schema|
-        type_schema["definitions"].each do |_, property_schema|
-          if pattern = property_schema["pattern"]
-            property_schema["pattern"] = Regexp.new(pattern)
-          end
+    def manifest_regex(schema_part)
+      schema_part["definitions"].each do |_, type_schema|
+        if type_schema.has_key?("definitions")
+          manifest_regex(type_schema)
+        end
+        if pattern = type_schema["pattern"]
+          type_schema["pattern"] = Regexp.new(pattern)
         end
       end
     end

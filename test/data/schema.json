@@ -51,7 +51,7 @@
           "definitions": {
             "account_number": {
               "type": ["string"],
-              "pattern": "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}$"
+              "pattern": "[0-9]{4}\\-[0-9]{4}\\-[0-9]{4}\\-[0-9]{4}$"
             },
             "name": {
               "type": ["string"]
