@@ -122,8 +122,9 @@ describe Committee::ResponseValidator do
   end
 
   it "rejects an invalid pattern match" do
-    @data = InvalidCreditCard.dup
+    @data = ValidAccount.dup
     @data["credit_cards"] = @data["credit_cards"].dup
+    @data["credit_cards"] << {"account_number" => "1234-1234-1234-HUGZ", "name" => "Rodney Mullen", "security_code" => 123}
     @link_schema = @schema["account"]["links"][0]
     @type_schema = @schema["account"]
 
