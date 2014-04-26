@@ -15,6 +15,14 @@ describe Committee::Middleware::Stub do
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
+  it "optionally calls into application" do
+    @app = new_rack_app(call: true)
+    get "/apps/heroku-api"
+    assert_equal 200, last_response.status
+    assert_equal ValidApp,
+      MultiJson.decode(last_response.headers["Committee-Response"])
+  end
+
   it "takes a prefix" do
     @app = new_rack_app(prefix: "/v1")
     get "/v1/apps/heroku-api"
@@ -31,8 +39,9 @@ describe Committee::Middleware::Stub do
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::Stub, options
-      run lambda { |_|
-        [200, {}, []]
+      run lambda { |env|
+        headers = { "Committee-Response" => MultiJson.encode(env["committee.response"]) }
+        [200, headers, []]
       }
     }
   end
