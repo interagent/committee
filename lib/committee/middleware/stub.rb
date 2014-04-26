@@ -3,6 +3,7 @@ module Committee::Middleware
     def initialize(app, options={})
       super
       @cache = {}
+      @call   = options[:call]
       @prefix = options[:prefix]
     end
 
@@ -10,11 +11,16 @@ module Committee::Middleware
       request = Rack::Request.new(env)
       link_schema, type_schema = @router.routes_request?(request, prefix: @prefix)
       if type_schema
-        str = cache(link_schema["method"], link_schema["href"]) do
-          data = Committee::ResponseGenerator.new(@schema, type_schema, link_schema).call
-          MultiJson.encode(data, pretty: true)
+        headers = { "Content-Type" => "application/json" }
+        data = cache(link_schema["method"], link_schema["href"]) do
+          Committee::ResponseGenerator.new(@schema, type_schema, link_schema).call
         end
-        [200, { "Content-Type" => "application/json" }, [str]]
+        if @call
+          env["committee.response"] = data
+          _, call_headers, _ = @app.call(env)
+          headers.merge!(call_headers)
+        end
+        [200, headers, [MultiJson.encode(data, pretty: true)]]
       else
         @app.call(env)
       end
