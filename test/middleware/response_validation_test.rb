@@ -14,7 +14,8 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "detects an invalid response Content-Type" do
-    @app = new_rack_app(MultiJson.encode([ValidApp]), {})
+    @app = new_rack_app(MultiJson.encode([ValidApp]),
+      { "Content-Type" => "application/xml" })
     get "/apps"
     assert_equal 500, last_response.status
     assert_match /response header must be set to/i, last_response.body
@@ -52,10 +53,23 @@ describe Committee::Middleware::ResponseValidation do
     assert_match /valid json/i, last_response.body
   end
 
-  def new_rack_app(response, headers={ "Content-Type" => "application/json" })
+  it "takes a prefix" do
+    @app = new_rack_app(MultiJson.encode([ValidApp]), {}, prefix: "/v1")
+    get "/v1/apps"
+    assert_equal 200, last_response.status
+  end
+
+  private
+
+  def new_rack_app(response, headers = {}, options = {})
+    headers = {
+      "Content-Type" => "application/json"
+    }.merge(headers)
+    options = {
+      schema: File.read("./test/data/schema.json")
+    }.merge(options)
     Rack::Builder.new {
-      use Committee::Middleware::ResponseValidation,
-        schema: File.read("./test/data/schema.json")
+      use Committee::Middleware::ResponseValidation, options
       run lambda { |_|
         [200, headers, [response]]
       }
