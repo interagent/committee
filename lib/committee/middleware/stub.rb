@@ -3,11 +3,12 @@ module Committee::Middleware
     def initialize(app, options={})
       super
       @cache = {}
+      @prefix = options[:prefix]
     end
 
     def call(env)
       request = Rack::Request.new(env)
-      link_schema, type_schema = @router.routes_request?(request)
+      link_schema, type_schema = @router.routes_request?(request, prefix: @prefix)
       if type_schema
         str = cache(link_schema["method"], link_schema["href"]) do
           data = Committee::ResponseGenerator.new(@schema, type_schema, link_schema).call
