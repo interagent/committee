@@ -15,6 +15,12 @@ describe Committee::Middleware::Stub do
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
+  it "responds with 201 on create actions" do
+    @app = new_rack_app
+    post "/apps"
+    assert_equal 201, last_response.status
+  end
+
   it "optionally calls into application" do
     @app = new_rack_app(call: true)
     get "/apps/heroku-api"

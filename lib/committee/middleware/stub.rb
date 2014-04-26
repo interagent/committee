@@ -20,7 +20,8 @@ module Committee::Middleware
           _, call_headers, _ = @app.call(env)
           headers.merge!(call_headers)
         end
-        [200, headers, [MultiJson.encode(data, pretty: true)]]
+        status = link_schema["rel"] == "create" ? 201 : 200
+        [status, headers, [MultiJson.encode(data, pretty: true)]]
       else
         @app.call(env)
       end
