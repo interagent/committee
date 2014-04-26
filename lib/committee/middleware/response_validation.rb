@@ -1,9 +1,15 @@
 module Committee::Middleware
   class ResponseValidation < Base
+    def initialize(app, options={})
+      super
+      @prefix = options[:prefix]
+    end
+
     def call(env)
       status, headers, response = @app.call(env)
       request = Rack::Request.new(env)
-      link_schema, type_schema = @router.routes_request?(request)
+      link_schema, type_schema =
+        @router.routes_request?(request, prefix: @prefix)
       if type_schema
         check_content_type!(headers)
         str = response.reduce("") { |str, s| str << s }
