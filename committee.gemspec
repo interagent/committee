@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name          = "committee"
   s.version       = "0.4.9"
 
-  s.summary       = "A collection of middleware to support JSON Schema."
+  s.summary       = "A collection of Rack middleware to support JSON Schema."
 
   s.authors       = ["Brandur", "geemus (Wesley Beary)"]
   s.email         = ["brandur@mutelight.org", "geemus+github@gmail.com"]
