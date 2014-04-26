@@ -1,9 +1,14 @@
 module Committee::Middleware
   class RequestValidation < Base
+    def initialize(app, options={})
+      super
+      @prefix = options[:prefix]
+    end
+
     def call(env)
       request = Rack::Request.new(env)
       env[@params_key] = Committee::RequestUnpacker.new(request).call
-      link, _ = @router.routes_request?(request)
+      link, _ = @router.routes_request?(request, prefix: @prefix)
       if link
         Committee::ParamValidator.new(env[@params_key], @schema, link).call
       end
