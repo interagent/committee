@@ -3,7 +3,7 @@ module Committee::Test
     def assert_schema_conform
       assert_schema_content_type
 
-      @schema ||= Committee::Schema.new(File.read(schema_path))
+      @schema ||= Committee::Schema.new(schema_contents)
       @router ||= Committee::Router.new(@schema)
 
       link_schema, type_schema =
@@ -28,6 +28,13 @@ module Committee::Test
         raise Committee::InvalidResponse,
           %{"Content-Type" response header must be set to "application/json".}
       end
+    end
+
+    # can be overridden alternatively to #schema_path in case the schema is
+    # easier to access as a string
+    # blob
+    def schema_contents
+      File.read(schema_path)
     end
 
     def schema_path
