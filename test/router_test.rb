@@ -8,15 +8,19 @@ describe Committee::Router do
   end
 
   it "builds routes without parameters" do
-    assert @router.routes?("GET", "/apps")
+    refute_nil @router.routes?("GET", "/apps")[0]
   end
 
   it "builds routes with parameters" do
-    assert @router.routes?("GET", "/apps/123")
+    refute_nil @router.routes?("GET", "/apps/123")[0]
+  end
+
+  it "doesn't match anything on a /" do
+    assert_nil @router.routes?("GET", "/")[0]
   end
 
   it "takes a prefix" do
     # this is a sociopathic example
-    assert @router.routes?("GET", "/kpi/apps/123", prefix: "/kpi")
+    refute_nil @router.routes?("GET", "/kpi/apps/123", prefix: "/kpi")[0]
   end
 end
