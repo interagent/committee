@@ -12,28 +12,24 @@ describe Committee::ParamValidator do
       "app" => "heroku-api",
       "recipient" => "owner@heroku.com",
     }
-    Committee::ParamValidator.new(params, @schema, @link_schema).call
+    validate(params, @schema, @link_schema)
   end
 
   it "detects a missing parameter" do
     e = assert_raises(Committee::InvalidParams) do
-      Committee::ParamValidator.new({}, @schema, @link_schema).call
+      validate({}, @schema, @link_schema)
     end
     message = "Require params: app, recipient."
     assert_equal message, e.message
   end
 
-  it "detects an extraneous parameter" do
+  it "doesn't error on an extraneous parameter with allow_extra" do
     params = {
       "app" => "heroku-api",
       "cloud" => "production",
       "recipient" => "owner@heroku.com",
     }
-    e = assert_raises(Committee::InvalidParams) do
-      Committee::ParamValidator.new(params, @schema, @link_schema).call
-    end
-    message = "Unknown params: cloud."
-    assert_equal message, e.message
+    validate(params, @schema, @link_schema, allow_extra: true)
   end
 
   it "detects a parameter of the wrong type" do
@@ -42,7 +38,7 @@ describe Committee::ParamValidator do
       "recipient" => 123,
     }
     e = assert_raises(Committee::InvalidType) do
-      Committee::ParamValidator.new(params, @schema, @link_schema).call
+      validate(params, @schema, @link_schema)
     end
     message = %{Invalid type for key "recipient": expected 123 to be ["string"].}
     assert_equal message, e.message
@@ -54,7 +50,7 @@ describe Committee::ParamValidator do
       "recipient" => "not-email",
     }
     e = assert_raises(Committee::InvalidFormat) do
-      Committee::ParamValidator.new(params, @schema, @link_schema).call
+      validate(params, @schema, @link_schema)
     end
     message = %{Invalid format for key "recipient": expected "not-email" to be "email".}
     assert_equal message, e.message
@@ -66,7 +62,7 @@ describe Committee::ParamValidator do
     }
     link_schema = @schema["app"]["links"][0]
     e = assert_raises(Committee::InvalidPattern) do
-      Committee::ParamValidator.new(params, @schema, link_schema).call
+      validate(params, @schema, link_schema)
     end
     message = %{Invalid pattern for key "name": expected %@! to match "(?-mix:^[a-z][a-z0-9-]{3,30}$)".}
     assert_equal message, e.message
@@ -81,7 +77,7 @@ describe Committee::ParamValidator do
         ]
       }
       link_schema = @schema["stack"]["links"][2]
-      Committee::ParamValidator.new(params, @schema, link_schema).call
+      validate(params, @schema, link_schema)
     end
 
     it "detects an array item with a parameter of the wrong type" do
@@ -92,7 +88,7 @@ describe Committee::ParamValidator do
       }
       link_schema = @schema["stack"]["links"][2]
       e = assert_raises(Committee::InvalidType) do
-        Committee::ParamValidator.new(params, @schema, link_schema).call
+        validate(params, @schema, link_schema)
       end
       message = %{Invalid type for key "state": expected 123 to be ["string"].}
       assert_equal message, e.message
@@ -106,7 +102,7 @@ describe Committee::ParamValidator do
         "flags" => [ "vip", "customer" ]
       }
       link_schema = @schema["account"]["links"][1]
-      Committee::ParamValidator.new(params, @schema, link_schema).call
+      validate(params, @schema, link_schema)
     end
 
     it "detects an array item with a parameter of the wrong type" do
@@ -116,10 +112,16 @@ describe Committee::ParamValidator do
       }
       link_schema = @schema["account"]["links"][1]
       e = assert_raises(Committee::InvalidType) do
-        Committee::ParamValidator.new(params, @schema, link_schema).call
+        validate(params, @schema, link_schema)
       end
       message = %{Invalid type for key "flags": expected 999 to be ["string"].}
       assert_equal message, e.message
     end
+  end
+
+  private
+
+  def validate(params, schema, link_schema, options = {})
+    Committee::ParamValidator.new(params, schema, link_schema, options).call
   end
 end
