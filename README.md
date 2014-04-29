@@ -10,6 +10,11 @@ use Committee::Middleware::RequestValidation, schema: File.read(...)
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
 
+Options:
+
+* `allow_extra`: Doesn't raise an error when extra incoming parameters are found.
+* `prefix`: Mounts the middleware respond at a configured prefix.
+
 Some examples of use:
 
 ``` bash
@@ -95,6 +100,10 @@ use Committee::Middleware::ResponseValidation, schema: File.read(...)
 ```
 
 This piece of middleware validates the contents of the response received from up the stack for any route that matches the JSON Schema.
+
+Options:
+
+* `prefix`: Mounts the middleware respond at a configured prefix.
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
 

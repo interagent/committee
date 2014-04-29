@@ -2,15 +2,16 @@ module Committee
   class ParamValidator
     include Validation
 
-    def initialize(params, schema, link_schema)
+    def initialize(params, schema, link_schema, options = {})
       @params = params
       @schema = schema
       @link_schema = link_schema
+      @allow_extra = options[:allow_extra]
     end
 
     def call
       detect_missing!
-      detect_extra!
+      detect_extra! if !@allow_extra
       check_data!
     end
 

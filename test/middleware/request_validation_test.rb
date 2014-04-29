@@ -46,6 +46,18 @@ describe Committee::Middleware::RequestValidation do
     assert_match /unknown params/i, last_response.body
   end
 
+  it "doesn't error on an extra parameter with allow_extra" do
+    @app = new_rack_app(allow_extra: true)
+    params = {
+      "app" => "heroku-api",
+      "cloud" => "production",
+      "recipient" => "owner@heroku.com",
+    }
+    header "Content-Type", "application/json"
+    post "/account/app-transfers", MultiJson.encode(params)
+    assert_equal 200, last_response.status
+  end
+
   it "rescues JSON errors" do
     @app = new_rack_app
     header "Content-Type", "application/json"
