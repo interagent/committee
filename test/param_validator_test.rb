@@ -122,16 +122,16 @@ describe Committee::ParamValidator do
   describe "combined errors" do
     params = {
       "app" => "%@!", # wrong format
-      "recipient" => 123, # wrong pattern
+      "recipient" => 123, # wrong type
       "cloud" => true, # extra
     }
     it "renders a multiline error" do
       e = assert_raises(Committee::InvalidParams) do
         validate(params, @schema, @link_schema)
       end
-      assert_match "Unknown params: cloud", e.message
       assert_match "Invalid format for key \"app\"", e.message
       assert_match "Invalid type for key \"recipient\"", e.message
+      assert_match "Unknown params: cloud", e.message
     end
   end
 
