@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    committee (0.4.10)
+    committee (0.4.11)
       multi_json (> 0.0)
       rack (> 0.0)
 
