@@ -10,9 +10,19 @@ module Committee
     end
 
     def call
-      detect_missing!
+      @errors = Hash.new(Array.new)
+
+      detect_missing
       detect_extra! if !@allow_extra
       check_data!
+
+      unless @errors.empty?
+        message = []
+        if missing = @errors[:missing]
+          message << "Require params: #{missing.join(", ")}."
+        end
+        raise InvalidParams, message.join("\n")
+      end
     end
 
     private
@@ -62,10 +72,9 @@ module Committee
       end
     end
 
-    def detect_missing!
-      missing = required_keys - @params.keys
-      if missing.count > 0
-        raise InvalidParams.new("Require params: #{missing.join(', ')}.")
+    def detect_missing
+      (required_keys - @params.keys).each do |missing|
+        @errors[:missing] += [missing]
       end
     end
 
