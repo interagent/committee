@@ -24,6 +24,9 @@ module Committee
         if extra = @errors[:extra]
           message << "Unknown params: #{extra.join(", ")}."
         end
+        if other = @errors[:other]
+          message += other
+        end
         raise InvalidParams, message.join("\n")
       end
     end
@@ -110,9 +113,11 @@ module Committee
 
       # if nothing was matched, throw error according to first definition
       if !match && definition = definitions.first
-        check_type!(definition["type"], value, key)
-        check_format!(definition["format"], value, key)
-        check_pattern!(definition["pattern"], value, key)
+        @errors[:other] ||= []
+        error_message = type_error(definition["type"], value, key) ||
+          format_error(definition["format"], value, key) ||
+          pattern_error(definition["pattern"], value, key)
+        @errors[:other] << error_message
       end
     end
   end
