@@ -1,14 +1,14 @@
 PATH
   remote: .
   specs:
-    committee (0.4.11)
+    committee (0.4.12)
       multi_json (> 0.0)
       rack (> 0.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    multi_json (1.9.2)
+    multi_json (1.9.3)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
