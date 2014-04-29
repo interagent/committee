@@ -8,18 +8,14 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    minitest (5.0.8)
     multi_json (1.9.2)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
-    rake (10.1.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   committee!
-  minitest
   rack-test
-  rake
