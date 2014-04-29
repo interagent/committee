@@ -104,7 +104,7 @@ module Committee
           check_format(definition["format"], value, key) &&
           check_pattern(definition["pattern"], value, key)
           match = true
-          next
+          break
         end
       end
 
