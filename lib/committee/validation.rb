@@ -32,9 +32,9 @@ module Committee
 
       description = case identifier
       when String
-        %{Invalid type for key "#{identifier}": expected #{value} to be #{allowed_types}.}
+        %{Invalid type for key "#{identifier}": expected #{value.inspect} to be #{allowed_types}.}
       when Array
-        %{Invalid type at "#{identifier.join(":")}": expected #{value} to be #{allowed_types}.}
+        %{Invalid type at "#{identifier.join(":")}": expected #{value.inspect} to be #{allowed_types}.}
       end
 
       raise InvalidType, description
