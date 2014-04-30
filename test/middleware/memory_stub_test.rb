@@ -23,6 +23,26 @@ describe Committee::Middleware::Stub do
     end
   end
 
+  describe "POST to create a new resource" do
+    it "renders a 201" do
+      params = { name: "foo" }
+      post "/apps", MultiJson.encode(params)
+      assert_equal 201, last_response.status
+      data = MultiJson.decode(last_response.body)
+      assert_equal "foo", data["name"]
+    end
+
+    it "subsequently lists it" do
+      params = { name: "foo" }
+      post "/apps", MultiJson.encode(params)
+      assert_equal 201, last_response.status
+      get "/apps"
+      assert_equal 200, last_response.status
+      data = MultiJson.decode(last_response.body)
+      assert_equal "foo", data.first["name"]
+    end
+  end
+
   private
 
   def new_rack_app(options = {})

@@ -1,5 +1,6 @@
 require "multi_json"
 require "rack"
+require "securerandom"
 
 require_relative "committee/errors"
 require_relative "committee/validation"

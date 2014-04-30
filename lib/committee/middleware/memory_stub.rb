@@ -2,7 +2,7 @@ module Committee::Middleware
   class MemoryStub < Base
     def initialize(app, options={})
       super
-      @memory = {}
+      @@memory ||= {}
       @call   = options[:call]
       @prefix = options[:prefix]
     end
@@ -29,6 +29,8 @@ module Committee::Middleware
             list_resources(type_schema["id"])
           end
         when "POST"
+          data = MultiJson.decode(request.body.read)
+          add_resource(type_schema, data)
         end
         
         status = 201 if link_schema["rel"] == "create"
@@ -41,11 +43,29 @@ module Committee::Middleware
     protected
 
     def list_resources(schema_id)
-      (@memory[schema_id] || {}).values
+      (@@memory[schema_id] || {}).values
     end
 
     def fetch_resource(schema_id, resource_id)
-      (@memory[schema_id] || {})[resource_id]
+      (@@memory[schema_id] || {})[resource_id]
+    end
+
+    def add_resource(schema, payload)
+      data = schema["definitions"].inject({}) do |final, (attr, spec)|
+        final[attr] = spec["default"] || payload[attr] || generate_default(attr, spec)
+        final
+      end
+      @@memory[schema["id"]] ||= {}
+      @@memory[schema["id"]][payload["id"]] = data
+    end
+
+    def generate_default(attr, spec)
+      case attr
+      when "id"
+        SecureRandom.uuid
+      when "created_at", "updated_at"
+        Time.now
+      end
     end
 
     # can only match a single id for now
