@@ -17,7 +17,15 @@ module Committee::Middleware
         end
         if @call
           env["committee.response"] = data
-          _, call_headers, _ = @app.call(env)
+          call_status, call_headers, call_body = @app.call(env)
+
+          # a committee.suppress signal initiates a direct pass through
+          if env["committee.suppress"] == true
+            return call_status, call_headers, call_body
+          end
+
+          # otherwise keep the headers and whatever data manipulations were
+          # made, and stub normally
           headers.merge!(call_headers)
         end
         status = link_schema["rel"] == "create" ? 201 : 200

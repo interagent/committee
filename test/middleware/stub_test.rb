@@ -29,6 +29,15 @@ describe Committee::Middleware::Stub do
       MultiJson.decode(last_response.headers["Committee-Response"])
   end
 
+  it "optionally returns the application's response" do
+    @app = new_rack_app(call: true, suppress: true)
+    get "/apps/heroku-api"
+    assert_equal 429, last_response.status
+    assert_equal ValidApp,
+      MultiJson.decode(last_response.headers["Committee-Response"])
+      assert_equal "", last_response.body
+  end
+
   it "takes a prefix" do
     @app = new_rack_app(prefix: "/v1")
     get "/v1/apps/heroku-api"
@@ -40,6 +49,7 @@ describe Committee::Middleware::Stub do
   private
 
   def new_rack_app(options = {})
+    suppress = options.delete(:suppress)
     options = {
       schema: File.read("./test/data/schema.json")
     }.merge(options)
@@ -47,7 +57,8 @@ describe Committee::Middleware::Stub do
       use Committee::Middleware::Stub, options
       run lambda { |env|
         headers = { "Committee-Response" => MultiJson.encode(env["committee.response"]) }
-        [200, headers, []]
+        env["committee.suppress"] = suppress
+        [429, headers, []]
       }
     }
   end
