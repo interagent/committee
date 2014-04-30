@@ -87,8 +87,6 @@ module Committee
     end
 
     def try_match(key, value, definitions)
-      match = false
-
       # try to match data against any possible definition
       definitions.each do |definition|
         if !check_type(definition["type"], value, key)
