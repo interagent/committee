@@ -34,7 +34,7 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_rack_app(MultiJson.encode([data]))
     get "/apps"
     assert_equal 500, last_response.status
-    assert_match /missing keys/i, last_response.body
+    assert_match /is mandatory/i, last_response.body
   end
 
   it "detects extra keys in response" do
@@ -43,7 +43,7 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_rack_app(MultiJson.encode([data]))
     get "/apps"
     assert_equal 500, last_response.status
-    assert_match /extra keys/i, last_response.body
+    assert_match /unknown parameter/i, last_response.body
   end
 
   it "rescues JSON errors" do
