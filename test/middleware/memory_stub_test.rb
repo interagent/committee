@@ -4,15 +4,23 @@ describe Committee::Middleware::Stub do
   include Rack::Test::Methods
 
   def app
-    @app
+    @app ||= new_rack_app
   end
 
-  it "starts with an empty collection" do
-    @app = new_rack_app
-    get "/apps"
-    assert_equal 200, last_response.status
-    data = MultiJson.decode(last_response.body)
-    assert_equal [], data
+  describe "GET on a collection" do
+    it "starts with an empty collection" do
+      get "/apps"
+      assert_equal 200, last_response.status
+      data = MultiJson.decode(last_response.body)
+      assert_equal [], data
+    end
+  end
+
+  describe "GET on a resource" do
+    it "renders a 404 if resource is not in memory" do
+      get "/apps/foo"
+      assert_equal 404, last_response.status
+    end
   end
 
   private
