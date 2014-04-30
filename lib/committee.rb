@@ -11,6 +11,7 @@ require_relative "committee/router"
 require_relative "committee/schema"
 
 require_relative "committee/middleware/base"
+require_relative "committee/middleware/memory_stub"
 require_relative "committee/middleware/request_validation"
 require_relative "committee/middleware/response_validation"
 require_relative "committee/middleware/stub"
