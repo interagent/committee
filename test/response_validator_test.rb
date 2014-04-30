@@ -77,7 +77,7 @@ describe Committee::ResponseValidator do
       @schema["app"])
 
     value = "2014-03-10T00:00:00Z"
-    assert_nil validator.check_format!("date-time", value, ["example"])
+    assert validator.check_format("date-time", value, ["example"])
   end
 
   it "accepts date-time format with milliseconds" do
@@ -88,7 +88,7 @@ describe Committee::ResponseValidator do
       @schema["app"])
 
     value = "2014-03-10T00:00:00.123Z"
-    assert_nil validator.check_format!("date-time", value, ["example"])
+    assert validator.check_format("date-time", value, ["example"])
   end
 
   it "accepts a simple array" do
