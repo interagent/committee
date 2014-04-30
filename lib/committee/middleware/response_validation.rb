@@ -21,8 +21,8 @@ module Committee::Middleware
         ).call
       end
       [status, headers, response]
-    rescue Committee::InvalidResponse
-      render_error(500, :invalid_response, $!.message)
+    rescue Committee::InvalidResponse => e
+      render_error(500, :invalid_response, e.message)
     rescue MultiJson::LoadError
       render_error(500, :invalid_response, "Response wasn't valid JSON.")
     end
