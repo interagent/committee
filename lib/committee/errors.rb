@@ -5,15 +5,6 @@ module Committee
   class BadRequest < Error
   end
 
-  class InvalidPattern < Error
-  end
-
-  class InvalidFormat < Error
-  end
-
-  class InvalidType < Error
-  end
-
   class InvalidParams < Error
     def initialize
       @errors = {}
