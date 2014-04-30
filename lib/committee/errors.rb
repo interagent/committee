@@ -1,22 +1,25 @@
 module Committee
-  class BadRequest < StandardError
+  class Error < StandardError
   end
 
-  class InvalidPattern < StandardError
+  class BadRequest < Error
   end
 
-  class InvalidFormat < StandardError
+  class InvalidPattern < Error
   end
 
-  class InvalidType < StandardError
+  class InvalidFormat < Error
   end
 
-  class InvalidParams < StandardError
+  class InvalidType < Error
   end
 
-  class InvalidResponse < StandardError
+  class InvalidParams < Error
   end
 
-  class ReferenceNotFound < StandardError
+  class InvalidResponse < Error
+  end
+
+  class ReferenceNotFound < Error
   end
 end
