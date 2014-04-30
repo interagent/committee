@@ -21,8 +21,8 @@ module Committee::Middleware
       @app.call(env)
     rescue Committee::BadRequest => e
       render_error(400, :bad_request, e.message)
-    rescue Committee::Error => e
-      render_error(422, :invalid_params, e.message)
+    rescue Committee::InvalidParams => e
+      render_error(422, :invalid_params, e.full_message)
     rescue MultiJson::LoadError
       render_error(400, :invalid_params, "Request body wasn't valid JSON.")
     end

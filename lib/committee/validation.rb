@@ -1,21 +1,17 @@
 module Committee
   module Validation
     def check_format!(format, value, identifier)
-      if msg = format_error(format, value, identifier)
-        raise InvalidFormat, msg
-      end
-    end
-
-    def format_error(format, value, identifier)
       return if !format
       return if check_format(format, value, identifier)
 
-      case identifier
+      msg = case identifier
       when String
         %{Invalid format for key "#{identifier}": expected "#{value}" to be "#{format}".}
       when Array
         %{Invalid format at "#{identifier.join(":")}": expected "#{value}" to be "#{format}".}
       end
+
+      raise InvalidFormat, msg
     end
 
     def check_format(format, value, identifier)
@@ -32,20 +28,16 @@ module Committee
     end
 
     def check_type!(allowed_types, value, identifier)
-      if msg = type_error(allowed_types, value, identifier)
-        raise InvalidType, msg
-      end
-    end
-
-    def type_error(allowed_types, value, identifier)
       return if check_type(allowed_types, value, identifier)
 
-      case identifier
+      msg = case identifier
       when String
         %{Invalid type for key "#{identifier}": expected #{value.inspect} to be #{allowed_types}.}
       when Array
         %{Invalid type at "#{identifier.join(":")}": expected #{value.inspect} to be #{allowed_types}.}
       end
+
+      raise InvalidType, msg
     end
 
     def check_type(allowed_types, value, identifier)
@@ -72,20 +64,16 @@ module Committee
     end
 
     def check_pattern!(pattern, value, identifier)
-      if msg = pattern_error(pattern, value, identifier)
-        raise InvalidPattern, msg
-      end
-    end
-
-    def pattern_error(pattern, value, identifier)
       return if check_pattern(pattern, value, identifier)
 
-      case identifier
+      msg = case identifier
       when String
         %{Invalid pattern for key "#{identifier}": expected #{value} to match "#{pattern}".}
       when Array
           %{Invalid pattern at "#{identifier.join(":")}": expected #{value} to match "#{pattern}".}
       end
+
+      raise InvalidPattern, msg
     end
 
     def check_pattern(pattern, value, identifier)

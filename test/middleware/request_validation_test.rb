@@ -30,7 +30,7 @@ describe Committee::Middleware::RequestValidation do
     header "Content-Type", "application/json"
     post "/account/app-transfers", "{}"
     assert_equal 422, last_response.status
-    assert_match /require params/i, last_response.body
+    assert_match /is mandatory/i, last_response.body
   end
 
   it "detects an extra parameter" do
@@ -43,7 +43,7 @@ describe Committee::Middleware::RequestValidation do
     header "Content-Type", "application/json"
     post "/account/app-transfers", MultiJson.encode(params)
     assert_equal 422, last_response.status
-    assert_match /unknown params/i, last_response.body
+    assert_match /unknown parameter/i, last_response.body
   end
 
   it "doesn't error on an extra parameter with allow_extra" do
