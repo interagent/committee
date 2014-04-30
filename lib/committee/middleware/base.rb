@@ -13,7 +13,7 @@ module Committee::Middleware
 
     def render_error(status, id, message)
       [status, { "Content-Type" => "application/json" },
-        [MultiJson.encode(id: id, error: message)]]
+        [MultiJson.encode({ id: id, error: message }, pretty: true)]]
     end
   end
 end
