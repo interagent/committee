@@ -31,9 +31,9 @@ module Committee::Middleware
         when "POST"
           data = MultiJson.decode(request.body.read)
           add_resource(type_schema, data)
+          status = 201
         end
-        
-        status = 201 if link_schema["rel"] == "create"
+
         [status, headers, [MultiJson.encode(data, pretty: true)]]
       else
         @app.call(env)
