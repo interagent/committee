@@ -45,7 +45,7 @@ $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d
 use Committee::Middleware::Stub, schema: File.read(...)
 ```
 
-This piece of middleware intercepts any routes that are in the JSON Schema, then builds and returns an appropriate an appropriate response for them.
+This piece of middleware intercepts any routes that are in the JSON Schema, then builds and returns an appropriate response for them.
 
 ``` bash
 $ curl -X GET http://localhost:9292/apps
