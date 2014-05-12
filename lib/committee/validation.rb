@@ -77,7 +77,7 @@ module Committee
     end
 
     def check_pattern(pattern, value, identifier)
-      !pattern || value =~ pattern
+      !pattern || value =~ Regexp.new(pattern)
     end
   end
 end
