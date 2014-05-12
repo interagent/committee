@@ -9,12 +9,12 @@ module Committee
     end
 
     def [](type)
-      @schema["definitions"][type]
+      find(@schema["properties"][type]['$ref'])
     end
 
     def each
-      @schema["definitions"].each do |type, type_schema|
-        yield(type, type_schema)
+      @schema["properties"].each do |type, ref|
+        yield(type, find(ref['$ref']))
       end
     end
 

@@ -926,8 +926,20 @@
     }
   },
   "properties": {
+    "account": {
+      "$ref": "#/definitions/account"
+    },
     "app": {
-      "$ref": "/definitions/app"
+      "$ref": "#/definitions/app"
+    },
+    "app-transfer": {
+      "$ref": "#/definitions/app-transfer"
+    },
+    "region": {
+      "$ref": "#/definitions/region"
+    },
+    "stack": {
+      "$ref": "#/definitions/stack"
     }
   },
   "$schema": "http://json-schema.org/draft-04/hyper-schema",
