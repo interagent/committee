@@ -290,7 +290,6 @@
         "git_url": {
           "description": "git repo URL of app",
           "example": "git@heroku.com/example.git",
-          "format": "uri",
           "pattern": "^git@heroku\\.com/[a-z][a-z0-9-]{3,30}\\.git$",
           "readOnly": true,
           "type": [

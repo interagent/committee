@@ -28,24 +28,6 @@ describe Committee::Middleware::ResponseValidation do
     assert_match /valid JSON/i, last_response.body
   end
 
-  it "detects missing keys in response" do
-    data = ValidApp.dup
-    data.delete("name")
-    @app = new_rack_app(MultiJson.encode([data]))
-    get "/apps"
-    assert_equal 500, last_response.status
-    assert_match /missing keys/i, last_response.body
-  end
-
-  it "detects extra keys in response" do
-    data = ValidApp.dup
-    data.merge!("tier" => "important")
-    @app = new_rack_app(MultiJson.encode([data]))
-    get "/apps"
-    assert_equal 500, last_response.status
-    assert_match /extra keys/i, last_response.body
-  end
-
   it "rescues JSON errors" do
     @app = new_rack_app("[{x:y}]")
     get "/apps"
@@ -66,7 +48,7 @@ describe Committee::Middleware::ResponseValidation do
       "Content-Type" => "application/json"
     }.merge(headers)
     options = {
-      schema: File.read("./test/data/schema.json")
+      schema: MultiJson.decode(File.read("./test/data/schema.json"))
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, options
