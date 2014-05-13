@@ -5,7 +5,7 @@ module Committee::Middleware
 
       @params_key = options[:params_key] || "committee.params"
       data = options[:schema] || raise("need option `schema`")
-      @schema = Committee::Schema.new(data)
+      @schema = JsonSchema.parse!(data)
       @router = Committee::Router.new(@schema)
     end
 

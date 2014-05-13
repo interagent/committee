@@ -3,7 +3,6 @@ module Committee
     include Validation
 
     def initialize(data, schema, link_schema, type_schema)
-
       @data = data
       @schema = schema
       @link_schema = link_schema

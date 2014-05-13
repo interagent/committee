@@ -24,13 +24,14 @@ module Committee
 
     def build_routes(schema)
       routes = {}
-      schema.each do |_, type_schema|
-        type_schema["links"].each do |link|
-          routes[link["method"]] ||= []
+      # realistically, we should be examining links recursively at all levels
+      schema.properties.each do |_, type_schema|
+        type_schema.links.each do |link|
+          method = link.method.to_s.upcase
+          routes[method] ||= []
           # /apps/{id} --> /apps/([^/]+)
-          href = link["href"].gsub(/\{(.*?)\}/, "[^/]+")
-          routes[link["method"]] <<
-            [%r{^#{href}$}, link, type_schema]
+          href = link.href.gsub(/\{(.*?)\}/, "[^/]+")
+          routes[method] << [%r{^#{href}$}, link, type_schema]
         end
       end
       routes

@@ -2,8 +2,8 @@ require_relative "test_helper"
 
 describe Committee::Router do
   before do
-    data = File.read("./test/data/schema.json")
-    schema = Committee::Schema.new(data)
+    data = MultiJson.decode(File.read("./test/data/schema.json"))
+    schema = JsonSchema.parse!(data)
     @router = Committee::Router.new(schema)
   end
 
