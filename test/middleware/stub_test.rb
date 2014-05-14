@@ -51,7 +51,7 @@ describe Committee::Middleware::Stub do
   def new_rack_app(options = {})
     suppress = options.delete(:suppress)
     options = {
-      schema: File.read("./test/data/schema.json")
+      schema: MultiJson.decode(File.read("./test/data/schema.json"))
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::Stub, options

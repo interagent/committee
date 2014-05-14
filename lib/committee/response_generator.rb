@@ -1,29 +1,35 @@
 module Committee
   class ResponseGenerator
-    def initialize(schema, type_schema, link_schema)
-      @schema = schema
-      @type_schema = type_schema
-      @link_schema = link_schema
-    end
+    def call(link)
+      data = generate_properties(link.parent)
 
-    def call
-      generate_properties(@type_schema)
+      # list is a special case; wrap data in an array
+      data = [data] if link.rel == "instances"
+
+      data
     end
 
     private
 
     def generate_properties(schema)
       data = {}
-      schema["properties"].each do |name, value|
-        data[name] = if value["properties"]
+      schema.properties.each do |key, value|
+        data[key] = if !value.properties.empty?
           generate_properties(value)
         else
-          definition = @schema.find(value["$ref"])
-          definition["example"]
+          # special example attribute was included; use its value
+          if !value.data["example"].nil?
+            value.data["example"]
+          # null is allowed; use that
+          elsif value.type.include?("null")
+            nil
+          # otherwise we don't know what to do (we could eventually generate
+          # random data based on type/format
+          else
+            raise(%{At "#{schema.id}"/"#{key}": no "example" attribute and "null" is not allowed; don't know how to generate property.})
+          end
         end
       end
-      # list is a special case; wrap data in an array
-      data = [data] if @link_schema["title"] == "List"
       data
     end
   end
