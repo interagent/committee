@@ -11,8 +11,7 @@ module Committee::Middleware
     def call(env)
       request = Rack::Request.new(env)
       env[@params_key] = Committee::RequestUnpacker.new(request).call
-      link, _ = @router.routes_request?(request, prefix: @prefix)
-      if link
+      if link = @router.routes_request?(request, prefix: @prefix)
         Committee::ParamValidator.new.call(link, env[@params_key])
       end
       @app.call(env)

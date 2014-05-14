@@ -6,9 +6,8 @@ module Committee::Test
       @schema ||= JsonSchema.parse!(MultiJson.decode(schema_contents))
       @router ||= Committee::Router.new(@schema)
 
-      link, _ =
+      link =
         @router.routes_request?(last_request, prefix: schema_url_prefix)
-
       unless link
         response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
         raise Committee::InvalidResponse.new(response)

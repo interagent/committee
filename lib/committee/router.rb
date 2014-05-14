@@ -7,13 +7,13 @@ module Committee
     def routes?(method, path, options = {})
       path = path.gsub(/^#{options[:prefix]}/, "") if options[:prefix]
       if method_routes = @routes[method]
-        method_routes.each do |pattern, link, schema|
+        method_routes.each do |pattern, link|
           if path =~ pattern
-            return link, schema
+            return link
           end
         end
       end
-      [nil, nil]
+      nil
     end
 
     def routes_request?(request, options = {})
@@ -31,7 +31,7 @@ module Committee
           routes[method] ||= []
           # /apps/{id} --> /apps/([^/]+)
           href = link.href.gsub(/\{(.*?)\}/, "[^/]+")
-          routes[method] << [%r{^#{href}$}, link, type_schema]
+          routes[method] << [%r{^#{href}$}, link]
         end
       end
       routes

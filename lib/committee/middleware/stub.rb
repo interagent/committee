@@ -9,8 +9,7 @@ module Committee::Middleware
 
     def call(env)
       request = Rack::Request.new(env)
-      link, _ = @router.routes_request?(request, prefix: @prefix)
-      if link
+      if link = @router.routes_request?(request, prefix: @prefix)
         headers = { "Content-Type" => "application/json" }
         data = cache(link.method, link.href) do
           Committee::ResponseGenerator.new.call(link)
