@@ -50,10 +50,11 @@ describe Committee::Middleware::Stub do
       data.delete("name")
       @app = new_rack_app(MultiJson.encode([data]))
       get "/apps"
-      e = assert_raises(Committee::InvalidResponse) do
+      e = assert_raises(Committee::InvalidParams) do
         assert_schema_conform
       end
-      assert_match /missing keys/i, e.message
+      assert_equal 1, e.count
+      assert_equal :missing, e.on(:name)
     end
   end
 

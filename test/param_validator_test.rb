@@ -19,8 +19,9 @@ describe Committee::ParamValidator do
     e = assert_raises(Committee::InvalidParams) do
       validate({}, @schema, @link_schema)
     end
-    message = "Require params: app, recipient."
-    assert_equal message, e.message
+    assert_equal 2, e.count
+    assert_equal :missing, e.on(:app)
+    assert_equal :missing, e.on(:recipient)
   end
 
   it "doesn't error on an extraneous parameter with allow_extra" do
@@ -37,11 +38,11 @@ describe Committee::ParamValidator do
       "app" => "heroku-api",
       "recipient" => 123,
     }
-    e = assert_raises(Committee::InvalidType) do
+    e = assert_raises(Committee::InvalidParams) do
       validate(params, @schema, @link_schema)
     end
-    message = %{Invalid type for key "recipient": expected 123 to be ["string"].}
-    assert_equal message, e.message
+    assert_equal 1, e.count
+    assert_equal :bad_type, e.on(:recipient)
   end
 
   it "detects a parameter of the wrong format" do
@@ -49,11 +50,11 @@ describe Committee::ParamValidator do
       "app" => "heroku-api",
       "recipient" => "not-email",
     }
-    e = assert_raises(Committee::InvalidFormat) do
+    e = assert_raises(Committee::InvalidParams) do
       validate(params, @schema, @link_schema)
     end
-    message = %{Invalid format for key "recipient": expected "not-email" to be "email".}
-    assert_equal message, e.message
+    assert_equal 1, e.count
+    assert_equal :bad_format, e.on(:recipient)
   end
 
   it "detects a parameter of the wrong pattern" do
@@ -61,11 +62,11 @@ describe Committee::ParamValidator do
       "name" => "%@!"
     }
     link_schema = @schema["app"]["links"][0]
-    e = assert_raises(Committee::InvalidPattern) do
+    e = assert_raises(Committee::InvalidParams) do
       validate(params, @schema, link_schema)
     end
-    message = %{Invalid pattern for key "name": expected %@! to match "(?-mix:^[a-z][a-z0-9-]{3,30}$)".}
-    assert_equal message, e.message
+    assert_equal 1, e.count
+    assert_equal :bad_pattern, e.on(:name)
   end
 
   describe "complex arrays" do
@@ -87,11 +88,11 @@ describe Committee::ParamValidator do
         ]
       }
       link_schema = @schema["stack"]["links"][2]
-      e = assert_raises(Committee::InvalidType) do
+      e = assert_raises(Committee::InvalidParams) do
         validate(params, @schema, link_schema)
       end
-      message = %{Invalid type for key "state": expected 123 to be ["string"].}
-      assert_equal message, e.message
+      assert_equal 1, e.count
+      assert_equal :bad_type, e.on(:state)
     end
   end
 
@@ -111,11 +112,28 @@ describe Committee::ParamValidator do
         "flags" => [ "vip", "customer", 999 ]
       }
       link_schema = @schema["account"]["links"][1]
-      e = assert_raises(Committee::InvalidType) do
+      e = assert_raises(Committee::InvalidParams) do
         validate(params, @schema, link_schema)
       end
-      message = %{Invalid type for key "flags": expected 999 to be ["string"].}
-      assert_equal message, e.message
+      assert_equal 1, e.count
+      assert_equal :bad_type, e.on(:flags)
+    end
+  end
+
+  describe "combined errors" do
+    params = {
+      "app" => "%@!", # bad pattern
+      "recipient" => 123, # bad type
+      "cloud" => true, # extra
+    }
+    it "stores errors on all params" do
+      e = assert_raises(Committee::InvalidParams) do
+        validate(params, @schema, @link_schema)
+      end
+      assert_equal 3, e.count
+      assert_equal :bad_pattern, e.on(:app)
+      assert_equal :bad_type, e.on(:recipient)
+      assert_equal :extra, e.on(:cloud)
     end
   end
 

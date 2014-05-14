@@ -24,47 +24,55 @@ module Committee
       data_keys = build_data_keys(data)
       schema_keys = build_schema_keys
 
-      extra = data_keys - schema_keys
-      missing = schema_keys - data_keys
+      @error = InvalidParams.new
 
-      errors = []
-
-      if extra.count > 0
-        errors << "Extra keys in response: #{extra.join(', ')}."
+      (data_keys - schema_keys).each do |extra_param|
+        @error.add(:extra, extra_param)
       end
 
-      if missing.count > 0
-        errors << "Missing keys in response: #{missing.join(', ')}."
+      (schema_keys - data_keys).each do |missing_param|
+        @error.add(:missing, missing_param)
       end
 
-      unless errors.empty?
-        raise InvalidResponse, ["`#{@link_schema['method']} #{@link_schema['href']}` deviates from schema.", *errors].join(' ')
-      end
+      check_data(@type_schema, data, [])
 
-      check_data!(@type_schema, data, [])
+      if @error.count > 0
+        raise @error
+      end
     end
 
-    def check_data!(schema, data, path)
+    def check_data(schema, data, path)
       schema["properties"].each do |key, value|
+        next if @error.on(key) == :missing
+
         if value["properties"]
-          check_data!(value, data[key], path + [key])
+          check_data(value, data[key], path + [key])
         elsif value["type"] == ["array"]
           definition = @schema.find(value["items"]["$ref"])
           data[key].each do |datum|
-            check_type!(definition["type"], datum, path + [key])
-            check_data!(definition, datum, path + [key]) if definition["type"] == ["object"]
-            unless definition["type"].include?("null") && datum.nil?
-              check_format!(definition["format"], datum, path + [key])
-              check_pattern!(definition["pattern"], datum, path + [key])
+            if !check_type(definition["type"], datum, path + [key])
+              @error.add(:bad_type, key)
+            elsif definition["type"] == ["object"]
+              check_data(definition, datum, path + [key])
+            elsif definition["type"].include?("null") && datum.nil?
+              next
+            elsif !check_format(definition["format"], datum, path + [key])
+              @error.add(:bad_format, key)
+            elsif !check_pattern(definition["pattern"], datum, path + [key])
+              @error.add(:bad_pattern, key)
             end
           end
 
         else
           definition = @schema.find(value["$ref"])
-          check_type!(definition["type"], data[key], path + [key])
-          unless definition["type"].include?("null") && data[key].nil?
-            check_format!(definition["format"], data[key], path + [key])
-            check_pattern!(definition["pattern"], data[key], path + [key])
+          if !check_type(definition["type"], data[key], path + [key])
+            @error.add(:bad_type, key)
+          elsif definition["type"].include?("null") && data[key].nil?
+            next
+          elsif !check_format(definition["format"], data[key], path + [key])
+            @error.add(:bad_format, key)
+          elsif !check_pattern(definition["pattern"], data[key], path + [key])
+            @error.add(:bad_pattern, key)
           end
         end
       end

@@ -36,37 +36,37 @@ describe Committee::ResponseValidator do
 
   it "detects missing keys in response" do
     @data.delete("name")
-    e = assert_raises(Committee::InvalidResponse) { call }
-    message = %r{Missing keys in response: name.}
-    assert_match message, e.message
+    e = assert_raises(Committee::InvalidParams) { call }
+    assert_equal 1, e.count
+    assert_equal :missing, e.on(:name)
   end
 
   it "detects extra keys in response" do
     @data.merge!("tier" => "important")
-    e = assert_raises(Committee::InvalidResponse) { call }
-    message = %r{Extra keys in response: tier.}
-    assert_match message, e.message
+    e = assert_raises(Committee::InvalidParams) { call }
+    assert_equal 1, e.count
+    assert_equal :extra, e.on(:tier)
   end
 
   it "detects mismatched types" do
     @data.merge!("maintenance" => "not-bool")
-    e = assert_raises(Committee::InvalidType) { call }
-    message = %{Invalid type at "maintenance": expected "not-bool" to be ["boolean"].}
-    assert_equal message, e.message
+    e = assert_raises(Committee::InvalidParams) { call }
+    assert_equal 1, e.count
+    assert_equal :bad_type, e.on(:maintenance)
   end
 
   it "detects bad formats" do
     @data.merge!("id" => "123")
-    e = assert_raises(Committee::InvalidFormat) { call }
-    message = %{Invalid format at "id": expected "123" to be "uuid".}
-    assert_equal message, e.message
+    e = assert_raises(Committee::InvalidParams) { call }
+    assert_equal 1, e.count
+    assert_equal :bad_format, e.on(:id)
   end
 
   it "detects bad patterns" do
     @data.merge!("name" => "%@!")
-    e = assert_raises(Committee::InvalidPattern) { call }
-    message = %{Invalid pattern at "name": expected %@! to match "(?-mix:^[a-z][a-z0-9-]{3,30}$)".}
-    assert_equal message, e.message
+    e = assert_raises(Committee::InvalidParams) { call }
+    assert_equal 1, e.count
+    assert_equal :bad_pattern, e.on(:name)
   end
 
   it "accepts date-time format without milliseconds" do
@@ -77,7 +77,7 @@ describe Committee::ResponseValidator do
       @schema["app"])
 
     value = "2014-03-10T00:00:00Z"
-    assert_nil validator.check_format!("date-time", value, ["example"])
+    assert validator.check_format("date-time", value, ["example"])
   end
 
   it "accepts date-time format with milliseconds" do
@@ -88,7 +88,7 @@ describe Committee::ResponseValidator do
       @schema["app"])
 
     value = "2014-03-10T00:00:00.123Z"
-    assert_nil validator.check_format!("date-time", value, ["example"])
+    assert validator.check_format("date-time", value, ["example"])
   end
 
   it "accepts a simple array" do
@@ -116,9 +116,9 @@ describe Committee::ResponseValidator do
     @link_schema = @schema["account"]["links"][1]
     @type_schema = @schema["account"]
 
-    e = assert_raises(Committee::InvalidType) { call }
-    message = %{Invalid type at "flags": expected false to be ["string"].}
-    assert_equal message, e.message
+    e = assert_raises(Committee::InvalidParams) { call }
+    assert_equal 1, e.count
+    assert_equal :bad_type, e.on(:flags)
   end
 
   it "rejects an invalid pattern match" do
@@ -128,9 +128,9 @@ describe Committee::ResponseValidator do
     @link_schema = @schema["account"]["links"][0]
     @type_schema = @schema["account"]
 
-    e = assert_raises(Committee::InvalidPattern) { call }
-    message = %{Invalid pattern at "credit_cards:account_number": expected 1234-1234-1234-HUGZ to match "(?-mix:[0-9]{4}\\-[0-9]{4}\\-[0-9]{4}\\-[0-9]{4}$)".}
-    assert_equal message, e.message
+    e = assert_raises(Committee::InvalidParams) { call }
+    assert_equal 1, e.count
+    assert_equal :bad_pattern, e.on(:account_number)
   end
 
   private

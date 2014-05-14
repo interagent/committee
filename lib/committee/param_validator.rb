@@ -10,9 +10,15 @@ module Committee
     end
 
     def call
-      detect_missing!
-      detect_extra! if !@allow_extra
+      @error = InvalidParams.new
+
+      detect_missing
+      detect_extra if !@allow_extra
       check_data!
+
+      if @error.count > 0
+        raise @error
+      end
     end
 
     private
@@ -55,17 +61,15 @@ module Committee
       end
     end
 
-    def detect_extra!
-      extra = @params.keys - all_keys
-      if extra.count > 0
-        raise InvalidParams.new("Unknown params: #{extra.join(', ')}.")
+    def detect_extra
+      (@params.keys - all_keys).each do |param|
+        @error.add(:extra, param)
       end
     end
 
-    def detect_missing!
-      missing = required_keys - @params.keys
-      if missing.count > 0
-        raise InvalidParams.new("Require params: #{missing.join(', ')}.")
+    def detect_missing
+      (required_keys - @params.keys).each do |param|
+        @error.add(:missing, param)
       end
     end
 
@@ -83,23 +87,19 @@ module Committee
     end
 
     def try_match(key, value, definitions)
-      match = false
-
       # try to match data against any possible definition
       definitions.each do |definition|
-        if check_type(definition["type"], value, key) &&
-          check_format(definition["format"], value, key) &&
-          check_pattern(definition["pattern"], value, key)
-          match = true
-          next
+        if !check_type(definition["type"], value, key)
+          @error.add(:bad_type, key)
+        elsif !check_format(definition["format"], value, key)
+          @error.add(:bad_format, key)
+        elsif !check_pattern(definition["pattern"], value, key)
+          @error.add(:bad_pattern, key)
+        else
+          # passed all tests; clear any error from previous definitions
+          @error.remove(key)
+          break
         end
-      end
-
-      # if nothing was matched, throw error according to first definition
-      if !match && definition = definitions.first
-        check_type!(definition["type"], value, key)
-        check_format!(definition["format"], value, key)
-        check_pattern!(definition["pattern"], value, key)
       end
     end
   end

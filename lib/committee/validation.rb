@@ -1,19 +1,5 @@
 module Committee
   module Validation
-    def check_format!(format, value, identifier)
-      return if !format
-      return if check_format(format, value, identifier)
-
-      description = case identifier
-      when String
-        %{Invalid format for key "#{identifier}": expected "#{value}" to be "#{format}".}
-      when Array
-        %{Invalid format at "#{identifier.join(":")}": expected "#{value}" to be "#{format}".}
-      end
-
-      raise InvalidFormat, description
-    end
-
     def check_format(format, value, identifier)
       case format
       when "date-time"
@@ -25,19 +11,6 @@ module Committee
       else
         true
       end
-    end
-
-    def check_type!(allowed_types, value, identifier)
-      return if check_type(allowed_types, value, identifier)
-
-      description = case identifier
-      when String
-        %{Invalid type for key "#{identifier}": expected #{value.inspect} to be #{allowed_types}.}
-      when Array
-        %{Invalid type at "#{identifier.join(":")}": expected #{value.inspect} to be #{allowed_types}.}
-      end
-
-      raise InvalidType, description
     end
 
     def check_type(allowed_types, value, identifier)
@@ -61,19 +34,6 @@ module Committee
       end
 
       !(allowed_types & types).empty?
-    end
-
-    def check_pattern!(pattern, value, identifier)
-      return if check_pattern(pattern, value, identifier)
-
-      description = case identifier
-      when String
-        %{Invalid pattern for key "#{identifier}": expected #{value} to match "#{pattern}".}
-      when Array
-          %{Invalid pattern at "#{identifier.join(":")}": expected #{value} to match "#{pattern}".}
-      end
-
-      raise InvalidPattern, description
     end
 
     def check_pattern(pattern, value, identifier)
