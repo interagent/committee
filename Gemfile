@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gemspec
 
-group :development, :test do
+group :development do
   gem "pry"
   gem "pry-debugger"
   gem "pry-doc"
