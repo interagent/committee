@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-describe Committee::ParamValidator do
+describe Committee::RequestValidator do
   before do
     @schema =
       JsonSchema.parse!(MultiJson.decode(File.read("./test/data/schema.json")))
@@ -19,7 +19,7 @@ describe Committee::ParamValidator do
     params = {
       "name" => "%@!"
     }
-    e = assert_raises(Committee::InvalidParams) do
+    e = assert_raises(Committee::InvalidRequest) do
       call(params)
     end
     message = %{At "/schema/app": Expected string to match pattern "/^[a-z][a-z0-9-]{3,30}$/", value was: %@!.}
@@ -29,6 +29,6 @@ describe Committee::ParamValidator do
   private
 
   def call(params)
-    Committee::ParamValidator.new.call(@link, params)
+    Committee::RequestValidator.new.call(@link, params)
   end
 end

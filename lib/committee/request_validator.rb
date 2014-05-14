@@ -1,5 +1,5 @@
 module Committee
-  class ParamValidator
+  class RequestValidator
     def initialize(options = {})
     end
 
@@ -7,7 +7,7 @@ module Committee
       if link.schema
         valid, errors = link.schema.validate(params)
         if !valid
-          raise InvalidParams,
+          raise InvalidRequest,
             JsonSchema::SchemaError.aggregate(errors)
         end
       end

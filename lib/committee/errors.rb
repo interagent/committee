@@ -14,7 +14,7 @@ module Committee
   class InvalidType < Error
   end
 
-  class InvalidParams < Error
+  class InvalidRequest < Error
   end
 
   class InvalidResponse < Error

@@ -12,7 +12,7 @@ module Committee::Middleware
       request = Rack::Request.new(env)
       env[@params_key] = Committee::RequestUnpacker.new(request).call
       if link = @router.routes_request?(request, prefix: @prefix)
-        Committee::ParamValidator.new.call(link, env[@params_key])
+        Committee::RequestValidator.new.call(link, env[@params_key])
       end
       @app.call(env)
     rescue Committee::BadRequest
