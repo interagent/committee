@@ -1,8 +1,6 @@
 module Committee::Test
   module Methods
     def assert_schema_conform
-      assert_schema_content_type
-
       if (data = schema_contents).is_a?(String)
         warn_string_deprecated
         data = MultiJson.decode(data)
@@ -19,14 +17,11 @@ module Committee::Test
       end
 
       data = MultiJson.decode(last_response.body)
-      Committee::ResponseValidator.new(link).call(data)
+      Committee::ResponseValidator.new(link).call(last_response.headers, data)
     end
 
     def assert_schema_content_type
-      unless last_response.headers["Content-Type"] =~ %r{application/json}
-        raise Committee::InvalidResponse,
-          %{"Content-Type" response header must be set to "application/json".}
-      end
+      Committee.warn_deprecated("Use of #assert_schema_content_type is deprecated; use #assert_schema_conform instead.")
     end
 
     # can be overridden alternatively to #schema_path in case the schema is

@@ -13,19 +13,9 @@ describe Committee::Middleware::Stub do
   end
 
   describe "#assert_schema_content_type" do
-    it "passes through a valid response" do
-      @app = new_rack_app(MultiJson.encode([ValidApp]))
-      get "/apps"
+    it "warns about deprecation" do
+      mock(Committee).warn_deprecated.with_any_args
       assert_schema_content_type
-    end
-
-    it "detects an invalid response Content-Type" do
-      @app = new_rack_app(MultiJson.encode([ValidApp]), {})
-      get "/apps"
-      e = assert_raises(Committee::InvalidResponse) do
-        assert_schema_content_type
-      end
-      assert_match /response header must be set to/i, e.message
     end
   end
 

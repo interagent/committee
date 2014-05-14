@@ -13,14 +13,6 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
-  it "detects an invalid response Content-Type" do
-    @app = new_rack_app(MultiJson.encode([ValidApp]),
-      { "Content-Type" => "application/xml" })
-    get "/apps"
-    assert_equal 500, last_response.status
-    assert_match /response header must be set to/i, last_response.body
-  end
-
   it "detects an invalid response" do
     @app = new_rack_app("")
     get "/apps"
