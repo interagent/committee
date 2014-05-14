@@ -22,7 +22,7 @@ describe Committee::RequestValidator do
     e = assert_raises(Committee::InvalidRequest) do
       call(params)
     end
-    message = %{At "/schema/app": Expected string to match pattern "/^[a-z][a-z0-9-]{3,30}$/", value was: %@!.}
+    message = %{Invalid request.\n\nAt "/schema/app": Expected string to match pattern "/^[a-z][a-z0-9-]{3,30}$/", value was: %@!.}
     assert_equal message, e.message
   end
 

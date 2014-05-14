@@ -15,8 +15,20 @@ module Committee
       end
 
       if !@validator.validate(data)
-        raise InvalidResponse,
-          JsonSchema::SchemaError.aggregate(@validator.errors)
+        errors = error_messages(@validator.errors).join("\n")
+        raise InvalidResponse, "Invalid response.\n\n#{errors}"
+      end
+    end
+
+    private
+
+    def error_messages(errors)
+      errors.map do |error|
+        if error.schema
+          %{At "#{error.schema.uri}": #{error.message}}
+        else
+          error.message
+        end
       end
     end
   end
