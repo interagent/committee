@@ -20,7 +20,7 @@ GEM
       debugger-ruby_core_source (~> 1.2.4)
     debugger-linecache (1.2.0)
     debugger-ruby_core_source (1.2.4)
-    json_schema (0.0.6)
+    json_schema (0.0.7)
     method_source (0.8.1)
     minitest (5.3.2)
     multi_json (1.10.0)
