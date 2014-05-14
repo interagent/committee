@@ -3,24 +3,19 @@ module Committee::Test
     def assert_schema_conform
       assert_schema_content_type
 
-      @schema ||= Committee::Schema.new(schema_contents)
+      @schema ||= JsonSchema.parse!(MultiJson.decode(schema_contents))
       @router ||= Committee::Router.new(@schema)
 
-      link_schema, type_schema =
+      link, _ =
         @router.routes_request?(last_request, prefix: schema_url_prefix)
 
-      unless link_schema
+      unless link
         response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
         raise Committee::InvalidResponse.new(response)
       end
 
       data = MultiJson.decode(last_response.body)
-      Committee::ResponseValidator.new(
-        data,
-        @schema,
-        link_schema,
-        type_schema
-      ).call
+      Committee::ResponseValidator.new(link).call(data)
     end
 
     def assert_schema_content_type

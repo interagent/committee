@@ -44,17 +44,6 @@ describe Committee::Middleware::Stub do
       end
       assert_match /response header must be set to/i, e.message
     end
-
-    it "detects missing keys in response" do
-      data = ValidApp.dup
-      data.delete("name")
-      @app = new_rack_app(MultiJson.encode([data]))
-      get "/apps"
-      e = assert_raises(Committee::InvalidResponse) do
-        assert_schema_conform
-      end
-      assert_match /missing keys/i, e.message
-    end
   end
 
   private
