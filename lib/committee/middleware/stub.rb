@@ -9,7 +9,7 @@ module Committee::Middleware
 
     def call(env)
       request = Rack::Request.new(env)
-      link, type_schema = @router.routes_request?(request, prefix: @prefix)
+      link, _ = @router.routes_request?(request, prefix: @prefix)
       if link
         headers = { "Content-Type" => "application/json" }
         data = cache(link.method, link.href) do
