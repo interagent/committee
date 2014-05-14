@@ -39,11 +39,6 @@ describe Committee::ResponseValidator do
   private
 
   def call
-    Committee::ResponseValidator.new(
-      @data,
-      @schema,
-      @link,
-      @type_schema
-    ).call
+    Committee::ResponseValidator.new(@link).call(@data)
   end
 end

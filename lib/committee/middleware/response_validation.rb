@@ -8,17 +8,12 @@ module Committee::Middleware
     def call(env)
       status, headers, response = @app.call(env)
       request = Rack::Request.new(env)
-      link_schema, type_schema =
+      link, _ =
         @router.routes_request?(request, prefix: @prefix)
-      if type_schema
+      if link
         check_content_type!(headers)
         str = response.reduce("") { |str, s| str << s }
-        Committee::ResponseValidator.new(
-          MultiJson.decode(str),
-          @schema,
-          link_schema,
-          type_schema
-        ).call
+        Committee::ResponseValidator.new(link).call(MultiJson.decode(str))
       end
       [status, headers, response]
     rescue Committee::InvalidResponse
