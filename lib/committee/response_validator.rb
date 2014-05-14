@@ -1,7 +1,5 @@
 module Committee
   class ResponseValidator
-    include Validation
-
     def initialize(data, schema, link, type_schema)
       @data = data
       @schema = schema

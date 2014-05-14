@@ -2,8 +2,10 @@ module Committee::Middleware
   class RequestValidation < Base
     def initialize(app, options={})
       super
-      @allow_extra = options[:allow_extra]
       @prefix = options[:prefix]
+
+      # deprecated
+      @allow_extra = options[:allow_extra]
     end
 
     def call(env)
@@ -11,12 +13,7 @@ module Committee::Middleware
       env[@params_key] = Committee::RequestUnpacker.new(request).call
       link, _ = @router.routes_request?(request, prefix: @prefix)
       if link
-        Committee::ParamValidator.new(
-          env[@params_key],
-          @schema,
-          link,
-          allow_extra: @allow_extra
-        ).call
+        Committee::ParamValidator.new.call(link, env[@params_key])
       end
       @app.call(env)
     rescue Committee::BadRequest
