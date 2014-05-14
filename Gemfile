@@ -7,4 +7,5 @@ group :development do
   #gem "pry-debugger"
   #gem "pry-doc"
   #gem "pry-stack_explorer"
+  gem "rr", require: false
 end

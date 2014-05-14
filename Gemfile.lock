@@ -16,6 +16,7 @@ GEM
     rack-test (0.6.2)
       rack (>= 1.0)
     rake (10.2.2)
+    rr (1.1.2)
 
 PLATFORMS
   ruby
@@ -25,3 +26,4 @@ DEPENDENCIES
   minitest
   rack-test
   rake
+  rr

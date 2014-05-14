@@ -15,3 +15,11 @@ require_relative "committee/middleware/response_validation"
 require_relative "committee/middleware/stub"
 
 require_relative "committee/test/methods"
+
+module Committee
+  def self.warn_deprecated(message)
+    if !$VERBOSE.nil?
+      $stderr.puts(message)
+    end
+  end
+end

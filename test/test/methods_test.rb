@@ -44,6 +44,14 @@ describe Committee::Middleware::Stub do
       end
       assert_match /response header must be set to/i, e.message
     end
+
+    it "warns when sending a deprecated string" do
+      stub(self).schema_contents { File.read(schema_path) }
+      mock(Committee).warn_deprecated.with_any_args
+      @app = new_rack_app(MultiJson.encode([ValidApp]))
+      get "/apps"
+      assert_schema_conform
+    end
   end
 
   private

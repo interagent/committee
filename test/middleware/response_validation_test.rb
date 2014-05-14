@@ -41,6 +41,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "warns when sending a deprecated string" do
+    mock(Committee).warn_deprecated.with_any_args
+    @app = new_rack_app(MultiJson.encode([ValidApp]), {},
+      schema: File.read("./test/data/schema.json"))
+    get "/apps"
+    assert_equal 200, last_response.status
+  end
+
   private
 
   def new_rack_app(response, headers = {}, options = {})

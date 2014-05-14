@@ -3,7 +3,12 @@ module Committee::Test
     def assert_schema_conform
       assert_schema_content_type
 
-      @schema ||= JsonSchema.parse!(MultiJson.decode(schema_contents))
+      if (data = schema_contents).is_a?(String)
+        warn_string_deprecated
+        data = MultiJson.decode(data)
+      end
+
+      @schema ||= JsonSchema.parse!(data)
       @router ||= Committee::Router.new(@schema)
 
       link =
@@ -28,15 +33,19 @@ module Committee::Test
     # easier to access as a string
     # blob
     def schema_contents
-      File.read(schema_path)
+      MultiJson.decode(File.read(schema_path))
     end
 
     def schema_path
-      raise "Please override #schema_path."
+      raise "Please override #schema_contents or #schema_path."
     end
 
     def schema_url_prefix
       nil
+    end
+
+    def warn_string_deprecated
+      Committee.warn_deprecated("Committee: returning a string from `#schema_contents` is deprecated; please return a deserialized hash instead.")
     end
   end
 end

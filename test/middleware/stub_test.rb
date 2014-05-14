@@ -46,6 +46,15 @@ describe Committee::Middleware::Stub do
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
+  it "warns when sending a deprecated string" do
+    mock(Committee).warn_deprecated.with_any_args
+    @app = new_rack_app(schema: File.read("./test/data/schema.json"))
+    get "/apps/heroku-api"
+    assert_equal 200, last_response.status
+    data = MultiJson.decode(last_response.body)
+    assert_equal ValidApp.keys.sort, data.keys.sort
+  end
+
   private
 
   def new_rack_app(options = {})

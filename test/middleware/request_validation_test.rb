@@ -44,6 +44,18 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "warns when sending a deprecated string" do
+    mock(Committee).warn_deprecated.with_any_args
+    @app = new_rack_app(schema: File.read("./test/data/schema.json"))
+    params = {
+      "app" => "heroku-api",
+      "recipient" => "owner@heroku.com",
+    }
+    header "Content-Type", "application/json"
+    post "/v1/account/app-transfers", MultiJson.encode(params)
+    assert_equal 200, last_response.status
+  end
+
   private
 
   def new_rack_app(options = {})
