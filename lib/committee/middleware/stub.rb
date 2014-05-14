@@ -9,11 +9,10 @@ module Committee::Middleware
 
     def call(env)
       request = Rack::Request.new(env)
-      link_schema, type_schema = @router.routes_request?(request, prefix: @prefix)
-      if type_schema
+      if link = @router.routes_request?(request, prefix: @prefix)
         headers = { "Content-Type" => "application/json" }
-        data = cache(link_schema["method"], link_schema["href"]) do
-          Committee::ResponseGenerator.new(@schema, type_schema, link_schema).call
+        data = cache(link.method, link.href) do
+          Committee::ResponseGenerator.new.call(link)
         end
         if @call
           env["committee.response"] = data
@@ -28,7 +27,7 @@ module Committee::Middleware
           # made, and stub normally
           headers.merge!(call_headers)
         end
-        status = link_schema["rel"] == "create" ? 201 : 200
+        status = link.rel == "create" ? 201 : 200
         [status, headers, [MultiJson.encode(data, pretty: true)]]
       else
         @app.call(env)

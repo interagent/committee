@@ -13,19 +13,9 @@ describe Committee::Middleware::Stub do
   end
 
   describe "#assert_schema_content_type" do
-    it "passes through a valid response" do
-      @app = new_rack_app(MultiJson.encode([ValidApp]))
-      get "/apps"
+    it "warns about deprecation" do
+      mock(Committee).warn_deprecated.with_any_args
       assert_schema_content_type
-    end
-
-    it "detects an invalid response Content-Type" do
-      @app = new_rack_app(MultiJson.encode([ValidApp]), {})
-      get "/apps"
-      e = assert_raises(Committee::InvalidResponse) do
-        assert_schema_content_type
-      end
-      assert_match /response header must be set to/i, e.message
     end
   end
 
@@ -45,15 +35,12 @@ describe Committee::Middleware::Stub do
       assert_match /response header must be set to/i, e.message
     end
 
-    it "detects missing keys in response" do
-      data = ValidApp.dup
-      data.delete("name")
-      @app = new_rack_app(MultiJson.encode([data]))
+    it "warns when sending a deprecated string" do
+      stub(self).schema_contents { File.read(schema_path) }
+      mock(Committee).warn_deprecated.with_any_args
+      @app = new_rack_app(MultiJson.encode([ValidApp]))
       get "/apps"
-      e = assert_raises(Committee::InvalidResponse) do
-        assert_schema_conform
-      end
-      assert_match /missing keys/i, e.message
+      assert_schema_conform
     end
   end
 

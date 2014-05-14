@@ -2,25 +2,25 @@ require_relative "test_helper"
 
 describe Committee::Router do
   before do
-    data = File.read("./test/data/schema.json")
-    schema = Committee::Schema.new(data)
+    data = MultiJson.decode(File.read("./test/data/schema.json"))
+    schema = JsonSchema.parse!(data)
     @router = Committee::Router.new(schema)
   end
 
   it "builds routes without parameters" do
-    refute_nil @router.routes?("GET", "/apps")[0]
+    refute_nil @router.routes?("GET", "/apps")
   end
 
   it "builds routes with parameters" do
-    refute_nil @router.routes?("GET", "/apps/123")[0]
+    refute_nil @router.routes?("GET", "/apps/123")
   end
 
   it "doesn't match anything on a /" do
-    assert_nil @router.routes?("GET", "/")[0]
+    assert_nil @router.routes?("GET", "/")
   end
 
   it "takes a prefix" do
     # this is a sociopathic example
-    refute_nil @router.routes?("GET", "/kpi/apps/123", prefix: "/kpi")[0]
+    refute_nil @router.routes?("GET", "/kpi/apps/123", prefix: "/kpi")
   end
 end
