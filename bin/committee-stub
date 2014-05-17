@@ -32,8 +32,8 @@ schema = File.read(args[0])
 
 app = Rack::Builder.new {
   use Committee::Middleware::RequestValidation, schema: schema
-  use Committee::Middleware::Stub, schema: schema
   use Committee::Middleware::ResponseValidation, schema: schema
+  use Committee::Middleware::Stub, schema: schema
   run lambda { |_|
     [404, {}, ["Not found"]]
   }
