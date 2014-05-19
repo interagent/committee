@@ -23,7 +23,7 @@ module Committee
         end
       end
       # list is a special case; wrap data in an array
-      data = [data] if @link_schema["title"] == "List"
+      data = [data] if @link_schema["rel"] == "instances"
       data
     end
   end
