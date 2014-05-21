@@ -1,3 +1,2 @@
 before_script:
-  - gem build committee.gemspec
-  - gem install --dev committee-*.gem
+  - gem install json_schema minitest multi_json rack rack-test rr
