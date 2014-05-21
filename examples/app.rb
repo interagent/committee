@@ -1,14 +1,14 @@
 require "committee"
+require "multi_json"
 require "securerandom"
 require "sinatra/base"
 
 class App < Sinatra::Base
-  SCHEMA = File.read("schema.json")
+  SCHEMA = MultiJson.decode(File.read("schema.json"))
 
   # The request validator verifies that the required input parameters (and no
   # unknown input parameters) are included with the request and that they are
-  # of the right types. The :allow_extra key can be used to relax the
-  # constraint on parameters that are not defined in the schema.
+  # of the right types.
   use Committee::Middleware::RequestValidation, schema: SCHEMA
 
   # The stubbing middleware generates sample responses based on the schema. The
