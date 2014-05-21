@@ -157,3 +157,4 @@ describe Committee::Middleware::Stub do
     end
    end
 end
+```
