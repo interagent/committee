@@ -163,7 +163,7 @@ end
 Run tests with the following:
 
 ```
-gem install rr
+gem install json_schema minitest multi_json rack rack-test rr
 rake
 ```
 
