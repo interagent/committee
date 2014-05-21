@@ -1,0 +1,2 @@
+before_script:
+  - gem install minitest rr
