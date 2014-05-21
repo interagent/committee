@@ -9,7 +9,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    json_schema (0.0.7)
+    json_schema (0.0.9)
     minitest (5.3.2)
     multi_json (1.10.0)
     rack (1.5.2)
