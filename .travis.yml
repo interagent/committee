@@ -1,2 +1,2 @@
 before_script:
-  - gem install minitest rr
+  - gem install minitest rack-test rr
