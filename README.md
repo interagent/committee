@@ -158,3 +158,19 @@ describe Committee::Middleware::Stub do
    end
 end
 ```
+
+## Development
+
+Run tests with the following:
+
+```
+gem install rr
+rake
+```
+
+Run a particular test suite or test:
+
+```
+ruby -Ilib -Itest test/router_test.rb
+ruby -Ilib -Itest test/router_test.rb -n /prefix/
+```
