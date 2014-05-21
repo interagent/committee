@@ -12,7 +12,6 @@ This piece of middleware validates the parameters of incoming requests to make s
 
 Options:
 
-* `allow_extra`: Doesn't raise an error when extra incoming parameters are found.
 * `prefix`: Mounts the middleware respond at a configured prefix.
 
 Some examples of use:
