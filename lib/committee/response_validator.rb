@@ -17,7 +17,7 @@ module Committee
       end
 
       if !@validator.validate(data)
-        errors = error_messages(@validator.errors).join("\n")
+        errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
         raise InvalidResponse, "Invalid response.\n\n#{errors}"
       end
     end
@@ -28,16 +28,6 @@ module Committee
       unless headers["Content-Type"] =~ %r{application/json}
         raise Committee::InvalidResponse,
           %{"Content-Type" response header must be set to "application/json".}
-      end
-    end
-
-    def error_messages(errors)
-      errors.map do |error|
-        if error.schema
-          %{At "#{error.schema.uri}": #{error.message}}
-        else
-          error.message
-        end
       end
     end
   end
