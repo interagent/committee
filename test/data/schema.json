@@ -44,6 +44,11 @@
               }
             }
           },
+          "targetSchema": {
+            "items": {
+              "$ref": "#/definitions/app"
+            }
+          },
           "title": "Create"
         },
         {
@@ -51,6 +56,9 @@
           "href": "/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fname)}",
           "method": "DELETE",
           "rel": "destroy",
+          "targetSchema": {
+            "$ref": "#/definitions/app"
+          },
           "title": "Delete"
         },
         {
@@ -58,6 +66,9 @@
           "href": "/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fname)}",
           "method": "GET",
           "rel": "self",
+          "targetSchema": {
+            "$ref": "#/definitions/app"
+          },
           "title": "Info"
         },
         {
@@ -65,6 +76,9 @@
           "href": "/apps",
           "method": "GET",
           "rel": "instances",
+          "targetSchema": {
+            "$ref": "#/definitions/app"
+          },
           "title": "List"
         },
         {
@@ -72,6 +86,9 @@
           "href": "/apps/archived",
           "method": "GET",
           "rel": "instances",
+          "targetSchema": {
+            "$ref": "#/definitions/app"
+          },
           "title": "List archived"
         },
         {
@@ -88,6 +105,9 @@
                 "$ref": "#/definitions/app/definitions/name"
               }
             }
+          },
+          "targetSchema": {
+            "$ref": "#/definitions/app"
           },
           "title": "Update"
         }

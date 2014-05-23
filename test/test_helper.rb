@@ -1,6 +1,7 @@
 require "minitest"
 require "minitest/spec"
 require "minitest/autorun"
+#require "pry-rescue/minitest"
 require "rack/test"
 require "rr"
 
