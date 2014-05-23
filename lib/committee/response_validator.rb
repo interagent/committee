@@ -2,7 +2,11 @@ module Committee
   class ResponseValidator
     def initialize(link)
       @link = link
-      @validator = JsonSchema::Validator.new(link.parent)
+
+      # we should eventually move off of validating against parent schema too
+      # ... this is a Herokuism and not in the specification
+      schema = link.target_schema || link.parent
+      @validator = JsonSchema::Validator.new(schema)
     end
 
     def call(headers, data)
