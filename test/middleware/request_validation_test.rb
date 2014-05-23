@@ -17,6 +17,17 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "detects an invalid request" do
+    @app = new_rack_app
+    header "Content-Type", "application/json"
+    params = {
+      "name" => 1
+    }
+    post "/apps", MultiJson.encode(params)
+    assert_equal 400, last_response.status
+    assert_match /invalid request/i, last_response.body
+  end
+
   it "detects an invalid Content-Type" do
     @app = new_rack_app
     header "Content-Type", "application/whats-this"

@@ -15,12 +15,10 @@ module Committee::Middleware
         Committee::RequestValidator.new.call(link, env[@params_key])
       end
       @app.call(env)
-    rescue Committee::BadRequest
+    rescue Committee::BadRequest, Committee::InvalidRequest
       render_error(400, :bad_request, $!.message)
-    rescue Committee::Error
-      render_error(422, :invalid_params, $!.message)
     rescue MultiJson::LoadError
-      render_error(400, :invalid_params, "Request body wasn't valid JSON.")
+      render_error(400, :bad_request, "Request body wasn't valid JSON.")
     end
   end
 end
