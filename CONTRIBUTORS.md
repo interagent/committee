@@ -1,4 +1,3 @@
-* Brandur <brandur@heroku.com>
 * Brandur <brandur@mutelight.org>
 * Dane Harrigan <dane.harrigan@gmail.com>
 * Mark McGranaghan <mmcgrana@gmail.com>
