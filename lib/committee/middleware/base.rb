@@ -10,6 +10,7 @@ module Committee::Middleware
         data = MultiJson.decode(data)
       end
       @schema = JsonSchema.parse!(data)
+      @schema.expand_references!
       @router = Committee::Router.new(@schema)
     end
 

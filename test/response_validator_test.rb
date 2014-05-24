@@ -8,6 +8,7 @@ describe Committee::ResponseValidator do
     }
     @schema =
       JsonSchema.parse!(MultiJson.decode(File.read("./test/data/schema.json")))
+    @schema.expand_references!
     # GET /apps/:id
     @get_link = @link = @schema.properties["app"].links[2]
     # GET /apps

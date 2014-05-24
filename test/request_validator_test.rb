@@ -4,6 +4,7 @@ describe Committee::RequestValidator do
   before do
     @schema =
       JsonSchema.parse!(MultiJson.decode(File.read("./test/data/schema.json")))
+    @schema.expand_references!
     # POST /apps/:id
     @link = @link = @schema.properties["app"].links[0]
   end

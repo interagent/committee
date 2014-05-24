@@ -1,7 +1,7 @@
 module Committee
   class ResponseGenerator
     def call(link)
-      data = generate_properties(link.parent)
+      data = generate_properties(link.target_schema || link.parent)
 
       # list is a special case; wrap data in an array
       data = [data] if link.rel == "instances"

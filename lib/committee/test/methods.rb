@@ -6,7 +6,11 @@ module Committee::Test
         data = MultiJson.decode(data)
       end
 
-      @schema ||= JsonSchema.parse!(data)
+      @schema ||= begin
+        schema = JsonSchema.parse!(data)
+        schema.expand_references!
+        schema
+      end
       @router ||= Committee::Router.new(@schema)
 
       link =

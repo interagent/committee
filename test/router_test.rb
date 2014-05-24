@@ -4,6 +4,7 @@ describe Committee::Router do
   before do
     data = MultiJson.decode(File.read("./test/data/schema.json"))
     schema = JsonSchema.parse!(data)
+    schema.expand_references!
     @router = Committee::Router.new(schema)
   end
 
