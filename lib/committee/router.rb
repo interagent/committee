@@ -24,17 +24,27 @@ module Committee
 
     def build_routes(schema)
       routes = {}
-      # realistically, we should be examining links recursively at all levels
-      schema.properties.each do |_, type_schema|
-        type_schema.links.each do |link|
-          method = link.method.to_s.upcase
-          routes[method] ||= []
-          # /apps/{id} --> /apps/([^/]+)
-          href = link.href.gsub(/\{(.*?)\}/, "[^/]+")
-          routes[method] << [%r{^#{href}$}, link]
-        end
+
+      schema.links.each do |link|
+        method, href = parse_link(link)
+        routes[method] ||= []
+        routes[method] << [%r{^#{href}$}, link]
       end
+
+      # recursively iterate through all `properties` subschemas to build a
+      # complete routing table
+      schema.properties.each do |_, subschema|
+        routes.merge!(build_routes(subschema))
+      end
+
       routes
+    end
+
+    def parse_link(link)
+      method = link.method.to_s.upcase
+      # /apps/{id} --> /apps/([^/]+)
+      href = link.href.gsub(/\{(.*?)\}/, "[^/]+")
+      [method, href]
     end
   end
 end
