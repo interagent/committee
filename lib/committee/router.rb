@@ -34,7 +34,7 @@ module Committee
       # recursively iterate through all `properties` subschemas to build a
       # complete routing table
       schema.properties.each do |_, subschema|
-        routes.merge!(build_routes(subschema))
+        routes.merge!(build_routes(subschema)) { |_, r1, r2| r1 + r2 }
       end
 
       routes
