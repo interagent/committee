@@ -25,7 +25,7 @@ module Committee::Test
     end
 
     def assert_schema_content_type
-      Committee.warn_deprecated("Use of #assert_schema_content_type is deprecated; use #assert_schema_conform instead.")
+      Committee.warn_deprecated("Committee: use of #assert_schema_content_type is deprecated; use #assert_schema_conform instead.")
     end
 
     # can be overridden alternatively to #schema_path in case the schema is
