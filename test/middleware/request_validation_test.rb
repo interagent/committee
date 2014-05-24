@@ -28,17 +28,6 @@ describe Committee::Middleware::RequestValidation do
     assert_match /invalid request/i, last_response.body
   end
 
-  it "detects an invalid Content-Type" do
-    @app = new_rack_app
-    header "Content-Type", "application/whats-this"
-    params = {
-      "name" => "cloudnasium"
-    }
-    post "/apps", MultiJson.encode(params)
-    assert_equal 400, last_response.status
-    assert_match /unsupported content-type/i, last_response.body
-  end
-
   it "rescues JSON errors" do
     @app = new_rack_app
     header "Content-Type", "application/json"

@@ -10,9 +10,10 @@ module Committee::Middleware
 
     def call(env)
       request = Rack::Request.new(env)
-      env[@params_key] = Committee::RequestUnpacker.new(request).call
       if link = @router.routes_request?(request, prefix: @prefix)
-        Committee::RequestValidator.new.call(link, env[@params_key])
+        validator = Committee::RequestValidator.new(link)
+        validator.call(request)
+        env[@params_key] = validator.data
       end
       @app.call(env)
     rescue Committee::BadRequest, Committee::InvalidRequest
