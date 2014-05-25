@@ -29,7 +29,10 @@ module Committee
     private
 
     def check_content_type!(headers)
-      unless headers["Content-Type"] =~ %r{application/json}
+      match = [%r{application/json}, %r{application/schema\+json}].any? { |m|
+        headers["Content-Type"] =~ m
+      }
+      unless match
         raise Committee::InvalidResponse,
           %{"Content-Type" response header must be set to "application/json".}
       end
