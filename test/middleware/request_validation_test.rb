@@ -57,6 +57,18 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "routes to paths not in schema" do
+    @app = new_rack_app
+    get "/not-a-resource"
+    assert_equal 200, last_response.status
+  end
+
+  it "doesn't route to paths not in schema when in strict mode" do
+    @app = new_rack_app(strict: true)
+    get "/not-a-resource"
+    assert_equal 404, last_response.status
+  end
+
   private
 
   def new_rack_app(options = {})

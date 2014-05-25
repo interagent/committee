@@ -3,6 +3,7 @@ module Committee::Middleware
     def initialize(app, options={})
       super
       @prefix = options[:prefix]
+      @strict = options[:strict]
 
       # deprecated
       @allow_extra = options[:allow_extra]
@@ -14,8 +15,15 @@ module Committee::Middleware
       if link = @router.routes_request?(request, prefix: @prefix)
         validator = Committee::RequestValidator.new(link)
         validator.call(request, env[@params_key])
+        @app.call(env)
+      else
+        if @strict
+          render_error(404, :not_found,
+            "That request method and path combination isn't defined.")
+        else
+          @app.call(env)
+        end
       end
-      @app.call(env)
     rescue Committee::BadRequest, Committee::InvalidRequest
       render_error(400, :bad_request, $!.message)
     rescue MultiJson::LoadError

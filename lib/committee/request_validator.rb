@@ -18,9 +18,11 @@ module Committee
     private
 
     def check_content_type!(request)
-      unless Rack::Mime.match?(@link.enc_type, request.content_type)
-        raise Committee::InvalidRequest,
-          %{"Content-Type" request header must be set to "#{@link.enc_type}".}
+      if request.content_type
+        unless Rack::Mime.match?(@link.enc_type, request.content_type)
+          raise Committee::InvalidRequest,
+            %{"Content-Type" request header must be set to "#{@link.enc_type}".}
+        end
       end
     end
   end
