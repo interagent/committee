@@ -1,16 +1,13 @@
 module Committee
   class RequestValidator
-    attr_accessor :data
-
     def initialize(link, options = {})
       @link = link
     end
 
-    def call(request)
+    def call(request, data)
       check_content_type!(request)
-      @data = Committee::RequestUnpacker.new(request).call
       if @link.schema
-        valid, errors = @link.schema.validate(@data)
+        valid, errors = @link.schema.validate(data)
         if !valid
           errors = JsonSchema::SchemaError.aggregate(errors).join("\n")
           raise InvalidRequest, "Invalid request.\n\n#{errors}"

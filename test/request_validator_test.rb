@@ -9,18 +9,23 @@ describe Committee::RequestValidator do
     @schema.expand_references!
     # POST /apps/:id
     @link = @link = @schema.properties["app"].links[0]
+    @request = Rack::Request.new({
+      "CONTENT_TYPE" => "application/json",
+    })
   end
 
   it "passes through a valid request" do
-    params = {
+    data = {
       "name" => "heroku-api",
     }
-    call(request(params))
+    call(data)
   end
 
   it "detects an invalid request Content-Type" do
     e = assert_raises(Committee::InvalidRequest) {
-      call(Rack::Request.new("CONTENT_TYPE" => "application/x-www-form-urlencoded"))
+      @request =
+        Rack::Request.new("CONTENT_TYPE" => "application/x-www-form-urlencoded")
+      call({})
     }
     message =
       %{"Content-Type" request header must be set to "application/json".}
@@ -28,11 +33,11 @@ describe Committee::RequestValidator do
   end
 
   it "detects a parameter of the wrong pattern" do
-    params = {
+    data = {
       "name" => "%@!"
     }
     e = assert_raises(Committee::InvalidRequest) do
-      call(request(params))
+      call(data)
     end
     message = %{Invalid request.\n\n#/name: failed schema #/definitions/app/links/0/schema/properties/name: Expected string to match pattern "/^[a-z][a-z0-9-]{3,30}$/", value was: %@!.}
     assert_equal message, e.message
@@ -40,15 +45,7 @@ describe Committee::RequestValidator do
 
   private
 
-  def call(request)
-    Committee::RequestValidator.new(@link).call(request)
-  end
-
-  def request(params)
-    env = {
-      "CONTENT_TYPE" => "application/json",
-      "rack.input"   => StringIO.new(MultiJson.encode(params))
-    }
-    Rack::Request.new(env)
+  def call(data)
+    Committee::RequestValidator.new(@link).call(@request, data)
   end
 end
