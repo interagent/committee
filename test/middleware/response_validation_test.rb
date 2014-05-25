@@ -41,6 +41,13 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "rescues JSON errors" do
+    @app = new_rack_app("[{x:y}]", {}, raise: true)
+    assert(Committee::InvalidResponse) do
+      get "/apps"
+    end
+  end
+
   private
 
   def new_rack_app(response, headers = {}, options = {})
