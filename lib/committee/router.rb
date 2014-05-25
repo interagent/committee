@@ -27,6 +27,7 @@ module Committee
 
       schema.links.each do |link|
         method, href = parse_link(link)
+        next unless method
         routes[method] ||= []
         routes[method] << [%r{^#{href}$}, link]
       end
@@ -41,6 +42,7 @@ module Committee
     end
 
     def parse_link(link)
+      return nil, nil if !link.method || !link.href
       method = link.method.to_s.upcase
       # /apps/{id} --> /apps/([^/]+)
       href = link.href.gsub(/\{(.*?)\}/, "[^/]+")
