@@ -18,14 +18,16 @@ module Committee::Middleware
         @app.call(env)
       else
         if @strict
-          render_error(404, :not_found,
-            "That request method and path combination isn't defined.")
+          raise Committee::NotFound
         else
           @app.call(env)
         end
       end
     rescue Committee::BadRequest, Committee::InvalidRequest
       render_error(400, :bad_request, $!.message)
+    rescue Committee::NotFound
+      render_error(404, :not_found,
+        "That request method and path combination isn't defined.")
     rescue MultiJson::LoadError
       render_error(400, :bad_request, "Request body wasn't valid JSON.")
     end

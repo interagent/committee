@@ -11,6 +11,9 @@ module Committee
   class InvalidResponse < Error
   end
 
+  class NotFound < Error
+  end
+
   class ReferenceNotFound < Error
   end
 end
