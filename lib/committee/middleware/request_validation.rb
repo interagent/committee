@@ -3,6 +3,7 @@ module Committee::Middleware
     def initialize(app, options={})
       super
       @prefix = options[:prefix]
+      @raise  = options[:raise]
       @strict = options[:strict]
 
       # deprecated
@@ -24,11 +25,14 @@ module Committee::Middleware
         end
       end
     rescue Committee::BadRequest, Committee::InvalidRequest
+      raise if @raise
       render_error(400, :bad_request, $!.message)
     rescue Committee::NotFound
+      raise if @raise
       render_error(404, :not_found,
         "That request method and path combination isn't defined.")
     rescue MultiJson::LoadError
+      raise Committee::InvalidRequest if @raise
       render_error(400, :bad_request, "Request body wasn't valid JSON.")
     end
   end

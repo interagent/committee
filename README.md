@@ -13,7 +13,8 @@ This piece of middleware validates the parameters of incoming requests to make s
 Options:
 
 * `prefix`: Mounts the middleware respond at a configured prefix.
-* `strict`: Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run.
+* `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
+* `strict`: Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run (default to `false`).
 
 Some examples of use:
 
@@ -104,6 +105,7 @@ This piece of middleware validates the contents of the response received from up
 Options:
 
 * `prefix`: Mounts the middleware respond at a configured prefix.
+* `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
 

@@ -69,6 +69,14 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 404, last_response.status
   end
 
+  it "optionally raises an error" do
+    @app = new_rack_app(raise: true)
+    header "Content-Type", "application/json"
+    assert_raises(Committee::InvalidRequest) do
+      post "/apps", "{x:y}"
+    end
+  end
+
   private
 
   def new_rack_app(options = {})

@@ -3,6 +3,7 @@ module Committee::Middleware
     def initialize(app, options={})
       super
       @prefix = options[:prefix]
+      @raise  = options[:raise]
     end
 
     def call(env)
@@ -15,8 +16,10 @@ module Committee::Middleware
       end
       [status, headers, response]
     rescue Committee::InvalidResponse
+      raise if @raise
       render_error(500, :invalid_response, $!.message)
     rescue MultiJson::LoadError
+      raise Commitee::InvalidResponse if @raise
       render_error(500, :invalid_response, "Response wasn't valid JSON.")
     end
   end
