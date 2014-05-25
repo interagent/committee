@@ -99,7 +99,7 @@ committee-stub -p <port> <path to JSON schema>
 use Committee::Middleware::ResponseValidation, schema: JSON.parse(File.read(...))
 ```
 
-This piece of middleware validates the contents of the response received from up the stack for any route that matches the JSON Schema.
+This piece of middleware validates the contents of the response received from up the stack for any route that matches the JSON Schema. A hyper-schema link's `targetSchema` property is used to determine what a valid response looks like.
 
 Options:
 
