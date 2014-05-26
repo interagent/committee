@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.executables   << "committee-stub"
   s.files         = Dir["{bin,lib,test}/**/*.rb"]
 
-  s.add_dependency "json_schema", "~> 0.0.20"
+  s.add_dependency "json_schema", "~> 0.1"
   s.add_dependency "multi_json", "> 0.0"
   s.add_dependency "rack", "> 0.0"
 end
