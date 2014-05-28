@@ -1,11 +1,12 @@
 #!/usr/bin/env ruby
 
+require "multi_json"
 require 'optparse'
 
 require_relative "../lib/committee"
 
 args = ARGV.dup
-options = { Port: 9292 }
+options = { port: 9292, tolerant: false }
 opt_parser = OptionParser.new do |opts|
   opts.banner = "Usage: rackup [options] [JSON Schema file]"
 
@@ -17,8 +18,12 @@ opt_parser = OptionParser.new do |opts|
     exit
   }
 
+  opts.on("-t", "--tolerant", "don't perform request/response validations") {
+    options[:tolerant] = true
+  }
+
   opts.on("-p", "--port PORT", "use PORT (default: 9292)") { |port|
-    options[:Port] = port
+    options[:port] = port
   }
 end
 opt_parser.parse!(args)
@@ -28,16 +33,18 @@ unless args.count == 1
   exit
 end
 
-schema = File.read(args[0])
+schema = MultiJson.decode(File.read(args[0]))
 
 app = Rack::Builder.new {
-  use Committee::Middleware::RequestValidation, schema: schema
-  use Committee::Middleware::ResponseValidation, schema: schema
+  unless options[:tolerant]
+    use Committee::Middleware::RequestValidation, schema: schema
+    use Committee::Middleware::ResponseValidation, schema: schema
+  end
+
   use Committee::Middleware::Stub, schema: schema
   run lambda { |_|
     [404, {}, ["Not found"]]
   }
 }
 
-options[:app] = app
-Rack::Server.start(options)
+Rack::Server.start(app: app, Port: options[:port])
