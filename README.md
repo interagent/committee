@@ -155,7 +155,7 @@ describe Committee::Middleware::Stub do
 
   describe "GET /" do
     it "conforms to schema" do
-      assert_schema_confirm
+      assert_schema_conform
     end
    end
 end
