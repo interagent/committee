@@ -12,11 +12,12 @@ module Committee
     def call(headers, data)
       check_content_type!(headers)
 
-      if @link.rel == "instances"
+      if @link.rel == "instances" && !@link.target_schema
         if !data.is_a?(Array)
           raise InvalidResponse, "List endpoints must return an array of objects."
         end
         # only consider the first object during the validation from here on
+        # (but only in cases where `targetSchema` is not set)
         data = data[0]
       end
 

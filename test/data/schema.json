@@ -45,9 +45,7 @@
             }
           },
           "targetSchema": {
-            "items": {
-              "$ref": "#/definitions/app"
-            }
+            "$ref": "#/definitions/app"
           },
           "title": "Create"
         },
@@ -77,7 +75,10 @@
           "method": "GET",
           "rel": "instances",
           "targetSchema": {
-            "$ref": "#/definitions/app"
+            "items": {
+              "$ref": "#/definitions/app"
+            },
+            "type": "array"
           },
           "title": "List"
         },

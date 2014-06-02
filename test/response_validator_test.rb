@@ -28,6 +28,7 @@ describe Committee::ResponseValidator do
 
   it "detects an improperly formatted list response" do
     @link = @list_link
+    @link.target_schema = nil
     e = assert_raises(Committee::InvalidResponse) { call }
     message = "List endpoints must return an array of objects."
     assert_equal message, e.message
