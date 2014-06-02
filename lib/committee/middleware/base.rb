@@ -18,7 +18,7 @@ module Committee::Middleware
 
     def render_error(status, id, message)
       [status, { "Content-Type" => "application/json" },
-        [MultiJson.encode({ id: id, error: message }, pretty: true)]]
+        [MultiJson.encode({ id: id, message: message }, pretty: true)]]
     end
 
     def warn_string_deprecated
