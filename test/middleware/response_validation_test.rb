@@ -43,7 +43,7 @@ describe Committee::Middleware::ResponseValidation do
 
   it "rescues JSON errors" do
     @app = new_rack_app("[{x:y}]", {}, raise: true)
-    assert(Committee::InvalidResponse) do
+    assert_raises(Committee::InvalidResponse) do
       get "/apps"
     end
   end
