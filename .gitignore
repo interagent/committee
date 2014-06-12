@@ -2,3 +2,4 @@
 *.gem
 *.sw*
 tags
+Gemfile.lock

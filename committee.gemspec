@@ -15,4 +15,9 @@ Gem::Specification.new do |s|
   s.add_dependency "json_schema", "~> 0.1"
   s.add_dependency "multi_json", "> 0.0"
   s.add_dependency "rack", "> 0.0"
+
+  s.add_development_dependency "minitest", "~> 5.3.4"
+  s.add_development_dependency "rack-test", "~> 0.6.2"
+  s.add_development_dependency "rake", "~> 10.3.2"
+  s.add_development_dependency "rr", "~> 1.1.2"
 end

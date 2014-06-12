@@ -166,13 +166,13 @@ end
 Run tests with the following:
 
 ```
-gem install json_schema minitest multi_json rack rack-test rr
-rake
+bundle install
+bundle exec rake
 ```
 
 Run a particular test suite or test:
 
 ```
-ruby -Ilib -Itest test/router_test.rb
-ruby -Ilib -Itest test/router_test.rb -n /prefix/
+bundle exec ruby -Ilib -Itest test/router_test.rb
+bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
 ```
