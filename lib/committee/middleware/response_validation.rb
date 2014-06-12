@@ -10,8 +10,11 @@ module Committee::Middleware
       status, headers, response = @app.call(env)
       request = Rack::Request.new(env)
       if link = @router.routes_request?(request, prefix: @prefix)
-        str = response.reduce("") { |str, s| str << s }
-        data = MultiJson.decode(str)
+        full_body = ""
+        response.each do |chunk|
+          full_body << chunk
+        end
+        data = MultiJson.decode(full_body)
         Committee::ResponseValidator.new(link).call(headers, data)
       end
       [status, headers, response]
