@@ -22,7 +22,7 @@ module Committee::Middleware
       raise if @raise
       render_error(500, :invalid_response, $!.message)
     rescue MultiJson::LoadError
-      raise Commitee::InvalidResponse if @raise
+      raise Committee::InvalidResponse if @raise
       render_error(500, :invalid_response, "Response wasn't valid JSON.")
     end
   end
