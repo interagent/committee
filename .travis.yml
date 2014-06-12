@@ -1,4 +1,6 @@
-before_script:
-  - gem install json_schema minitest multi_json rack rack-test rr
+cache: bundler
+
+script: bundle exec rake
+
 notifications:
   email: false
