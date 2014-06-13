@@ -27,7 +27,7 @@ module Committee
         # PUT or PATCH too. Silly Rack.
         indifferent_params(@request.POST)
       else
-        raise BadRequest, "Unsupported Content-Type: #{@request.content_type}."
+        {}
       end
     end
 

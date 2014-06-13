@@ -59,8 +59,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    assert_raises(Committee::BadRequest) do
-      Committee::RequestUnpacker.new(request).call
-    end
+    params = Committee::RequestUnpacker.new(request).call
+    assert_equal({}, params)
   end
 end
