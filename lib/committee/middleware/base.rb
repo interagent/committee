@@ -11,7 +11,17 @@ module Committee::Middleware
       end
       @schema = JsonSchema.parse!(data)
       @schema.expand_references!
-      @router = Committee::Router.new(@schema)
+      @router = Committee::Router.new(@schema, options)
+    end
+
+    def call(env)
+      request = Rack::Request.new(env)
+
+      if @router.includes_request?(request)
+        handle(request)
+      else
+        @app.call(request.env)
+      end
     end
 
     private

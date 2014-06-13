@@ -11,11 +11,9 @@ module Committee::Test
         schema.expand_references!
         schema
       end
-      @router ||= Committee::Router.new(@schema)
+      @router ||= Committee::Router.new(@schema, prefix: schema_url_prefix)
 
-      link =
-        @router.routes_request?(last_request, prefix: schema_url_prefix)
-      unless link
+      unless link = @router.find_request_link(last_request)
         response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
         raise Committee::InvalidResponse.new(response)
       end
