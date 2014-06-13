@@ -2,14 +2,13 @@ module Committee::Middleware
   class ResponseValidation < Base
     def initialize(app, options={})
       super
-      @prefix = options[:prefix]
       @raise  = options[:raise]
     end
 
     def call(env)
       status, headers, response = @app.call(env)
       request = Rack::Request.new(env)
-      if link = @router.routes_request?(request, prefix: @prefix)
+      if link = @router.routes_request?(request)
         full_body = ""
         response.each do |chunk|
           full_body << chunk

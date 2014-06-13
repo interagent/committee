@@ -11,7 +11,7 @@ module Committee::Middleware
       end
       @schema = JsonSchema.parse!(data)
       @schema.expand_references!
-      @router = Committee::Router.new(@schema)
+      @router = Committee::Router.new(@schema, options)
     end
 
     private
