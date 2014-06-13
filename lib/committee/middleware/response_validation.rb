@@ -5,10 +5,10 @@ module Committee::Middleware
       @raise  = options[:raise]
     end
 
-    def call(env)
-      status, headers, response = @app.call(env)
-      request = Rack::Request.new(env)
-      if link = @router.routes_request?(request)
+    def handle(request)
+      status, headers, response = @app.call(request.env)
+
+      if link = @router.find_request_link(request)
         full_body = ""
         response.each do |chunk|
           full_body << chunk

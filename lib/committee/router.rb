@@ -3,10 +3,19 @@ module Committee
     def initialize(schema, options = {})
       @routes = build_routes(schema)
       @prefix = options[:prefix]
+      @prefix_regexp = /\A#{Regexp.escape(@prefix)}/.freeze if @prefix
     end
 
-    def routes?(method, path)
-      path = path.gsub(/\A#{Regexp.escape(@prefix)}/, "") if @prefix
+    def includes?(path)
+      !@prefix || path =~ @prefix_regexp
+    end
+
+    def includes_request?(request)
+      includes?(request.path)
+    end
+
+    def find_link(method, path)
+      path = path.gsub(@prefix_regexp, "") if @prefix
       if method_routes = @routes[method]
         method_routes.each do |pattern, link|
           if path =~ pattern
@@ -17,8 +26,8 @@ module Committee
       nil
     end
 
-    def routes_request?(request)
-      routes?(request.request_method, request.path_info)
+    def find_request_link(request)
+      find_link(request.request_method, request.path_info)
     end
 
     private

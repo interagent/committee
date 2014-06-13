@@ -9,19 +9,17 @@ module Committee::Middleware
       @allow_extra = options[:allow_extra]
     end
 
-    def call(env)
-      request = Rack::Request.new(env)
-      if link = @router.routes_request?(request)
-        env[@params_key] = Committee::RequestUnpacker.new(request).call
+    def handle(request)
+      request.env[@params_key] = Committee::RequestUnpacker.new(request).call
+
+      if link = @router.find_request_link(request)
         validator = Committee::RequestValidator.new(link)
-        validator.call(request, env[@params_key])
-        @app.call(env)
+        validator.call(request, request.env[@params_key])
+        @app.call(request.env)
+      elsif @strict
+        raise Committee::NotFound
       else
-        if @strict
-          raise Committee::NotFound
-        else
-          @app.call(env)
-        end
+        @app.call(request.env)
       end
     rescue Committee::BadRequest, Committee::InvalidRequest
       raise if @raise

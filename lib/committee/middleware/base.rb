@@ -14,6 +14,16 @@ module Committee::Middleware
       @router = Committee::Router.new(@schema, options)
     end
 
+    def call(env)
+      request = Rack::Request.new(env)
+
+      if @router.includes_request?(request)
+        handle(request)
+      else
+        @app.call(request.env)
+      end
+    end
+
     private
 
     def render_error(status, id, message)

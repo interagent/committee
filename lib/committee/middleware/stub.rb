@@ -3,22 +3,21 @@ module Committee::Middleware
     def initialize(app, options={})
       super
       @cache = {}
-      @call   = options[:call]
+      @call  = options[:call]
     end
 
-    def call(env)
-      request = Rack::Request.new(env)
-      if link = @router.routes_request?(request)
+    def handle(request)
+      if link = @router.find_request_link(request)
         headers = { "Content-Type" => "application/json" }
         data = cache(link.method, link.href) do
           Committee::ResponseGenerator.new.call(link)
         end
         if @call
-          env["committee.response"] = data
-          call_status, call_headers, call_body = @app.call(env)
+          request.env["committee.response"] = data
+          call_status, call_headers, call_body = @app.call(request.env)
 
           # a committee.suppress signal initiates a direct pass through
-          if env["committee.suppress"] == true
+          if request.env["committee.suppress"] == true
             return call_status, call_headers, call_body
           end
 
@@ -29,7 +28,7 @@ module Committee::Middleware
         status = link.rel == "create" ? 201 : 200
         [status, headers, [MultiJson.encode(data, pretty: true)]]
       else
-        @app.call(env)
+        @app.call(request.env)
       end
     end
 
