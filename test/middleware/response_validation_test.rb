@@ -20,6 +20,12 @@ describe Committee::Middleware::ResponseValidation do
     assert_match /valid JSON/i, last_response.body
   end
 
+  it "ignores a non-2xx invalid response" do
+    @app = new_rack_app("[]", {}, app_status: 404)
+    get "/apps"
+    assert_equal 404, last_response.status
+  end
+
   it "rescues JSON errors" do
     @app = new_rack_app("[{x:y}]")
     get "/apps"
@@ -60,7 +66,7 @@ describe Committee::Middleware::ResponseValidation do
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, options
       run lambda { |_|
-        [200, headers, [response]]
+        [options.fetch(:app_status, 200), headers, [response]]
       }
     }
   end
