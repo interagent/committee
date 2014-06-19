@@ -5,7 +5,7 @@ module Committee
     end
 
     def call(request, data)
-      check_content_type!(request)
+      check_content_type!(request, data)
       if @link.schema
         valid, errors = @link.schema.validate(data)
         if !valid
@@ -17,13 +17,19 @@ module Committee
 
     private
 
-    def check_content_type!(request)
-      if request.content_type
+    def check_content_type!(request, data)
+      if request.content_type && !empty_request?(request)
         unless Rack::Mime.match?(@link.enc_type, request.content_type)
           raise Committee::InvalidRequest,
             %{"Content-Type" request header must be set to "#{@link.enc_type}".}
         end
       end
+    end
+
+    def empty_request?(request)
+      data = request.body.read
+      request.body.rewind
+      data.empty?
     end
   end
 end

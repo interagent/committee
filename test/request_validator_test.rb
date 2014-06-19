@@ -11,6 +11,7 @@ describe Committee::RequestValidator do
     @link = @link = @schema.properties["app"].links[0]
     @request = Rack::Request.new({
       "CONTENT_TYPE" => "application/json",
+      "rack.input"   => StringIO.new("{}"),
     })
   end
 
@@ -24,12 +25,24 @@ describe Committee::RequestValidator do
   it "detects an invalid request Content-Type" do
     e = assert_raises(Committee::InvalidRequest) {
       @request =
-        Rack::Request.new("CONTENT_TYPE" => "application/x-www-form-urlencoded")
+        Rack::Request.new({
+          "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+          "rack.input"   => StringIO.new("{}"),
+        })
       call({})
     }
     message =
       %{"Content-Type" request header must be set to "application/json".}
     assert_equal message, e.message
+  end
+
+  it "allows an invalid Content-Type with an empty body" do
+    @request =
+      Rack::Request.new({
+        "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+        "rack.input"   => StringIO.new(""),
+      })
+    call({})
   end
 
   it "detects a parameter of the wrong pattern" do
