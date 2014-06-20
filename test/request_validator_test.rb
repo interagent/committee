@@ -10,8 +10,9 @@ describe Committee::RequestValidator do
     # POST /apps/:id
     @link = @link = @schema.properties["app"].links[0]
     @request = Rack::Request.new({
-      "CONTENT_TYPE" => "application/json",
-      "rack.input"   => StringIO.new("{}"),
+      "CONTENT_TYPE"   => "application/json",
+      "rack.input"     => StringIO.new("{}"),
+      "REQUEST_METHOD" => "POST"
     })
   end
 
