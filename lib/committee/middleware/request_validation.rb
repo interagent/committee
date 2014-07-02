@@ -2,15 +2,19 @@ module Committee::Middleware
   class RequestValidation < Base
     def initialize(app, options={})
       super
-      @raise  = options[:raise]
-      @strict = options[:strict]
+      @allow_form_params = options.fetch(:allow_form_params, true)
+      @raise             = options[:raise]
+      @strict            = options[:strict]
 
       # deprecated
       @allow_extra = options[:allow_extra]
     end
 
     def handle(request)
-      request.env[@params_key] = Committee::RequestUnpacker.new(request).call
+      request.env[@params_key] = Committee::RequestUnpacker.new(
+        request,
+        allow_form_params: @allow_form_params
+      ).call
 
       if link = @router.find_request_link(request)
         validator = Committee::RequestValidator.new(link)
