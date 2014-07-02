@@ -32,13 +32,23 @@ describe Committee::RequestUnpacker do
     assert_equal({}, params)
   end
 
-  it "unpacks params on Content-Type: application/x-www-form-urlencoded" do
+  it "doesn't unpack form params" do
     env = {
       "CONTENT_TYPE" => "application/x-www-form-urlencoded",
       "rack.input"   => StringIO.new("x=y"),
     }
     request = Rack::Request.new(env)
     params = Committee::RequestUnpacker.new(request).call
+    assert_equal({}, params)
+  end
+
+  it "unpacks form params with allow_form_params" do
+    env = {
+      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+      "rack.input"   => StringIO.new("x=y"),
+    }
+    request = Rack::Request.new(env)
+    params = Committee::RequestUnpacker.new(request, allow_form_params: true).call
     assert_equal({ "x" => "y" }, params)
   end
 

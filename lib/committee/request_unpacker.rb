@@ -1,7 +1,9 @@
 module Committee
   class RequestUnpacker
-    def initialize(request)
+    def initialize(request, options={})
       @request = request
+
+      @allow_form_params = options[:allow_form_params]
     end
 
     def call
@@ -22,7 +24,7 @@ module Committee
         else
           {}
         end
-      elsif @request.content_type == "application/x-www-form-urlencoded"
+      elsif @allow_form_params && @request.content_type == "application/x-www-form-urlencoded"
         # Actually, POST means anything in the request body, could be from
         # PUT or PATCH too. Silly Rack.
         indifferent_params(@request.POST)
