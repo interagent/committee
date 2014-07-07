@@ -22,6 +22,26 @@ describe Committee::RequestUnpacker do
     assert_equal({ "x" => "y" }, params)
   end
 
+  it "doesn't unpack JSON under other Content-Types" do
+    env = {
+      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+      "rack.input"   => StringIO.new('{"x":"y"}'),
+    }
+    request = Rack::Request.new(env)
+    params = Committee::RequestUnpacker.new(request).call
+    assert_equal({}, params)
+  end
+
+  it "unpacks JSON under other Content-Types with optimistic_json" do
+    env = {
+      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+      "rack.input"   => StringIO.new('{"x":"y"}'),
+    }
+    request = Rack::Request.new(env)
+    params = Committee::RequestUnpacker.new(request, optimistic_json: true).call
+    assert_equal({ "x" => "y" }, params)
+  end
+
   it "unpacks an empty hash on an empty request body" do
     env = {
       "CONTENT_TYPE" => "application/json",

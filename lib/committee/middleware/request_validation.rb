@@ -3,6 +3,7 @@ module Committee::Middleware
     def initialize(app, options={})
       super
       @allow_form_params = options.fetch(:allow_form_params, true)
+      @optimistic_json   = options.fetch(:optimistic_json, false)
       @raise             = options[:raise]
       @strict            = options[:strict]
 
@@ -13,7 +14,8 @@ module Committee::Middleware
     def handle(request)
       request.env[@params_key] = Committee::RequestUnpacker.new(
         request,
-        allow_form_params: @allow_form_params
+        allow_form_params: @allow_form_params,
+        optimistic_json:   @optimistic_json
       ).call
 
       if link = @router.find_request_link(request)
