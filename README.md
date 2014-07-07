@@ -12,6 +12,7 @@ This piece of middleware validates the parameters of incoming requests to make s
 
 Options:
 
+* `allow_form_params`: Specifies that input can alternatively be specificed as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations.
 * `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
 * `prefix`: Mounts the middleware respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
