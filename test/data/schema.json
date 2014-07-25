@@ -93,6 +93,24 @@
           "title": "List archived"
         },
         {
+          "description": "Search through apps.",
+          "href": "/apps/search",
+          "method": "GET",
+          "rel": "instances",
+          "targetSchema": {
+            "$ref": "#/definitions/app"
+          },
+          "schema": {
+            "properties": {
+              "query": {
+                "$ref": "#/definitions/app/definitions/name"
+              }
+            },
+            "required": ["query"]
+          },
+          "title": "Search"
+        },
+        {
           "description": "Update an existing app.",
           "href": "/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fname)}",
           "method": "PATCH",
