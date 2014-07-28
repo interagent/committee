@@ -3,8 +3,9 @@ module Committee
     def initialize(request, options={})
       @request = request
 
-      @allow_form_params = options[:allow_form_params]
-      @optimistic_json   = options[:optimistic_json]
+      @allow_form_params  = options[:allow_form_params]
+      @allow_query_params = options[:allow_query_params]
+      @optimistic_json    = options[:optimistic_json]
     end
 
     def call
@@ -16,7 +17,7 @@ module Committee
         parse_json rescue MultiJson::LoadError nil
       end
 
-      if params
+      params = if params
         params
       elsif @allow_form_params && @request.content_type == "application/x-www-form-urlencoded"
         # Actually, POST means anything in the request body, could be from
@@ -24,6 +25,12 @@ module Committee
         indifferent_params(@request.POST)
       else
         {}
+      end
+
+      if @allow_query_params
+        indifferent_params(@request.GET).merge(params)
+      else
+        params
       end
     end
 

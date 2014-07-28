@@ -7,7 +7,7 @@ module Committee
     def call(request, data)
       check_content_type!(request, data)
       if @link.schema
-        valid, errors = @link.schema.validate(request.params.merge(data))
+        valid, errors = @link.schema.validate(data)
         if !valid
           errors = JsonSchema::SchemaError.aggregate(errors).join("\n")
           raise InvalidRequest, "Invalid request.\n\n#{errors}"
