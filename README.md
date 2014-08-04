@@ -12,7 +12,8 @@ This piece of middleware validates the parameters of incoming requests to make s
 
 Options:
 
-* `allow_form_params`: Specifies that input can alternatively be specificed as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations.
+* `allow_form_params`: Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations.
+* `allow_query_params`: Specifies that query string parameters will be taken into consideration when doing validation (defaults to `true`).
 * `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
 * `prefix`: Mounts the middleware respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
@@ -24,6 +25,10 @@ Some examples of use:
 # missing required parameter
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api"}'
 {"id":"invalid_params","error":"Require params: recipient."}
+
+# missing required parameter (should have &query=...)
+$ curl -X GET http://localhost:9292/search?category=all
+{"id":"invalid_params","error":"Require params: query."}
 
 # contains an unknown parameter
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api","recipient":"api@heroku.com","sender":"api@heroku.com"}'

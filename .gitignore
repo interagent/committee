@@ -3,3 +3,4 @@
 *.sw*
 tags
 Gemfile.lock
+.DS_Store

@@ -37,6 +37,18 @@ describe Committee::RequestValidator do
     assert_equal message, e.message
   end
 
+  it "detects an missing parameter in GET requests" do
+    # GET /apps/search?query=...
+    @link = @link = @schema.properties["app"].links[5]
+    @request = Rack::Request.new({})
+    e = assert_raises(Committee::InvalidRequest) do
+      call({})
+    end
+    message =
+      %{Invalid request.\n\n#: failed schema #/definitions/app/links/5/schema: Missing required keys "query" in object; keys are "".}
+    assert_equal message, e.message
+  end
+
   it "allows an invalid Content-Type with an empty body" do
     @request =
       Rack::Request.new({
