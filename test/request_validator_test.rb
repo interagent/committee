@@ -45,7 +45,7 @@ describe Committee::RequestValidator do
       call({})
     end
     message =
-      %{Invalid request.\n\n#: failed schema #/definitions/app/links/5/schema: Missing required keys "query" in object; keys are "".}
+      %{Invalid request.\n\n#: failed schema /schema/app#/definitions/app/links/5/schema: Missing required keys "query" in object; keys are "".}
     assert_equal message, e.message
   end
 
@@ -65,7 +65,7 @@ describe Committee::RequestValidator do
     e = assert_raises(Committee::InvalidRequest) do
       call(data)
     end
-    message = %{Invalid request.\n\n#/name: failed schema #/definitions/app/links/0/schema/properties/name: Expected string to match pattern "/^[a-z][a-z0-9-]{3,30}$/", value was: %@!.}
+    message = %{Invalid request.\n\n#/name: failed schema /schema/app#/definitions/app/links/0/schema/properties/name: Expected string to match pattern "/^[a-z][a-z0-9-]{3,30}$/", value was: %@!.}
     assert_equal message, e.message
   end
 
