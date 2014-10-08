@@ -2,10 +2,11 @@ require_relative "test_helper"
 
 describe Committee::ResponseValidator do
   before do
-    @data = ValidApp.dup
+    @status = 200
     @headers = {
       "Content-Type" => "application/json"
     }
+    @data = ValidApp.dup
     @schema =
       JsonSchema.parse!(MultiJson.decode(File.read("./test/data/schema.json")))
     @schema.expand_references!
@@ -42,6 +43,11 @@ describe Committee::ResponseValidator do
     assert_equal message, e.message
   end
 
+  it "allows no Content-Type for 204 No Content" do
+    @status, @headers = 204, {}
+    call
+  end
+
   it "allows application/schema+json in responses as well" do
     @headers = { "Content-Type" => "application/schema+json" }
     call
@@ -57,6 +63,6 @@ describe Committee::ResponseValidator do
   private
 
   def call
-    Committee::ResponseValidator.new(@link).call(@headers, @data)
+    Committee::ResponseValidator.new(@link).call(@status, @headers, @data)
   end
 end
