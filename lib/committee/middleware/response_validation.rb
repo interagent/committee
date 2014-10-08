@@ -15,7 +15,7 @@ module Committee::Middleware
           full_body << chunk
         end
         data = MultiJson.decode(full_body)
-        Committee::ResponseValidator.new(link).call(headers, data)
+        Committee::ResponseValidator.new(link).call(status, headers, data)
       end
 
       [status, headers, response]

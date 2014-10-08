@@ -9,8 +9,10 @@ module Committee
       @validator = JsonSchema::Validator.new(schema)
     end
 
-    def call(headers, data)
-      check_content_type!(headers)
+    def call(status, headers, data)
+      unless status == 204 # 204 No Content
+        check_content_type!(headers)
+      end
 
       if @link.rel == "instances" && !@link.target_schema
         if !data.is_a?(Array)

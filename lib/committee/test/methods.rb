@@ -19,7 +19,7 @@ module Committee::Test
       end
 
       data = MultiJson.decode(last_response.body)
-      Committee::ResponseValidator.new(link).call(last_response.headers, data)
+      Committee::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
     end
 
     def assert_schema_content_type
