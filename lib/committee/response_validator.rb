@@ -18,9 +18,13 @@ module Committee
         if !data.is_a?(Array)
           raise InvalidResponse, "List endpoints must return an array of objects."
         end
+
         # only consider the first object during the validation from here on
         # (but only in cases where `targetSchema` is not set)
         data = data[0]
+
+        # if the array was empty, allow it through
+        return if data == nil
       end
 
       if !@validator.validate(data)
