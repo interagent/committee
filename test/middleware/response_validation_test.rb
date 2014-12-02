@@ -26,6 +26,12 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 404, last_response.status
   end
 
+  it "passes through a 204 (no content) response" do
+    @app = new_rack_app("", {}, app_status: 204)
+    get "/apps"
+    assert_equal 204, last_response.status
+  end
+
   it "rescues JSON errors" do
     @app = new_rack_app("[{x:y}]")
     get "/apps"
