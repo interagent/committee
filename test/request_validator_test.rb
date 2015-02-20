@@ -23,6 +23,18 @@ describe Committee::RequestValidator do
     call(data)
   end
 
+  it "passes through a valid request with Content-Type options" do
+    @request =
+      Rack::Request.new({
+      "CONTENT_TYPE" => "application/json; charset=utf-8",
+      "rack.input"   => StringIO.new("{}"),
+    })
+    data = {
+      "name" => "heroku-api",
+    }
+    call(data)
+  end
+
   it "detects an invalid request Content-Type" do
     e = assert_raises(Committee::InvalidRequest) {
       @request =
