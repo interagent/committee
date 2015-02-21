@@ -11,7 +11,7 @@ module Committee
     def call
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON
-      params = if !@request.content_type || @request.content_type =~ %r{application/json}
+      params = if !@request.content_type || @request.content_type =~ %r{application/.*json}
         parse_json
       elsif @optimistic_json
         parse_json rescue MultiJson::LoadError nil
