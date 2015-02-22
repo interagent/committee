@@ -11,7 +11,7 @@ module Committee
     def call
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON
-      params = if !@request.content_type || @request.content_type =~ %r{application/.*json}
+      params = if !@request.media_type || @request.media_type =~ %r{application/.*json}
         parse_json
       elsif @optimistic_json
         parse_json rescue MultiJson::LoadError nil
@@ -19,7 +19,7 @@ module Committee
 
       params = if params
         params
-      elsif @allow_form_params && @request.content_type == "application/x-www-form-urlencoded"
+      elsif @allow_form_params && @request.media_type == "application/x-www-form-urlencoded"
         # Actually, POST means anything in the request body, could be from
         # PUT or PATCH too. Silly Rack.
         indifferent_params(@request.POST)
