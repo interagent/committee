@@ -35,21 +35,24 @@ describe Committee::ResponseValidator do
     assert_equal message, e.message
   end
 
-  it "detects an invalid response Content-Type" do
+  it "detects a blank response Content-Type" do
     @headers = {}
     e = assert_raises(Committee::InvalidResponse) { call }
     message =
-      %{"Content-Type" response header must be set to "application/json".}
+      %{"Content-Type" response header must be set to "#{@link.enc_type}".}
+    assert_equal message, e.message
+  end
+
+  it "detects an invalid response Content-Type" do
+    @headers = { "Content-Type" => "text/html" }
+    e = assert_raises(Committee::InvalidResponse) { call }
+    message =
+      %{"Content-Type" response header must be set to "#{@link.enc_type}".}
     assert_equal message, e.message
   end
 
   it "allows no Content-Type for 204 No Content" do
     @status, @headers = 204, {}
-    call
-  end
-
-  it "allows application/schema+json in responses as well" do
-    @headers = { "Content-Type" => "application/schema+json" }
     call
   end
 
