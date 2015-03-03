@@ -11,7 +11,8 @@ module Committee
 
     def call(status, headers, data)
       unless status == 204 # 204 No Content
-        check_content_type!(headers)
+        response = Rack::Response.new(data, status, headers)
+        check_content_type!(response)
       end
 
       if @link.rel == "instances" && !@link.target_schema
@@ -35,13 +36,10 @@ module Committee
 
     private
 
-    def check_content_type!(headers)
-      match = [%r{application/json}, %r{application/schema\+json}].any? { |m|
-        headers["Content-Type"] =~ m
-      }
-      unless match
+    def check_content_type!(response)
+      unless Rack::Mime.match?(response.content_type.to_s, @link.enc_type)
         raise Committee::InvalidResponse,
-          %{"Content-Type" response header must be set to "application/json".}
+          %{"Content-Type" response header must be set to "#{@link.enc_type}".}
       end
     end
   end
