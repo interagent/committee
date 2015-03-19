@@ -21,6 +21,11 @@ describe Committee::ResponseValidator do
     call
   end
 
+  it "passes through a valid response with Content-Type options" do
+    @headers = { "Content-Type" => "application/json; charset=utf-8" }
+    call
+  end
+
   it "passes through a valid list response" do
     @data = [@data]
     @link = @list_link

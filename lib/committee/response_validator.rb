@@ -36,8 +36,12 @@ module Committee
 
     private
 
+    def response_media_type(response)
+      response.content_type.to_s.split(";").first.to_s
+    end
+
     def check_content_type!(response)
-      unless Rack::Mime.match?(response.content_type.to_s, @link.enc_type)
+      unless Rack::Mime.match?(response_media_type(response), @link.enc_type)
         raise Committee::InvalidResponse,
           %{"Content-Type" response header must be set to "#{@link.enc_type}".}
       end
