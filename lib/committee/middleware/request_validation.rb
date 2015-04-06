@@ -5,7 +5,6 @@ module Committee::Middleware
       @allow_form_params  = options.fetch(:allow_form_params, true)
       @allow_query_params = options.fetch(:allow_query_params, true)
       @optimistic_json    = options.fetch(:optimistic_json, false)
-      @raise              = options[:raise]
       @strict             = options[:strict]
 
       # deprecated
@@ -31,14 +30,17 @@ module Committee::Middleware
       end
     rescue Committee::BadRequest, Committee::InvalidRequest
       raise if @raise
-      render_error(400, :bad_request, $!.message)
+      @error_class.new(400, :bad_request, $!.message).render
     rescue Committee::NotFound
       raise if @raise
-      render_error(404, :not_found,
-        "That request method and path combination isn't defined.")
+      @error_class.new(
+        404,
+        :not_found,
+        "That request method and path combination isn't defined."
+      ).render
     rescue MultiJson::LoadError
       raise Committee::InvalidRequest if @raise
-      render_error(400, :bad_request, "Request body wasn't valid JSON.")
+      @error_class.new(400, :bad_request, "Request body wasn't valid JSON.").render
     end
   end
 end

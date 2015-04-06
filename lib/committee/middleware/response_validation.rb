@@ -2,7 +2,6 @@ module Committee::Middleware
   class ResponseValidation < Base
     def initialize(app, options={})
       super
-      @raise = options[:raise]
       @validate_errors = options[:validate_errors]
     end
 
@@ -21,10 +20,10 @@ module Committee::Middleware
       [status, headers, response]
     rescue Committee::InvalidResponse
       raise if @raise
-      render_error(500, :invalid_response, $!.message)
+      @error_class.new(500, :invalid_response, $!.message).render
     rescue MultiJson::LoadError
       raise Committee::InvalidResponse if @raise
-      render_error(500, :invalid_response, "Response wasn't valid JSON.")
+      @error_class.new(500, :invalid_response, "Response wasn't valid JSON.").render
     end
 
     def validate?(status)
