@@ -32,6 +32,11 @@ describe Committee::ResponseValidator do
     call
   end
 
+  it "passes through a 204 No Content response" do
+    @status, @headers, @data = 204, {}, nil
+    call
+  end
+
   it "detects an improperly formatted list response" do
     @link = @list_link
     @link.target_schema = nil

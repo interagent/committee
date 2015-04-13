@@ -32,7 +32,7 @@ module Committee
         return if data == nil
       end
 
-      if !@validator.validate(data)
+      if self.class.validate?(status) && !@validator.validate(data)
         errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
         raise InvalidResponse, "Invalid response.\n\n#{errors}"
       end
