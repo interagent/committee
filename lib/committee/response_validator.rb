@@ -9,6 +9,10 @@ module Committee
       @validator = JsonSchema::Validator.new(schema)
     end
 
+    def self.validate?(status)
+      status != 204 and @validate_errors || (200...300).include?(status)
+    end
+
     def call(status, headers, data)
       unless status == 204 # 204 No Content
         response = Rack::Response.new(data, status, headers)
@@ -28,7 +32,7 @@ module Committee
         return if data == nil
       end
 
-      if !@validator.validate(data)
+      if self.class.validate?(status) && !@validator.validate(data)
         errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
         raise InvalidResponse, "Invalid response.\n\n#{errors}"
       end

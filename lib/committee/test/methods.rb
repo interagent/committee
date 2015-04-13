@@ -18,8 +18,10 @@ module Committee::Test
         raise Committee::InvalidResponse.new(response)
       end
 
-      data = MultiJson.decode(last_response.body)
-      Committee::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
+      if validate_response?(last_response.status)
+        data = MultiJson.decode(last_response.body)
+        Committee::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
+      end
     end
 
     def assert_schema_content_type
@@ -43,6 +45,10 @@ module Committee::Test
 
     def warn_string_deprecated
       Committee.warn_deprecated("Committee: returning a string from `#schema_contents` is deprecated; please return a deserialized hash instead.")
+    end
+
+    def validate_response?(status)
+      Committee::ResponseValidator.validate?(status)
     end
   end
 end

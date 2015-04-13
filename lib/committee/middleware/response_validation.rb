@@ -28,7 +28,7 @@ module Committee::Middleware
     end
 
     def validate?(status)
-      status != 204 and @validate_errors || (200...300).include?(status)
+      Committee::ResponseValidator.validate?(status)
     end
   end
 end
