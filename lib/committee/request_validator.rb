@@ -32,7 +32,7 @@ module Committee
 
     def empty_request?(request)
       # small optimization: assume GET and DELETE don't have bodies
-      return true if request.get? || request.delete?
+      return true if request.get? || request.delete? || !request.body
 
       data = request.body.read
       request.body.rewind
