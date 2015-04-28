@@ -17,9 +17,14 @@ module Committee
 
     private
 
+    def request_media_type(request)
+      request.content_type.to_s.split(";").first.to_s
+    end
+
     def check_content_type!(request, data)
-      if request.media_type && !empty_request?(request)
-        unless Rack::Mime.match?(request.media_type, @link.enc_type)
+      content_type = request_media_type(request)
+      if content_type && !empty_request?(request)
+        unless Rack::Mime.match?(content_type, @link.enc_type)
           raise Committee::InvalidRequest,
             %{"Content-Type" request header must be set to "#{@link.enc_type}".}
         end
@@ -28,7 +33,7 @@ module Committee
 
     def empty_request?(request)
       # small optimization: assume GET and DELETE don't have bodies
-      return true if request.get? || request.delete?
+      return true if request.get? || request.delete? || !request.body
 
       data = request.body.read
       request.body.rewind

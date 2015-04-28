@@ -16,6 +16,11 @@ describe Committee::RequestValidator do
     })
   end
 
+  it "passes through a valid request with Content-Type options" do
+    @headers = { "Content-Type" => "application/json; charset=utf-8" }
+    call({})
+  end
+
   it "passes through a valid request" do
     data = {
       "name" => "heroku-api",
