@@ -6,7 +6,7 @@ A collection of middleware to help build services with JSON Schema.
 
 Committe is tested on the following MRI versions:
 
-- 1.9.3
+- 1.9.3p551
 - 2.1.6
 - 2.2.0
 
