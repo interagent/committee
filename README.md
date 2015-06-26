@@ -8,7 +8,7 @@ Committe is tested on the following MRI versions:
 
 - 1.9.3-p551
 - 2.1.6
-- 2.2.0
+- 2.2.2
 
 ## Committee::Middleware::RequestValidation
 
