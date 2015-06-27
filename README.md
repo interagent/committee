@@ -4,7 +4,7 @@ A collection of middleware to help build services with JSON Schema.
 
 ## Supported Ruby Versions
 
-Committe is tested on the following MRI versions:
+Committee is tested on the following MRI versions:
 
 - 1.9.3-p551
 - 2.1.6
