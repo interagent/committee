@@ -22,6 +22,7 @@ Options:
 
 * `allow_form_params`: Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations.
 * `allow_query_params`: Specifies that query string parameters will be taken into consideration when doing validation (defaults to `true`).
+* `check_content_type`: Specifies that content_type should be verified according jsonschema definition. (defaults to `true`).
 * `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).

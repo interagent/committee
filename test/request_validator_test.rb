@@ -54,6 +54,15 @@ describe Committee::RequestValidator do
     assert_equal message, e.message
   end
 
+  it "allows skipping content_type check" do
+    @request =
+      Rack::Request.new({
+        "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+        "rack.input"   => StringIO.new("{}"),
+      })
+    call({}, check_content_type: false)
+  end
+
   it "detects an missing parameter in GET requests" do
     # GET /apps/search?query=...
     @link = @link = @schema.properties["app"].links[5]
@@ -88,7 +97,7 @@ describe Committee::RequestValidator do
 
   private
 
-  def call(data)
-    Committee::RequestValidator.new(@link).call(@request, data)
+  def call(data, options={})
+    Committee::RequestValidator.new(@link, options).call(@request, data)
   end
 end

@@ -2,10 +2,11 @@ module Committee
   class RequestValidator
     def initialize(link, options = {})
       @link = link
+      @check_content_type = options.fetch(:check_content_type, true)
     end
 
     def call(request, data)
-      check_content_type!(request, data)
+      check_content_type!(request, data) if @check_content_type
       if @link.schema
         valid, errors = @link.schema.validate(data)
         if !valid
