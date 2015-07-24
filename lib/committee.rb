@@ -8,6 +8,7 @@ require_relative "committee/request_validator"
 require_relative "committee/response_generator"
 require_relative "committee/response_validator"
 require_relative "committee/router"
+require_relative "committee/validation_error"
 
 require_relative "committee/middleware/base"
 require_relative "committee/middleware/request_validation"

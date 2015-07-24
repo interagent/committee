@@ -23,6 +23,7 @@ Options:
 * `allow_form_params`: Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations.
 * `allow_query_params`: Specifies that query string parameters will be taken into consideration when doing validation (defaults to `true`).
 * `check_content_type`: Specifies that content_type should be verified according jsonschema definition. (defaults to `true`).
+* `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
 * `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
@@ -33,27 +34,27 @@ Some examples of use:
 ``` bash
 # missing required parameter
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api"}'
-{"id":"invalid_params","error":"Require params: recipient."}
+{"id":"invalid_params","message":"Require params: recipient."}
 
 # missing required parameter (should have &query=...)
 $ curl -X GET http://localhost:9292/search?category=all
-{"id":"invalid_params","error":"Require params: query."}
+{"id":"invalid_params","message":"Require params: query."}
 
 # contains an unknown parameter
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api","recipient":"api@heroku.com","sender":"api@heroku.com"}'
-{"id":"invalid_params","error":"Unknown params: sender."}
+{"id":"invalid_params","message":"Unknown params: sender."}
 
 # invalid type
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api","recipient":7}'
-{"id":"invalid_params","error":"Invalid type for key \"recipient\": expected 7 to be [\"string\"]."}%
+{"id":"invalid_params","message":"Invalid type for key \"recipient\": expected 7 to be [\"string\"]."}
 
 # invalid format (supports date-time, email, uuid)
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api","recipient":"api@heroku"}'
-{"id":"invalid_params","error":"Invalid format for key \"recipient\": expected \"api@heroku\" to be \"email\"."
+{"id":"invalid_params","message":"Invalid format for key \"recipient\": expected \"api@heroku\" to be \"email\"."
 
 # invalid pattern
 $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d '{"name":"$#%"}'
-{"id":"invalid_params","error":"Invalid pattern for key \"name\": expected $#% to match \"(?-mix:^[a-z][a-z0-9-]{3,30}$)\"."}
+{"id":"invalid_params","message":"Invalid pattern for key \"name\": expected $#% to match \"(?-mix:^[a-z][a-z0-9-]{3,30}$)\"."}
 ```
 
 ## Committee::Middleware::Stub
@@ -120,6 +121,7 @@ This piece of middleware validates the contents of the response received from up
 
 Options:
 
+* `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
 * `validate_errors`: Also validate non-2xx responses (defaults to `false`).
@@ -143,7 +145,50 @@ The middleware will raise an error to indicate what the problems are:
 ``` bash
 # missing keys in response
 $ curl -X GET http://localhost:9292/apps
-{"id":"invalid_response","error":"Missing keys in response: archived_at, buildpack_provided_description, created_at, git_url, id, maintenance, name, owner:email, owner:id, region:id, region:name, released_at, repo_size, slug_size, stack:id, stack:name, updated_at, web_url."}
+{"id":"invalid_response","message":"Missing keys in response: archived_at, buildpack_provided_description, created_at, git_url, id, maintenance, name, owner:email, owner:id, region:id, region:name, released_at, repo_size, slug_size, stack:id, stack:name, updated_at, web_url."}
+```
+
+## Validation Errors
+
+Committee will by default respond with a generic error JSON body for validation errors (when the `raise` middleware option is `false`).
+
+Here's an example error to show the default format:
+
+```json
+{
+  "id":"invalid_response",
+  "message":"Missing keys in response: archived_at, buildpack_provided_description, created_at, git_url, id, maintenance, name, owner:email, owner:id, region:id, region:name, released_at, repo_size, slug_size, stack:id, stack:name, updated_at, web_url."
+}
+```
+
+You can customize this JSON body by setting the `error_class` middleware option. The `error_class` will be instantiated with: `status`, `id`, and `message`.
+
+* `status`: HTTP status code
+* `id`: HTTP status name/string
+* `message`: error message
+
+Here's an example of a class to format errors according to [JSON API](http://jsonapi.org/format/#errors):
+
+```ruby
+module MyAPI
+  class ValidationError < Committee::ValidationError
+    def error_body
+      {
+        errors: [
+          { status: id, detail: message }
+        ]
+      }
+    end
+
+    def render
+      [
+        status,
+        { "Content-Type" => "application/vnd.api+json" },
+        [MultiJson.encode(error_body)]
+      ]
+    end
+  end
+end
 ```
 
 ## Test Assertions

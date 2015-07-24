@@ -3,12 +3,14 @@ module Committee::Middleware
     def initialize(app, options={})
       @app = app
 
+      @error_class = options.fetch(:error_class, Committee::ValidationError)
       @params_key = options[:params_key] || "committee.params"
       data = options[:schema] || raise("need option `schema`")
       if data.is_a?(String)
         warn_string_deprecated
         data = MultiJson.decode(data)
       end
+      @raise = options[:raise]
       @schema = JsonSchema.parse!(data)
       @schema.expand_references!
       @router = Committee::Router.new(@schema, options)
@@ -25,11 +27,6 @@ module Committee::Middleware
     end
 
     private
-
-    def render_error(status, id, message)
-      [status, { "Content-Type" => "application/json" },
-        [MultiJson.encode({ id: id, message: message }, pretty: true)]]
-    end
 
     def warn_string_deprecated
       Committee.warn_deprecated("Committee: passing a string to `schema` option is deprecated; please send a deserialized hash instead.")
