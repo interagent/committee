@@ -14,7 +14,11 @@ module Committee
       params = if !@request.media_type || @request.media_type =~ %r{application/.*json}
         parse_json
       elsif @optimistic_json
-        parse_json rescue MultiJson::LoadError nil
+        begin
+          parse_json
+        rescue MultiJson::LoadError
+          nil
+        end
       end
 
       params = if params
