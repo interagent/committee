@@ -84,6 +84,16 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  it "optionally skip content_type check" do
+    @app = new_rack_app(check_content_type: false)
+    params = {
+      "name" => "cloudnasium"
+    }
+    header "Content-Type", "text/html"
+    post "/apps", MultiJson.encode(params)
+    assert_equal 200, last_response.status
+  end
+
   private
 
   def new_rack_app(options = {})

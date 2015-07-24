@@ -4,6 +4,7 @@ module Committee::Middleware
       super
       @allow_form_params  = options.fetch(:allow_form_params, true)
       @allow_query_params = options.fetch(:allow_query_params, true)
+      @check_content_type = options.fetch(:check_content_type, true)
       @optimistic_json    = options.fetch(:optimistic_json, false)
       @raise              = options[:raise]
       @strict             = options[:strict]
@@ -21,7 +22,7 @@ module Committee::Middleware
       ).call
 
       if link = @router.find_request_link(request)
-        validator = Committee::RequestValidator.new(link)
+        validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
         validator.call(request, request.env[@params_key])
         @app.call(request.env)
       elsif @strict
