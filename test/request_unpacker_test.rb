@@ -42,7 +42,7 @@ describe Committee::RequestUnpacker do
     assert_equal({ "x" => "y" }, params)
   end
 
-  it "returns {} when try to unpacks nonJSON under other Content-Types with optimistic_json" do
+  it "returns {} when unpacking non-JSON with optimistic_json" do
     env = {
       "CONTENT_TYPE" => "application/x-www-form-urlencoded",
       "rack.input"   => StringIO.new('x=y&foo=42'),
