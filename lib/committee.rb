@@ -1,5 +1,4 @@
 require "json_schema"
-require "multi_json"
 require "rack"
 
 require_relative "committee/errors"

@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   s.files         = Dir["{bin,lib,test}/**/*.rb"]
 
   s.add_dependency "json_schema", "~> 0.6", ">= 0.6.1"
-  s.add_dependency "multi_json", "~> 1.10"
   s.add_dependency "rack", "~> 1.5"
 
   s.add_development_dependency "minitest", "~> 5.3"
