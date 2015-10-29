@@ -4,7 +4,7 @@ require "securerandom"
 require "sinatra/base"
 
 class App < Sinatra::Base
-  SCHEMA = MultiJson.decode(File.read("schema.json"))
+  SCHEMA = JSON.parse(File.read("schema.json"))
 
   # The request validator verifies that the required input parameters (and no
   # unknown input parameters) are included with the request and that they are

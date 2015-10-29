@@ -1,3 +1,4 @@
+require "json"
 require "json_schema"
 require "rack"
 

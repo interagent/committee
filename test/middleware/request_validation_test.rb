@@ -13,7 +13,7 @@ describe Committee::Middleware::RequestValidation do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/apps", MultiJson.encode(params)
+    post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
   end
 
@@ -23,7 +23,7 @@ describe Committee::Middleware::RequestValidation do
     params = {
       "name" => 1
     }
-    post "/apps", MultiJson.encode(params)
+    post "/apps", JSON.generate(params)
     assert_equal 400, last_response.status
     assert_match /invalid request/i, last_response.body
   end
@@ -42,7 +42,7 @@ describe Committee::Middleware::RequestValidation do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/v1/apps", MultiJson.encode(params)
+    post "/v1/apps", JSON.generate(params)
     assert_equal 200, last_response.status
   end
 
@@ -60,7 +60,7 @@ describe Committee::Middleware::RequestValidation do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/apps", MultiJson.encode(params)
+    post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
   end
 
@@ -90,7 +90,7 @@ describe Committee::Middleware::RequestValidation do
       "name" => "cloudnasium"
     }
     header "Content-Type", "text/html"
-    post "/apps", MultiJson.encode(params)
+    post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
   end
 
@@ -98,7 +98,7 @@ describe Committee::Middleware::RequestValidation do
 
   def new_rack_app(options = {})
     options = {
-      schema: MultiJson.decode(File.read("./test/data/schema.json"))
+      schema: JSON.parse(File.read("./test/data/schema.json"))
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::RequestValidation, options

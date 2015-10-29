@@ -39,7 +39,7 @@ module Committee::Middleware
         :not_found,
         "That request method and path combination isn't defined."
       ).render
-    rescue MultiJson::LoadError
+    rescue JSON::ParserError
       raise Committee::InvalidRequest if @raise
       @error_class.new(400, :bad_request, "Request body wasn't valid JSON.").render
     end

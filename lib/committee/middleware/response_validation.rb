@@ -13,7 +13,7 @@ module Committee::Middleware
         response.each do |chunk|
           full_body << chunk
         end
-        data = MultiJson.decode(full_body)
+        data = JSON.parse(full_body)
         Committee::ResponseValidator.new(link).call(status, headers, data)
       end
 
@@ -21,7 +21,7 @@ module Committee::Middleware
     rescue Committee::InvalidResponse
       raise if @raise
       @error_class.new(500, :invalid_response, $!.message).render
-    rescue MultiJson::LoadError
+    rescue JSON::ParserError
       raise Committee::InvalidResponse if @raise
       @error_class.new(500, :invalid_response, "Response wasn't valid JSON.").render
     end

@@ -15,7 +15,7 @@ describe Committee::ValidationError do
     response = [
       400,
       { "Content-Type" => "application/json" },
-      [MultiJson.encode(body)]
+      [JSON.generate(body)]
     ]
 
     assert_equal @error.render, response

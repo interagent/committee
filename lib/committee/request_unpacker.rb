@@ -16,7 +16,7 @@ module Committee
       elsif @optimistic_json
         begin
           parse_json
-        rescue MultiJson::LoadError
+        rescue JSON::ParserError
           nil
         end
       end
@@ -66,7 +66,7 @@ module Committee
     def parse_json
       if (body = @request.body.read).length != 0
         @request.body.rewind
-        hash = MultiJson.decode(body)
+        hash = JSON.parse(body)
         # We want a hash specifically. '42', 42, and [42] will all be
         # decoded properly, but we can't use them here.
         if !hash.is_a?(Hash)

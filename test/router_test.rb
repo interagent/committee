@@ -30,7 +30,7 @@ describe Committee::Router do
   end
 
   def router(options = {})
-    data = MultiJson.decode(File.read("./test/data/schema.json"))
+    data = JSON.parse(File.read("./test/data/schema.json"))
     schema = JsonSchema.parse!(data)
     schema.expand_references!
     Committee::Router.new(schema, options)

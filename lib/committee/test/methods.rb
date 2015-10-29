@@ -3,7 +3,7 @@ module Committee::Test
     def assert_schema_conform
       if (data = schema_contents).is_a?(String)
         warn_string_deprecated
-        data = MultiJson.decode(data)
+        data = JSON.parse(data)
       end
 
       @schema ||= begin
@@ -19,7 +19,7 @@ module Committee::Test
       end
 
       if validate_response?(last_response.status)
-        data = MultiJson.decode(last_response.body)
+        data = JSON.parse(last_response.body)
         Committee::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
       end
     end
@@ -32,7 +32,7 @@ module Committee::Test
     # easier to access as a string
     # blob
     def schema_contents
-      MultiJson.decode(File.read(schema_path))
+      JSON.parse(File.read(schema_path))
     end
 
     def schema_path
