@@ -1,10 +1,11 @@
 require "committee"
-require "multi_json"
+require "json"
 require "securerandom"
 require "sinatra/base"
+require "yaml"
 
 class App < Sinatra::Base
-  SCHEMA = JSON.parse(File.read("schema.json"))
+  SCHEMA = YAML.load(File.read(File.expand_path("../schema.json", __FILE__)))
 
   # The request validator verifies that the required input parameters (and no
   # unknown input parameters) are included with the request and that they are
