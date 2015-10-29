@@ -238,3 +238,11 @@ Run a particular test suite or test:
 bundle exec ruby -Ilib -Itest test/router_test.rb
 bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
 ```
+
+## Release
+
+Use the `release` task:
+
+```
+bundle exec rake release
+```
