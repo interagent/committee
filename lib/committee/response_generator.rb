@@ -12,25 +12,24 @@ module Committee
     private
 
     def generate_properties(schema)
-      data = {}
-      schema.properties.each do |key, value|
-        data[key] = if !value.properties.empty?
-          generate_properties(value)
-        else
-          # special example attribute was included; use its value
-          if !value.data["example"].nil?
-            value.data["example"]
-          # null is allowed; use that
-          elsif value.type.include?("null")
-            nil
-          # otherwise we don't know what to do (we could eventually generate
-          # random data based on type/format
-          else
-            raise(%{At "#{schema.id}"/"#{key}": no "example" attribute and "null" is not allowed; don't know how to generate property.})
-          end
+      # special example attribute was included; use its value
+      if !schema.data["example"].nil?
+        schema.data["example"]
+      # null is allowed; use that
+      elsif schema.type.include?("null")
+        nil
+      elsif schema.type.include?("array") && !schema.items.nil?
+        [generate_properties(schema.items)]
+      elsif !schema.properties.empty?
+        data = {}
+        schema.properties.map do |key, value|
+          data[key] = generate_properties(value)
         end
+        data
+      else
+        raise(%{At "#{schema.pointer}": no "example" attribute and "null" } +
+          %{is not allowed; don't know how to generate property.})
       end
-      data
     end
   end
 end
