@@ -26,7 +26,7 @@ module Committee::Middleware
           headers.merge!(call_headers)
         end
         status = link.rel == "create" ? 201 : 200
-        [status, headers, [JSON.generate(data, pretty: true)]]
+        [status, headers, [JSON.pretty_generate(data)]]
       else
         @app.call(request.env)
       end
