@@ -1,4 +1,4 @@
-# Committee
+# Committee  [![Travis Status](https://travis-ci.org/interagent/committee.svg)](https://travis-ci.org/interagent/committee)
 
 A collection of middleware to help build services with JSON Schema.
 
