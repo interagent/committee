@@ -184,7 +184,7 @@ module MyAPI
       [
         status,
         { "Content-Type" => "application/vnd.api+json" },
-        [MultiJson.encode(error_body)]
+        [JSON.generate(error_body)]
       ]
     end
   end
@@ -206,7 +206,7 @@ describe Committee::Middleware::Stub do
     Sinatra.new do
       get "/" do
         content_type :json
-        MultiJson.encode({ "foo" => "bar" })
+        JSON.generate({ "foo" => "bar" })
       end
     end
   end

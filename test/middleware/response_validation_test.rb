@@ -8,7 +8,7 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "passes through a valid response" do
-    @app = new_rack_app(MultiJson.encode([ValidApp]))
+    @app = new_rack_app(JSON.generate([ValidApp]))
     get "/apps"
     assert_equal 200, last_response.status
   end
@@ -40,14 +40,14 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "takes a prefix" do
-    @app = new_rack_app(MultiJson.encode([ValidApp]), {}, prefix: "/v1")
+    @app = new_rack_app(JSON.generate([ValidApp]), {}, prefix: "/v1")
     get "/v1/apps"
     assert_equal 200, last_response.status
   end
 
   it "warns when sending a deprecated string" do
     mock(Committee).warn_deprecated.with_any_args
-    @app = new_rack_app(MultiJson.encode([ValidApp]), {},
+    @app = new_rack_app(JSON.generate([ValidApp]), {},
       schema: File.read("./test/data/schema.json"))
     get "/apps"
     assert_equal 200, last_response.status
@@ -67,7 +67,7 @@ describe Committee::Middleware::ResponseValidation do
       "Content-Type" => "application/json"
     }.merge(headers)
     options = {
-      schema: MultiJson.decode(File.read("./test/data/schema.json"))
+      schema: JSON.parse(File.read("./test/data/schema.json"))
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, options

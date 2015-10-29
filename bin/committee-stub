@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-require "multi_json"
 require 'optparse'
+require 'yaml'
 
 require_relative "../lib/committee"
 
@@ -33,7 +33,7 @@ unless args.count == 1
   exit
 end
 
-schema = MultiJson.decode(File.read(args[0]))
+schema = ::YAML.load(File.read(args[0]))
 
 app = Rack::Builder.new {
   unless options[:tolerant]

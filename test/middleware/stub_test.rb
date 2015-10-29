@@ -11,7 +11,7 @@ describe Committee::Middleware::Stub do
     @app = new_rack_app
     get "/apps/heroku-api"
     assert_equal 200, last_response.status
-    data = MultiJson.decode(last_response.body)
+    data = JSON.parse(last_response.body)
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
@@ -26,7 +26,7 @@ describe Committee::Middleware::Stub do
     get "/apps/heroku-api"
     assert_equal 200, last_response.status
     assert_equal ValidApp,
-      MultiJson.decode(last_response.headers["Committee-Response"])
+      JSON.parse(last_response.headers["Committee-Response"])
   end
 
   it "optionally returns the application's response" do
@@ -34,7 +34,7 @@ describe Committee::Middleware::Stub do
     get "/apps/heroku-api"
     assert_equal 429, last_response.status
     assert_equal ValidApp,
-      MultiJson.decode(last_response.headers["Committee-Response"])
+      JSON.parse(last_response.headers["Committee-Response"])
       assert_equal "", last_response.body
   end
 
@@ -42,7 +42,7 @@ describe Committee::Middleware::Stub do
     @app = new_rack_app(prefix: "/v1")
     get "/v1/apps/heroku-api"
     assert_equal 200, last_response.status
-    data = MultiJson.decode(last_response.body)
+    data = JSON.parse(last_response.body)
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
@@ -51,7 +51,7 @@ describe Committee::Middleware::Stub do
     @app = new_rack_app(schema: File.read("./test/data/schema.json"))
     get "/apps/heroku-api"
     assert_equal 200, last_response.status
-    data = MultiJson.decode(last_response.body)
+    data = JSON.parse(last_response.body)
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
@@ -60,12 +60,12 @@ describe Committee::Middleware::Stub do
   def new_rack_app(options = {})
     suppress = options.delete(:suppress)
     options = {
-      schema: MultiJson.decode(File.read("./test/data/schema.json"))
+      schema: JSON.parse(File.read("./test/data/schema.json"))
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::Stub, options
       run lambda { |env|
-        headers = { "Committee-Response" => MultiJson.encode(env["committee.response"]) }
+        headers = { "Committee-Response" => JSON.generate(env["committee.response"]) }
         env["committee.suppress"] = suppress
         [429, headers, []]
       }

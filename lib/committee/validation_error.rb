@@ -16,7 +16,7 @@ module Committee
       [
         status,
         { "Content-Type" => "application/json" },
-        [MultiJson.encode(error_body)]
+        [JSON.generate(error_body)]
       ]
     end
   end

@@ -8,7 +8,7 @@ module Committee::Middleware
       data = options[:schema] || raise("need option `schema`")
       if data.is_a?(String)
         warn_string_deprecated
-        data = MultiJson.decode(data)
+        data = JSON.parse(data)
       end
       @raise = options[:raise]
       @schema = JsonSchema.parse!(data)

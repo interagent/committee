@@ -21,13 +21,13 @@ describe Committee::Middleware::Stub do
 
   describe "#assert_schema_conform" do
     it "passes through a valid response" do
-      @app = new_rack_app(MultiJson.encode([ValidApp]))
+      @app = new_rack_app(JSON.generate([ValidApp]))
       get "/apps"
       assert_schema_conform
     end
 
     it "detects an invalid response Content-Type" do
-      @app = new_rack_app(MultiJson.encode([ValidApp]), {})
+      @app = new_rack_app(JSON.generate([ValidApp]), {})
       get "/apps"
       e = assert_raises(Committee::InvalidResponse) do
         assert_schema_conform
@@ -38,7 +38,7 @@ describe Committee::Middleware::Stub do
     it "warns when sending a deprecated string" do
       stub(self).schema_contents { File.read(schema_path) }
       mock(Committee).warn_deprecated.with_any_args
-      @app = new_rack_app(MultiJson.encode([ValidApp]))
+      @app = new_rack_app(JSON.generate([ValidApp]))
       get "/apps"
       assert_schema_conform
     end

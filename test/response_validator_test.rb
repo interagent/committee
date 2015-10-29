@@ -8,7 +8,7 @@ describe Committee::ResponseValidator do
     }
     @data = ValidApp.dup
     @schema =
-      JsonSchema.parse!(MultiJson.decode(File.read("./test/data/schema.json")))
+      JsonSchema.parse!(JSON.parse(File.read("./test/data/schema.json")))
     @schema.expand_references!
     # GET /apps/:id
     @get_link = @link = @schema.properties["app"].links[2]
