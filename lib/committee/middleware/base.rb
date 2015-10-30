@@ -5,14 +5,19 @@ module Committee::Middleware
 
       @error_class = options.fetch(:error_class, Committee::ValidationError)
       @params_key = options[:params_key] || "committee.params"
-      data = options[:schema] || raise("need option `schema`")
-      if data.is_a?(String)
-        warn_string_deprecated
-        data = JSON.parse(data)
-      end
       @raise = options[:raise]
-      @schema = JsonSchema.parse!(data)
-      @schema.expand_references!
+
+      schema = options[:schema] || raise("need option `schema`")
+      if schema.is_a?(String)
+        warn_string_deprecated
+        schema = JSON.parse(schema)
+      end
+      if schema.is_a?(Hash)
+        schema = JsonSchema.parse!(schema)
+        schema.expand_references!
+      end
+      @schema = schema
+
       @router = Committee::Router.new(@schema, options)
     end
 
