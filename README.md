@@ -241,8 +241,10 @@ bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
 
 ## Release
 
-Use the `release` task:
+1. Update the version in `committee.gemspec` as appropriate for [semantic
+   versioning](http://semver.org).
+2. Run the `release` task:
 
-```
-bundle exec rake release
-```
+    ```
+    bundle exec rake release
+    ```
