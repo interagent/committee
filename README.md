@@ -6,9 +6,10 @@ A collection of middleware to help build services with JSON Schema.
 
 Committee is tested on the following MRI versions:
 
-- 1.9.3-p551
-- 2.1.6
-- 2.2.3
+- 2.0
+- 2.1
+- 2.2
+- 2.3 (preview)
 
 ## Committee::Middleware::RequestValidation
 
