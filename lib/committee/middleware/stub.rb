@@ -24,6 +24,10 @@ module Committee::Middleware
           # otherwise keep the headers and whatever data manipulations were
           # made, and stub normally
           headers.merge!(call_headers)
+
+          # allow allow the handler to change the data object (if unchanged, it
+          # will be the same one that we set above)
+          data = request.env["committee.response"]
         end
         status = link.rel == "create" ? 201 : 200
         [status, headers, [JSON.pretty_generate(data)]]
