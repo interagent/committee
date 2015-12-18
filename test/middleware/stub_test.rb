@@ -55,9 +55,18 @@ describe Committee::Middleware::Stub do
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
+  it "allows the stub's response to be replaced" do
+    response = { replaced: true }
+    @app = new_rack_app(call: true, response: response)
+    get "/apps/heroku-api"
+    assert_equal 200, last_response.status
+    assert_equal response, JSON.parse(last_response.body, symbolize_names: true)
+  end
+
   private
 
   def new_rack_app(options = {})
+    response = options.delete(:response)
     suppress = options.delete(:suppress)
     options = {
       schema: JSON.parse(File.read("./test/data/schema.json"))
@@ -65,6 +74,7 @@ describe Committee::Middleware::Stub do
     Rack::Builder.new {
       use Committee::Middleware::Stub, options
       run lambda { |env|
+        env["committee.response"] = response if response
         headers = { "Committee-Response" => JSON.generate(env["committee.response"]) }
         env["committee.suppress"] = suppress
         [429, headers, []]
