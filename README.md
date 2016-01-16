@@ -9,7 +9,7 @@ Committee is tested on the following MRI versions:
 - 2.0
 - 2.1
 - 2.2
-- 2.3 (preview)
+- 2.3
 
 ## Committee::Middleware::RequestValidation
 
