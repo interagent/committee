@@ -1,6 +1,6 @@
 module Committee
   class ResponseValidator
-    def initialize(link, validate_errors: false)
+    def initialize(link, validate_errors = false)
       @link = link
       @validate_errors = validate_errors
 
@@ -11,7 +11,7 @@ module Committee
     end
     attr_reader :validate_errors
 
-    def self.validate?(status, validate_errors: false)
+    def self.validate?(status, validate_errors = false)
       status != 204 and validate_errors || (200...300).include?(status)
     end
 
@@ -34,7 +34,7 @@ module Committee
         return if data == nil
       end
 
-      if self.class.validate?(status, validate_errors: validate_errors) && !@validator.validate(data)
+      if self.class.validate?(status, validate_errors) && !@validator.validate(data)
         errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
         raise InvalidResponse, "Invalid response.\n\n#{errors}"
       end

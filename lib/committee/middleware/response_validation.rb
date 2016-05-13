@@ -16,7 +16,7 @@ module Committee::Middleware
           full_body << chunk
         end
         data = JSON.parse(full_body)
-        Committee::ResponseValidator.new(link, validate_errors: validate_errors).call(status, headers, data)
+        Committee::ResponseValidator.new(link, validate_errors).call(status, headers, data)
       end
 
       [status, headers, response]
@@ -29,7 +29,7 @@ module Committee::Middleware
     end
 
     def validate?(status)
-      Committee::ResponseValidator.validate?(status, validate_errors: validate_errors)
+      Committee::ResponseValidator.validate?(status, validate_errors)
     end
   end
 end
