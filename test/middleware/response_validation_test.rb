@@ -26,6 +26,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 404, last_response.status
   end
 
+  it "optionally validates non-2xx invalid responses" do
+    @app = new_rack_app("", {}, {app_status: 404, validate_errors: true})
+
+    get "/apps"
+    assert_equal 500, last_response.status
+    assert_match /valid JSON/i, last_response.body
+  end
+
   it "passes through a 204 (no content) response" do
     @app = new_rack_app("", {}, app_status: 204)
     get "/apps"

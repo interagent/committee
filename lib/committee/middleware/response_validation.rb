@@ -5,6 +5,8 @@ module Committee::Middleware
       @validate_errors = options[:validate_errors]
     end
 
+    attr_reader :validate_errors
+
     def handle(request)
       status, headers, response = @app.call(request.env)
 
@@ -14,7 +16,7 @@ module Committee::Middleware
           full_body << chunk
         end
         data = JSON.parse(full_body)
-        Committee::ResponseValidator.new(link).call(status, headers, data)
+        Committee::ResponseValidator.new(link, validate_errors: validate_errors).call(status, headers, data)
       end
 
       [status, headers, response]
@@ -27,7 +29,7 @@ module Committee::Middleware
     end
 
     def validate?(status)
-      Committee::ResponseValidator.validate?(status)
+      Committee::ResponseValidator.validate?(status, validate_errors: validate_errors)
     end
   end
 end
