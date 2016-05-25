@@ -1,5 +1,7 @@
 module Committee
   class ResponseValidator
+    attr_reader :validate_errors
+
     def initialize(link, options = {})
       @link = link
       @validate_errors = options[:validate_errors]
@@ -9,7 +11,6 @@ module Committee
       schema = link.target_schema || link.parent
       @validator = JsonSchema::Validator.new(schema)
     end
-    attr_reader :validate_errors
 
     def self.validate?(status, options = {})
       validate_errors = options[:validate_errors]

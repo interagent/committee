@@ -1,11 +1,11 @@
 module Committee::Middleware
   class ResponseValidation < Base
+    attr_reader :validate_errors
+
     def initialize(app, options = {})
       super
       @validate_errors = options[:validate_errors]
     end
-
-    attr_reader :validate_errors
 
     def handle(request)
       status, headers, response = @app.call(request.env)
