@@ -1,8 +1,8 @@
 module Committee
   class ResponseValidator
-    def initialize(link, validate_errors = false)
+    def initialize(link, options = {})
       @link = link
-      @validate_errors = validate_errors
+      @validate_errors = options[:validate_errors]
 
       # we should eventually move off of validating against parent schema too
       # ... this is a Herokuism and not in the specification
@@ -11,7 +11,9 @@ module Committee
     end
     attr_reader :validate_errors
 
-    def self.validate?(status, validate_errors = false)
+    def self.validate?(status, options = {})
+      validate_errors = options[:validate_errors]
+
       status != 204 and validate_errors || (200...300).include?(status)
     end
 
@@ -34,7 +36,7 @@ module Committee
         return if data == nil
       end
 
-      if self.class.validate?(status, validate_errors) && !@validator.validate(data)
+      if self.class.validate?(status, validate_errors: validate_errors) && !@validator.validate(data)
         errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
         raise InvalidResponse, "Invalid response.\n\n#{errors}"
       end
