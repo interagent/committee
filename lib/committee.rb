@@ -1,6 +1,7 @@
 require "json"
 require "json_schema"
 require "rack"
+require "securerandom"
 
 require_relative "committee/errors"
 require_relative "committee/request_unpacker"
@@ -11,6 +12,7 @@ require_relative "committee/router"
 require_relative "committee/validation_error"
 
 require_relative "committee/middleware/base"
+require_relative "committee/middleware/memory_stub"
 require_relative "committee/middleware/request_validation"
 require_relative "committee/middleware/response_validation"
 require_relative "committee/middleware/stub"
