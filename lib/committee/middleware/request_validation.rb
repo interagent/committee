@@ -13,14 +13,13 @@ module Committee::Middleware
     end
 
     def handle(request)
-      request.env[@params_key] = Committee::RequestUnpacker.new(
-        request,
-        allow_form_params:  @allow_form_params,
-        allow_query_params: @allow_query_params,
-        optimistic_json:    @optimistic_json
-      ).call
-
       if link = @router.find_request_link(request)
+        request.env[@params_key] = Committee::RequestUnpacker.new(
+          request,
+          allow_form_params:  @allow_form_params,
+          allow_query_params: @allow_query_params,
+          optimistic_json:    @optimistic_json
+        ).call
         validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
         validator.call(request, request.env[@params_key])
         @app.call(request.env)
