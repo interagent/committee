@@ -2,11 +2,12 @@ module Committee::Middleware
   class RequestValidation < Base
     def initialize(app, options={})
       super
-      @allow_form_params  = options.fetch(:allow_form_params, true)
-      @allow_query_params = options.fetch(:allow_query_params, true)
-      @check_content_type = options.fetch(:check_content_type, true)
-      @optimistic_json    = options.fetch(:optimistic_json, false)
-      @strict             = options[:strict]
+      @allow_form_params   = options.fetch(:allow_form_params, true)
+      @allow_query_params  = options.fetch(:allow_query_params, true)
+      @check_content_type  = options.fetch(:check_content_type, true)
+      @optimistic_json     = options.fetch(:optimistic_json, false)
+      @coerce_query_params = options.fetch(:coerce_query_params, false)
+      @strict              = options[:strict]
 
       # deprecated
       @allow_extra = options[:allow_extra]
