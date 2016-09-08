@@ -15,6 +15,14 @@ module Committee::Middleware
 
     def handle(request)
       if link = @router.find_request_link(request)
+        if @coerce_query_params && !request.GET.nil? && !link.schema.nil?
+          request.env["rack.request.query_hash"].merge!(
+            Committee::QueryHashCoercer.new(
+              request.GET,
+              link.schema
+            ).call
+          )
+        end
         request.env[@params_key] = Committee::RequestUnpacker.new(
           request,
           allow_form_params:  @allow_form_params,
