@@ -13,7 +13,15 @@ Gem::Specification.new do |s|
   s.files         = Dir["{bin,lib,test}/**/*.rb"]
 
   s.add_dependency "json_schema", "~> 0.6", ">= 0.6.1"
-  s.add_dependency "rack", ">= 1.5"
+
+  # Rack 2.0+ requires Ruby >= 2.2.2 which is problematic for the test suite on
+  # older Ruby versions. Check Ruby the version here and put a maximum
+  # constraint on Rack if necessary.
+  if RUBY_VERSION >= '2.2.2'
+    s.add_dependency "rack", ">= 1.5"
+  else
+    s.add_dependency "rack", ">= 1.5", "< 2.0"
+  end
 
   s.add_development_dependency "minitest", "~> 5.3"
   s.add_development_dependency "rack-test", "~> 0.6"
