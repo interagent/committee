@@ -1,6 +1,6 @@
 require_relative "test_helper"
 
-describe Committee::QueryHashCoercer do
+describe Committee::QueryParamsCoercer do
   before do
     @schema =
       JsonSchema.parse!(JSON.parse(File.read("./test/data/schema.json")))
@@ -65,6 +65,6 @@ describe Committee::QueryHashCoercer do
   private
 
   def call(data)
-    Committee::QueryHashCoercer.new(data, @link.schema).call
+    Committee::QueryParamsCoercer.new(data, @link.schema).call
   end
 end

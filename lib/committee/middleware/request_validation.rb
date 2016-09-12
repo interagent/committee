@@ -17,7 +17,7 @@ module Committee::Middleware
       if link = @router.find_request_link(request)
         if @coerce_query_params && !request.GET.nil? && !link.schema.nil?
           request.env["rack.request.query_hash"].merge!(
-            Committee::QueryHashCoercer.new(
+            Committee::QueryParamsCoercer.new(
               request.GET,
               link.schema
             ).call

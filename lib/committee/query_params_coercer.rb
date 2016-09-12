@@ -4,7 +4,7 @@
 # +call+ returns a hash of all params which could be coerced - coercion errors
 # are simply ignored and expected to be handled later by schema validation.
 module Committee
-  class QueryHashCoercer
+  class QueryParamsCoercer
     def initialize(query_hash, schema)
       @query_hash = query_hash
       @schema = schema
