@@ -16,19 +16,24 @@ module Committee
         original_val = @query_hash[k]
         unless original_val.nil?
           s.type.each do |to_type|
-            begin
-              case to_type
-              when "null"
-                coerced[k] = nil if original_val.empty?
-              when "integer"
+            case to_type
+            when "null"
+              coerced[k] = nil if original_val.empty?
+            when "integer"
+              begin
                 coerced[k] = Integer(original_val)
-              when "number"
-                coerced[k] = Float(original_val)
-              when "boolean"
-                coerced[k] = true if original_val == "true"
-                coerced[k] = false if original_val == "false"
+              rescue ArgumentError => e
+                raise e unless e.message =~ /invalid value for Integer/
               end
-            rescue ArgumentError
+            when "number"
+              begin
+                coerced[k] = Float(original_val)
+              rescue ArgumentError => e
+                raise e unless e.message =~ /invalid value for Float/
+              end
+            when "boolean"
+              coerced[k] = true if original_val == "true"
+              coerced[k] = false if original_val == "false"
             end
             break if coerced.key?(k)
           end
