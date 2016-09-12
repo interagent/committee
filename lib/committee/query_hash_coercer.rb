@@ -1,3 +1,8 @@
+# Attempts to coerce params given in the query hash (which are all strings) into
+# the types specified by the schema.
+# Currently supported types: null, integer, number and boolean.
+# +call+ returns a hash of all params which could be coerced - coercion errors
+# are simply ignored and expected to be handled later by schema validation.
 module Committee
   class QueryHashCoercer
     def initialize(query_hash, schema)
