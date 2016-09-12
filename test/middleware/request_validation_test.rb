@@ -101,6 +101,14 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "still raises an error if query param coercion is not possible" do
+    @app = new_rack_app(coerce_query_params: true)
+    header "Content-Type", "application/json"
+    get "/search/apps", {"per_page" => "foo", "query" => "cloudnasium"}
+    assert_equal 400, last_response.status
+    assert_match /invalid request/i, last_response.body
+  end
+
   private
 
   def new_rack_app(options = {})
