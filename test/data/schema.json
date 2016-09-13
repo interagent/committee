@@ -29,6 +29,28 @@
           "type": [
             "string"
           ]
+        },
+        "per_page": {
+          "description": "Number of items per page",
+          "example": 10,
+          "type": [
+            "integer"
+          ]
+        },
+        "threshold": {
+          "description": "Number of items per page",
+          "example": 3.5,
+          "type": [
+            "null",
+            "number"
+          ]
+        },
+        "deleted": {
+          "description": "Whether deleted apps should be listed",
+          "example": true,
+          "type": [
+            "boolean"
+          ]
         }
       },
       "links": [
@@ -94,7 +116,7 @@
         },
         {
           "description": "Search through apps.",
-          "href": "/apps/search",
+          "href": "/search/apps",
           "method": "GET",
           "rel": "instances",
           "targetSchema": {
@@ -104,6 +126,15 @@
             "properties": {
               "query": {
                 "$ref": "#/definitions/app/definitions/name"
+              },
+              "per_page": {
+                "$ref": "#/definitions/app/definitions/per_page"
+              },
+              "threshold": {
+                "$ref": "#/definitions/app/definitions/threshold"
+              },
+              "deleted": {
+                "$ref": "#/definitions/app/definitions/deleted"
               }
             },
             "required": ["query"]
