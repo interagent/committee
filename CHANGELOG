@@ -1,0 +1,5 @@
+Unreleased
+
+1.15.0 2016-09-13
+	Add the `coerce_query_params` option to allow queries with basic types to
+	be checked against a schema
