@@ -8,7 +8,10 @@ module Committee::Middleware
 
     def handle(request)
       if link = @router.find_request_link(request)
-        headers = { "Content-Type" => "application/json" }
+        headers = {
+          "Content-Type" => "application/json",
+          "Access-Control-Allow-Origin" => "*"
+        }
         data = cache(link.method, link.href) do
           Committee::ResponseGenerator.new.call(link)
         end
