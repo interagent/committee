@@ -48,7 +48,7 @@ describe Committee::Middleware::Stub do
 
   it "warns when sending a deprecated string" do
     mock(Committee).warn_deprecated.with_any_args
-    @app = new_rack_app(schema: File.read("./test/data/schema.json"))
+    @app = new_rack_app(schema: File.read("./test/data/hyperschema/heroku.json"))
     get "/apps/heroku-api"
     assert_equal 200, last_response.status
     data = JSON.parse(last_response.body)
@@ -69,7 +69,7 @@ describe Committee::Middleware::Stub do
     response = options.delete(:response)
     suppress = options.delete(:suppress)
     options = {
-      schema: JSON.parse(File.read("./test/data/schema.json"))
+      schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::Stub, options

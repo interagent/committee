@@ -55,7 +55,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "warns when sending a deprecated string" do
     mock(Committee).warn_deprecated.with_any_args
-    @app = new_rack_app(schema: File.read("./test/data/schema.json"))
+    @app = new_rack_app(schema: File.read("./test/data/hyperschema/heroku.json"))
     params = {
       "name" => "cloudnasium"
     }
@@ -113,7 +113,7 @@ describe Committee::Middleware::RequestValidation do
 
   def new_rack_app(options = {})
     options = {
-      schema: JSON.parse(File.read("./test/data/schema.json"))
+      schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::RequestValidation, options

@@ -8,7 +8,7 @@ describe Committee::Middleware::Base do
   end
 
   it "accepts schema hash" do
-    @app = new_rack_app(schema: JSON.parse(File.read("./test/data/schema.json")))
+    @app = new_rack_app(schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
     params = {
       "name" => "cloudnasium"
     }
@@ -18,7 +18,7 @@ describe Committee::Middleware::Base do
   end
 
   it "accepts schema object" do
-    schema = JsonSchema.parse!(JSON.parse(File.read("./test/data/schema.json")))
+    schema = JsonSchema.parse!(JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
     @app = new_rack_app(schema: schema)
     params = {
       "name" => "cloudnasium"
