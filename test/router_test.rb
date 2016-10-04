@@ -33,6 +33,8 @@ describe Committee::Router do
     data = JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
     schema = JsonSchema.parse!(data)
     schema.expand_references!
-    Committee::Router.new(schema, options)
+    Committee::Router.new(schema, options.merge(
+      driver: Committee::Drivers::HyperSchema.new
+    ))
   end
 end

@@ -1,10 +1,15 @@
 module Committee
   class ResponseGenerator
     def call(link)
-      data = generate_properties(link.target_schema || link.parent)
+      data = generate_properties(link.target_schema)
 
-      # list is a special case; wrap data in an array
-      data = [data] if link.rel == "instances"
+      # List is a special case; wrap data in an array.
+      #
+      # This is poor form that's here so as not to introduce breaking behavior.
+      # It should be eventually be removed.
+      if link.is_a?(Committee::Drivers::HyperSchema::Link) && link.rel == "instances"
+        data = [data]
+      end
 
       data
     end

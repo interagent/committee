@@ -29,8 +29,7 @@ module Committee::Middleware
           # will be the same one that we set above)
           data = request.env["committee.response"]
         end
-        status = link.rel == "create" ? 201 : 200
-        [status, headers, [JSON.pretty_generate(data)]]
+        [link.status_success, headers, [JSON.pretty_generate(data)]]
       else
         @app.call(request.env)
       end
