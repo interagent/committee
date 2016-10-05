@@ -1,11 +1,9 @@
 module Committee
   class Router
     def initialize(schema, options = {})
-      @driver = options[:driver] ||
-        raise(ArgumentError, "Committee: need driver.")
-      @routes = @driver.build_routes(schema)
       @prefix = options[:prefix]
       @prefix_regexp = /\A#{Regexp.escape(@prefix)}/.freeze if @prefix
+      @schema = schema
     end
 
     def includes?(path)
@@ -18,7 +16,7 @@ module Committee
 
     def find_link(method, path)
       path = path.gsub(@prefix_regexp, "") if @prefix
-      if method_routes = @routes[method]
+      if method_routes = @schema.routes[method]
         method_routes.each do |pattern, link|
           if path =~ pattern
             return link

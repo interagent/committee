@@ -1,27 +1,18 @@
 module Committee::Drivers
   class HyperSchema
-    def build_routes(schema)
-      routes = {}
-
-      schema.links.each do |link|
-        method, href = parse_link(link)
-        next unless method
-        routes[method] ||= []
-        routes[method] << [%r{^#{href}$}, Link.new(link)]
-      end
-
-      # recursively iterate through all `properties` subschemas to build a
-      # complete routing table
-      schema.properties.each do |_, subschema|
-        routes.merge!(build_routes(subschema)) { |_, r1, r2| r1 + r2 }
-      end
-
-      routes
-    end
-
     def parse(schema)
-      schema = JsonSchema.parse!(schema)
-      schema.expand_references!
+      # Really we'd like to only have data hashes passed into drivers these
+      # days, but here we handle a JsonSchema::Schema for now to maintain
+      # backward compatibility (this library used to be hyper-schema only).
+      if schema.is_a?(JsonSchema::Schema)
+        hyper_schema = schema
+      else
+        hyper_schema = JsonSchema.parse!(schema)
+        hyper_schema.expand_references!
+      end
+
+      schema = Schema.new
+      schema.routes = build_routes(hyper_schema)
       schema
     end
 
@@ -82,7 +73,30 @@ module Committee::Drivers
       attr_accessor :hyper_schema_link
     end
 
+    class Schema
+      attr_accessor :routes
+    end
+
     private
+
+    def build_routes(hyper_schema)
+      routes = {}
+
+      hyper_schema.links.each do |link|
+        method, href = parse_link(link)
+        next unless method
+        routes[method] ||= []
+        routes[method] << [%r{^#{href}$}, Link.new(link)]
+      end
+
+      # recursively iterate through all `properties` subschemas to build a
+      # complete routing table
+      hyper_schema.properties.each do |_, subschema|
+        routes.merge!(build_routes(subschema)) { |_, r1, r2| r1 + r2 }
+      end
+
+      routes
+    end
 
     def href_to_regex(href)
       href.gsub(/\{(.*?)\}/, "[^/]+")

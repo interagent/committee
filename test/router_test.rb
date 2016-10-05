@@ -30,10 +30,7 @@ describe Committee::Router do
   end
 
   def router(options = {})
-    schema = JsonSchema.parse!(hyper_schema_data)
-    schema.expand_references!
-    Committee::Router.new(schema, options.merge(
-      driver: Committee::Drivers::HyperSchema.new
-    ))
+    schema = Committee::Drivers::HyperSchema.new.parse(hyper_schema_data)
+    Committee::Router.new(schema, options)
   end
 end

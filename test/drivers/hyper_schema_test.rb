@@ -5,28 +5,22 @@ describe Committee::Drivers::HyperSchema do
     @driver = Committee::Drivers::HyperSchema.new
   end
 
-  it "builds a routing table" do
-    schema = JsonSchema.parse!(hyper_schema_data)
-    schema.expand_references!
+  it "parses a hyper-schema and builds routes" do
+    schema = @driver.parse(hyper_schema_data)
+    assert_kind_of Committee::Drivers::HyperSchema::Schema, schema
 
-    routes = @driver.build_routes(schema)
-    assert_kind_of Hash, routes
-    refute routes.empty?
-    assert(routes.keys.all? { |m|
+    assert_kind_of Hash, schema.routes
+    refute schema.routes.empty?
+    assert(schema.routes.keys.all? { |m|
       ["DELETE", "GET", "PATCH", "POST", "PUT"].include?(m)
     })
 
-    routes.each do |(_, method_routes)|
+    schema.routes.each do |(_, method_routes)|
       method_routes.each do |regex, link|
         assert_kind_of Regexp, regex
         assert_kind_of Committee::Drivers::HyperSchema::Link, link
       end
     end
-  end
-
-  it "parses a hyper-schema" do
-    schema = @driver.parse({})
-    assert_kind_of JsonSchema::Schema, schema
   end
 end
 

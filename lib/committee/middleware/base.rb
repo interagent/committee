@@ -17,15 +17,20 @@ module Committee::Middleware
 
       if schema.is_a?(Hash)
         schema = @driver.parse(schema)
-      elsif schema.is_a?(JsonSchema::Schema) && driver_name != :hyper_schema
-        raise ArgumentError,
-          "Committee: JSON schema data is only accepted for driver " \
-          "hyper_schema. Try passing a hash instead."
+      elsif schema.is_a?(JsonSchema::Schema)
+        if driver_name == :hyper_schema
+          # Along with a special case here we've also special cased it within
+          # the driver itself.
+          schema = @driver.parse(schema)
+        else
+          raise ArgumentError,
+            "Committee: JSON schema data is only accepted for driver " \
+            "hyper_schema. Try passing a hash instead."
+        end
       end
       @schema = schema
 
       @router = Committee::Router.new(@schema,
-        driver: @driver,
         prefix: options[:prefix]
       )
     end

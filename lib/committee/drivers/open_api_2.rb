@@ -1,20 +1,5 @@
 module Committee::Drivers
   class OpenAPI2
-    DEFINITIONS_PSEUDO_URI = "http://json-schema.org/committee-definitions"
-
-    # These are fields that the OpenAPI 2 spec considers mandatory to be
-    # included in the document's top level.
-    REQUIRED_FIELDS = [
-      :consumes,
-      :definitions,
-      :paths,
-      :produces,
-      :swagger,
-    ].map(&:to_s).freeze
-
-    def build_routes(spec)
-    end
-
     def parse(data)
       REQUIRED_FIELDS.each do |field|
         if !data[field]
@@ -79,6 +64,18 @@ module Committee::Drivers
     end
 
     private
+
+    DEFINITIONS_PSEUDO_URI = "http://json-schema.org/committee-definitions"
+
+    # These are fields that the OpenAPI 2 spec considers mandatory to be
+    # included in the document's top level.
+    REQUIRED_FIELDS = [
+      :consumes,
+      :definitions,
+      :paths,
+      :produces,
+      :swagger,
+    ].map(&:to_s).freeze
 
     def find_best_fit_response(link_data)
       if response_data = link_data["responses"]["200"]
