@@ -13,9 +13,11 @@ ValidApp = {
 }.freeze
 
 def hyper_schema_data
-  JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
+  @hyper_schema_data ||=
+    JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
 end
 
 def open_api_2_data
-  JSON.parse(File.read("./test/data/openapi2/petstore-expanded.json"))
+  @open_api_2_data ||=
+    JSON.parse(File.read("./test/data/openapi2/petstore-expanded.json"))
 end
