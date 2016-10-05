@@ -7,6 +7,15 @@ require "rr"
 
 require_relative "../lib/committee"
 
+# The OpenAPI sample specification provided directly from the organization uses
+# a couple custom "format" values for JSON schema, namely "int32" and "int64".
+# Provide basic definitions for them here so that we don't error when trying to
+# parse the sample.
+JsonSchema.configure do |c|
+  c.register_format 'int32', ->(data) {}
+  c.register_format 'int64', ->(data) {}
+end
+
 ValidApp = {
   "maintenance" => false,
   "name"        => "example",

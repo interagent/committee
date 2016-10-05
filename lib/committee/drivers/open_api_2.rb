@@ -1,5 +1,7 @@
 module Committee::Drivers
   class OpenAPI2
+    DEFINITIONS_PSEUDO_URI = "http://json-schema.org/committee-definitions"
+
     # These are fields that the OpenAPI 2 spec considers mandatory to be
     # included in the document's top level.
     REQUIRED_FIELDS = [
@@ -41,10 +43,21 @@ module Committee::Drivers
       # still find a resource at '#/definitions/resource' instead of
       # '#/resource').
       schema = JsonSchema.parse!({
-        "definitions": data['definitions'],
+        "definitions" => data['definitions'],
       })
       schema.expand_references!
+      schema.uri = DEFINITIONS_PSEUDO_URI
       spec.definitions = schema
+
+      # So this is a little weird: an OpenAPI specification is _not_ a valid
+      # JSON schema and yet it self-references like it is a valid JSON schema.
+      # To work around this what we do is parse its "definitions" section as a
+      # JSON schema and then build a document store here containing that. When
+      # trying to resolve a reference from elsewhere in the spec, we build a
+      # synthetic schema with a JSON reference to the document created from
+      # "definitions" and then expand references against this store.
+      store = JsonSchema::DocumentStore.new
+      store.add_schema(schema)
 
       routes = {}
       data['paths'].each do |path, methods|
@@ -58,12 +71,24 @@ module Committee::Drivers
           # TODO: Need to implement request schema.
           link.schema = nil
 
+          # Arbitrarily pick one response for the time being. Prefers in order:
+          # a 200, 201, any 3-digit numerical response, then anything at all.
           status, response_data = find_best_fit_response(link_data)
           if status
             link.status_success = status
 
-            # TODO: Need to resolve references in response schema.
-            link.target_schema = response_data["schema"]
+            # See the note on our DocumentStore's initialization, but what
+            # we're doing here is prefixing references with a specialized
+            # internal URI so that they can reference definitions from another
+            # document in the store.
+            target_schema = rewrite_references(response_data["schema"])
+
+            # A link need not necessarily specify a target schema.
+            if target_schema
+              target_schema = JsonSchema.parse!(target_schema)
+              target_schema.expand_references!(store: store)
+              link.target_schema = target_schema
+            end
           end
 
           routes[method] ||= []
@@ -118,6 +143,8 @@ module Committee::Drivers
       elsif response_data = link_data["responses"]["201"]
         [201, response_data]
       else
+        # Sort responses so that we can try to prefer any 3-digit status code.
+        # If there are none, we'll just take anything from the list.
         ordered_responses = link_data["responses"].
           select { |k, v| k =~ /[0-9]{3}/ }
         if first = ordered_responses.first
@@ -130,6 +157,20 @@ module Committee::Drivers
 
     def href_to_regex(href)
       href.gsub(/\{(.*?)\}/, "[^/]+")
+    end
+
+    def rewrite_references(schema)
+      if schema.is_a?(Hash)
+        ref = schema["$ref"]
+        if ref && ref.is_a?(String) && ref[0] == "#"
+          schema["$ref"] = DEFINITIONS_PSEUDO_URI + ref
+        else
+          schema.each do |_, v|
+            rewrite_references(v)
+          end
+        end
+      end
+      schema
     end
   end
 end
