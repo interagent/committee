@@ -37,65 +37,8 @@ module Committee::Drivers
       spec.consumes = data['consumes'].first
       spec.produces = data['produces'].first
 
-      # The "definitions" section of an OpenAPI 2 spec is a valid JSON schema.
-      # We extract it from the spec and parse it as a schema in isolation so
-      # that all references to it will still have correct paths (i.e. we can
-      # still find a resource at '#/definitions/resource' instead of
-      # '#/resource').
-      schema = JsonSchema.parse!({
-        "definitions" => data['definitions'],
-      })
-      schema.expand_references!
-      schema.uri = DEFINITIONS_PSEUDO_URI
-      spec.definitions = schema
-
-      # So this is a little weird: an OpenAPI specification is _not_ a valid
-      # JSON schema and yet it self-references like it is a valid JSON schema.
-      # To work around this what we do is parse its "definitions" section as a
-      # JSON schema and then build a document store here containing that. When
-      # trying to resolve a reference from elsewhere in the spec, we build a
-      # synthetic schema with a JSON reference to the document created from
-      # "definitions" and then expand references against this store.
-      store = JsonSchema::DocumentStore.new
-      store.add_schema(schema)
-
-      routes = {}
-      data['paths'].each do |path, methods|
-        methods.each do |method, link_data|
-          method = method.upcase
-
-          link = Link.new
-          link.href = spec.base_path + path
-          link.method = method
-
-          # TODO: Need to implement request schema.
-          link.schema = nil
-
-          # Arbitrarily pick one response for the time being. Prefers in order:
-          # a 200, 201, any 3-digit numerical response, then anything at all.
-          status, response_data = find_best_fit_response(link_data)
-          if status
-            link.status_success = status
-
-            # See the note on our DocumentStore's initialization, but what
-            # we're doing here is prefixing references with a specialized
-            # internal URI so that they can reference definitions from another
-            # document in the store.
-            target_schema = rewrite_references(response_data["schema"])
-
-            # A link need not necessarily specify a target schema.
-            if target_schema
-              target_schema = JsonSchema.parse!(target_schema)
-              target_schema.expand_references!(store: store)
-              link.target_schema = target_schema
-            end
-          end
-
-          routes[method] ||= []
-          routes[method] << [href_to_regex(link.href), link]
-        end
-      end
-      spec.routes = routes
+      spec.definitions, store = parse_definitions!(data)
+      spec.routes = parse_routes!(data, spec, store)
 
       spec
     end
@@ -157,6 +100,71 @@ module Committee::Drivers
 
     def href_to_regex(href)
       href.gsub(/\{(.*?)\}/, "[^/]+")
+    end
+
+    def parse_definitions!(data)
+      # The "definitions" section of an OpenAPI 2 spec is a valid JSON schema.
+      # We extract it from the spec and parse it as a schema in isolation so
+      # that all references to it will still have correct paths (i.e. we can
+      # still find a resource at '#/definitions/resource' instead of
+      # '#/resource').
+      schema = JsonSchema.parse!({
+        "definitions" => data['definitions'],
+      })
+      schema.expand_references!
+      schema.uri = DEFINITIONS_PSEUDO_URI
+
+      # So this is a little weird: an OpenAPI specification is _not_ a valid
+      # JSON schema and yet it self-references like it is a valid JSON schema.
+      # To work around this what we do is parse its "definitions" section as a
+      # JSON schema and then build a document store here containing that. When
+      # trying to resolve a reference from elsewhere in the spec, we build a
+      # synthetic schema with a JSON reference to the document created from
+      # "definitions" and then expand references against this store.
+      store = JsonSchema::DocumentStore.new
+      store.add_schema(schema)
+
+      [schema, store]
+    end
+
+    def parse_routes!(data, spec, store)
+      routes = {}
+      data['paths'].each do |path, methods|
+        methods.each do |method, link_data|
+          method = method.upcase
+
+          link = Link.new
+          link.href = spec.base_path + path
+          link.method = method
+
+          # TODO: Need to implement request schema.
+          link.schema = nil
+
+          # Arbitrarily pick one response for the time being. Prefers in order:
+          # a 200, 201, any 3-digit numerical response, then anything at all.
+          status, response_data = find_best_fit_response(link_data)
+          if status
+            link.status_success = status
+
+            # See the note on our DocumentStore's initialization in
+            # #parse_definitions!, but what we're doing here is prefixing
+            # references with a specialized internal URI so that they can
+            # reference definitions from another document in the store.
+            target_schema = rewrite_references(response_data["schema"])
+
+            # A link need not necessarily specify a target schema.
+            if target_schema
+              target_schema = JsonSchema.parse!(target_schema)
+              target_schema.expand_references!(store: store)
+              link.target_schema = target_schema
+            end
+          end
+
+          routes[method] ||= []
+          routes[method] << [href_to_regex(link.href), link]
+        end
+      end
+      routes
     end
 
     def rewrite_references(schema)
