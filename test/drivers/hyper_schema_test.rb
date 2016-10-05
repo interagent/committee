@@ -6,8 +6,7 @@ describe Committee::Drivers::HyperSchema do
   end
 
   it "builds a routing table" do
-    data = JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
-    schema = JsonSchema.parse!(data)
+    schema = JsonSchema.parse!(hyper_schema_data)
     schema.expand_references!
 
     routes = @driver.build_routes(schema)

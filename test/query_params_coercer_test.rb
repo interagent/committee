@@ -2,8 +2,7 @@ require_relative "test_helper"
 
 describe Committee::QueryParamsCoercer do
   before do
-    @schema =
-      JsonSchema.parse!(JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
+    @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
     # GET /search/apps
     @link = @link = @schema.properties["app"].links[5]

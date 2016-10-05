@@ -4,8 +4,7 @@ require "stringio"
 
 describe Committee::RequestValidator do
   before do
-    @schema =
-      JsonSchema.parse!(JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
+    @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
     # POST /apps/:id
     @link = @link = @schema.properties["app"].links[0]

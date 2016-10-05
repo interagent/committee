@@ -113,7 +113,7 @@ describe Committee::Middleware::RequestValidation do
 
   def new_rack_app(options = {})
     options = {
-      schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
+      schema: hyper_schema_data,
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::RequestValidation, options

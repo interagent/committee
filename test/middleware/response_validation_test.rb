@@ -75,7 +75,7 @@ describe Committee::Middleware::ResponseValidation do
       "Content-Type" => "application/json"
     }.merge(headers)
     options = {
-      schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
+      schema: hyper_schema_data,
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, options

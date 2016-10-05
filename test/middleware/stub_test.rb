@@ -69,7 +69,7 @@ describe Committee::Middleware::Stub do
     response = options.delete(:response)
     suppress = options.delete(:suppress)
     options = {
-      schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
+      schema: hyper_schema_data,
     }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::Stub, options

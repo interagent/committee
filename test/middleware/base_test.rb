@@ -10,7 +10,7 @@ describe Committee::Middleware::Base do
   it "accepts schema hash" do
     @app = new_rack_app(
       driver: :hyper_schema,
-      schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
+      schema: hyper_schema_data,
     )
     params = {
       "name" => "cloudnasium"
@@ -21,7 +21,7 @@ describe Committee::Middleware::Base do
   end
 
   it "accepts schema object" do
-    schema = JsonSchema.parse!(JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
+    schema = JsonSchema.parse!(hyper_schema_data)
     @app = new_rack_app(
       driver: :hyper_schema,
       schema: schema
@@ -35,7 +35,7 @@ describe Committee::Middleware::Base do
   end
 
   it "doesn't accept schema object for non-hyper-schema driver" do
-    schema = JsonSchema.parse!(JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
+    schema = JsonSchema.parse!(hyper_schema_data)
     @app = new_rack_app(
       driver: :open_api_2,
       schema: schema
