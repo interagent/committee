@@ -6,7 +6,10 @@ module Committee
       # List is a special case; wrap data in an array.
       #
       # This is poor form that's here so as not to introduce breaking behavior.
-      # It should be eventually be removed.
+      # The "instances" value of "rel" is a Heroku-ism and was originally
+      # introduced before we understood how to use "targetSchema". It's not
+      # meaningful with the context of the hyper-schema specification and
+      # should be eventually be removed.
       if legacy_hyper_schema_rel?(link)
         data = [data]
       end
@@ -39,7 +42,8 @@ module Committee
 
     def legacy_hyper_schema_rel?(link)
        link.is_a?(Committee::Drivers::HyperSchema::Link) &&
-         link.rel == "instances"
+         link.rel == "instances" &&
+         !link.target_schema
     end
   end
 end

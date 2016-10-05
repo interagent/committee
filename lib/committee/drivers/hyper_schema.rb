@@ -39,6 +39,10 @@ module Committee::Drivers
         hyper_schema_link.href
       end
 
+      def media_type
+        hyper_schema_link.media_type
+      end
+
       def method
         hyper_schema_link.method
       end

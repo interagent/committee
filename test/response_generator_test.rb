@@ -34,6 +34,7 @@ describe Committee::ResponseGenerator do
     @link = @list_link
     data = call
 
+    @link.parent = nil
     @link.target_schema = nil
 
     # We're testing for legacy behavior here: even without a `targetSchema` as
@@ -64,6 +65,8 @@ describe Committee::ResponseGenerator do
   end
 
   def call
-    Committee::ResponseGenerator.new.call(@link)
+    # hyper-schema link should be dropped into driver wrapper before it's used
+    link = Committee::Drivers::HyperSchema::Link.new(@link)
+    Committee::ResponseGenerator.new.call(link)
   end
 end

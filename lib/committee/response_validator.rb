@@ -6,9 +6,7 @@ module Committee
       @link = link
       @validate_errors = options[:validate_errors]
 
-      # we should eventually move off of validating against parent schema too
-      # ... this is a Herokuism and not in the specification
-      schema = link.target_schema || link.parent
+      schema = link.target_schema
       @validator = JsonSchema::Validator.new(schema)
     end
 
@@ -24,7 +22,14 @@ module Committee
         check_content_type!(response)
       end
 
-      if @link.rel == "instances" && !@link.target_schema
+      # List is a special case; expect data in an array.
+      #
+      # This is poor form that's here so as not to introduce breaking behavior.
+      # The "instances" value of "rel" is a Heroku-ism and was originally
+      # introduced before we understood how to use "targetSchema". It's not
+      # meaningful with the context of the hyper-schema specification and
+      # should be eventually be removed.
+      if legacy_hyper_schema_rel?(@link)
         if !data.is_a?(Array)
           raise InvalidResponse, "List endpoints must return an array of objects."
         end
@@ -44,6 +49,12 @@ module Committee
     end
 
     private
+
+    def legacy_hyper_schema_rel?(link)
+       link.is_a?(Committee::Drivers::HyperSchema::Link) &&
+         link.rel == "instances" &&
+         !link.target_schema
+    end
 
     def response_media_type(response)
       response.content_type.to_s.split(";").first.to_s

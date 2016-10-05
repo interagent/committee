@@ -35,6 +35,7 @@ describe Committee::Drivers::HyperSchema::Link do
   before do
     @hyper_schema_link = JsonSchema::Schema::Link.new
     @hyper_schema_link.href = "/apps"
+    @hyper_schema_link.media_type = "application/json"
     @hyper_schema_link.method = "GET"
     @hyper_schema_link.parent = { "title": "parent" }
     @hyper_schema_link.rel = "instances"
@@ -45,6 +46,10 @@ describe Committee::Drivers::HyperSchema::Link do
 
   it "proxies #href" do
     assert_equal "/apps", @link.href
+  end
+
+  it "proxies #media_type" do
+    assert_equal "application/json", @link.media_type
   end
 
   it "proxies #method" do

@@ -39,7 +39,15 @@ describe Committee::ResponseValidator do
 
   it "detects an improperly formatted list response" do
     @link = @list_link
+
+    @link.parent = nil
     @link.target_schema = nil
+
+    # We're testing for legacy behavior here: even without a `targetSchema` as
+    # long as `rel` is set to `instances` we still wrap the the result in an
+    # array.
+    assert_equal "instances", @link.rel
+
     e = assert_raises(Committee::InvalidResponse) { call }
     message = "List endpoints must return an array of objects."
     assert_equal message, e.message
@@ -76,6 +84,8 @@ describe Committee::ResponseValidator do
   private
 
   def call
-    Committee::ResponseValidator.new(@link).call(@status, @headers, @data)
+    # hyper-schema link should be dropped into driver wrapper before it's used
+    link = Committee::Drivers::HyperSchema::Link.new(@link)
+    Committee::ResponseValidator.new(link).call(@status, @headers, @data)
   end
 end
