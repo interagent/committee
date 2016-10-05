@@ -67,7 +67,7 @@ module Committee::Drivers
           end
 
           routes[method] ||= []
-          routes[method] << link
+          routes[method] << [href_to_regex(link.href), link]
         end
       end
       spec.routes = routes
@@ -126,6 +126,10 @@ module Committee::Drivers
           [nil, nil]
         end
       end
+    end
+
+    def href_to_regex(href)
+      href.gsub(/\{(.*?)\}/, "[^/]+")
     end
   end
 end

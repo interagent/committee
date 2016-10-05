@@ -84,11 +84,15 @@ module Committee::Drivers
 
     private
 
+    def href_to_regex(href)
+      href.gsub(/\{(.*?)\}/, "[^/]+")
+    end
+
     def parse_link(link)
       return nil, nil if !link.method || !link.href
       method = link.method.to_s.upcase
       # /apps/{id} --> /apps/([^/]+)
-      href = link.href.gsub(/\{(.*?)\}/, "[^/]+")
+      href = href_to_regex(link.href)
       [method, href]
     end
   end
