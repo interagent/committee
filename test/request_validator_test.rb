@@ -98,6 +98,8 @@ describe Committee::RequestValidator do
   private
 
   def call(data, options={})
-    Committee::RequestValidator.new(@link, options).call(@request, data)
+    # hyper-schema link should be dropped into driver wrapper before it's used
+    link = Committee::Drivers::HyperSchema::Link.new(@link)
+    Committee::RequestValidator.new(link, options).call(@request, data)
   end
 end

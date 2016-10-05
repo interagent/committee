@@ -35,10 +35,16 @@ module Committee::Drivers
         self.hyper_schema_link = hyper_schema_link
       end
 
+      # The link's input media type. i.e. How requests should be encoded.
+      def enc_type
+        hyper_schema_link.enc_type
+      end
+
       def href
         hyper_schema_link.href
       end
 
+      # The link's output media type. i.e. How responses should be encoded.
       def media_type
         hyper_schema_link.media_type
       end
@@ -49,6 +55,12 @@ module Committee::Drivers
 
       def rel
         hyper_schema_link.rel
+      end
+
+      # The link's input schema. i.e. How we validate an endpoint's incoming
+      # parameters.
+      def schema
+        hyper_schema_link.schema
       end
 
       def status_success
