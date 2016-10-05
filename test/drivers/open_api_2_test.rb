@@ -41,8 +41,8 @@ describe Committee::Drivers::OpenAPI2::Link do
     @link.media_type = "application/json"
     @link.method = "GET"
     @link.status_success = 200
-    @link.schema = { "title": "input" }
-    @link.target_schema = { "title": "target" }
+    @link.schema = { "title" => "input" }
+    @link.target_schema = { "title" => "target" }
   end
 
   it "uses set #enc_type" do
@@ -69,7 +69,7 @@ describe Committee::Drivers::OpenAPI2::Link do
   end
 
   it "uses set #schema" do
-    assert_equal({ "title": "input" }, @link.schema)
+    assert_equal({ "title" => "input" }, @link.schema)
   end
 
   it "uses set #status_success" do
@@ -77,6 +77,6 @@ describe Committee::Drivers::OpenAPI2::Link do
   end
 
   it "uses set #target_schema" do
-    assert_equal({ "title": "target" }, @link.target_schema)
+    assert_equal({ "title" => "target" }, @link.target_schema)
   end
 end

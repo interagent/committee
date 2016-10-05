@@ -31,10 +31,10 @@ describe Committee::Drivers::HyperSchema::Link do
     @hyper_schema_link.href = "/apps"
     @hyper_schema_link.media_type = "application/json"
     @hyper_schema_link.method = "GET"
-    @hyper_schema_link.parent = { "title": "parent" }
+    @hyper_schema_link.parent = { "title" => "parent" }
     @hyper_schema_link.rel = "instances"
-    @hyper_schema_link.schema = { "title": "input" }
-    @hyper_schema_link.target_schema = { "title": "target" }
+    @hyper_schema_link.schema = { "title" => "input" }
+    @hyper_schema_link.target_schema = { "title" => "target" }
 
     @link = Committee::Drivers::HyperSchema::Link.new(@hyper_schema_link)
   end
