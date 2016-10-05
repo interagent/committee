@@ -1,7 +1,8 @@
 module Committee
   class Router
     def initialize(schema, options = {})
-      @driver = options[:driver]
+      @driver = options[:driver] ||
+        raise(ArgumentError, "Committee: need driver.")
       @routes = @driver.build_routes(schema)
       @prefix = options[:prefix]
       @prefix_regexp = /\A#{Regexp.escape(@prefix)}/.freeze if @prefix

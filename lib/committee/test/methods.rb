@@ -1,17 +1,18 @@
 module Committee::Test
   module Methods
     def assert_schema_conform
+      @driver ||= Committee::Drivers.driver_from_name(committee_driver)
+
       if (data = schema_contents).is_a?(String)
         warn_string_deprecated
         data = JSON.parse(data)
       end
 
       @schema ||= begin
-        schema = JsonSchema.parse!(data)
-        schema.expand_references!
-        schema
+        @driver.parse(data)
       end
-      @router ||= Committee::Router.new(@schema, prefix: schema_url_prefix)
+      @router ||= Committee::Router.new(@schema,
+        driver: @driver, prefix: schema_url_prefix)
 
       unless link = @router.find_request_link(last_request)
         response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
@@ -26,6 +27,12 @@ module Committee::Test
 
     def assert_schema_content_type
       Committee.warn_deprecated("Committee: use of #assert_schema_content_type is deprecated; use #assert_schema_conform instead.")
+    end
+
+    # Can be overridden with a different driver name for other API definition
+    # formats.
+    def committee_driver
+      :hyper_schema
     end
 
     # can be overridden alternatively to #schema_path in case the schema is
