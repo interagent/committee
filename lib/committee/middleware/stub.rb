@@ -9,9 +9,11 @@ module Committee::Middleware
     def handle(request)
       if link = @router.find_request_link(request)
         headers = { "Content-Type" => "application/json" }
+
         data = cache(link.method, link.href) do
           Committee::ResponseGenerator.new.call(link)
         end
+
         if @call
           request.env["committee.response"] = data
           call_status, call_headers, call_body = @app.call(request.env)
@@ -29,6 +31,7 @@ module Committee::Middleware
           # will be the same one that we set above)
           data = request.env["committee.response"]
         end
+
         [link.status_success, headers, [JSON.pretty_generate(data)]]
       else
         @app.call(request.env)
