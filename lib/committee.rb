@@ -11,6 +11,7 @@ require_relative "committee/response_validator"
 require_relative "committee/router"
 require_relative "committee/validation_error"
 
+require_relative "committee/drivers"
 require_relative "committee/drivers/hyper_schema"
 require_relative "committee/drivers/open_api_2"
 
