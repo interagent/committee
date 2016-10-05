@@ -7,7 +7,7 @@ module Committee
       #
       # This is poor form that's here so as not to introduce breaking behavior.
       # It should be eventually be removed.
-      if link.is_a?(Committee::Drivers::HyperSchema::Link) && link.rel == "instances"
+      if legacy_hyper_schema_rel?(link)
         data = [data]
       end
 
@@ -35,6 +35,11 @@ module Committee
         raise(%{At "#{schema.pointer}": no "example" attribute and "null" } +
           %{is not allowed; don't know how to generate property.})
       end
+    end
+
+    def legacy_hyper_schema_rel?(link)
+       link.is_a?(Committee::Drivers::HyperSchema::Link) &&
+         link.rel == "instances"
     end
   end
 end
