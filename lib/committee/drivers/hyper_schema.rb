@@ -67,6 +67,8 @@ module Committee::Drivers
         hyper_schema_link.rel == "create" ? 201 : 200
       end
 
+      # The link's output schema. i.e. How we validate an endpoint's response
+      # data.
       def target_schema
         # Falling back on the link's parent schema is legacy behavior to
         # support existing Heroku hyper-schemas that don't have a
