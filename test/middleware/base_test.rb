@@ -8,7 +8,10 @@ describe Committee::Middleware::Base do
   end
 
   it "accepts schema hash" do
-    @app = new_rack_app(schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
+    @app = new_rack_app(
+      driver: :hyper_schema,
+      schema: JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
+    )
     params = {
       "name" => "cloudnasium"
     }
@@ -19,13 +22,39 @@ describe Committee::Middleware::Base do
 
   it "accepts schema object" do
     schema = JsonSchema.parse!(JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
-    @app = new_rack_app(schema: schema)
+    @app = new_rack_app(
+      driver: :hyper_schema,
+      schema: schema
+    )
     params = {
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
+  end
+
+  it "doesn't accept schema object for non-hyper-schema driver" do
+    schema = JsonSchema.parse!(JSON.parse(File.read("./test/data/hyperschema/heroku.json")))
+    @app = new_rack_app(
+      driver: :open_api_2,
+      schema: schema
+    )
+    e = assert_raises(ArgumentError) do
+      post "/apps"
+    end
+    assert_equal "Committee: JSON schema data is only accepted for driver " \
+      "hyper_schema. Try passing a hash instead.", e.message
+  end
+
+  it "complains on unknown driver" do
+    @app = new_rack_app(
+      driver: :blueprint
+    )
+    e = assert_raises(ArgumentError) do
+      post "/apps"
+    end
+    assert_equal %{Committee: unknown driver "blueprint".}, e.message
   end
 
   private

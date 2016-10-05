@@ -3,7 +3,8 @@ module Committee::Middleware
     def initialize(app, options={})
       @app = app
 
-      @driver = initialize_driver(options.fetch(:driver, :hyper_schema))
+      driver_name = options.fetch(:driver, :hyper_schema)
+      @driver = initialize_driver(driver_name)
       @error_class = options.fetch(:error_class, Committee::ValidationError)
       @params_key = options[:params_key] || "committee.params"
       @raise = options[:raise]
@@ -14,7 +15,14 @@ module Committee::Middleware
         schema = JSON.parse(schema)
       end
 
-      @schema = @driver.parse(schema)
+      if schema.is_a?(Hash)
+        schema = @driver.parse(schema)
+      elsif schema.is_a?(JsonSchema::Schema) && driver_name != :hyper_schema
+        raise ArgumentError,
+          "Committee: JSON schema data is only accepted for driver " \
+          "hyper_schema. Try passing a hash instead."
+      end
+      @schema = schema
 
       @router = Committee::Router.new(@schema,
         driver: @driver,
@@ -41,7 +49,7 @@ module Committee::Middleware
       when :open_api_2
         Committee::Drivers::OpenAPI2.new
       else
-        raise ArgumentError, %{Committee: unknown driver "#{name}"}
+        raise ArgumentError, %{Committee: unknown driver "#{name}".}
       end
     end
 
