@@ -63,6 +63,16 @@ describe Committee::Middleware::Stub do
     assert_equal response, JSON.parse(last_response.body, symbolize_names: true)
   end
 
+  it "responds with a stubbed response for OpenAPI" do
+    @app = new_rack_app(
+      driver: :open_api_2,
+      schema: open_api_2_data)
+    get "/api/pets/fido"
+    assert_equal 200, last_response.status
+    data = JSON.parse(last_response.body)
+    assert_equal ValidPet.keys.sort, data.keys.sort
+  end
+
   private
 
   def new_rack_app(options = {})

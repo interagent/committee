@@ -57,10 +57,43 @@ describe Committee::ResponseGenerator do
     end
 
     expected = <<-eos.gsub(/\n +/, "").strip
-      At "#/definitions/app/properties/maintenance": no "example" attribute and 
+      At "get /apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fname)}" 
+      "#/definitions/app/properties/maintenance": no "example" attribute and 
       "null" is not allowed; don't know how to generate property.
     eos
     assert_equal expected, e.message
+  end
+
+  it "generates basic types" do
+    link = Committee::Drivers::OpenAPI2::Link.new
+    link.target_schema = JsonSchema::Schema.new
+
+    link.target_schema.type = ["integer"]
+    assert_equal 0, Committee::ResponseGenerator.new.call(link)
+
+    link.target_schema.type = ["null"]
+    assert_equal nil, Committee::ResponseGenerator.new.call(link)
+
+    link.target_schema.type = ["string"]
+    assert_equal "", Committee::ResponseGenerator.new.call(link)
+  end
+
+  it "prefers an example to a built-in value" do
+    link = Committee::Drivers::OpenAPI2::Link.new
+    link.target_schema = JsonSchema::Schema.new
+
+    link.target_schema.data = { "example" => 123 }
+    link.target_schema.type = ["integer"]
+
+    assert_equal 123, Committee::ResponseGenerator.new.call(link)
+  end
+
+  it "prefers non-null types to null types" do
+    link = Committee::Drivers::OpenAPI2::Link.new
+    link.target_schema = JsonSchema::Schema.new
+
+    link.target_schema.type = ["null", "integer"]
+    assert_equal 0, Committee::ResponseGenerator.new.call(link)
   end
 
   def call

@@ -68,6 +68,23 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  it "passes through a valid response for OpenAPI" do
+    @app = new_rack_app(JSON.generate([ValidPet]), {},
+      driver: :open_api_2,
+      schema: open_api_2_data)
+    get "/api/pets"
+    assert_equal 200, last_response.status
+  end
+
+  it "detects an invalid response for OpenAPI" do
+    @app = new_rack_app("", {},
+      driver: :open_api_2,
+      schema: open_api_2_data)
+    get "/api/pets"
+    assert_equal 500, last_response.status
+    assert_match /valid JSON/i, last_response.body
+  end
+
   private
 
   def new_rack_app(response, headers = {}, options = {})

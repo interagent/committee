@@ -5,13 +5,23 @@ describe Committee::Drivers::OpenAPI2 do
     @driver = Committee::Drivers::OpenAPI2.new
   end
 
-  it "builds a routing table" do
-  end
-
   it "parses an OpenAPI 2 spec" do
     spec = @driver.parse(open_api_2_data)
     assert_kind_of Committee::Drivers::OpenAPI2::Spec, spec
     assert_kind_of JsonSchema::Schema, spec.definitions
+
+    assert_kind_of Hash, spec.routes
+    refute spec.routes.empty?
+    assert(spec.routes.keys.all? { |m|
+      ["DELETE", "GET", "PATCH", "POST", "PUT"].include?(m)
+    })
+
+    spec.routes.each do |(_, method_routes)|
+      method_routes.each do |regex, link|
+        assert_kind_of Regexp, regex
+        assert_kind_of Committee::Drivers::OpenAPI2::Link, link
+      end
+    end
   end
 
   it "refuses to parse other version of OpenAPI" do

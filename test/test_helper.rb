@@ -16,9 +16,17 @@ JsonSchema.configure do |c|
   c.register_format 'int64', ->(data) {}
 end
 
+# For our hyper-schema example.
 ValidApp = {
   "maintenance" => false,
   "name"        => "example",
+}.freeze
+
+# For our OpenAPI example.
+ValidPet = {
+  "id"   => 123,
+  "name" => "example",
+  "tag"  => "tag-123",
 }.freeze
 
 def hyper_schema_data

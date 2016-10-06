@@ -158,7 +158,7 @@ module Committee::Drivers
           end
 
           routes[method] ||= []
-          routes[method] << [href_to_regex(link.href), link]
+          routes[method] << [%r{^#{href_to_regex(link.href)}$}, link]
         end
       end
       routes
