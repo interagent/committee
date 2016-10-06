@@ -20,6 +20,15 @@ describe Committee::Drivers::OpenAPI2 do
       method_routes.each do |regex, link|
         assert_kind_of Regexp, regex
         assert_kind_of Committee::Drivers::OpenAPI2::Link, link
+
+        # verify that we've correct generated a parameters schema for each link
+        if link.target_schema
+          assert_kind_of JsonSchema::Schema, link.schema if link.schema
+        end
+
+        if link.target_schema
+          assert_kind_of JsonSchema::Schema, link.target_schema
+        end
       end
     end
   end
@@ -88,5 +97,75 @@ describe Committee::Drivers::OpenAPI2::Link do
 
   it "uses set #target_schema" do
     assert_equal({ "title" => "target" }, @link.target_schema)
+  end
+end
+
+describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
+  before do
+  end
+
+  it "reflects a basic type into a schema" do
+    data = {
+      "parameters" => [
+        {
+          "name" => "limit",
+          "type" => "integer",
+        }
+      ]
+    }
+    schema = call(data)
+
+    assert_equal ["limit"], schema.properties.keys
+    assert_equal [], schema.required
+    assert_equal ["integer"], schema.properties["limit"].type
+  end
+
+  it "reflects a required property into a schema" do
+    data = {
+      "parameters" => [
+        {
+          "name" => "limit",
+          "required" => true,
+        }
+      ]
+    }
+    schema = call(data)
+
+    assert_equal ["limit"], schema.required
+  end
+
+  it "reflects an array with an items schema into a schema" do
+    data = {
+      "parameters" => [
+        {
+          "name" => "tags",
+          "type" => "array",
+          "items" => {
+            "type" => "string"
+          }
+        }
+      ]
+    }
+    schema = call(data)
+
+    assert_equal ["array"], schema.properties["tags"].type
+    assert_equal({ "type" => "string" }, schema.properties["tags"].items)
+  end
+
+  it "requires that certain fields are present" do
+    data = {
+      "parameters" => [
+        {
+        }
+      ]
+    }
+    e = assert_raises ArgumentError do
+      call(data)
+    end
+    assert_equal "Committee: no name section in link data.", e.message
+  end
+
+  def call(data)
+    Committee::Drivers::OpenAPI2::ParameterSchemaBuilder.new(data).call
   end
 end

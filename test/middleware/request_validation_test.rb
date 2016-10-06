@@ -109,6 +109,25 @@ describe Committee::Middleware::RequestValidation do
     assert_match /invalid request/i, last_response.body
   end
 
+  it "passes through a valid request for OpenAPI" do
+    @app = new_rack_app(
+      coerce_query_params: true,
+      driver: :open_api_2,
+      schema: open_api_2_data)
+    get "/api/pets?limit=3"
+    assert_equal 200, last_response.status
+  end
+
+  it "detects an invalid request for OpenAPI" do
+    @app = new_rack_app(
+      coerce_query_params: true,
+      driver: :open_api_2,
+      schema: open_api_2_data)
+    get "/api/pets?limit=foo"
+    assert_equal 400, last_response.status
+    assert_match /invalid request/i, last_response.body
+  end
+
   private
 
   def new_rack_app(options = {})

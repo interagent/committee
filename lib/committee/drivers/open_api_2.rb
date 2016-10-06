@@ -55,6 +55,62 @@ module Committee::Drivers
       end
     end
 
+    # ParameterSchemaBuilder converts OpenAPI 2 link parameters, which are not
+    # quite JSON schemas (but will be in OpenAPI 3) into synthetic schemas that
+    # we can use to do some basic request validation.
+    class ParameterSchemaBuilder
+      def initialize(link_data)
+        self.link_data = link_data
+      end
+
+      def call
+        link_schema = JsonSchema::Schema.new
+        link_schema.properties = {}
+        link_schema.required = []
+
+        if link_data["parameters"]
+          link_data["parameters"].each do |param_data|
+            LINK_REQUIRED_FIELDS.each do |field|
+              if !param_data[field]
+                raise ArgumentError,
+                  "Committee: no #{field} section in link data."
+              end
+            end
+
+            param_schema = JsonSchema::Schema.new
+
+            # We could probably use more validation here, but the formats of
+            # OpenAPI 2 are based off of what's available in JSON schema, and
+            # therefore this should map over quite well.
+            param_schema.type = [param_data["type"]]
+
+            # And same idea: despite parameters not being schemas, the items
+            # key (if preset) is actually a schema that defines each item of an
+            # array type, so we can just reflect that directly onto our
+            # artifical schema.
+            if param_data["type"] == "array" && param_data["items"]
+              param_schema.items = param_data["items"]
+            end
+
+            link_schema.properties[param_data["name"]] = param_schema
+            if param_data["required"] == true
+              link_schema.required << param_data["name"]
+            end
+          end
+        end
+
+        link_schema
+      end
+
+      private
+
+      LINK_REQUIRED_FIELDS = [
+        :name
+      ].map(&:to_s).freeze
+
+      attr_accessor :link_data
+    end
+
     class Spec
       attr_accessor :base_path
       attr_accessor :consumes
@@ -134,8 +190,9 @@ module Committee::Drivers
           link.href = spec.base_path + path
           link.method = method
 
-          # TODO: Need to implement request schema.
-          link.schema = nil
+          # Convert the spec's parameter pseudo-schemas into JSON schemas that
+          # we can use for some basic request validation.
+          link.schema = ParameterSchemaBuilder.new(link_data).call
 
           # Arbitrarily pick one response for the time being. Prefers in order:
           # a 200, 201, any 3-digit numerical response, then anything at all.
