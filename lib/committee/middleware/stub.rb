@@ -7,7 +7,8 @@ module Committee::Middleware
     end
 
     def handle(request)
-      if link = @router.find_request_link(request)
+      link, _ = @router.find_request_link(request)
+      if link
         headers = { "Content-Type" => "application/json" }
 
         data = cache(link.method, link.href) do

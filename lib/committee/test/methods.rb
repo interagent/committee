@@ -14,7 +14,8 @@ module Committee::Test
       @router ||= Committee::Router.new(@schema,
         driver: @driver, prefix: schema_url_prefix)
 
-      unless link = @router.find_request_link(last_request)
+      link, _ = @router.find_request_link(last_request)
+      unless link
         response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
         raise Committee::InvalidResponse.new(response)
       end

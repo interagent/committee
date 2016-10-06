@@ -152,7 +152,7 @@ module Committee::Drivers
     end
 
     def href_to_regex(href)
-      href.gsub(/\{(.*?)\}/, "[^/]+")
+      href.gsub(/\{(.*?)\}/, '(?<\1>[^/]+)')
     end
 
     def parse_definitions!(data)

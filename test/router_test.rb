@@ -2,35 +2,64 @@ require_relative "test_helper"
 
 describe Committee::Router do
   it "builds routes without parameters" do
-    refute_nil router.find_link("GET", "/apps")
+    link, _ = hyper_schema_router.find_link("GET", "/apps")
+    refute_nil link
   end
 
   it "builds routes with parameters" do
-    refute_nil router.find_link("GET", "/apps/123")
+    link, _ = hyper_schema_router.find_link("GET", "/apps/123")
+    refute_nil link
   end
 
   it "doesn't match anything on a /" do
-    assert_nil router.find_link("GET", "/")
+    link, _ = hyper_schema_router.find_link("GET", "/")
+    assert_nil link
   end
 
   it "takes a prefix" do
     # this is a sociopathic example
-    assert router(prefix: "/kpi").find_link("GET", "/kpi/apps/123")
+    link, _ = hyper_schema_router(prefix: "/kpi").find_link("GET", "/kpi/apps/123")
+    refute_nil link
   end
 
   it "includes all paths without a prefix" do
-    assert router.includes?("/")
-    assert router.includes?("/apps")
+    link, _ = hyper_schema_router.includes?("/")
+    refute_nil link
+
+    link, _ = hyper_schema_router.includes?("/apps")
+    refute_nil link
   end
 
   it "only includes the prefix path with a prefix" do
-    refute router(prefix: "/kpi").includes?("/")
-    assert router(prefix: "/kpi").includes?("/kpi")
-    assert router(prefix: "/kpi").includes?("/kpi/apps")
+    link, _ = hyper_schema_router(prefix: "/kpi").includes?("/")
+    assert_nil link
+
+    link, _ = hyper_schema_router(prefix: "/kpi").includes?("/kpi")
+    refute_nil link
+
+    link, _ = hyper_schema_router(prefix: "/kpi").includes?("/kpi/apps")
+    refute_nil link
   end
 
-  def router(options = {})
+  it "provides named parameters" do
+    link, param_matches = open_api_2_router.find_link("GET", "/api/pets/fido")
+    refute_nil link
+    assert_equal({ "id" => "fido" }, param_matches)
+  end
+
+  it "doesn't provide named parameters where none are available" do
+    link, param_matches = open_api_2_router.find_link("GET", "/api/pets")
+    refute_nil link
+    assert_equal({}, param_matches)
+  end
+
+  def hyper_schema_router(options = {})
     schema = Committee::Drivers::HyperSchema.new.parse(hyper_schema_data)
+    Committee::Router.new(schema, options)
+  end
+
+  def open_api_2_router(options = {})
+    schema = Committee::Drivers::OpenAPI2.new.parse(open_api_2_data)
     Committee::Router.new(schema, options)
   end
 end

@@ -33,6 +33,12 @@ describe Committee::Drivers::OpenAPI2 do
     end
   end
 
+  it "names capture groups into href regexes" do
+    spec = @driver.parse(open_api_2_data)
+    assert_equal %r{^\/api\/pets\/(?<id>[^\/]+)$}.inspect,
+      spec.routes["DELETE"][0][0].inspect
+  end
+
   it "refuses to parse other version of OpenAPI" do
     data = open_api_2_data
     data['swagger'] = '3.0'

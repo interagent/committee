@@ -18,8 +18,9 @@ module Committee
       path = path.gsub(@prefix_regexp, "") if @prefix
       if method_routes = @schema.routes[method]
         method_routes.each do |pattern, link|
-          if path =~ pattern
-            return link
+          if matches = pattern.match(path)
+            hash = Hash[matches.names.zip(matches.captures)]
+            return link, hash
           end
         end
       end

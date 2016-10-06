@@ -2,6 +2,7 @@ module Committee::Middleware
   class RequestValidation < Base
     def initialize(app, options={})
       super
+
       @allow_form_params   = options.fetch(:allow_form_params, true)
       @allow_query_params  = options.fetch(:allow_query_params, true)
       @check_content_type  = options.fetch(:check_content_type, true)
@@ -14,7 +15,7 @@ module Committee::Middleware
     end
 
     def handle(request)
-      link = @router.find_request_link(request)
+      link, param_matches = @router.find_request_link(request)
 
       if link && @coerce_query_params && !request.GET.nil? && !link.schema.nil?
         request.env["rack.request.query_hash"].merge!(
