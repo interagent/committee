@@ -23,6 +23,14 @@ require_relative "committee/middleware/stub"
 require_relative "committee/test/methods"
 
 module Committee
+  def self.debug?
+    ENV["COMMITTEE_DEBUG"]
+  end
+
+  def self.log_debug(message)
+    $stderr.puts(message) if debug?
+  end
+
   def self.warn_deprecated(message)
     if !$VERBOSE.nil?
       $stderr.puts(message)

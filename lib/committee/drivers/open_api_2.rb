@@ -234,8 +234,11 @@ module Committee::Drivers
             end
           end
 
+          rx = %r{^#{href_to_regex(link.href)}$}
+          Committee.log_debug "Created route: #{link.method} #{link.href} (regex #{rx})"
+
           routes[method] ||= []
-          routes[method] << [%r{^#{href_to_regex(link.href)}$}, link]
+          routes[method] << [rx, link]
         end
       end
       routes

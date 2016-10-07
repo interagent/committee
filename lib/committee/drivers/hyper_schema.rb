@@ -105,8 +105,12 @@ module Committee::Drivers
       hyper_schema.links.each do |link|
         method, href = parse_link(link)
         next unless method
+
+        rx = %r{^#{href}$}
+        Committee.log_debug "Created route: #{method} #{href} (regex #{rx})"
+
         routes[method] ||= []
-        routes[method] << [%r{^#{href}$}, Link.new(link)]
+        routes[method] << [rx, Link.new(link)]
       end
 
       # recursively iterate through all `properties` subschemas to build a
