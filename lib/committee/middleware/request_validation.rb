@@ -26,10 +26,12 @@ module Committee::Middleware
         # Attempts to coerce parameters that appear in a link's URL to Ruby
         # types that can be validated with a schema.
         if @coerce_path_params
-          path_params = Committee::StringParamsCoercer.new(
-            param_matches,
-            link.schema
-          ).call
+          path_params = param_matches.merge(
+            Committee::StringParamsCoercer.new(
+              param_matches,
+              link.schema
+            ).call
+          )
         end
 
         # Attempts to coerce parameters that appear in a query string to Ruby
