@@ -30,32 +30,35 @@ opt_parser = OptionParser.new do |opts|
     options[:port] = port
   }
 end
-opt_parser.parse!(args)
 
-unless args.count == 1
-  puts opt_parser.to_s
-  exit
-end
+if $0 == __FILE__
+  opt_parser.parse!(args)
 
-# We could just pass the options directly through to middleware and it would do
-# the driver initialization and loading for us, but we get quite a significant
-# speed advantage by pre-parsing this ourselves so that it doesn't need to be
-# done for every request.
-driver = Committee::Drivers.driver_from_name(options[:driver] || :hyper_schema)
-schema = ::YAML.load(File.read(args[0]))
-schema = driver.parse(schema)
-
-app = Rack::Builder.new {
-  unless options[:tolerant]
-    use Committee::Middleware::RequestValidation, schema: schema
-    use Committee::Middleware::ResponseValidation, schema: schema
+  unless args.count == 1
+    puts opt_parser.to_s
+    exit
   end
 
-  use Committee::Middleware::Stub, schema: schema
+  # We could just pass the options directly through to middleware and it would
+  # do the driver initialization and loading for us, but we get quite a
+  # significant speed advantage by pre-parsing this ourselves so that it
+  # doesn't need to be done for every request.
+  driver = Committee::Drivers.driver_from_name(options[:driver] || :hyper_schema)
+  schema = ::YAML.load(File.read(args[0]))
+  schema = driver.parse(schema)
 
-  run lambda { |_|
-    [404, {}, ["Not found"]]
+  app = Rack::Builder.new {
+    unless options[:tolerant]
+      use Committee::Middleware::RequestValidation, schema: schema
+      use Committee::Middleware::ResponseValidation, schema: schema
+    end
+
+    use Committee::Middleware::Stub, schema: schema
+
+    run lambda { |_|
+      [404, {}, ["Not found"]]
+    }
   }
-}
 
-Rack::Server.start(app: app, Port: options[:port])
+  Rack::Server.start(app: app, Port: options[:port])
+end
