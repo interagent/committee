@@ -56,7 +56,7 @@ describe Committee::Middleware::ResponseValidation do
   it "warns when sending a deprecated string" do
     mock(Committee).warn_deprecated.with_any_args
     @app = new_rack_app(JSON.generate([ValidApp]), {},
-      schema: File.read("./test/data/hyperschema/heroku.json"))
+      schema: File.read("./test/data/hyperschema/paas.json"))
     get "/apps"
     assert_equal 200, last_response.status
   end

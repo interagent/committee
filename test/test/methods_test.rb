@@ -9,7 +9,7 @@ describe Committee::Middleware::Stub do
   end
 
   def schema_path
-    "./test/data/hyperschema/heroku.json"
+    "./test/data/hyperschema/paas.json"
   end
 
   describe "#assert_schema_content_type" do

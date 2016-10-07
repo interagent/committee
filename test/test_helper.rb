@@ -30,7 +30,7 @@ ValidPet = {
 }.freeze
 
 def hyper_schema_data
-  JSON.parse(File.read("./test/data/hyperschema/heroku.json"))
+  JSON.parse(File.read("./test/data/hyperschema/paas.json"))
 end
 
 def open_api_2_data

@@ -1,13 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-04/hyper-schema",
-  "title": "Heroku Platform API",
-  "description": "The platform API empowers developers to automate, extend and combine Heroku with other services.",
+  "title": "PAAAS Platform API",
+  "description": "The platform API empowers developers to automate and extend a generic PAAAS service.",
   "type": [
     "object"
   ],
   "definitions": {
     "app": {
-      "description": "An app represents the program that you would like to deploy and run on Heroku.",
+      "description": "An app represents the program that you would like to deploy and run on a PAAS.",
       "id": "schema/app",
       "title": "Apps",
       "type": [
