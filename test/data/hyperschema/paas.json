@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/hyper-schema",
-  "title": "PAAAS Platform API",
+  "title": "PAAS Platform API",
   "description": "The platform API empowers developers to automate and extend a generic PAAAS service.",
   "type": [
     "object"
