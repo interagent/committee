@@ -8,7 +8,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "passes through a valid request" do
-    @app = new_rack_app
+    @app = new_rack_app(schema: hyper_schema)
     params = {
       "name" => "cloudnasium"
     }
@@ -18,7 +18,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "detects an invalid request" do
-    @app = new_rack_app
+    @app = new_rack_app(schema: hyper_schema)
     header "Content-Type", "application/json"
     params = {
       "name" => 1
@@ -29,7 +29,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "rescues JSON errors" do
-    @app = new_rack_app
+    @app = new_rack_app(schema: hyper_schema)
     header "Content-Type", "application/json"
     post "/apps", "{x:y}"
     assert_equal 400, last_response.status
@@ -37,7 +37,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "takes a prefix" do
-    @app = new_rack_app(prefix: "/v1")
+    @app = new_rack_app(prefix: "/v1", schema: hyper_schema)
     params = {
       "name" => "cloudnasium"
     }
@@ -47,7 +47,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "ignores paths outside the prefix" do
-    @app = new_rack_app(prefix: "/v1")
+    @app = new_rack_app(prefix: "/v1", schema: hyper_schema)
     header "Content-Type", "text/html"
     get "/hello"
     assert_equal 200, last_response.status
@@ -65,19 +65,19 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "routes to paths not in schema" do
-    @app = new_rack_app
+    @app = new_rack_app(schema: hyper_schema)
     get "/not-a-resource"
     assert_equal 200, last_response.status
   end
 
   it "doesn't route to paths not in schema when in strict mode" do
-    @app = new_rack_app(strict: true)
+    @app = new_rack_app(schema: hyper_schema, strict: true)
     get "/not-a-resource"
     assert_equal 404, last_response.status
   end
 
   it "optionally raises an error" do
-    @app = new_rack_app(raise: true)
+    @app = new_rack_app(raise: true, schema: hyper_schema)
     header "Content-Type", "application/json"
     assert_raises(Committee::InvalidRequest) do
       post "/apps", "{x:y}"
@@ -85,7 +85,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "optionally skip content_type check" do
-    @app = new_rack_app(check_content_type: false)
+    @app = new_rack_app(check_content_type: false, schema: hyper_schema)
     params = {
       "name" => "cloudnasium"
     }
@@ -95,14 +95,14 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "optionally coerces query params" do
-    @app = new_rack_app(coerce_query_params: true)
+    @app = new_rack_app(coerce_query_params: true, schema: hyper_schema)
     header "Content-Type", "application/json"
     get "/search/apps", {"per_page" => "10", "query" => "cloudnasium"}
     assert_equal 200, last_response.status
   end
 
   it "still raises an error if query param coercion is not possible" do
-    @app = new_rack_app(coerce_query_params: true)
+    @app = new_rack_app(coerce_query_params: true, schema: hyper_schema)
     header "Content-Type", "application/json"
     get "/search/apps", {"per_page" => "foo", "query" => "cloudnasium"}
     assert_equal 400, last_response.status
@@ -110,37 +110,27 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "passes through a valid request for OpenAPI" do
-    @app = new_rack_app(
-      coerce_query_params: true,
-      driver: :open_api_2,
-      schema: open_api_2_data)
+    @app = new_rack_app(schema: open_api_2_schema)
     get "/api/pets?limit=3"
     assert_equal 200, last_response.status
   end
 
   it "detects an invalid request for OpenAPI" do
-    @app = new_rack_app(
-      coerce_query_params: true,
-      driver: :open_api_2,
-      schema: open_api_2_data)
+    @app = new_rack_app(schema: open_api_2_schema)
     get "/api/pets?limit=foo"
     assert_equal 400, last_response.status
     assert_match /invalid request/i, last_response.body
   end
 
   it "passes through a valid request for OpenAPI including path parameters" do
-    @app = new_rack_app(
-      driver: :open_api_2,
-      schema: open_api_2_data)
+    @app = new_rack_app(schema: open_api_2_schema)
     # not that ID is expect to be an integer
     get "/api/pets/123"
     assert_equal 200, last_response.status
   end
 
   it "detects an invalid request for OpenAPI including path parameters" do
-    @app = new_rack_app(
-      driver: :open_api_2,
-      schema: open_api_2_data)
+    @app = new_rack_app(schema: open_api_2_schema)
     # not that ID is expect to be an integer
     get "/api/pets/not-integer"
     assert_equal 400, last_response.status
@@ -150,9 +140,6 @@ describe Committee::Middleware::RequestValidation do
   private
 
   def new_rack_app(options = {})
-    options = {
-      schema: hyper_schema_data,
-    }.merge(options)
     Rack::Builder.new {
       use Committee::Middleware::RequestValidation, options
       run lambda { |_|

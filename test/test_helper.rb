@@ -29,10 +29,26 @@ ValidPet = {
   "tag"  => "tag-123",
 }.freeze
 
+def hyper_schema
+  @hyper_schema ||= begin
+    driver = Committee::Drivers::HyperSchema.new
+    driver.parse(hyper_schema_data)
+  end
+end
+
+def open_api_2_schema
+  @open_api_2_schema ||= begin
+    driver = Committee::Drivers::OpenAPI2.new
+    driver.parse(open_api_2_data)
+  end
+end
+
+# Don't cache this because we'll often manipulate the created hash in tests.
 def hyper_schema_data
   JSON.parse(File.read("./test/data/hyperschema/paas.json"))
 end
 
+# Don't cache this because we'll often manipulate the created hash in tests.
 def open_api_2_data
   JSON.parse(File.read("./test/data/openapi2/petstore-expanded.json"))
 end

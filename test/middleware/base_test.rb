@@ -8,11 +8,8 @@ describe Committee::Middleware::Base do
   end
 
   it "accepts just a schema object" do
-    driver = Committee::Drivers::HyperSchema.new
-    schema = driver.parse(hyper_schema_data)
-
     @app = new_rack_app(
-      schema: schema
+      schema: hyper_schema
     )
     params = {
       "name" => "cloudnasium"
@@ -51,7 +48,7 @@ describe Committee::Middleware::Base do
     assert_equal 200, last_response.status
   end
 
-  it "accepts driver name and schema object (legacy behavior)" do
+  it "accepts driver name and JsonSchema::Schema object (legacy behavior)" do
     schema = JsonSchema.parse!(hyper_schema_data)
     @app = new_rack_app(
       driver: :hyper_schema,
