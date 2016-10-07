@@ -1,5 +1,17 @@
 module Committee::Drivers
   class HyperSchema
+    # Whether parameters in a request's path will be considered and coerced by
+    # default.
+    def default_path_params
+      false
+    end
+
+    # Whether parameters in a request's path will be considered and coerced by
+    # default.
+    def default_query_params
+      false
+    end
+
     def parse(schema)
       # Really we'd like to only have data hashes passed into drivers these
       # days, but here we handle a JsonSchema::Schema for now to maintain

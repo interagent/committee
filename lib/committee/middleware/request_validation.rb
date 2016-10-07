@@ -7,8 +7,12 @@ module Committee::Middleware
       @allow_query_params  = options.fetch(:allow_query_params, true)
       @check_content_type  = options.fetch(:check_content_type, true)
       @optimistic_json     = options.fetch(:optimistic_json, false)
-      @coerce_query_params = options.fetch(:coerce_query_params, false)
       @strict              = options[:strict]
+
+      @coerce_path_params = options.fetch(:coerce_path_params,
+        @driver.default_path_params)
+      @coerce_query_params = options.fetch(:coerce_query_params,
+        @driver.default_query_params)
 
       # deprecated
       @allow_extra = options[:allow_extra]
@@ -16,14 +20,24 @@ module Committee::Middleware
 
     def handle(request)
       link, param_matches = @router.find_request_link(request)
+      path_params = {}
 
-      if link && @coerce_query_params && !request.GET.nil? && !link.schema.nil?
-        request.env["rack.request.query_hash"].merge!(
-          Committee::QueryParamsCoercer.new(
-            request.GET,
+      if link
+        if @coerce_path_params
+          path_params = Committee::QueryParamsCoercer.new(
+            param_matches,
             link.schema
           ).call
-        )
+        end
+
+        if @coerce_query_params && !request.GET.nil? && !link.schema.nil?
+          request.env["rack.request.query_hash"].merge!(
+            Committee::QueryParamsCoercer.new(
+              request.GET,
+              link.schema
+            ).call
+          )
+        end
       end
 
       request.env[@params_key] = Committee::RequestUnpacker.new(
@@ -32,6 +46,8 @@ module Committee::Middleware
         allow_query_params: @allow_query_params,
         optimistic_json:    @optimistic_json
       ).call
+
+      request.env[@params_key].merge!(path_params)
 
       if link
         validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)

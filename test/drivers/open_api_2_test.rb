@@ -56,6 +56,14 @@ describe Committee::Drivers::OpenAPI2 do
     end
     assert_equal "Committee: no definitions section in spec data.", e.message
   end
+
+  it "defaults to path parameters" do
+    assert_equal true, @driver.default_path_params
+  end
+
+  it "defaults to query parameters" do
+    assert_equal true, @driver.default_query_params
+  end
 end
 
 describe Committee::Drivers::OpenAPI2::Link do

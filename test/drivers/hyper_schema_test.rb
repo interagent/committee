@@ -22,6 +22,14 @@ describe Committee::Drivers::HyperSchema do
       end
     end
   end
+
+  it "defaults to no path parameters" do
+    assert_equal false, @driver.default_path_params
+  end
+
+  it "defaults to no query parameters" do
+    assert_equal false, @driver.default_query_params
+  end
 end
 
 describe Committee::Drivers::HyperSchema::Link do

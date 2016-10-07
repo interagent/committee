@@ -1,5 +1,17 @@
 module Committee::Drivers
   class OpenAPI2
+    # Whether parameters in a request's path will be considered and coerced by
+    # default.
+    def default_path_params
+      true
+    end
+
+    # Whether parameters in a request's path will be considered and coerced by
+    # default.
+    def default_query_params
+      true
+    end
+
     def parse(data)
       REQUIRED_FIELDS.each do |field|
         if !data[field]

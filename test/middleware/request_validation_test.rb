@@ -128,6 +128,25 @@ describe Committee::Middleware::RequestValidation do
     assert_match /invalid request/i, last_response.body
   end
 
+  it "passes through a valid request for OpenAPI including path parameters" do
+    @app = new_rack_app(
+      driver: :open_api_2,
+      schema: open_api_2_data)
+    # not that ID is expect to be an integer
+    get "/api/pets/123"
+    assert_equal 200, last_response.status
+  end
+
+  it "detects an invalid request for OpenAPI including path parameters" do
+    @app = new_rack_app(
+      driver: :open_api_2,
+      schema: open_api_2_data)
+    # not that ID is expect to be an integer
+    get "/api/pets/not-integer"
+    assert_equal 400, last_response.status
+    assert_match /invalid request/i, last_response.body
+  end
+
   private
 
   def new_rack_app(options = {})
