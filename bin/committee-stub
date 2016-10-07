@@ -18,6 +18,10 @@ opt_parser = OptionParser.new do |opts|
     exit
   }
 
+  opts.on("-d", "--driver NAME", "name of driver [open_api_2|hyper_schema]") { |name|
+    options[:driver] = name.to_sym
+  }
+
   opts.on("-t", "--tolerant", "don't perform request/response validations") {
     options[:tolerant] = true
   }
@@ -37,11 +41,15 @@ schema = ::YAML.load(File.read(args[0]))
 
 app = Rack::Builder.new {
   unless options[:tolerant]
-    use Committee::Middleware::RequestValidation, schema: schema
-    use Committee::Middleware::ResponseValidation, schema: schema
+    use Committee::Middleware::RequestValidation,
+      driver: options[:driver], schema: schema
+    use Committee::Middleware::ResponseValidation,
+      driver: options[:driver], schema: schema
   end
 
-  use Committee::Middleware::Stub, schema: schema
+  use Committee::Middleware::Stub,
+    driver: options[:driver], schema: schema
+
   run lambda { |_|
     [404, {}, ["Not found"]]
   }
