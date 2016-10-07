@@ -15,10 +15,14 @@ module Committee
 
     # Driver is a base class for driver implementations.
     class Driver
+      # Whether parameters in a request's path will be considered and coerced
+      # by default.
       def default_path_params
         raise "needs implementation"
       end
 
+      # Whether parameters in a request's query string will be considered and
+      # coerced by default.
       def default_query_params
         raise "needs implementation"
       end

@@ -6,8 +6,8 @@ module Committee::Drivers
       false
     end
 
-    # Whether parameters in a request's path will be considered and coerced by
-    # default.
+    # Whether parameters in a request's query string will be considered and
+    # coerced by default.
     def default_query_params
       false
     end
