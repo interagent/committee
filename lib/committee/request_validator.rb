@@ -24,7 +24,7 @@ module Committee
 
     def check_content_type!(request, data)
       content_type = request_media_type(request)
-      if content_type && !empty_request?(request)
+      if content_type && @link.enc_type && !empty_request?(request)
         unless Rack::Mime.match?(content_type, @link.enc_type)
           raise Committee::InvalidRequest,
             %{"Content-Type" request header must be set to "#{@link.enc_type}".}

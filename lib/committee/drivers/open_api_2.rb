@@ -213,7 +213,9 @@ module Committee::Drivers
           method = method.upcase
 
           link = Link.new
+          link.enc_type = spec.consumes
           link.href = spec.base_path + path
+          link.media_type = spec.produces
           link.method = method
 
           # Convert the spec's parameter pseudo-schemas into JSON schemas that
