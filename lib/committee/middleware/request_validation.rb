@@ -10,9 +10,9 @@ module Committee::Middleware
       @strict              = options[:strict]
 
       @coerce_path_params = options.fetch(:coerce_path_params,
-        @driver.default_path_params)
+        @schema.driver.default_path_params)
       @coerce_query_params = options.fetch(:coerce_query_params,
-        @driver.default_query_params)
+        @schema.driver.default_query_params)
 
       # deprecated
       @allow_extra = options[:allow_extra]

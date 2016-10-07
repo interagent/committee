@@ -53,17 +53,6 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "warns when sending a deprecated string" do
-    mock(Committee).warn_deprecated.with_any_args
-    @app = new_rack_app(schema: File.read("./test/data/hyperschema/paas.json"))
-    params = {
-      "name" => "cloudnasium"
-    }
-    header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
-  end
-
   it "routes to paths not in schema" do
     @app = new_rack_app(schema: hyper_schema)
     get "/not-a-resource"

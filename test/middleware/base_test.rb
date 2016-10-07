@@ -19,13 +19,10 @@ describe Committee::Middleware::Base do
     assert_equal 200, last_response.status
   end
 
-  it "accepts driver and schema objects" do
-    driver = Committee::Drivers::HyperSchema.new
-    schema = driver.parse(hyper_schema_data)
-
+  it "accepts schema string (legacy behavior)" do
+    mock(Committee).warn_deprecated.with_any_args
     @app = new_rack_app(
-      driver: driver,
-      schema: schema,
+      schema: JSON.dump(hyper_schema_data)
     )
     params = {
       "name" => "cloudnasium"
@@ -35,10 +32,10 @@ describe Committee::Middleware::Base do
     assert_equal 200, last_response.status
   end
 
-  it "accepts driver name and schema hash" do
+  it "accepts schema hash (legacy behavior)" do
+    mock(Committee).warn_deprecated.with_any_args
     @app = new_rack_app(
-      driver: :hyper_schema,
-      schema: hyper_schema_data,
+      schema: hyper_schema_data
     )
     params = {
       "name" => "cloudnasium"
@@ -48,11 +45,13 @@ describe Committee::Middleware::Base do
     assert_equal 200, last_response.status
   end
 
-  it "accepts driver name and JsonSchema::Schema object (legacy behavior)" do
-    schema = JsonSchema.parse!(hyper_schema_data)
+  it "accepts schema JsonSchema::Schema object (legacy behavior)" do
+    # Note we don't warn here because this is a recent deprecation and passing
+    # a schema object will not be a huge performance hit. We should probably
+    # start warning on the next version.
+
     @app = new_rack_app(
-      driver: :hyper_schema,
-      schema: schema
+      schema: JsonSchema.parse!(hyper_schema_data)
     )
     params = {
       "name" => "cloudnasium"
@@ -60,22 +59,10 @@ describe Committee::Middleware::Base do
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
-  end
-
-  it "doesn't accept other driver types" do
-    @app = new_rack_app(
-      driver: "hello"
-    )
-    e = assert_raises(ArgumentError) do
-      post "/apps"
-    end
-    assert_equal "Committee: driver expected to be a symbol or an instance " +
-      "of Committee::Drivers::Driver.", e.message
   end
 
   it "doesn't accept other schema types" do
     @app = new_rack_app(
-      driver: :hyper_schema,
       schema: 7,
     )
     e = assert_raises(ArgumentError) do
@@ -83,29 +70,6 @@ describe Committee::Middleware::Base do
     end
     assert_equal "Committee: schema expected to be a hash or an instance " +
       "of Committee::Drivers::Schema.", e.message
-  end
-
-  it "doesn't accept schema object for non-hyper-schema driver" do
-    schema = JsonSchema.parse!(hyper_schema_data)
-    @app = new_rack_app(
-      driver: :open_api_2,
-      schema: schema
-    )
-    e = assert_raises(ArgumentError) do
-      post "/apps"
-    end
-    assert_equal "Committee: JSON schema data is only accepted for driver " \
-      "hyper_schema. Try passing a hash instead.", e.message
-  end
-
-  it "complains on unknown driver" do
-    @app = new_rack_app(
-      driver: :blueprint
-    )
-    e = assert_raises(ArgumentError) do
-      post "/apps"
-    end
-    assert_equal %{Committee: unknown driver "blueprint".}, e.message
   end
 
   private

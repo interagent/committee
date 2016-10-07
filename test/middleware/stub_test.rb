@@ -46,15 +46,6 @@ describe Committee::Middleware::Stub do
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
-  it "warns when sending a deprecated string" do
-    mock(Committee).warn_deprecated.with_any_args
-    @app = new_rack_app(schema: File.read("./test/data/hyperschema/paas.json"))
-    get "/apps/heroku-api"
-    assert_equal 200, last_response.status
-    data = JSON.parse(last_response.body)
-    assert_equal ValidApp.keys.sort, data.keys.sort
-  end
-
   it "allows the stub's response to be replaced" do
     response = { replaced: true }
     @app = new_rack_app(call: true, response: response, schema: hyper_schema)
