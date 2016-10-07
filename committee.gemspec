@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.executables   << "committee-stub"
   s.files         = Dir["{bin,lib,test}/**/*.rb"]
 
-  s.add_dependency "json_schema", "~> 0.14", ">= 0.14.0"
+  s.add_dependency "json_schema", "~> 0.14", ">= 0.14.1"
 
   # Rack 2.0+ requires Ruby >= 2.2.2 which is problematic for the test suite on
   # older Ruby versions. Check Ruby the version here and put a maximum
