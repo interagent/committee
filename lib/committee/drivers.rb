@@ -31,6 +31,11 @@ module Committee
         raise "needs implementation"
       end
 
+      # Parses an API schema and builds a set of route definitions for use with
+      # Committee.
+      #
+      # The expected input format is a data hash with keys as strings (as
+      # opposed to symbols) like the kind produced by JSON.parse or YAML.load.
       def parse(data)
         raise "needs implementation"
       end

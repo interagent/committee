@@ -16,6 +16,11 @@ module Committee::Drivers
       :hyper_schema
     end
 
+    # Parses an API schema and builds a set of route definitions for use with
+    # Committee.
+    #
+    # The expected input format is a data hash with keys as strings (as opposed
+    # to symbols) like the kind produced by JSON.parse or YAML.load.
     def parse(schema)
       # Really we'd like to only have data hashes passed into drivers these
       # days, but here we handle a JsonSchema::Schema for now to maintain
