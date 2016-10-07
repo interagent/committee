@@ -7,7 +7,23 @@ describe Committee::Middleware::Base do
     @app
   end
 
-  it "accepts schema hash" do
+  it "accepts driver and schema objects" do
+    driver = Committee::Drivers.driver_from_name(:hyper_schema)
+    schema = driver.parse(hyper_schema_data)
+
+    @app = new_rack_app(
+      driver: driver,
+      schema: schema,
+    )
+    params = {
+      "name" => "cloudnasium"
+    }
+    header "Content-Type", "application/json"
+    post "/apps", JSON.generate(params)
+    assert_equal 200, last_response.status
+  end
+
+  it "accepts driver name and schema hash" do
     @app = new_rack_app(
       driver: :hyper_schema,
       schema: hyper_schema_data,
@@ -20,7 +36,7 @@ describe Committee::Middleware::Base do
     assert_equal 200, last_response.status
   end
 
-  it "accepts schema object" do
+  it "accepts driver name and schema object (legacy behavior)" do
     schema = JsonSchema.parse!(hyper_schema_data)
     @app = new_rack_app(
       driver: :hyper_schema,
@@ -32,6 +48,47 @@ describe Committee::Middleware::Base do
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
+  end
+
+  it "doesn't accept mismatched driver and schema objects" do
+    driver = Committee::Drivers.driver_from_name(:hyper_schema)
+    schema = driver.parse(hyper_schema_data)
+
+    other_driver = Committee::Drivers.driver_from_name(:open_api_2)
+
+    @app = new_rack_app(
+      driver: other_driver,
+      schema: schema,
+    )
+    e = assert_raises(ArgumentError) do
+      post "/apps"
+    end
+    assert_equal "Committee: schema (Committee::Drivers::HyperSchema::Schema) " \
+      "doesn't match driver schema (Committee::Drivers::OpenAPI2::Spec).",
+      e.message
+  end
+
+  it "doesn't accept other driver types" do
+    @app = new_rack_app(
+      driver: "hello"
+    )
+    e = assert_raises(ArgumentError) do
+      post "/apps"
+    end
+    assert_equal "Committee: driver expected to be a symbol or an instance " +
+      "of Committee::Drivers::Driver.", e.message
+  end
+
+  it "doesn't accept other schema types" do
+    @app = new_rack_app(
+      driver: :hyper_schema,
+      schema: 7,
+    )
+    e = assert_raises(ArgumentError) do
+      post "/apps"
+    end
+    assert_equal "Committee: schema expected to be a hash or an instance " +
+      "of Committee::Drivers::Schema.", e.message
   end
 
   it "doesn't accept schema object for non-hyper-schema driver" do

@@ -37,18 +37,23 @@ unless args.count == 1
   exit
 end
 
+# We could just pass the options directly through to middleware and it would do
+# the driver initialization and loading for us, but we get quite a significant
+# speed advantage by pre-parsing this ourselves so that it doesn't need to be
+# done for every request.
+driver = Committee::Drivers.driver_from_name(options[:driver] || :hyper_schema)
 schema = ::YAML.load(File.read(args[0]))
+schema = driver.parse(schema)
 
 app = Rack::Builder.new {
   unless options[:tolerant]
     use Committee::Middleware::RequestValidation,
-      driver: options[:driver], schema: schema
+      driver: driver, schema: schema
     use Committee::Middleware::ResponseValidation,
-      driver: options[:driver], schema: schema
+      driver: driver, schema: schema
   end
 
-  use Committee::Middleware::Stub,
-    driver: options[:driver], schema: schema
+  use Committee::Middleware::Stub, driver: driver, schema: schema
 
   run lambda { |_|
     [404, {}, ["Not found"]]

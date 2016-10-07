@@ -1,5 +1,5 @@
 module Committee::Drivers
-  class OpenAPI2
+  class OpenAPI2 < Committee::Drivers::Driver
     # Whether parameters in a request's path will be considered and coerced by
     # default.
     def default_path_params
@@ -10,6 +10,10 @@ module Committee::Drivers
     # default.
     def default_query_params
       true
+    end
+
+    def name
+      :open_api_2
     end
 
     def parse(data)
@@ -25,7 +29,7 @@ module Committee::Drivers
 
       spec = Spec.new
 
-      spec.base_path = data['basePath'] || '/'
+      spec.base_path = data['basePath'] || ''
 
       # Arbitrarily choose the first media type found in these arrays. This
       # appraoch could probably stand to be improved, but at least users will
@@ -38,6 +42,10 @@ module Committee::Drivers
       spec.routes = parse_routes!(data, spec, store)
 
       spec
+    end
+
+    def schema_class
+      Committee::Drivers::OpenAPI2::Spec
     end
 
     # Link abstracts an API link specifically for OpenAPI 2.
@@ -123,7 +131,7 @@ module Committee::Drivers
       attr_accessor :link_data
     end
 
-    class Spec
+    class Spec < Committee::Drivers::Schema
       attr_accessor :base_path
       attr_accessor :consumes
       attr_accessor :definitions

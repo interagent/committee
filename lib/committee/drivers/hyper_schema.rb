@@ -1,5 +1,5 @@
 module Committee::Drivers
-  class HyperSchema
+  class HyperSchema < Committee::Drivers::Driver
     # Whether parameters in a request's path will be considered and coerced by
     # default.
     def default_path_params
@@ -10,6 +10,10 @@ module Committee::Drivers
     # default.
     def default_query_params
       false
+    end
+
+    def name
+      :hyper_schema
     end
 
     def parse(schema)
@@ -26,6 +30,10 @@ module Committee::Drivers
       schema = Schema.new
       schema.routes = build_routes(hyper_schema)
       schema
+    end
+
+    def schema_class
+      Committee::Drivers::HyperSchema::Schema
     end
 
     # Link abstracts an API link specifically for JSON hyper-schema.
@@ -85,7 +93,7 @@ module Committee::Drivers
       attr_accessor :hyper_schema_link
     end
 
-    class Schema
+    class Schema < Committee::Drivers::Schema
       attr_accessor :routes
     end
 
