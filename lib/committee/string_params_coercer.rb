@@ -1,10 +1,15 @@
-# Attempts to coerce params given in the query hash (which are all strings) into
-# the types specified by the schema.
-# Currently supported types: null, integer, number and boolean.
-# +call+ returns a hash of all params which could be coerced - coercion errors
-# are simply ignored and expected to be handled later by schema validation.
 module Committee
-  class QueryParamsCoercer
+  # StringParamsCoercer takes parameters that are specified over a medium that
+  # can only accept strings (for example in a URL path or in query parameters)
+  # and attempts to coerce them into known types based of a link's schema
+  # definition.
+  #
+  # Currently supported types: null, integer, number and boolean.
+  #
+  # +call+ returns a hash of all params which could be coerced - coercion
+  # errors are simply ignored and expected to be handled later by schema
+  # validation.
+  class StringParamsCoercer
     def initialize(query_hash, schema)
       @query_hash = query_hash
       @schema = schema

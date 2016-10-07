@@ -23,16 +23,20 @@ module Committee::Middleware
       path_params = {}
 
       if link
+        # Attempts to coerce parameters that appear in a link's URL to Ruby
+        # types that can be validated with a schema.
         if @coerce_path_params
-          path_params = Committee::QueryParamsCoercer.new(
+          path_params = Committee::StringParamsCoercer.new(
             param_matches,
             link.schema
           ).call
         end
 
+        # Attempts to coerce parameters that appear in a query string to Ruby
+        # types that can be validated with a schema.
         if @coerce_query_params && !request.GET.nil? && !link.schema.nil?
           request.env["rack.request.query_hash"].merge!(
-            Committee::QueryParamsCoercer.new(
+            Committee::StringParamsCoercer.new(
               request.GET,
               link.schema
             ).call
