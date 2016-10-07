@@ -27,26 +27,26 @@ module Committee::Drivers
         raise ArgumentError, "Committee: driver requires OpenAPI 2.0."
       end
 
-      spec = Spec.new
-      spec.driver = self
+      schema = Schema.new
+      schema.driver = self
 
-      spec.base_path = data['basePath'] || ''
+      schema.base_path = data['basePath'] || ''
 
       # Arbitrarily choose the first media type found in these arrays. This
       # appraoch could probably stand to be improved, but at least users will
       # for now have the option of turning media type validation off if they so
       # choose.
-      spec.consumes = data['consumes'].first
-      spec.produces = data['produces'].first
+      schema.consumes = data['consumes'].first
+      schema.produces = data['produces'].first
 
-      spec.definitions, store = parse_definitions!(data)
-      spec.routes = parse_routes!(data, spec, store)
+      schema.definitions, store = parse_definitions!(data)
+      schema.routes = parse_routes!(data, schema, store)
 
-      spec
+      schema
     end
 
     def schema_class
-      Committee::Drivers::OpenAPI2::Spec
+      Committee::Drivers::OpenAPI2::Schema
     end
 
     # Link abstracts an API link specifically for OpenAPI 2.
@@ -132,7 +132,7 @@ module Committee::Drivers
       attr_accessor :link_data
     end
 
-    class Spec < Committee::Drivers::Schema
+    class Schema < Committee::Drivers::Schema
       attr_accessor :base_path
       attr_accessor :consumes
 
@@ -206,16 +206,16 @@ module Committee::Drivers
       [schema, store]
     end
 
-    def parse_routes!(data, spec, store)
+    def parse_routes!(data, schema, store)
       routes = {}
       data['paths'].each do |path, methods|
         methods.each do |method, link_data|
           method = method.upcase
 
           link = Link.new
-          link.enc_type = spec.consumes
-          link.href = spec.base_path + path
-          link.media_type = spec.produces
+          link.enc_type = schema.consumes
+          link.href = schema.base_path + path
+          link.media_type = schema.produces
           link.method = method
 
           # Convert the spec's parameter pseudo-schemas into JSON schemas that

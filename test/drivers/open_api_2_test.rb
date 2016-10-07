@@ -6,18 +6,18 @@ describe Committee::Drivers::OpenAPI2 do
   end
 
   it "parses an OpenAPI 2 spec" do
-    spec = @driver.parse(open_api_2_data)
-    assert_kind_of Committee::Drivers::OpenAPI2::Spec, spec
-    assert_kind_of JsonSchema::Schema, spec.definitions
-    assert_equal @driver, spec.driver
+    schema = @driver.parse(open_api_2_data)
+    assert_kind_of Committee::Drivers::OpenAPI2::Schema, schema
+    assert_kind_of JsonSchema::Schema, schema.definitions
+    assert_equal @driver, schema.driver
 
-    assert_kind_of Hash, spec.routes
-    refute spec.routes.empty?
-    assert(spec.routes.keys.all? { |m|
+    assert_kind_of Hash, schema.routes
+    refute schema.routes.empty?
+    assert(schema.routes.keys.all? { |m|
       ["DELETE", "GET", "PATCH", "POST", "PUT"].include?(m)
     })
 
-    spec.routes.each do |(_, method_routes)|
+    schema.routes.each do |(_, method_routes)|
       method_routes.each do |regex, link|
         assert_kind_of Regexp, regex
         assert_kind_of Committee::Drivers::OpenAPI2::Link, link
@@ -35,9 +35,9 @@ describe Committee::Drivers::OpenAPI2 do
   end
 
   it "names capture groups into href regexes" do
-    spec = @driver.parse(open_api_2_data)
+    schema = @driver.parse(open_api_2_data)
     assert_equal %r{^\/api\/pets\/(?<id>[^\/]+)$}.inspect,
-      spec.routes["DELETE"][0][0].inspect
+      schema.routes["DELETE"][0][0].inspect
   end
 
   it "refuses to parse other version of OpenAPI" do
