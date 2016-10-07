@@ -28,6 +28,7 @@ module Committee::Drivers
       end
 
       spec = Spec.new
+      spec.driver = self
 
       spec.base_path = data['basePath'] || ''
 
@@ -134,6 +135,11 @@ module Committee::Drivers
     class Spec < Committee::Drivers::Schema
       attr_accessor :base_path
       attr_accessor :consumes
+
+      # A link back to the derivative instace of Committee::Drivers::Driver
+      # that create this schema.
+      attr_accessor :driver
+
       attr_accessor :definitions
       attr_accessor :produces
       attr_accessor :routes

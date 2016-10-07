@@ -8,6 +8,7 @@ describe Committee::Drivers::HyperSchema do
   it "parses a hyper-schema and builds routes" do
     schema = @driver.parse(hyper_schema_data)
     assert_kind_of Committee::Drivers::HyperSchema::Schema, schema
+    assert_equal @driver, schema.driver
 
     assert_kind_of Hash, schema.routes
     refute schema.routes.empty?

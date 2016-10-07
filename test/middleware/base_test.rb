@@ -7,8 +7,23 @@ describe Committee::Middleware::Base do
     @app
   end
 
+  it "accepts just a schema object" do
+    driver = Committee::Drivers::HyperSchema.new
+    schema = driver.parse(hyper_schema_data)
+
+    @app = new_rack_app(
+      schema: schema
+    )
+    params = {
+      "name" => "cloudnasium"
+    }
+    header "Content-Type", "application/json"
+    post "/apps", JSON.generate(params)
+    assert_equal 200, last_response.status
+  end
+
   it "accepts driver and schema objects" do
-    driver = Committee::Drivers.driver_from_name(:hyper_schema)
+    driver = Committee::Drivers::HyperSchema.new
     schema = driver.parse(hyper_schema_data)
 
     @app = new_rack_app(
@@ -48,24 +63,6 @@ describe Committee::Middleware::Base do
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
-  end
-
-  it "doesn't accept mismatched driver and schema objects" do
-    driver = Committee::Drivers.driver_from_name(:hyper_schema)
-    schema = driver.parse(hyper_schema_data)
-
-    other_driver = Committee::Drivers.driver_from_name(:open_api_2)
-
-    @app = new_rack_app(
-      driver: other_driver,
-      schema: schema,
-    )
-    e = assert_raises(ArgumentError) do
-      post "/apps"
-    end
-    assert_equal "Committee: schema (Committee::Drivers::HyperSchema::Schema) " \
-      "doesn't match driver schema (Committee::Drivers::OpenAPI2::Spec).",
-      e.message
   end
 
   it "doesn't accept other driver types" do

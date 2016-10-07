@@ -38,6 +38,11 @@ module Committee
 
     # Schema is a base class for driver schema implementations.
     class Schema
+      # A link back to the derivative instace of Committee::Drivers::Driver
+      # that create this schema.
+      def driver
+        raise "needs implementation"
+      end
     end
   end
 end

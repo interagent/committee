@@ -9,6 +9,7 @@ describe Committee::Drivers::OpenAPI2 do
     spec = @driver.parse(open_api_2_data)
     assert_kind_of Committee::Drivers::OpenAPI2::Spec, spec
     assert_kind_of JsonSchema::Schema, spec.definitions
+    assert_equal @driver, spec.driver
 
     assert_kind_of Hash, spec.routes
     refute spec.routes.empty?

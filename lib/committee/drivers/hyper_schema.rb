@@ -28,6 +28,7 @@ module Committee::Drivers
       end
 
       schema = Schema.new
+      schema.driver = self
       schema.routes = build_routes(hyper_schema)
       schema
     end
@@ -94,6 +95,10 @@ module Committee::Drivers
     end
 
     class Schema < Committee::Drivers::Schema
+      # A link back to the derivative instace of Committee::Drivers::Driver
+      # that create this schema.
+      attr_accessor :driver
+
       attr_accessor :routes
     end
 

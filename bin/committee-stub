@@ -47,13 +47,11 @@ schema = driver.parse(schema)
 
 app = Rack::Builder.new {
   unless options[:tolerant]
-    use Committee::Middleware::RequestValidation,
-      driver: driver, schema: schema
-    use Committee::Middleware::ResponseValidation,
-      driver: driver, schema: schema
+    use Committee::Middleware::RequestValidation, schema: schema
+    use Committee::Middleware::ResponseValidation, schema: schema
   end
 
-  use Committee::Middleware::Stub, driver: driver, schema: schema
+  use Committee::Middleware::Stub, schema: schema
 
   run lambda { |_|
     [404, {}, ["Not found"]]

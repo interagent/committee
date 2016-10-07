@@ -3,18 +3,26 @@ module Committee::Middleware
     def initialize(app, options={})
       @app = app
 
-      @driver = get_driver(options.fetch(:driver, :hyper_schema))
       @error_class = options.fetch(:error_class, Committee::ValidationError)
       @params_key = options[:params_key] || "committee.params"
       @raise = options[:raise]
-      @schema = get_schema(options[:schema] ||
-        raise(ArgumentError, "Committee: need option `schema`"))
 
-      # Just a basic sanity check to make sure that we were given a sane
-      # combination of driver and schema.
-      if !@schema.is_a?(@driver.schema_class)
-        raise ArgumentError, "Committee: schema (#{@schema.class.name}) " \
-          "doesn't match driver schema (#{@driver.schema_class.name})."
+      # If we got a schema of the expected type, that's all we need to do.
+      schema = options[:schema]
+      if schema.kind_of?(Committee::Drivers::Schema)
+        @schema = schema
+        @driver = schema.driver
+      end
+
+      # We may have already acquired a driver from the given schema.
+      unless @driver
+        @driver = get_driver(options.fetch(:driver, :hyper_schema))
+      end
+
+      # If not given a schema object directly, parse one out from the driver.
+      unless @schema
+        @schema = get_schema(options[:schema] ||
+          raise(ArgumentError, "Committee: need option `schema`"))
       end
 
       @router = Committee::Router.new(@schema,
@@ -56,9 +64,7 @@ module Committee::Middleware
         schema = JSON.parse(schema)
       end
 
-      if schema.kind_of?(Committee::Drivers::Schema)
-        schema
-      elsif schema.is_a?(Hash)
+      if schema.is_a?(Hash)
         @driver.parse(schema)
       elsif schema.is_a?(JsonSchema::Schema)
         if @driver.name == :hyper_schema
