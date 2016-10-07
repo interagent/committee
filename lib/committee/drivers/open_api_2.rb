@@ -208,13 +208,24 @@ module Committee::Drivers
 
     def parse_routes!(data, schema, store)
       routes = {}
+
+      # This is a performance optimization: instead of going through each link
+      # and parsing out its JSON schema separately, instead we just aggregate
+      # all schemas into one big hash and then parse it all at the end. After
+      # we parse it, go through each link and assign a proper schema object. In
+      # practice this comes out to somewhere on the order of 50x faster.
+      target_schemas_data = { "properties" => {} }
+
       data['paths'].each do |path, methods|
+        href = schema.base_path + path
+        target_schemas_data["properties"][href] = { "properties" => {} }
+
         methods.each do |method, link_data|
           method = method.upcase
 
           link = Link.new
           link.enc_type = schema.consumes
-          link.href = schema.base_path + path
+          link.href = href
           link.media_type = schema.produces
           link.method = method
 
@@ -228,17 +239,10 @@ module Committee::Drivers
           if status
             link.status_success = status
 
-            # See the note on our DocumentStore's initialization in
-            # #parse_definitions!, but what we're doing here is prefixing
-            # references with a specialized internal URI so that they can
-            # reference definitions from another document in the store.
-            target_schema = rewrite_references(response_data["schema"])
-
             # A link need not necessarily specify a target schema.
-            if target_schema
-              target_schema = JsonSchema.parse!(target_schema)
-              target_schema.expand_references!(store: store)
-              link.target_schema = target_schema
+            if response_data["schema"]
+              target_schemas_data["properties"][href]["properties"][method] =
+                response_data["schema"]
             end
           end
 
@@ -249,6 +253,25 @@ module Committee::Drivers
           routes[method] << [rx, link]
         end
       end
+
+      # See the note on our DocumentStore's initialization in
+      # #parse_definitions!, but what we're doing here is prefixing references
+      # with a specialized internal URI so that they can reference definitions
+      # from another document in the store.
+      target_schemas = rewrite_references(target_schemas_data)
+
+      target_schemas = JsonSchema.parse!(target_schemas)
+      target_schemas.expand_references!(store: store)
+
+      # As noted above, now that we've parsed our aggregate response schema, go
+      # back through each link and them their response schema.
+      routes.each do |method, method_routes|
+        method_routes.each do |(_, link)|
+          link.target_schema =
+            target_schemas.properties[link.href].properties[method]
+        end
+      end
+
       routes
     end
 
