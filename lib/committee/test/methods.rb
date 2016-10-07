@@ -1,20 +1,41 @@
 module Committee::Test
   module Methods
     def assert_schema_conform
-      @driver ||= Committee::Drivers.driver_from_name(committee_driver)
+      @committee_schema ||= begin
+        # The preferred option. The user has already parsed a schema elsewhere
+        # and we therefore don't have to worry about any performance
+        # implications of having to do it for every single test suite.
+        if committee_schema
+          committee_schema
+        else
+          schema = schema_contents
 
-      if (data = schema_contents).is_a?(String)
-        warn_string_deprecated
-        data = JSON.parse(data)
+          if schema.is_a?(String)
+            warn_string_deprecated
+          elsif schema.is_a?(Hash)
+            warn_hash_deprecated
+          end
+
+          if schema.is_a?(String)
+            schema = JSON.parse(schema)
+          end
+
+          if schema.is_a?(Hash) || schema.is_a?(JsonSchema::Schema)
+            driver = Committee::Drivers::HyperSchema.new
+
+            # The driver itself has its own special cases to be able to parse
+            # either a hash or JsonSchema::Schema object.
+            schema = driver.parse(schema)
+          end
+
+          schema
+        end
       end
 
-      @schema ||= begin
-        @driver.parse(data)
-      end
-      @router ||= Committee::Router.new(@schema,
-        driver: @driver, prefix: schema_url_prefix)
+      @committee_router ||= Committee::Router.new(@committee_schema,
+        prefix: schema_url_prefix)
 
-      link, _ = @router.find_request_link(last_request)
+      link, _ = @committee_router.find_request_link(last_request)
       unless link
         response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
         raise Committee::InvalidResponse.new(response)
@@ -32,8 +53,8 @@ module Committee::Test
 
     # Can be overridden with a different driver name for other API definition
     # formats.
-    def committee_driver
-      :hyper_schema
+    def committee_schema
+      nil
     end
 
     # can be overridden alternatively to #schema_path in case the schema is
@@ -44,15 +65,23 @@ module Committee::Test
     end
 
     def schema_path
-      raise "Please override #schema_contents or #schema_path."
+      raise "Please override #commitee_schema."
     end
 
     def schema_url_prefix
       nil
     end
 
+    def warn_hash_deprecated
+      Committee.warn_deprecated("Committee: returning a hash from " \
+        "#schema_contents and using #schema_path is deprecated; please " \
+        "override #committee_schema instead.")
+    end
+
     def warn_string_deprecated
-      Committee.warn_deprecated("Committee: returning a string from `#schema_contents` is deprecated; please return a deserialized hash instead.")
+      Committee.warn_deprecated("Committee: returning a string from " \
+        "#schema_contents is deprecated; please override #committee_schema " \
+        "instead.")
     end
 
     def validate_response?(status)

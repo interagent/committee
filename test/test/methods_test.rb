@@ -1,6 +1,6 @@
 require_relative "../test_helper"
 
-describe Committee::Middleware::Stub do
+describe Committee::Test::Methods do
   include Committee::Test::Methods
   include Rack::Test::Methods
 
@@ -8,8 +8,16 @@ describe Committee::Middleware::Stub do
     @app
   end
 
-  def schema_path
-    "./test/data/hyperschema/paas.json"
+  def committee_schema
+    hyper_schema
+  end
+
+  before do
+    # This is a little icky, but the test methods will cache router and schema
+    # values between tests. This makes sense in real life, but is harmful for
+    # our purposes here in testing the module.
+    @committee_router = nil
+    @committee_schema = nil
   end
 
   describe "#assert_schema_content_type" do
@@ -35,9 +43,40 @@ describe Committee::Middleware::Stub do
       assert_match /response header must be set to/i, e.message
     end
 
-    it "warns when sending a deprecated string" do
-      stub(self).schema_contents { File.read(schema_path) }
+    it "accepts schema string (legacy behavior)" do
       mock(Committee).warn_deprecated.with_any_args
+
+      stub(self).committee_schema { nil }
+      stub(self).schema_contents { JSON.dump(hyper_schema_data) }
+
+      @app = new_rack_app(JSON.generate([ValidApp]))
+      get "/apps"
+      assert_schema_conform
+    end
+
+    it "accepts schema hash (legacy behavior)" do
+      mock(Committee).warn_deprecated.with_any_args
+
+      stub(self).committee_schema { nil }
+      stub(self).schema_contents { hyper_schema_data }
+
+      @app = new_rack_app(JSON.generate([ValidApp]))
+      get "/apps"
+      assert_schema_conform
+    end
+
+    it "accepts schema JsonSchema::Schema object (legacy behavior)" do
+      # Note we don't warn here because this is a recent deprecation and
+      # passing a schema object will not be a huge performance hit. We should
+      # probably start warning on the next version.
+
+      stub(self).committee_schema { nil }
+      stub(self).schema_contents do
+        schema = JsonSchema.parse!(hyper_schema_data)
+        schema.expand_references!
+        schema
+      end
+
       @app = new_rack_app(JSON.generate([ValidApp]))
       get "/apps"
       assert_schema_conform
