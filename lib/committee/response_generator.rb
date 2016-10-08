@@ -1,7 +1,7 @@
 module Committee
   class ResponseGenerator
     def call(link)
-      data = generate_properties(link, link.target_schema)
+      data = generate_properties(link, target_schema(link))
 
       # List is a special case; wrap data in an array.
       #
@@ -60,9 +60,21 @@ module Committee
     end
 
     def legacy_hyper_schema_rel?(link)
-       link.is_a?(Committee::Drivers::HyperSchema::Link) &&
-         link.rel == "instances" &&
-         !link.target_schema
+      link.is_a?(Committee::Drivers::HyperSchema::Link) &&
+        link.rel == "instances" &&
+        !link.target_schema
+    end
+
+    # Gets the target schema of a link. This is normally just the standard
+    # response schema, but we allow some legacy behavior for hyper-schema links
+    # tagged with rel=instances to instead use the schema of their parent
+    # resource.
+    def target_schema(link)
+      if link.target_schema
+        link.target_schema
+      elsif legacy_hyper_schema_rel?(link)
+        link.parent
+      end
     end
   end
 end

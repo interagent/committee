@@ -36,10 +36,26 @@ describe Committee::ResponseValidator do
     call
   end
 
-  it "detects an improperly formatted list response" do
+  it "passes through a valid list response for for rel instances links" do
     @link = @list_link
 
-    @link.parent = nil
+    # forces the link to use `parent`
+    @link.target_schema = nil
+
+    # We're testing for legacy behavior here: even without a `targetSchema` as
+    # long as `rel` is set to `instances` we still wrap the the result in an
+    # array.
+    assert_equal "instances", @link.rel
+
+    @data = [@data]
+    @link = @list_link
+    call
+  end
+
+  it "detects an improperly formatted list response for rel instances link" do
+    @link = @list_link
+
+    # forces the link to use `parent`
     @link.target_schema = nil
 
     # We're testing for legacy behavior here: even without a `targetSchema` as

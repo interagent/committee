@@ -26,3 +26,20 @@ describe Committee::Bin::CommitteeStub do
     assert_equal "1234", options[:port]
   end
 end
+
+describe Committee::Bin::CommitteeStub, "app" do
+  include Rack::Test::Methods
+
+  before do
+    @bin = Committee::Bin::CommitteeStub.new
+  end
+
+  def app
+    @bin.get_app(hyper_schema, {})
+  end
+
+  it "defaults to a 404" do
+    get "/foos"
+    assert_equal 404, last_response.status
+  end
+end

@@ -6,8 +6,7 @@ module Committee
       @link = link
       @validate_errors = options[:validate_errors]
 
-      schema = link.target_schema
-      @validator = JsonSchema::Validator.new(schema)
+      @validator = JsonSchema::Validator.new(target_schema(link))
     end
 
     def self.validate?(status, options = {})
@@ -50,12 +49,6 @@ module Committee
 
     private
 
-    def legacy_hyper_schema_rel?(link)
-       link.is_a?(Committee::Drivers::HyperSchema::Link) &&
-         link.rel == "instances" &&
-         !link.target_schema
-    end
-
     def response_media_type(response)
       response.content_type.to_s.split(";").first.to_s
     end
@@ -66,6 +59,24 @@ module Committee
           raise Committee::InvalidResponse,
             %{"Content-Type" response header must be set to "#{@link.media_type}".}
         end
+      end
+    end
+
+    def legacy_hyper_schema_rel?(link)
+      link.is_a?(Committee::Drivers::HyperSchema::Link) &&
+        link.rel == "instances" &&
+        !link.target_schema
+    end
+
+    # Gets the target schema of a link. This is normally just the standard
+    # response schema, but we allow some legacy behavior for hyper-schema links
+    # tagged with rel=instances to instead use the schema of their parent
+    # resource.
+    def target_schema(link)
+      if link.target_schema
+        link.target_schema
+      elsif legacy_hyper_schema_rel?(link)
+        link.parent
       end
     end
   end

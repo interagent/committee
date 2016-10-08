@@ -31,10 +31,11 @@ describe Committee::ResponseGenerator do
 
   it "wraps list data tagged with rel 'instances' in an array" do
     @link = @list_link
-    data = call
 
-    @link.parent = nil
+    # forces the link to use `parent`
     @link.target_schema = nil
+
+    data = call
 
     # We're testing for legacy behavior here: even without a `targetSchema` as
     # long as `rel` is set to `instances` we still wrap the the result in an

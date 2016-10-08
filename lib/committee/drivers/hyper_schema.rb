@@ -70,6 +70,14 @@ module Committee::Drivers
         hyper_schema_link.method
       end
 
+      # Passes through a link's parent resource. Note that this is *not* part
+      # of the Link interface and is here to support a legacy Heroku-ism
+      # behavior that allowed a link tagged with rel=instances to imply that a
+      # list will be returned.
+      def parent
+        hyper_schema_link.parent
+      end
+
       def rel
         hyper_schema_link.rel
       end
@@ -87,11 +95,7 @@ module Committee::Drivers
       # The link's output schema. i.e. How we validate an endpoint's response
       # data.
       def target_schema
-        # Falling back on the link's parent schema is legacy behavior to
-        # support existing Heroku hyper-schemas that don't have a
-        # `targetSchema` defined. It's non-standard and shouldn't be relied
-        # upon.
-        hyper_schema_link.target_schema || hyper_schema_link.parent
+        hyper_schema_link.target_schema
       end
 
       private

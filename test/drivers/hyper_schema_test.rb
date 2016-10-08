@@ -89,12 +89,7 @@ describe Committee::Drivers::HyperSchema::Link do
     assert_equal 201, @link.status_success
   end
 
-  it "prefers to proxy #target_schema" do
+  it "proxies #target_schema" do
     assert_equal @hyper_schema_link.target_schema, @link.target_schema
-  end
-
-  it "falls back to parent for #target_schema" do
-    @hyper_schema_link.target_schema = nil
-    assert_equal @hyper_schema_link.parent, @link.target_schema
   end
 end
