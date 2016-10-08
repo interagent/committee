@@ -5,6 +5,14 @@ describe Committee::Drivers::OpenAPI2 do
     @driver = Committee::Drivers::OpenAPI2.new
   end
 
+  it "has a name" do
+    assert_equal :open_api_2, @driver.name
+  end
+
+  it "has a schema class" do
+    assert_equal Committee::Drivers::OpenAPI2::Schema, @driver.schema_class
+  end
+
   it "parses an OpenAPI 2 spec" do
     schema = @driver.parse(open_api_2_data)
     assert_kind_of Committee::Drivers::OpenAPI2::Schema, schema
@@ -40,6 +48,51 @@ describe Committee::Drivers::OpenAPI2 do
       schema.routes["DELETE"][0][0].inspect
   end
 
+  it "prefers a 200 response first" do
+    schema_data = schema_data_with_responses({
+      '201' => { 'schema' => { 'description' => '201 response' } },
+      '200' => { 'schema' => { 'description' => '200 response' } },
+    })
+
+    schema = @driver.parse(schema_data)
+    link = schema.routes['GET'][0][1]
+    assert_equal 200, link.status_success
+    assert_equal({ 'description' => '200 response' }, link.target_schema.data)
+  end
+
+  it "prefers a 201 response next" do
+    schema_data = schema_data_with_responses({
+      '302' => { 'schema' => { 'description' => '302 response' } },
+      '201' => { 'schema' => { 'description' => '201 response' } },
+    })
+
+    schema = @driver.parse(schema_data)
+    link = schema.routes['GET'][0][1]
+    assert_equal 201, link.status_success
+    assert_equal({ 'description' => '201 response' }, link.target_schema.data)
+  end
+
+  it "prefers any three-digit response next" do
+    schema_data = schema_data_with_responses({
+      'default' => { 'schema' => { 'description' => 'default response' } },
+      '302' => { 'schema' => { 'description' => '302 response' } },
+    })
+
+    schema = @driver.parse(schema_data)
+    link = schema.routes['GET'][0][1]
+    assert_equal 302, link.status_success
+    assert_equal({ 'description' => '302 response' }, link.target_schema.data)
+  end
+
+  it "falls back to no response" do
+    schema_data = schema_data_with_responses({})
+
+    schema = @driver.parse(schema_data)
+    link = schema.routes['GET'][0][1]
+    assert_equal nil, link.status_success
+    assert_equal nil, link.target_schema
+  end
+
   it "refuses to parse other version of OpenAPI" do
     data = open_api_2_data
     data['swagger'] = '3.0'
@@ -64,6 +117,22 @@ describe Committee::Drivers::OpenAPI2 do
 
   it "defaults to query parameters" do
     assert_equal true, @driver.default_query_params
+  end
+
+  def schema_data_with_responses(response_data)
+    {
+      'swagger' => '2.0',
+      'consumes' => ['application/json'],
+      'produces' => ['application/json'],
+      'paths' => {
+        '/foos' => {
+          'get' => {
+            'responses' => response_data,
+          },
+        },
+      },
+      'definitions' => {},
+    }
   end
 end
 

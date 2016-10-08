@@ -5,6 +5,14 @@ describe Committee::Drivers::HyperSchema do
     @driver = Committee::Drivers::HyperSchema.new
   end
 
+  it "has a name" do
+    assert_equal :hyper_schema, @driver.name
+  end
+
+  it "has a schema class" do
+    assert_equal Committee::Drivers::HyperSchema::Schema, @driver.schema_class
+  end
+
   it "parses a hyper-schema and builds routes" do
     schema = @driver.parse(hyper_schema_data)
     assert_kind_of Committee::Drivers::HyperSchema::Schema, schema
