@@ -27,5 +27,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rack-test", "~> 0.6"
   s.add_development_dependency "rake", "~> 10.3"
   s.add_development_dependency "rr", "~> 1.1"
-  s.add_development_dependency "simplecov"
+
+  # Gate gems that have trouble installing on older versions of Ruby.
+  if RUBY_VERSION >= '2.0.0'
+    s.add_development_dependency "pry"
+    s.add_development_dependency "pry-byebug"
+    s.add_development_dependency "simplecov"
+  end
 end
