@@ -13,7 +13,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
-  it "detects an invalid response" do
+  it "detects a response invalid due to schema" do
+    @app = new_rack_app("{}", {}, schema: hyper_schema)
+    get "/apps"
+    assert_equal 500, last_response.status
+    assert_match /{} is not an array/i, last_response.body
+  end
+
+  it "detects a response invalid due to not being JSON" do
     @app = new_rack_app("", {}, schema: hyper_schema)
     get "/apps"
     assert_equal 500, last_response.status

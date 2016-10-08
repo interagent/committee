@@ -35,7 +35,7 @@ describe Committee::Middleware::Stub do
     assert_equal 429, last_response.status
     assert_equal ValidApp,
       JSON.parse(last_response.headers["Committee-Response"])
-      assert_equal "", last_response.body
+    assert_equal "", last_response.body
   end
 
   it "takes a prefix" do
@@ -62,6 +62,12 @@ describe Committee::Middleware::Stub do
     assert_equal ValidPet.keys.sort, data.keys.sort
   end
 
+  it "calls into app for links that are undefined" do
+    @app = new_rack_app(call: false, schema: hyper_schema)
+    post "/foos"
+    assert_equal 429, last_response.status
+  end
+
   private
 
   def new_rack_app(options = {})
@@ -70,9 +76,19 @@ describe Committee::Middleware::Stub do
     Rack::Builder.new {
       use Committee::Middleware::Stub, options
       run lambda { |env|
-        env["committee.response"] = response if response
-        headers = { "Committee-Response" => JSON.generate(env["committee.response"]) }
+        if response
+          env["committee.response"] = response
+        end
+
+        headers = {}
+        if res = env["committee.response"]
+          headers.merge!({
+            "Committee-Response" => JSON.generate(res)
+          })
+        end
+
         env["committee.suppress"] = suppress
+
         [429, headers, []]
       }
     }
