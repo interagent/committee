@@ -68,6 +68,25 @@ describe Committee::Middleware::Stub do
     assert_equal 429, last_response.status
   end
 
+  it "caches the response if called multiple times" do
+    cache = {}
+    @app = new_rack_app(cache: cache, schema: hyper_schema)
+
+    get "/apps/heroku-api"
+    assert_equal 200, last_response.status
+
+    data = cache[cache.first[0]]
+    assert_equal ValidApp.keys.sort, data.keys.sort
+
+    # replace what we have in the cache
+    cache[cache.first[0]] = { "cached" => true }
+
+    get "/apps/heroku-api"
+    assert_equal 200, last_response.status
+    data = JSON.parse(last_response.body)
+    assert_equal({ "cached" => true }, data)
+  end
+
   private
 
   def new_rack_app(options = {})

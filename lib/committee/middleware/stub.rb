@@ -2,8 +2,16 @@ module Committee::Middleware
   class Stub < Base
     def initialize(app, options={})
       super
-      @cache = {}
-      @call  = options[:call]
+
+      # A bug in Committee's cache implementation meant that it wasn't working
+      # for a very long time, even for people who thought they were taking
+      # advantage of it. I repaired the caching feature, but have disable it by
+      # default so that we don't need to introduce any class-level variables
+      # that could have memory leaking implications. To enable caching, just
+      # pass an empty hash to this option.
+      @cache = options[:cache]
+
+      @call = options[:call]
     end
 
     def handle(request)
@@ -11,7 +19,7 @@ module Committee::Middleware
       if link
         headers = { "Content-Type" => "application/json" }
 
-        data = cache(link.method, link.href) do
+        data = cache(link) do
           Committee::ResponseGenerator.new.call(link)
         end
 
@@ -41,8 +49,13 @@ module Committee::Middleware
 
     private
 
-    def cache(method, href)
-      key = "#{method}+#{href}"
+    def cache(link)
+      return yield unless @cache
+
+      # Just the object ID is enough to uniquely identify the link, but store
+      # the method and href so that we can more easily introspect the cache if
+      # necessary.
+      key = "#{link.object_id}##{link.method}+#{link.href}"
       if @cache[key]
         @cache[key]
       else
