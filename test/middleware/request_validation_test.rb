@@ -126,6 +126,22 @@ describe Committee::Middleware::RequestValidation do
     assert_match /invalid request/i, last_response.body
   end
 
+  it "responds with parameters if configured to do so" do
+    @app = new_rack_app(params_response: true, schema: open_api_2_schema)
+    get "/api/pets?limit=3"
+    assert_equal 200, last_response.status
+
+    params = JSON.parse(last_response.headers["Committee-Params"])
+    assert_equal({ "limit" => 3 }, params)
+  end
+
+  it "doesn't normally respond with parameters" do
+    @app = new_rack_app(schema: open_api_2_schema)
+    get "/api/pets?limit=3"
+    assert_equal 200, last_response.status
+    assert_equal nil, last_response.headers["Committee-Params"]
+  end
+
   private
 
   def new_rack_app(options = {})

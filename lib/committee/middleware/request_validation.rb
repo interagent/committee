@@ -7,6 +7,7 @@ module Committee::Middleware
       @allow_query_params  = options.fetch(:allow_query_params, true)
       @check_content_type  = options.fetch(:check_content_type, true)
       @optimistic_json     = options.fetch(:optimistic_json, false)
+      @params_response     = options.fetch(:params_response, false)
       @strict              = options[:strict]
 
       @coerce_path_params = options.fetch(:coerce_path_params,
@@ -56,9 +57,19 @@ module Committee::Middleware
       request.env[@params_key].merge!(path_params)
 
       if link
-        validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
+        validator = Committee::RequestValidator.new(link,
+          check_content_type: @check_content_type)
         validator.call(request, request.env[@params_key])
-        @app.call(request.env)
+
+        status, headers, response = @app.call(request.env)
+
+        # Optionally include the parameters in the response. This is useful for
+        # test assertions against a request-validated stub.
+        if @params_response
+          headers["Committee-Params"] = JSON.generate(request.env[@params_key])
+        end
+
+        [status, headers, response]
       elsif @strict
         raise Committee::NotFound
       else
