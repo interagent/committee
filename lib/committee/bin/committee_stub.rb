@@ -53,9 +53,6 @@ module Committee
         end
         [options, parser]
       end
-
-      def get_schema(driver_name, data)
-      end
     end
   end
 end
