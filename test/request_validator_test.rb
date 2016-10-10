@@ -4,8 +4,7 @@ require "stringio"
 
 describe Committee::RequestValidator do
   before do
-    @schema =
-      JsonSchema.parse!(JSON.parse(File.read("./test/data/schema.json")))
+    @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
     # POST /apps/:id
     @link = @link = @schema.properties["app"].links[0]
@@ -98,6 +97,8 @@ describe Committee::RequestValidator do
   private
 
   def call(data, options={})
-    Committee::RequestValidator.new(@link, options).call(@request, data)
+    # hyper-schema link should be dropped into driver wrapper before it's used
+    link = Committee::Drivers::HyperSchema::Link.new(@link)
+    Committee::RequestValidator.new(link, options).call(@request, data)
   end
 end

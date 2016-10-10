@@ -7,8 +7,7 @@ describe Committee::ResponseValidator do
       "Content-Type" => "application/json"
     }
     @data = ValidApp.dup
-    @schema =
-      JsonSchema.parse!(JSON.parse(File.read("./test/data/schema.json")))
+    @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
     # GET /apps/:id
     @get_link = @link = @schema.properties["app"].links[2]
@@ -37,9 +36,33 @@ describe Committee::ResponseValidator do
     call
   end
 
-  it "detects an improperly formatted list response" do
+  it "passes through a valid list response for for rel instances links" do
     @link = @list_link
+
+    # forces the link to use `parent`
     @link.target_schema = nil
+
+    # We're testing for legacy behavior here: even without a `targetSchema` as
+    # long as `rel` is set to `instances` we still wrap the the result in an
+    # array.
+    assert_equal "instances", @link.rel
+
+    @data = [@data]
+    @link = @list_link
+    call
+  end
+
+  it "detects an improperly formatted list response for rel instances link" do
+    @link = @list_link
+
+    # forces the link to use `parent`
+    @link.target_schema = nil
+
+    # We're testing for legacy behavior here: even without a `targetSchema` as
+    # long as `rel` is set to `instances` we still wrap the the result in an
+    # array.
+    assert_equal "instances", @link.rel
+
     e = assert_raises(Committee::InvalidResponse) { call }
     message = "List endpoints must return an array of objects."
     assert_equal message, e.message
@@ -76,6 +99,8 @@ describe Committee::ResponseValidator do
   private
 
   def call
-    Committee::ResponseValidator.new(@link).call(@status, @headers, @data)
+    # hyper-schema link should be dropped into driver wrapper before it's used
+    link = Committee::Drivers::HyperSchema::Link.new(@link)
+    Committee::ResponseValidator.new(link).call(@status, @headers, @data)
   end
 end

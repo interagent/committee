@@ -2,16 +2,27 @@ module Committee::Middleware
   class Stub < Base
     def initialize(app, options={})
       super
-      @cache = {}
-      @call  = options[:call]
+
+      # A bug in Committee's cache implementation meant that it wasn't working
+      # for a very long time, even for people who thought they were taking
+      # advantage of it. I repaired the caching feature, but have disable it by
+      # default so that we don't need to introduce any class-level variables
+      # that could have memory leaking implications. To enable caching, just
+      # pass an empty hash to this option.
+      @cache = options[:cache]
+
+      @call = options[:call]
     end
 
     def handle(request)
-      if link = @router.find_request_link(request)
+      link, _ = @router.find_request_link(request)
+      if link
         headers = { "Content-Type" => "application/json" }
-        data = cache(link.method, link.href) do
+
+        data = cache(link) do
           Committee::ResponseGenerator.new.call(link)
         end
+
         if @call
           request.env["committee.response"] = data
           call_status, call_headers, call_body = @app.call(request.env)
@@ -29,8 +40,8 @@ module Committee::Middleware
           # will be the same one that we set above)
           data = request.env["committee.response"]
         end
-        status = link.rel == "create" ? 201 : 200
-        [status, headers, [JSON.pretty_generate(data)]]
+
+        [link.status_success, headers, [JSON.pretty_generate(data)]]
       else
         @app.call(request.env)
       end
@@ -38,8 +49,13 @@ module Committee::Middleware
 
     private
 
-    def cache(method, href)
-      key = "#{method}+#{href}"
+    def cache(link)
+      return yield unless @cache
+
+      # Just the object ID is enough to uniquely identify the link, but store
+      # the method and href so that we can more easily introspect the cache if
+      # necessary.
+      key = "#{link.object_id}##{link.method}+#{link.href}"
       if @cache[key]
         @cache[key]
       else

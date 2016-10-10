@@ -123,4 +123,14 @@ describe Committee::RequestUnpacker do
     params = Committee::RequestUnpacker.new(request).call
     assert_equal({}, params)
   end
+
+  # this is mostly here for line coverage
+  it "unpacks JSON containing an array" do
+    env = {
+      "rack.input" => StringIO.new('{"x":[]}'),
+    }
+    request = Rack::Request.new(env)
+    params = Committee::RequestUnpacker.new(request).call
+    assert_equal({ "x" => [] }, params)
+  end
 end

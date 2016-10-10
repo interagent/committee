@@ -6,10 +6,7 @@ module Committee
       @link = link
       @validate_errors = options[:validate_errors]
 
-      # we should eventually move off of validating against parent schema too
-      # ... this is a Herokuism and not in the specification
-      schema = link.target_schema || link.parent
-      @validator = JsonSchema::Validator.new(schema)
+      @validator = JsonSchema::Validator.new(target_schema(link))
     end
 
     def self.validate?(status, options = {})
@@ -24,7 +21,14 @@ module Committee
         check_content_type!(response)
       end
 
-      if @link.rel == "instances" && !@link.target_schema
+      # List is a special case; expect data in an array.
+      #
+      # This is poor form that's here so as not to introduce breaking behavior.
+      # The "instances" value of "rel" is a Heroku-ism and was originally
+      # introduced before we understood how to use "targetSchema". It's not
+      # meaningful with the context of the hyper-schema specification and
+      # should be eventually be removed.
+      if legacy_hyper_schema_rel?(@link)
         if !data.is_a?(Array)
           raise InvalidResponse, "List endpoints must return an array of objects."
         end
@@ -50,9 +54,29 @@ module Committee
     end
 
     def check_content_type!(response)
-      unless Rack::Mime.match?(response_media_type(response), @link.media_type)
-        raise Committee::InvalidResponse,
-          %{"Content-Type" response header must be set to "#{@link.media_type}".}
+      if @link.media_type
+        unless Rack::Mime.match?(response_media_type(response), @link.media_type)
+          raise Committee::InvalidResponse,
+            %{"Content-Type" response header must be set to "#{@link.media_type}".}
+        end
+      end
+    end
+
+    def legacy_hyper_schema_rel?(link)
+      link.is_a?(Committee::Drivers::HyperSchema::Link) &&
+        link.rel == "instances" &&
+        !link.target_schema
+    end
+
+    # Gets the target schema of a link. This is normally just the standard
+    # response schema, but we allow some legacy behavior for hyper-schema links
+    # tagged with rel=instances to instead use the schema of their parent
+    # resource.
+    def target_schema(link)
+      if link.target_schema
+        link.target_schema
+      elsif legacy_hyper_schema_rel?(link)
+        link.parent
       end
     end
   end

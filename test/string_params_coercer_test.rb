@@ -1,9 +1,8 @@
 require_relative "test_helper"
 
-describe Committee::QueryParamsCoercer do
+describe Committee::StringParamsCoercer do
   before do
-    @schema =
-      JsonSchema.parse!(JSON.parse(File.read("./test/data/schema.json")))
+    @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
     # GET /search/apps
     @link = @link = @schema.properties["app"].links[5]
@@ -65,6 +64,6 @@ describe Committee::QueryParamsCoercer do
   private
 
   def call(data)
-    Committee::QueryParamsCoercer.new(data, @link.schema).call
+    Committee::StringParamsCoercer.new(data, @link.schema).call
   end
 end

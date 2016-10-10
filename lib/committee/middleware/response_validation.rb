@@ -10,7 +10,8 @@ module Committee::Middleware
     def handle(request)
       status, headers, response = @app.call(request.env)
 
-      if validate?(status) && link = @router.find_request_link(request)
+      link, _ = @router.find_request_link(request)
+      if validate?(status) && link
         full_body = ""
         response.each do |chunk|
           full_body << chunk

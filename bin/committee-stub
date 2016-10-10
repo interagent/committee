@@ -6,45 +6,19 @@ require 'yaml'
 require_relative "../lib/committee"
 
 args = ARGV.dup
-options = { port: 9292, tolerant: false }
-opt_parser = OptionParser.new do |opts|
-  opts.banner = "Usage: rackup [options] [JSON Schema file]"
+bin = Committee::Bin::CommitteeStub.new
+options, parser = bin.get_options_parser
 
-  opts.separator ""
-  opts.separator "Options:"
+if $0 == __FILE__
+  parser.parse!(args)
 
-  opts.on_tail("-h", "-?", "--help", "Show this message") {
-    puts opts
+  unless args.count == 1 || options[:help]
+    puts parser.to_s
     exit
-  }
-
-  opts.on("-t", "--tolerant", "don't perform request/response validations") {
-    options[:tolerant] = true
-  }
-
-  opts.on("-p", "--port PORT", "use PORT (default: 9292)") { |port|
-    options[:port] = port
-  }
-end
-opt_parser.parse!(args)
-
-unless args.count == 1
-  puts opt_parser.to_s
-  exit
-end
-
-schema = ::YAML.load(File.read(args[0]))
-
-app = Rack::Builder.new {
-  unless options[:tolerant]
-    use Committee::Middleware::RequestValidation, schema: schema
-    use Committee::Middleware::ResponseValidation, schema: schema
   end
 
-  use Committee::Middleware::Stub, schema: schema
-  run lambda { |_|
-    [404, {}, ["Not found"]]
-  }
-}
+  driver = Committee::Drivers.driver_from_name(options[:driver])
+  schema = driver.parse(::YAML.load(File.read(args[0])))
 
-Rack::Server.start(app: app, Port: options[:port])
+  Rack::Server.start(app: bin.get_app(schema, options), Port: options[:port])
+end
