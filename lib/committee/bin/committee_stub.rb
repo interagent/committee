@@ -6,13 +6,15 @@ module Committee
     class CommitteeStub
       # Gets a Rack app suitable for use as a stub.
       def get_app(schema, options)
+        cache = {}
+
         Rack::Builder.new {
           unless options[:tolerant]
             use Committee::Middleware::RequestValidation, schema: schema
             use Committee::Middleware::ResponseValidation, schema: schema
           end
 
-          use Committee::Middleware::Stub, schema: schema
+          use Committee::Middleware::Stub, cache: cache, schema: schema
 
           run lambda { |_|
             [404, {}, ["Not found"]]
