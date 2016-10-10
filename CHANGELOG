@@ -1,5 +1,8 @@
 Unreleased
 
+2.0.0.pre 2016-10-10
+	Add support for OpenAPI 2.0
+
 1.15.0 2016-09-13
 	Add the `coerce_query_params` option to allow queries with basic types to
 	be checked against a schema
