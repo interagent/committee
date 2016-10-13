@@ -1,5 +1,8 @@
 Unreleased
 
+2.0.0.pre2 2016-10-13
+	Add support for body parameters in OpenAPI 2.0
+
 2.0.0.pre 2016-10-10
 	Add support for OpenAPI 2.0
 
