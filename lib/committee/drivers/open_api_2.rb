@@ -89,43 +89,54 @@ module Committee::Drivers
         self.link_data = link_data
       end
 
+      # Returns a tuple of (schema, schema_data) where only one of the two
+      # values is present. This is either a full schema that's ready to go _or_
+      # a hash of unparsed schema data.
       def call
-        link_schema = JsonSchema::Schema.new
-        link_schema.properties = {}
-        link_schema.required = []
-
         if link_data["parameters"]
-          link_data["parameters"].each do |param_data|
-            LINK_REQUIRED_FIELDS.each do |field|
-              if !param_data[field]
-                raise ArgumentError,
-                  "Committee: no #{field} section in link data."
+          body_param = link_data["parameters"].detect { |p| p["in"] == "body" }
+          if body_param
+            check_required_fields!(body_param)
+
+            if link_data["parameters"].detect { |p| p["in"] == "form" } != nil
+              raise ArgumentError, "Committee: can't mix body parameter " \
+                "with form parameters."
+            end
+
+            schema_data = body_param["schema"]
+            [nil, schema_data]
+          else
+            link_schema = JsonSchema::Schema.new
+            link_schema.properties = {}
+            link_schema.required = []
+
+            link_data["parameters"].each do |param_data|
+              check_required_fields!(param_data)
+
+              param_schema = JsonSchema::Schema.new
+
+              # We could probably use more validation here, but the formats of
+              # OpenAPI 2 are based off of what's available in JSON schema, and
+              # therefore this should map over quite well.
+              param_schema.type = [param_data["type"]]
+
+              # And same idea: despite parameters not being schemas, the items
+              # key (if preset) is actually a schema that defines each item of an
+              # array type, so we can just reflect that directly onto our
+              # artifical schema.
+              if param_data["type"] == "array" && param_data["items"]
+                param_schema.items = param_data["items"]
+              end
+
+              link_schema.properties[param_data["name"]] = param_schema
+              if param_data["required"] == true
+                link_schema.required << param_data["name"]
               end
             end
 
-            param_schema = JsonSchema::Schema.new
-
-            # We could probably use more validation here, but the formats of
-            # OpenAPI 2 are based off of what's available in JSON schema, and
-            # therefore this should map over quite well.
-            param_schema.type = [param_data["type"]]
-
-            # And same idea: despite parameters not being schemas, the items
-            # key (if preset) is actually a schema that defines each item of an
-            # array type, so we can just reflect that directly onto our
-            # artifical schema.
-            if param_data["type"] == "array" && param_data["items"]
-              param_schema.items = param_data["items"]
-            end
-
-            link_schema.properties[param_data["name"]] = param_schema
-            if param_data["required"] == true
-              link_schema.required << param_data["name"]
-            end
+            [link_schema, nil]
           end
         end
-
-        link_schema
       end
 
       private
@@ -135,6 +146,15 @@ module Committee::Drivers
       ].map(&:to_s).freeze
 
       attr_accessor :link_data
+
+      def check_required_fields!(param_data)
+        LINK_REQUIRED_FIELDS.each do |field|
+          if !param_data[field]
+            raise ArgumentError,
+              "Committee: no #{field} section in link data."
+          end
+        end
+      end
     end
 
     class Schema < Committee::Drivers::Schema
@@ -219,10 +239,14 @@ module Committee::Drivers
       # all schemas into one big hash and then parse it all at the end. After
       # we parse it, go through each link and assign a proper schema object. In
       # practice this comes out to somewhere on the order of 50x faster.
+      schemas_data = { "properties" => {} }
+
+      # Exactly the same idea, but for response schemas.
       target_schemas_data = { "properties" => {} }
 
       data['paths'].each do |path, methods|
         href = schema.base_path + path
+        schemas_data["properties"][href] = { "properties" => {} }
         target_schemas_data["properties"][href] = { "properties" => {} }
 
         methods.each do |method, link_data|
@@ -236,7 +260,14 @@ module Committee::Drivers
 
           # Convert the spec's parameter pseudo-schemas into JSON schemas that
           # we can use for some basic request validation.
-          link.schema = ParameterSchemaBuilder.new(link_data).call
+          link.schema, schema_data = ParameterSchemaBuilder.new(link_data).call
+
+          # If data came back instead of a schema (this occurs when a route has
+          # a single `body` parameter instead of a collection of URL/query/form
+          # parameters), store it for later parsing.
+          if schema_data
+            schemas_data["properties"][href]["properties"][method] = schema_data
+          end
 
           # Arbitrarily pick one response for the time being. Prefers in order:
           # a 200, 201, any 3-digit numerical response, then anything at all.
@@ -263,21 +294,38 @@ module Committee::Drivers
       # #parse_definitions!, but what we're doing here is prefixing references
       # with a specialized internal URI so that they can reference definitions
       # from another document in the store.
-      target_schemas = rewrite_references(target_schemas_data)
-
-      target_schemas = JsonSchema.parse!(target_schemas)
-      target_schemas.expand_references!(store: store)
+      schemas =
+        rewrite_references_and_parse(schemas_data, store)
+      target_schemas =
+        rewrite_references_and_parse(target_schemas_data, store)
 
       # As noted above, now that we've parsed our aggregate response schema, go
       # back through each link and them their response schema.
       routes.each do |method, method_routes|
         method_routes.each do |(_, link)|
+          # request
+          #
+          # Differs slightly from responses in that the schema may already have
+          # been set for endpoints with non-body parameters, so check for nil
+          # before we set it.
+          if schema = schemas.properties[link.href].properties[method]
+            link.schema = schema
+          end
+
+          # response
           link.target_schema =
             target_schemas.properties[link.href].properties[method]
         end
       end
 
       routes
+    end
+
+    def rewrite_references_and_parse(schemas_data, store)
+      schemas = rewrite_references(schemas_data)
+      schemas = JsonSchema.parse!(schemas_data)
+      schemas.expand_references!(:store => store)
+      schemas
     end
 
     def rewrite_references(schema)
