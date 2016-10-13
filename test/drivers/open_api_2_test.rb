@@ -197,8 +197,9 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
         }
       ]
     }
-    schema = call(data)
+    schema, schema_data = call(data)
 
+    assert_equal nil, schema_data
     assert_equal ["limit"], schema.properties.keys
     assert_equal [], schema.required
     assert_equal ["integer"], schema.properties["limit"].type
@@ -213,8 +214,9 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
         }
       ]
     }
-    schema = call(data)
+    schema, schema_data = call(data)
 
+    assert_equal nil, schema_data
     assert_equal ["limit"], schema.required
   end
 
@@ -230,10 +232,29 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
         }
       ]
     }
-    schema = call(data)
+    schema, schema_data = call(data)
 
+    assert_equal nil, schema_data
     assert_equal ["array"], schema.properties["tags"].type
     assert_equal({ "type" => "string" }, schema.properties["tags"].items)
+  end
+
+  it "returns schema data for a body parameter" do
+    data = {
+      "parameters" => [
+        {
+          "name" => "payload",
+          "in" => "body",
+          "schema" => {
+            "$ref" => "#/definitions/foo",
+          }
+        }
+      ]
+    }
+    schema, schema_data = call(data)
+
+    assert_equal nil, schema
+    assert_equal({ "$ref" => "#/definitions/foo" }, schema_data)
   end
 
   it "requires that certain fields are present" do
@@ -247,6 +268,26 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
       call(data)
     end
     assert_equal "Committee: no name section in link data.", e.message
+  end
+
+  it "requires that body parameters not be mixed with form parameters" do
+    data = {
+      "parameters" => [
+        {
+          "name" => "payload",
+          "in" => "body",
+        },
+        {
+          "name" => "limit",
+          "in" => "form",
+        },
+      ]
+    }
+    e = assert_raises ArgumentError do
+      call(data)
+    end
+    assert_equal "Committee: can't mix body parameter with form parameters.",
+      e.message
   end
 
   def call(data)
