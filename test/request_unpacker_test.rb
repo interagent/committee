@@ -82,6 +82,25 @@ describe Committee::RequestUnpacker do
     assert_equal({ "x" => "y" }, params)
   end
 
+  it "coerces form params with coerce_form_params and a schema" do
+    schema = JsonSchema::Schema.new
+    schema.properties = { "x" => JsonSchema::Schema.new }
+    schema.properties["x"].type = ["integer"]
+
+    env = {
+      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
+      "rack.input"   => StringIO.new("x=1"),
+    }
+    request = Rack::Request.new(env)
+    params = Committee::RequestUnpacker.new(
+      request,
+      allow_form_params: true,
+      coerce_form_params: true,
+      schema: schema
+    ).call
+    assert_equal({ "x" => 1 }, params)
+  end
+
   it "unpacks form & query params with allow_form_params and allow_query_params" do
     env = {
       "CONTENT_TYPE" => "application/x-www-form-urlencoded",

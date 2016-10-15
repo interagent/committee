@@ -111,6 +111,10 @@ describe Committee::Drivers::OpenAPI2 do
     assert_equal "Committee: no definitions section in spec data.", e.message
   end
 
+  it "defaults to coercing form parameters" do
+    assert_equal true, @driver.default_coerce_form_params
+  end
+
   it "defaults to path parameters" do
     assert_equal true, @driver.default_path_params
   end

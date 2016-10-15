@@ -1,5 +1,10 @@
 module Committee::Drivers
   class OpenAPI2 < Committee::Drivers::Driver
+    # Whether parameters that were form-encoded will be coerced by default.
+    def default_coerce_form_params
+      true
+    end
+
     # Whether parameters in a request's path will be considered and coerced by
     # default.
     def default_path_params

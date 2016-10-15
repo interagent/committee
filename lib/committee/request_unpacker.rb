@@ -5,7 +5,9 @@ module Committee
 
       @allow_form_params  = options[:allow_form_params]
       @allow_query_params = options[:allow_query_params]
+      @coerce_form_params = options[:coerce_form_params]
       @optimistic_json    = options[:optimistic_json]
+      @schema             = options[:schema]
     end
 
     def call
@@ -26,7 +28,16 @@ module Committee
       elsif @allow_form_params && @request.media_type == "application/x-www-form-urlencoded"
         # Actually, POST means anything in the request body, could be from
         # PUT or PATCH too. Silly Rack.
-        indifferent_params(@request.POST)
+        p = @request.POST
+
+        if @coerce_form_params && @schema
+          p.merge!(Committee::StringParamsCoercer.new(
+            p,
+            @schema
+          ).call)
+        end
+
+        p
       else
         {}
       end
