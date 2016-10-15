@@ -58,6 +58,13 @@ module Committee::Middleware
       if link
         validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
         validator.call(request, request.env[@params_key])
+
+        request.env["rack.request.query_hash"].merge!(
+            Committee::ParameterConverter
+                .new(request.env["rack.request.query_hash"], link.schema)
+                .convert!
+        )
+
         @app.call(request.env)
       elsif @strict
         raise Committee::NotFound
