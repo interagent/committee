@@ -9,6 +9,8 @@ module Committee::Middleware
       @optimistic_json     = options.fetch(:optimistic_json, false)
       @strict              = options[:strict]
 
+      @coerce_form_params = options.fetch(:coerce_form_params,
+        @schema.driver.default_coerce_form_params)
       @coerce_path_params = options.fetch(:coerce_path_params,
         @schema.driver.default_path_params)
       @coerce_query_params = options.fetch(:coerce_query_params,
@@ -50,7 +52,9 @@ module Committee::Middleware
         request,
         allow_form_params:  @allow_form_params,
         allow_query_params: @allow_query_params,
-        optimistic_json:    @optimistic_json
+        coerce_form_params: @coerce_form_params,
+        optimistic_json:    @optimistic_json,
+        schema:             link ? link.schema : nil
       ).call
 
       request.env[@params_key].merge!(path_params)

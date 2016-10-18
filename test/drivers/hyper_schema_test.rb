@@ -32,6 +32,10 @@ describe Committee::Drivers::HyperSchema do
     end
   end
 
+  it "defaults to not coercing form parameters" do
+    assert_equal false, @driver.default_coerce_form_params
+  end
+
   it "defaults to no path parameters" do
     assert_equal false, @driver.default_path_params
   end
