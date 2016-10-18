@@ -12,7 +12,7 @@ options, parser = bin.get_options_parser
 if $0 == __FILE__
   parser.parse!(args)
 
-  unless args.count == 1 || options[:help]
+  unless args.count == 1 || options[:help] || !options[:driver]
     puts parser.to_s
     exit
   end
