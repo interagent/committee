@@ -25,7 +25,7 @@ module Committee
       # Gets an option parser for command line arguments.
       def get_options_parser
         options = {
-          :driver   => :hyper_schema,
+          :driver   => nil,
           :help     => false,
           :port     => 9292,
           :tolerant => false,
@@ -37,12 +37,13 @@ module Committee
           opts.separator ""
           opts.separator "Options:"
 
-          opts.on_tail("-h", "-?", "--help", "Show this message") {
-            options[:help] = true
-          }
-
+          # required
           opts.on("-d", "--driver NAME", "name of driver [open_api_2|hyper_schema]") { |name|
             options[:driver] = name.to_sym
+          }
+
+          opts.on_tail("-h", "-?", "--help", "Show this message") {
+            options[:help] = true
           }
 
           opts.on("-t", "--tolerant", "don't perform request/response validations") {
