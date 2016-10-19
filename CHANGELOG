@@ -2,6 +2,7 @@ Unreleased
 
 2.0.0.pre3 2016-10-18
 	Add support for coercing types in form bodies (default on for OpenAPI 2.0)
+	Required that a driver name be passed to `committee-stub` executable
 
 2.0.0.pre2 2016-10-13
 	Add support for body parameters in OpenAPI 2.0
