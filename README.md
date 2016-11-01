@@ -30,6 +30,7 @@ Options:
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
 * `strict`: Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run (default to `false`).
+* `coerce_date_times`: Convert the string with `"format": "date-time"` parameter to DateTime object (default to `false`).
 
 Some examples of use:
 

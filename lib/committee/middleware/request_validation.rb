@@ -8,6 +8,7 @@ module Committee::Middleware
       @check_content_type  = options.fetch(:check_content_type, true)
       @optimistic_json     = options.fetch(:optimistic_json, false)
       @strict              = options[:strict]
+      @coerce_date_times   = options.fetch(:coerce_date_times, false)
 
       @coerce_path_params = options.fetch(:coerce_path_params,
         @schema.driver.default_path_params)
@@ -59,11 +60,13 @@ module Committee::Middleware
         validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
         validator.call(request, request.env[@params_key])
 
-        request.env["rack.request.query_hash"].merge!(
-            Committee::ParameterConverter
-                .new(request.env["rack.request.query_hash"], link.schema)
-                .convert!
-        )
+        if @coerce_date_times
+          request.env["rack.request.query_hash"].merge!(
+              Committee::ParameterConverter
+                  .new(request.env["rack.request.query_hash"], link.schema)
+                  .convert!
+          )
+        end
 
         @app.call(request.env)
       elsif @strict
