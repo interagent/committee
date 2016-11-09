@@ -244,7 +244,7 @@ bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
 ## Release
 
 1. Update the version in `committee.gemspec` as appropriate for [semantic
-   versioning](http://semver.org).
+   versioning](http://semver.org) and add details to `CHANGELOG`.
 2. Run the `release` task:
 
     ```
