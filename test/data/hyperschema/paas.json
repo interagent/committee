@@ -51,6 +51,14 @@
           "type": [
             "boolean"
           ]
+        },
+        "update_time": {
+          "description": "last update time",
+          "example": "2016-04-01T16:00:00+09:00",
+          "type": [
+            "string"
+          ],
+          "format": "date-time"
         }
       },
       "links": [
@@ -63,6 +71,9 @@
             "properties": {
               "name": {
                 "$ref": "#/definitions/app/definitions/name"
+              },
+              "update_time": {
+                "$ref": "#/definitions/app/definitions/update_time"
               }
             }
           },

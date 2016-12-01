@@ -17,6 +17,16 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "pass datetime string and coerce_date_times option enable" do
+    @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
+    params = {
+        "update_time" => "2016-04-01T16:00:00.000+09:00"
+    }
+    header "Content-Type", "application/json"
+    post "/apps", JSON.generate(params)
+    assert_equal 200, last_response.status
+  end
+
   it "detects an invalid request" do
     @app = new_rack_app(schema: hyper_schema)
     header "Content-Type", "application/json"
