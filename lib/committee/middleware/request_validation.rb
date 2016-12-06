@@ -60,13 +60,12 @@ module Committee::Middleware
         validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
         validator.call(request, request.env[@params_key])
 
-        if @coerce_date_times
-          request.env["rack.request.query_hash"].merge!(
-              Committee::ParameterConverter
-                  .new(request.env["rack.request.query_hash"], link.schema)
-                  .convert!
-          )
-        end
+        request.env["rack.request.query_hash"].merge!(
+          Committee::ParameterCoercer
+            .new(request.env["rack.request.query_hash"], link.schema,
+               coerce_date_times: @coerce_date_times)
+            .call
+        )
 
         @app.call(request.env)
       elsif @strict
