@@ -24,6 +24,7 @@ Options:
 * `allow_form_params`: Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations.
 * `allow_query_params`: Specifies that query string parameters will be taken into consideration when doing validation (defaults to `true`).
 * `check_content_type`: Specifies that `Content-Type` should be verified according to JSON Hyper-schema definition. (defaults to `true`).
+* `coerce_date_times`: Convert the string with `"format": "date-time"` parameter to DateTime object (default to `false`).
 * `coerce_query_params`: Tries to convert GET params (which are strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation.
 * `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
 * `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
