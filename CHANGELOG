@@ -1,5 +1,8 @@
 Unreleased
 
+2.0.0.pre5 2017-01-16
+	Fix bug in handling non-existent link with `coerce_date_times` enabled
+
 2.0.0.pre4 2016-12-06
 	Add `coerce_date_times` option to turn strings into time objects
 
