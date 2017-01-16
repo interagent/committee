@@ -17,7 +17,7 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "pass datetime string and coerce_date_times option enable" do
+  it "passes given a datetime and with coerce_date_times enabled" do
     @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
     params = {
         "update_time" => "2016-04-01T16:00:00.000+09:00"
@@ -27,7 +27,7 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "pass invalid datetime string and coerce_date_times option enable" do
+  it "passes given an invalid datetime string with coerce_date_times enabled" do
     @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
     params = {
         "update_time" => "invalid_datetime_format"
@@ -38,7 +38,7 @@ describe Committee::Middleware::RequestValidation do
     assert_match /invalid request/i, last_response.body
   end
 
-  it "pass non-exist schema link and coerce_date_times option enable" do
+  it "passes with coerce_date_times enabled and without a schema for a link" do
     @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
     header "Content-Type", "application/json"
     get "/apps", JSON.generate({})
