@@ -38,6 +38,13 @@ describe Committee::Middleware::RequestValidation do
     assert_match /invalid request/i, last_response.body
   end
 
+  it "pass non-exist schema link and coerce_date_times option enable" do
+    @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
+    header "Content-Type", "application/json"
+    get "/apps", JSON.generate({})
+    assert_equal 200, last_response.status
+  end
+
   it "detects an invalid request" do
     @app = new_rack_app(schema: hyper_schema)
     header "Content-Type", "application/json"

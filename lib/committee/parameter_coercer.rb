@@ -9,6 +9,8 @@ module Committee
 
     def call
       coerced = {}
+      return coerced unless @schema.respond_to?(:properties)
+
       @schema.properties.each do |k, s|
         original_val = @params[k]
 
