@@ -79,6 +79,13 @@ describe Committee::ResponseGenerator do
     assert_equal "", Committee::ResponseGenerator.new.call(link)
   end
 
+  it "generates an empty object for an object with no fields" do
+    link = Committee::Drivers::OpenAPI2::Link.new
+    link.target_schema = JsonSchema::Schema.new
+    link.target_schema.type = ["object"]
+    assert_equal({}, Committee::ResponseGenerator.new.call(link))
+  end
+
   it "prefers an example to a built-in value" do
     link = Committee::Drivers::OpenAPI2::Link.new
     link.target_schema = JsonSchema::Schema.new

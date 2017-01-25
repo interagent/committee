@@ -52,6 +52,11 @@ module Committee
         SCALAR_TYPES.each do |k, v|
           break(v) if schema.type.include?(k)
         end
+
+      # Schema is an object with no properties: just generate an empty object.
+      elsif schema.type == ["object"]
+        {}
+
       else
         raise(%{At "#{link.method} #{link.href}" "#{schema.pointer}": no } +
           %{"example" attribute and "null" } +
