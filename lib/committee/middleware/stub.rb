@@ -19,12 +19,13 @@ module Committee::Middleware
       if link
         headers = { "Content-Type" => "application/json" }
 
-        data = cache(link) do
+        data, schema = cache(link) do
           Committee::ResponseGenerator.new.call(link)
         end
 
         if @call
           request.env["committee.response"] = data
+          request.env["committee.response_schema"] = schema
           call_status, call_headers, call_body = @app.call(request.env)
 
           # a committee.suppress signal initiates a direct pass through
@@ -36,7 +37,7 @@ module Committee::Middleware
           # made, and stub normally
           headers.merge!(call_headers)
 
-          # allow allow the handler to change the data object (if unchanged, it
+          # allow the handler to change the data object (if unchanged, it
           # will be the same one that we set above)
           data = request.env["committee.response"]
         end

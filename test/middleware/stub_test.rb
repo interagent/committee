@@ -38,6 +38,15 @@ describe Committee::Middleware::Stub do
     assert_equal "", last_response.body
   end
 
+  it "optionally returns the application's response schema" do
+    @app = new_rack_app(call: true, schema: hyper_schema, suppress: true)
+    get "/apps/heroku-api"
+    assert_equal 429, last_response.status
+    assert_equal "#/definitions/app/links/2/targetSchema",
+      last_response.headers["Committee-Response-Schema"]
+    assert_equal "", last_response.body
+  end
+
   it "takes a prefix" do
     @app = new_rack_app(prefix: "/v1", schema: hyper_schema)
     get "/v1/apps/heroku-api"
@@ -75,7 +84,7 @@ describe Committee::Middleware::Stub do
     get "/apps/heroku-api"
     assert_equal 200, last_response.status
 
-    data = cache[cache.first[0]]
+    data, _schema = cache[cache.first[0]]
     assert_equal ValidApp.keys.sort, data.keys.sort
 
     # replace what we have in the cache
@@ -103,6 +112,12 @@ describe Committee::Middleware::Stub do
         if res = env["committee.response"]
           headers.merge!({
             "Committee-Response" => JSON.generate(res)
+          })
+        end
+
+        if res = env["committee.response_schema"]
+          headers.merge!({
+            "Committee-Response-Schema" => res.pointer,
           })
         end
 

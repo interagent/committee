@@ -10,13 +10,18 @@ describe Committee::ResponseGenerator do
     @list_link = @schema.properties["app"].links[3]
   end
 
+  it "returns the schema used to match" do
+    _data, schema = call
+    assert_equal @get_link.target_schema, schema
+  end
+
   it "generates string properties" do
-    data = call
+    data, _schema = call
     assert data["name"].is_a?(String)
   end
 
   it "generates non-string properties" do
-    data = call
+    data, _schema = call
     assert_includes [FalseClass, TrueClass], data["maintenance"].class
   end
 
@@ -25,7 +30,7 @@ describe Committee::ResponseGenerator do
 
     @link.rel = nil
 
-    data = call
+    data, _schema = call
     assert data.is_a?(Array)
   end
 
@@ -35,7 +40,7 @@ describe Committee::ResponseGenerator do
     # forces the link to use `parent`
     @link.target_schema = nil
 
-    data = call
+    data, _schema = call
 
     # We're testing for legacy behavior here: even without a `targetSchema` as
     # long as `rel` is set to `instances` we still wrap the the result in an
@@ -65,25 +70,46 @@ describe Committee::ResponseGenerator do
     assert_equal expected, e.message
   end
 
+  it "generates first enum value for a schema with enum" do
+    link = Committee::Drivers::OpenAPI2::Link.new
+    link.target_schema = JsonSchema::Schema.new
+    link.target_schema.enum = ["foo"]
+    link.target_schema.type = ["string"]
+    data, _schema = Committee::ResponseGenerator.new.call(link)
+    assert_equal("foo", data)
+  end
+
   it "generates basic types" do
     link = Committee::Drivers::OpenAPI2::Link.new
     link.target_schema = JsonSchema::Schema.new
 
     link.target_schema.type = ["integer"]
-    assert_equal 0, Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::ResponseGenerator.new.call(link)
+    assert_equal 0, data
 
     link.target_schema.type = ["null"]
-    assert_equal nil, Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::ResponseGenerator.new.call(link)
+    assert_equal nil, data
 
     link.target_schema.type = ["string"]
-    assert_equal "", Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::ResponseGenerator.new.call(link)
+    assert_equal "", data
+  end
+
+  it "generates an empty array for an array type" do
+    link = Committee::Drivers::OpenAPI2::Link.new
+    link.target_schema = JsonSchema::Schema.new
+    link.target_schema.type = ["array"]
+    data, _schema = Committee::ResponseGenerator.new.call(link)
+    assert_equal([], data)
   end
 
   it "generates an empty object for an object with no fields" do
     link = Committee::Drivers::OpenAPI2::Link.new
     link.target_schema = JsonSchema::Schema.new
     link.target_schema.type = ["object"]
-    assert_equal({}, Committee::ResponseGenerator.new.call(link))
+    data, _schema = Committee::ResponseGenerator.new.call(link)
+    assert_equal({}, data)
   end
 
   it "prefers an example to a built-in value" do
@@ -93,7 +119,8 @@ describe Committee::ResponseGenerator do
     link.target_schema.data = { "example" => 123 }
     link.target_schema.type = ["integer"]
 
-    assert_equal 123, Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::ResponseGenerator.new.call(link)
+    assert_equal 123, data
   end
 
   it "prefers non-null types to null types" do
@@ -101,7 +128,8 @@ describe Committee::ResponseGenerator do
     link.target_schema = JsonSchema::Schema.new
 
     link.target_schema.type = ["null", "integer"]
-    assert_equal 0, Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::ResponseGenerator.new.call(link)
+    assert_equal 0, data
   end
 
   def call
