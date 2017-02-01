@@ -1,5 +1,9 @@
 Unreleased
 
+2.0.0.pre6 2017-02-01
+	Add `committee.response_schema` env key
+	Add sample generators for schemas that are arrays or have enums
+
 2.0.0.pre5 2017-01-16
 	Fix bug in handling non-existent link with `coerce_date_times` enabled
 
