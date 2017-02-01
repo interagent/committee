@@ -1,7 +1,8 @@
 module Committee
   class ResponseGenerator
     def call(link)
-      data = generate_properties(link, target_schema(link))
+      schema = target_schema(link)
+      data = generate_properties(link, schema)
 
       # List is a special case; wrap data in an array.
       #
@@ -14,7 +15,7 @@ module Committee
         data = [data]
       end
 
-      data
+      [data, schema]
     end
 
     private
@@ -37,6 +38,7 @@ module Committee
       # special example attribute was included; use its value
       if schema.data && !schema.data["example"].nil?
         schema.data["example"]
+
       elsif !schema.all_of.empty? || !schema.properties.empty?
         data = {}
         schema.all_of.each do |subschema|
@@ -46,12 +48,21 @@ module Committee
           data[key] = generate_properties(link, value)
         end
         data
+
       elsif schema.type.include?("array") && !schema.items.nil?
         [generate_properties(link, schema.items)]
+
+      elsif schema.enum
+        schema.enum.first
+
       elsif schema.type.any? { |t| SCALAR_TYPES.include?(t) }
         SCALAR_TYPES.each do |k, v|
           break(v) if schema.type.include?(k)
         end
+
+      # Generate an empty array for arrays.
+      elsif schema.type == ["array"]
+        []
 
       # Schema is an object with no properties: just generate an empty object.
       elsif schema.type == ["object"]
