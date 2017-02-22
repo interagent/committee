@@ -89,7 +89,7 @@ describe Committee::ResponseGenerator do
 
     link.target_schema.type = ["null"]
     data, _schema = Committee::ResponseGenerator.new.call(link)
-    assert_equal nil, data
+    assert_nil data
 
     link.target_schema.type = ["string"]
     data, _schema = Committee::ResponseGenerator.new.call(link)
