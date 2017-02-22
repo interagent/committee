@@ -89,8 +89,8 @@ describe Committee::Drivers::OpenAPI2 do
 
     schema = @driver.parse(schema_data)
     link = schema.routes['GET'][0][1]
-    assert_equal nil, link.status_success
-    assert_equal nil, link.target_schema
+    assert_nil link.status_success
+    assert_nil link.target_schema
   end
 
   it "refuses to parse other version of OpenAPI" do
@@ -203,7 +203,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
     }
     schema, schema_data = call(data)
 
-    assert_equal nil, schema_data
+    assert_nil schema_data
     assert_equal ["limit"], schema.properties.keys
     assert_equal [], schema.required
     assert_equal ["integer"], schema.properties["limit"].type
@@ -220,7 +220,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
     }
     schema, schema_data = call(data)
 
-    assert_equal nil, schema_data
+    assert_nil schema_data
     assert_equal ["limit"], schema.required
   end
 
@@ -238,7 +238,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
     }
     schema, schema_data = call(data)
 
-    assert_equal nil, schema_data
+    assert_nil schema_data
     assert_equal ["array"], schema.properties["tags"].type
     assert_equal({ "type" => "string" }, schema.properties["tags"].items)
   end
@@ -257,7 +257,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
     }
     schema, schema_data = call(data)
 
-    assert_equal nil, schema
+    assert_nil schema
     assert_equal({ "$ref" => "#/definitions/foo" }, schema_data)
   end
 
