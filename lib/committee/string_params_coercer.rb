@@ -37,8 +37,8 @@ module Committee
                 raise e unless e.message =~ /invalid value for Float/
               end
             when "boolean"
-              coerced[k] = true if original_val == "true"
-              coerced[k] = false if original_val == "false"
+              coerced[k] = true if original_val == "true" || original_val == "1"
+              coerced[k] = false if original_val == "false" || original_val == "0"
             end
             break if coerced.key?(k)
           end

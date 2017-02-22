@@ -23,6 +23,10 @@ describe Committee::StringParamsCoercer do
     assert_equal({"deleted" => true}, call(data))
     data = {"deleted" => "false"}
     assert_equal({"deleted" => false}, call(data))
+    data = {"deleted" => "1"}
+    assert_equal({"deleted" => true}, call(data))
+    data = {"deleted" => "0"}
+    assert_equal({"deleted" => false}, call(data))
   end
 
   it "skips invalid values for boolean param" do
