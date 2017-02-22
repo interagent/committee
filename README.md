@@ -26,7 +26,8 @@ Options:
 * `check_content_type`: Specifies that `Content-Type` should be verified according to JSON Hyper-schema definition. (defaults to `true`).
 * `coerce_date_times`: Convert the string with `"format": "date-time"` parameter to DateTime object (default to `false`).
 * `coerce_form_params`: Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation.
-* `coerce_query_params`: The same as `coerce_form_params`, but `GET` parameters encoded in a request's query string.
+* `coerce_query_params`: The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string.
+* `coerce_path_params`: The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path.
 * `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
 * `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
 * `prefix`: Mounts the middleware to respond at a configured prefix.
