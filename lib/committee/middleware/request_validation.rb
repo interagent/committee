@@ -73,19 +73,19 @@ module Committee::Middleware
 
         @app.call(request.env)
       elsif @strict
-        raise Committee::NotFound
+        raise Committee::NotFound, "That request method and path combination isn't defined."
       else
         @app.call(request.env)
       end
     rescue Committee::BadRequest, Committee::InvalidRequest
       raise if @raise
       @error_class.new(400, :bad_request, $!.message).render
-    rescue Committee::NotFound
+    rescue Committee::NotFound => e
       raise if @raise
       @error_class.new(
         404,
         :not_found,
-        "That request method and path combination isn't defined."
+        e.message
       ).render
     rescue JSON::ParserError
       raise Committee::InvalidRequest if @raise
