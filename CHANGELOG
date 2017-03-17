@@ -1,5 +1,8 @@
 Unreleased
 
+2.0.0.pre7 2017-03-16
+	Raise `Committee::NotFound` with more meaningful error message
+
 2.0.0.pre6 2017-02-01
 	Add `committee.response_schema` env key
 	Add sample generators for schemas that are arrays or have enums
