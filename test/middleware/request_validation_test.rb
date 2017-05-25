@@ -157,11 +157,16 @@ describe Committee::Middleware::RequestValidation do
   private
 
   def new_rack_app(options = {})
+    new_rack_app_with_lambda(lambda { |_|
+      [200, {}, []]
+    }, options)
+  end
+
+
+  def new_rack_app_with_lambda(check_lambda, options = {})
     Rack::Builder.new {
       use Committee::Middleware::RequestValidation, options
-      run lambda { |_|
-        [200, {}, []]
-      }
+      run check_lambda
     }
   end
 end
