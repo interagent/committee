@@ -64,12 +64,8 @@ module Committee::Middleware
         validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
         validator.call(request, request.env[@params_key])
 
-        request.env["rack.request.query_hash"].merge!(
-          Committee::ParameterCoercer
-            .new(request.env["rack.request.query_hash"], link.schema,
-               coerce_date_times: @coerce_date_times)
-            .call
-        )
+        parameter_coerce(request, link, @params_key)
+        parameter_coerce(request, link, "rack.request.query_hash") if !request.GET.nil? && !link.schema.nil?
 
         @app.call(request.env)
       elsif @strict
@@ -91,5 +87,16 @@ module Committee::Middleware
       raise Committee::InvalidRequest if @raise
       @error_class.new(400, :bad_request, "Request body wasn't valid JSON.").render
     end
+
+    private
+
+      def parameter_coerce(request, link, coerce_key)
+        request.env[coerce_key].merge!(
+            Committee::ParameterCoercer
+                .new(request.env[coerce_key], link.schema,
+                     coerce_date_times: @coerce_date_times)
+                .call
+        )
+      end
   end
 end
