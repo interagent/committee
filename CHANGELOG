@@ -1,5 +1,8 @@
 Unreleased
 
+2.0.0.pre8 2017-05-27
+	Apply `coerce_date_times` to any type of incoming parameter
+
 2.0.0.pre7 2017-03-16
 	Raise `Committee::NotFound` with more meaningful error message
 
