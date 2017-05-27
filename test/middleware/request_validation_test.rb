@@ -17,11 +17,37 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "passes given a datetime and with coerce_date_times enabled" do
-    @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
+  it "passes given a datetime and with coerce_date_times enabled on GET endpoint" do
+    key_name = "update_time"
     params = {
-        "update_time" => "2016-04-01T16:00:00.000+09:00"
+        key_name => "2016-04-01T16:00:00.000+09:00",
+        "query" => "cloudnasium"
     }
+
+    check_parameter = lambda { |env|
+      assert_equal DateTime, env['rack.request.query_hash'][key_name].class
+      [200, {}, []]
+    }
+
+    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, schema: hyper_schema)
+
+    get "/search/apps", params
+    assert_equal 200, last_response.status
+  end
+
+  it "passes given a datetime and with coerce_date_times enabled on POST endpoint" do
+    key_name = "update_time"
+    params = {
+        key_name => "2016-04-01T16:00:00.000+09:00"
+    }
+
+    check_parameter = lambda { |env|
+      assert_equal DateTime, env['committee.params'][key_name].class
+      [200, {}, []]
+    }
+
+    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, schema: hyper_schema)
+
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
@@ -157,11 +183,16 @@ describe Committee::Middleware::RequestValidation do
   private
 
   def new_rack_app(options = {})
+    new_rack_app_with_lambda(lambda { |_|
+      [200, {}, []]
+    }, options)
+  end
+
+
+  def new_rack_app_with_lambda(check_lambda, options = {})
     Rack::Builder.new {
       use Committee::Middleware::RequestValidation, options
-      run lambda { |_|
-        [200, {}, []]
-      }
+      run check_lambda
     }
   end
 end

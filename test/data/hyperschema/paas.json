@@ -146,6 +146,9 @@
               },
               "deleted": {
                 "$ref": "#/definitions/app/definitions/deleted"
+              },
+              "update_time": {
+                "$ref": "#/definitions/app/definitions/update_time"
               }
             },
             "required": ["query"]
