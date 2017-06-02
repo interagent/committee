@@ -12,16 +12,26 @@ describe Committee::ParameterCoercer do
 
   it "pass datetime string" do
     params = { "update_time" => "2016-04-01T16:00:00.000+09:00"}
-    converted_params = call(params, coerce_date_times: true)
+    call(params, coerce_date_times: true)
 
-    assert_kind_of DateTime, converted_params["update_time"]
+    assert_kind_of DateTime, params["update_time"]
+  end
+
+  it "don't change object type" do
+    params = HashLikeObject.new
+    params["update_time"] = "2016-04-01T16:00:00.000+09:00"
+    call(params, coerce_date_times: true)
+
+    assert_kind_of DateTime, params["update_time"]
+    assert_kind_of HashLikeObject, params
   end
 
   it "pass invalid datetime string, not convert" do
-    params = { "update_time" => "llmfllmf"}
-    converted_params = call(params, coerce_date_times: true)
+    invalid_datetime = "llmfllmf"
+    params = { "update_time" => invalid_datetime}
+    call(params, coerce_date_times: true)
 
-    assert_nil converted_params["update_time"]
+    assert_equal invalid_datetime, params["update_time"]
   end
 
   it "pass array property" do
@@ -62,18 +72,18 @@ describe Committee::ParameterCoercer do
             }
         ],
     }
-    converted_params = call(params, coerce_date_times: true, coerce_recursive: true)
+    call(params, coerce_date_times: true, coerce_recursive: true)
 
-    first_data = converted_params["array_property"][0]
+    first_data = params["array_property"][0]
     assert_kind_of DateTime, first_data["update_time"]
     assert_kind_of Integer, first_data["per_page"]
 
-    second_data = converted_params["array_property"][1]
+    second_data = params["array_property"][1]
     assert_kind_of DateTime, second_data["update_time"]
     assert_kind_of Integer, second_data["per_page"]
     assert_kind_of Float, second_data["threshold"]
 
-    third_data = converted_params["array_property"][1]
+    third_data = params["array_property"][1]
     assert_kind_of Integer, third_data["per_page"]
     assert_kind_of Float, third_data["threshold"]
 
@@ -92,8 +102,10 @@ describe Committee::ParameterCoercer do
 
   private
 
+  class HashLikeObject < Hash; end
+
   def call(params, options={})
     link = Committee::Drivers::HyperSchema::Link.new(@link)
-    Committee::ParameterCoercer.new(params, link.schema, options).call
+    Committee::ParameterCoercer.new(params, link.schema, options).call!
   end
 end
