@@ -9,66 +9,57 @@ module Committee
     end
 
     def call!
-      return {} unless @schema.respond_to?(:properties)
-
-      coercer_value!(@params, @schema.properties)
+      coercer_object!(@params, @schema)
     end
 
     private
 
-      def coercer_value!(params, properties)
-        is_coerce = false
+      def coercer_object!(hash, schema)
+        return false unless schema.respond_to?(:properties)
 
-        properties.each do |k, s|
-          original_val = params[k]
-
+        is_coerced = false
+        schema.properties.each do |k, s|
+          original_val = hash[k]
           unless original_val.nil?
-            s.type.each do |to_type|
-              if @coerce_date_times && to_type == "string" && s.format == "date-time"
-                coerce_val = parse_date_time(original_val)
-
-                if coerce_val
-                  params[k] = coerce_val
-                  is_coerce = true
-                  break
-                end
-              end
-
-              if (@coerce_recursive && to_type == "array") || (@coerce_recursive && to_type == "object")
-                if coerce_data_recursive!(original_val, to_type, s)
-                  is_coerce = true
-                  break
-                end
-              end
+            new_value, is_changed = coercer_value!(original_val, s)
+            if is_changed
+              hash[k] = new_value
+              is_coerced = true
             end
           end
         end
 
-        is_coerce
+        is_coerced
       end
 
-      def coerce_data_recursive!(original_val, to_type, schema)
-        return coerce_array_data!(original_val, schema) if to_type == "array"
-        return coerce_object_data!(original_val, schema) if to_type == "object"
-        nil # bug?
+      def coercer_value!(original_val, s)
+        s.type.each do |to_type|
+          if @coerce_date_times && to_type == "string" && s.format == "date-time"
+            coerced_val = parse_date_time(original_val)
+            return coerced_val, true if coerced_val
+          end
+
+          return original_val, true if @coerce_recursive && (to_type == "array") && coercer_array_data!(original_val, s)
+
+          return original_val, true if @coerce_recursive && (to_type == "object") && coercer_object!(original_val, s)
+        end
+        return nil, false
       end
 
-      def coerce_object_data!(original_val, schema)
-        return false unless schema.respond_to?(:properties)
-
-        coercer_value!(original_val, schema.properties)
-      end
-
-      def coerce_array_data!(original_val, schema)
+      def coercer_array_data!(original_val, schema)
         return false unless schema.respond_to?(:items)
         return false unless original_val.is_a?(Array)
 
-        is_coerce = false
-        original_val.each do |d|
-          is_coerce = coercer_value!(d, schema.items.properties)
+        is_coerced = false
+        original_val.each_with_index do |d, index|
+          new_value, is_changed = coercer_value!(d, schema.items)
+          if is_changed
+            original_val[index] = new_value
+            is_coerced = true
+          end
         end
 
-        is_coerce
+        is_coerced
       end
 
       def parse_date_time(original_val)

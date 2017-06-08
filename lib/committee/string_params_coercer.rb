@@ -10,41 +10,90 @@ module Committee
   # errors are simply ignored and expected to be handled later by schema
   # validation.
   class StringParamsCoercer
-    def initialize(query_hash, schema)
+    def initialize(query_hash, schema, options = {})
       @query_hash = query_hash
       @schema = schema
+
+      @coerce_recursive = options.fetch(:coerce_recursive, false)
     end
 
-    def call
-      coerced = {}
-      @schema.properties.each do |k, s|
-        original_val = @query_hash[k]
+    def call!
+      coercer_object!(@query_hash, @schema)
+    end
+
+    private
+
+      def coercer_object!(hash, schema)
+        return false unless schema.respond_to?(:properties)
+
+        is_coerced = false
+        schema.properties.each do |k, s|
+          original_val = hash[k]
+          unless original_val.nil?
+            new_value, is_changed = coercer_value!(original_val, s)
+            if is_changed
+              hash[k] = new_value
+              is_coerced = true
+            end
+          end
+        end
+
+        is_coerced
+      end
+
+      def coercer_value!(original_val, s)
         unless original_val.nil?
           s.type.each do |to_type|
             case to_type
-            when "null"
-              coerced[k] = nil if original_val.empty?
-            when "integer"
-              begin
-                coerced[k] = Integer(original_val)
-              rescue ArgumentError => e
-                raise e unless e.message =~ /invalid value for Integer/
-              end
-            when "number"
-              begin
-                coerced[k] = Float(original_val)
-              rescue ArgumentError => e
-                raise e unless e.message =~ /invalid value for Float/
-              end
-            when "boolean"
-              coerced[k] = true if original_val == "true" || original_val == "1"
-              coerced[k] = false if original_val == "false" || original_val == "0"
+              when "null"
+                return nil, true if original_val.empty?
+              when "integer"
+                begin
+                  return Integer(original_val), true
+                rescue ArgumentError => e
+                  raise e unless e.message =~ /invalid value for Integer/
+                end
+              when "number"
+                begin
+                  return Float(original_val), true
+                rescue ArgumentError => e
+                  raise e unless e.message =~ /invalid value for Float/
+                end
+              when "boolean"
+                if original_val == "true" || original_val == "1"
+                  return true, true
+                end
+                if original_val == "false" || original_val == "0"
+                  return false, true
+                end
+              when "array"
+                if @coerce_recursive && coercer_array_data!(original_val, s)
+                  return original_val, true # change original value
+                end
+              when "object"
+                if @coerce_recursive && coercer_object!(original_val, s)
+                  return original_val, true # change original value
+                end
             end
-            break if coerced.key?(k)
           end
         end
+        return nil, false
       end
-      coerced
-    end
+
+      def coercer_array_data!(original_val, schema)
+        return false unless schema.respond_to?(:items)
+        return false unless original_val.is_a?(Array)
+
+        is_coerced = false
+        original_val.each_with_index do |d, index|
+          new_value, is_changed = coercer_value!(d, schema.items)
+          if is_changed
+            original_val[index] = new_value
+            is_coerced = true
+          end
+        end
+
+        is_coerced
+      end
   end
 end

@@ -9,6 +9,7 @@ module Committee::Middleware
       @optimistic_json     = options.fetch(:optimistic_json, false)
       @strict              = options[:strict]
       @coerce_date_times   = options.fetch(:coerce_date_times, false)
+      @coerce_recursive = options.fetch(:coerce_recursive, false)
 
       @coerce_form_params = options.fetch(:coerce_form_params,
         @schema.driver.default_coerce_form_params)
@@ -23,29 +24,18 @@ module Committee::Middleware
 
     def handle(request)
       link, param_matches = @router.find_request_link(request)
-      path_params = {}
 
       if link
         # Attempts to coerce parameters that appear in a link's URL to Ruby
         # types that can be validated with a schema.
         if @coerce_path_params
-          path_params = param_matches.merge(
-            Committee::StringParamsCoercer.new(
-              param_matches,
-              link.schema
-            ).call
-          )
+          Committee::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: @coerce_recursive).call!
         end
 
         # Attempts to coerce parameters that appear in a query string to Ruby
         # types that can be validated with a schema.
         if @coerce_query_params && !request.GET.nil? && !link.schema.nil?
-          request.env["rack.request.query_hash"].merge!(
-            Committee::StringParamsCoercer.new(
-              request.GET,
-              link.schema
-            ).call
-          )
+          Committee::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: @coerce_recursive).call!
         end
       end
 
@@ -58,7 +48,7 @@ module Committee::Middleware
         schema:             link ? link.schema : nil
       ).call
 
-      request.env[@params_key].merge!(path_params)
+      request.env[@params_key].merge!(param_matches) if param_matches
 
       if link
         validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
@@ -92,7 +82,7 @@ module Committee::Middleware
 
       def parameter_coerce!(request, link, coerce_key)
         Committee::ParameterCoercer.
-            new(request.env[coerce_key], link.schema, coerce_date_times: @coerce_date_times).
+            new(request.env[coerce_key], link.schema, coerce_date_times: @coerce_date_times, coerce_recursive: @coerce_recursive).
             call!
       end
   end
