@@ -18,19 +18,19 @@ module Committee
     end
 
     def call!
-      coercer_object!(@query_hash, @schema)
+      coerce_object!(@query_hash, @schema)
     end
 
     private
 
-      def coercer_object!(hash, schema)
+      def coerce_object!(hash, schema)
         return false unless schema.respond_to?(:properties)
 
         is_coerced = false
         schema.properties.each do |k, s|
           original_val = hash[k]
           unless original_val.nil?
-            new_value, is_changed = coercer_value!(original_val, s)
+            new_value, is_changed = coerce_value!(original_val, s)
             if is_changed
               hash[k] = new_value
               is_coerced = true
@@ -41,7 +41,7 @@ module Committee
         is_coerced
       end
 
-      def coercer_value!(original_val, s)
+      def coerce_value!(original_val, s)
         unless original_val.nil?
           s.type.each do |to_type|
             case to_type
@@ -67,11 +67,11 @@ module Committee
                   return false, true
                 end
               when "array"
-                if @coerce_recursive && coercer_array_data!(original_val, s)
+                if @coerce_recursive && coerce_array_data!(original_val, s)
                   return original_val, true # change original value
                 end
               when "object"
-                if @coerce_recursive && coercer_object!(original_val, s)
+                if @coerce_recursive && coerce_object!(original_val, s)
                   return original_val, true # change original value
                 end
             end
@@ -80,13 +80,13 @@ module Committee
         return nil, false
       end
 
-      def coercer_array_data!(original_val, schema)
+      def coerce_array_data!(original_val, schema)
         return false unless schema.respond_to?(:items)
         return false unless original_val.is_a?(Array)
 
         is_coerced = false
         original_val.each_with_index do |d, index|
-          new_value, is_changed = coercer_value!(d, schema.items)
+          new_value, is_changed = coerce_value!(d, schema.items)
           if is_changed
             original_val[index] = new_value
             is_coerced = true
