@@ -9,7 +9,7 @@ module Committee::Middleware
       @optimistic_json     = options.fetch(:optimistic_json, false)
       @strict              = options[:strict]
       @coerce_date_times   = options.fetch(:coerce_date_times, false)
-      @coerce_recursive = options.fetch(:coerce_recursive, false)
+      @coerce_recursive = options.fetch(:coerce_recursive, true)
 
       @coerce_form_params = options.fetch(:coerce_form_params,
         @schema.driver.default_coerce_form_params)
