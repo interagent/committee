@@ -109,7 +109,21 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "passes a nested object without recursive option" do
+  it "passes a nested object with coerce_recursive false" do
+    key_name = "update_time"
+    params = {
+        key_name => "2016-04-01T16:00:00.000+09:00",
+        "query" => "cloudnasium",
+        "array_property" => ARRAY_PROPERTY
+    }
+
+    @app = new_rack_app(coerce_query_params: true, coerce_date_times: true, coerce_recursive: false, schema: hyper_schema)
+
+    get "/search/apps", params
+    assert_equal 400, last_response.status # schema expect integer but we don't convert string to integer, so 400
+  end
+
+  it "passes a nested object with coerce_recursive default(true)" do
     key_name = "update_time"
     params = {
         key_name => "2016-04-01T16:00:00.000+09:00",
@@ -120,7 +134,7 @@ describe Committee::Middleware::RequestValidation do
     @app = new_rack_app(coerce_query_params: true, coerce_date_times: true, schema: hyper_schema)
 
     get "/search/apps", params
-    assert_equal 400, last_response.status # schema expect integer but we don't convert string to integer, so 400
+    assert_equal 200, last_response.status # schema expect integer but we don't convert string to integer, so 400
   end
 
   it "passes given a nested datetime and with coerce_recursive=true and coerce_date_times=true on POST endpoint" do
@@ -194,7 +208,7 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, schema: hyper_schema)
+    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, coerce_recursive: false, schema: hyper_schema)
 
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
