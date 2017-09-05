@@ -9,65 +9,122 @@ describe Committee::StringParamsCoercer do
   end
 
   it "doesn't coerce params not in the schema" do
-    data = {"owner" => "admin"}
-    assert_equal({}, call(data))
+    check_convert("onwer", "admin", "admin")
   end
 
   it "skips values for string param" do
-    data = {"name" => "foo"}
-    assert_equal({}, call(data))
+    check_convert("name", "foo", "foo")
   end
 
   it "coerces valid values for boolean param" do
-    data = {"deleted" => "true"}
-    assert_equal({"deleted" => true}, call(data))
-    data = {"deleted" => "false"}
-    assert_equal({"deleted" => false}, call(data))
-    data = {"deleted" => "1"}
-    assert_equal({"deleted" => true}, call(data))
-    data = {"deleted" => "0"}
-    assert_equal({"deleted" => false}, call(data))
+    check_convert("deleted", "true", true)
+    check_convert("deleted", "false", false)
+    check_convert("deleted", "1", true)
+    check_convert("deleted", "0", false)
   end
 
   it "skips invalid values for boolean param" do
-    data = {"deleted" => "foo"}
-    assert_equal({}, call(data))
+    check_convert("deleted", "foo", "foo")
   end
 
   it "coerces valid values for integer param" do
-    data = {"per_page" => "3"}
-    assert_equal({"per_page" => 3}, call(data))
+    check_convert("per_page", "3", 3)
   end
 
   it "skips invalid values for integer param" do
-    data = {"per_page" => "3.5"}
-    assert_equal({}, call(data))
-    data = {"per_page" => "false"}
-    assert_equal({}, call(data))
-    data = {"per_page" => ""}
-    assert_equal({}, call(data))
+    check_convert("per_page", "3.5", "3.5")
+    check_convert("per_page", "false", "false")
+    check_convert("per_page", "", "")
   end
 
   it "coerces valid values for number param" do
-    data = {"threshold" => "3"}
-    assert_equal({"threshold" => 3.0}, call(data))
-    data = {"threshold" => "3.5"}
-    assert_equal({"threshold" => 3.5}, call(data))
+    check_convert("threshold", "3", 3.0)
+    check_convert("threshold", "3.5", 3.5)
   end
 
   it "skips invalid values for number param" do
-    data = {"threshold" => "false"}
-    assert_equal({}, call(data))
+    check_convert("threshold", "false", "false")
   end
 
   it "coerces valid values for null param" do
-    data = {"threshold" => ""}
-    assert_equal({"threshold" => nil}, call(data))
+    check_convert("threshold", "", nil)
+  end
+
+  it "pass array property" do
+    params = {
+        "array_property" => [
+            {
+                "update_time" => "2016-04-01T16:00:00.000+09:00",
+                "per_page" => "1",
+                "nested_coercer_object" => {
+                    "update_time" => "2016-04-01T16:00:00.000+09:00",
+                    "threshold" => "1.5"
+                },
+                "nested_no_coercer_object" => {
+                    "per_page" => "1",
+                    "threshold" => "1.5"
+                },
+                "nested_coercer_array" => [
+                    {
+                        "update_time" => "2016-04-01T16:00:00.000+09:00",
+                        "threshold" => "1.5"
+                    }
+                ],
+                "nested_no_coercer_array" => [
+                    {
+                        "per_page" => "1",
+                        "threshold" => "1.5"
+                    }
+                ]
+            },
+            {
+                "update_time" => "2016-04-01T16:00:00.000+09:00",
+                "per_page" => "1",
+                "threshold" => "1.5"
+            },
+            {
+                "threshold" => "1.5",
+                "per_page" => "1"
+            }
+        ],
+    }
+    call(params, coerce_recursive: true)
+
+    first_data = params["array_property"][0]
+    assert_kind_of String, first_data["update_time"]
+    assert_kind_of Integer, first_data["per_page"]
+
+    second_data = params["array_property"][1]
+    assert_kind_of String, second_data["update_time"]
+    assert_kind_of Integer, second_data["per_page"]
+    assert_kind_of Float, second_data["threshold"]
+
+    third_data = params["array_property"][1]
+    assert_kind_of Integer, third_data["per_page"]
+    assert_kind_of Float, third_data["threshold"]
+
+    assert_kind_of String, first_data["nested_coercer_object"]["update_time"]
+    assert_kind_of Float, first_data["nested_coercer_object"]["threshold"]
+
+    assert_kind_of Integer, first_data["nested_no_coercer_object"]["per_page"]
+    assert_kind_of Float, first_data["nested_no_coercer_object"]["threshold"]
+
+    assert_kind_of String, first_data["nested_coercer_array"].first["update_time"]
+    assert_kind_of Float, first_data["nested_coercer_array"].first["threshold"]
+
+    assert_kind_of Integer, first_data["nested_no_coercer_array"].first["per_page"]
+    assert_kind_of Float, first_data["nested_no_coercer_array"].first["threshold"]
   end
 
   private
 
-  def call(data)
-    Committee::StringParamsCoercer.new(data, @link.schema).call
+  def check_convert(key, before_value, after_value)
+    data = {key => before_value}
+    call(data)
+    assert_equal(data[key], after_value)
+  end
+
+  def call(data, options={})
+    Committee::StringParamsCoercer.new(data, @link.schema, options).call!
   end
 end

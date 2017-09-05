@@ -31,10 +31,7 @@ module Committee
         p = @request.POST
 
         if @coerce_form_params && @schema
-          p.merge!(Committee::StringParamsCoercer.new(
-            p,
-            @schema
-          ).call)
+          Committee::StringParamsCoercer.new(p, @schema).call!
         end
 
         p

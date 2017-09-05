@@ -59,6 +59,72 @@
             "string"
           ],
           "format": "date-time"
+        },
+        "nested_no_coercer_object": {
+          "type": "object",
+          "properties": {
+            "per_page": {
+              "$ref": "#/definitions/app/definitions/per_page"
+            },
+            "threshold": {
+              "$ref": "#/definitions/app/definitions/threshold"
+            }
+          }
+        },
+        "nested_coercer_object": {
+          "type": "object",
+          "properties": {
+            "update_time": {
+              "$ref": "#/definitions/app/definitions/update_time"
+            },
+            "threshold": {
+              "$ref": "#/definitions/app/definitions/threshold"
+            }
+          }
+        },
+        "array_data": {
+          "type": "object",
+          "properties": {
+            "update_time": {
+              "$ref": "#/definitions/app/definitions/update_time"
+            },
+            "per_page": {
+              "$ref": "#/definitions/app/definitions/per_page"
+            },
+            "threshold": {
+              "$ref": "#/definitions/app/definitions/threshold"
+            },
+            "nested_coercer_object": {
+              "$ref": "#/definitions/app/definitions/nested_coercer_object"
+            },
+            "nested_no_coercer_object": {
+              "$ref": "#/definitions/app/definitions/nested_no_coercer_object"
+            },
+            "nested_coercer_array": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/app/definitions/nested_coercer_object"
+              }
+            },
+            "nested_no_coercer_array": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/app/definitions/nested_no_coercer_object"
+              }
+            },
+            "integer_array": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/app/definitions/per_page"
+              }
+            },
+            "datetime_array": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/app/definitions/update_time"
+              }
+            }
+          }
         }
       },
       "links": [
@@ -74,6 +140,12 @@
               },
               "update_time": {
                 "$ref": "#/definitions/app/definitions/update_time"
+              },
+              "array_property": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/app/definitions/array_data"
+                }
               }
             }
           },
@@ -149,6 +221,12 @@
               },
               "update_time": {
                 "$ref": "#/definitions/app/definitions/update_time"
+              },
+              "array_property": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/app/definitions/array_data"
+                }
               }
             },
             "required": ["query"]
