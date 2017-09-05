@@ -1,30 +1,15 @@
 Unreleased
 
-2.0.0.pre8 2017-05-27
-	Apply `coerce_date_times` to any type of incoming parameter
-
-2.0.0.pre7 2017-03-16
-	Raise `Committee::NotFound` with more meaningful error message
-
-2.0.0.pre6 2017-02-01
+2.0.0 2016-09-05
+	Add support for OpenAPI 2.0
+	Add support for coercing types in form bodies (default on for OpenAPI 2.0)
 	Add `committee.response_schema` env key
 	Add sample generators for schemas that are arrays or have enums
-
-2.0.0.pre5 2017-01-16
-	Fix bug in handling non-existent link with `coerce_date_times` enabled
-
-2.0.0.pre4 2016-12-06
 	Add `coerce_date_times` option to turn strings into time objects
-
-2.0.0.pre3 2016-10-18
-	Add support for coercing types in form bodies (default on for OpenAPI 2.0)
 	Required that a driver name be passed to `committee-stub` executable
-
-2.0.0.pre2 2016-10-13
-	Add support for body parameters in OpenAPI 2.0
-
-2.0.0.pre 2016-10-10
-	Add support for OpenAPI 2.0
+	Recurse into arrays and objects by default when coercing parameters
+	Add `coerce_recursive` option to disable recursive coercion
+	Raise `Committee::NotFound` with more meaningful error message
 
 1.15.0 2016-09-13
 	Add the `coerce_query_params` option to allow queries with basic types to

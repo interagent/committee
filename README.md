@@ -10,6 +10,7 @@ Committee is tested on the following MRI versions:
 - 2.1
 - 2.2
 - 2.3
+- 2.4
 
 ## Committee::Middleware::RequestValidation
 
@@ -25,10 +26,10 @@ Options:
 * `allow_query_params`: Specifies that query string parameters will be taken into consideration when doing validation (defaults to `true`).
 * `check_content_type`: Specifies that `Content-Type` should be verified according to JSON Hyper-schema definition. (defaults to `true`).
 * `coerce_date_times`: Convert the string with `"format": "date-time"` parameter to DateTime object (default to `false`).
-* `coerce_recursive`: Convert data in array object and nested object (default to `true`).
 * `coerce_form_params`: Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation.
 * `coerce_query_params`: The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string.
 * `coerce_path_params`: The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path.
+* `coerce_recursive`: Coerce data in arrays and other nested objects (default to `true`).
 * `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
 * `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
 * `prefix`: Mounts the middleware to respond at a configured prefix.
@@ -228,11 +229,6 @@ describe Committee::Middleware::Stub do
    end
 end
 ```
-
-## Update from 1.x to 2.x
-
-### coerce_recursive option  
-This option cause breaking changes and default `true`. if you want the behavior as before set `false`.
 
 ## Development
 
