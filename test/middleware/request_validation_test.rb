@@ -7,50 +7,6 @@ describe Committee::Middleware::RequestValidation do
     @app
   end
 
-  ARRAY_PROPERTY = [
-      {
-          "update_time" => "2016-04-01T16:00:00.000+09:00",
-          "per_page" => 1,
-          "nested_coercer_object" => {
-              "update_time" => "2016-04-01T16:00:00.000+09:00",
-              "threshold" => 1.5
-          },
-          "nested_no_coercer_object" => {
-              "per_page" => 1,
-              "threshold" => 1.5
-          },
-          "nested_coercer_array" => [
-              {
-                  "update_time" => "2016-04-01T16:00:00.000+09:00",
-                  "threshold" => 1.5
-              }
-          ],
-          "nested_no_coercer_array" => [
-              {
-                  "per_page" => 1,
-                  "threshold" => 1.5
-              }
-          ],
-          "integer_array" => [
-              1, 2, 3
-          ],
-          "datetime_array" => [
-              "2016-04-01T16:00:00.000+09:00",
-              "2016-04-01T17:00:00.000+09:00",
-              "2016-04-01T18:00:00.000+09:00"
-          ]
-      },
-      {
-          "update_time" => "2016-04-01T16:00:00.000+09:00",
-          "per_page" => 1,
-          "threshold" => 1.5
-      },
-      {
-          "threshold" => 1.5,
-          "per_page" => 1
-      }
-  ]
-
   it "passes through a valid request" do
     @app = new_rack_app(schema: hyper_schema)
     params = {
@@ -79,162 +35,18 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "passes a nested object with recursive option" do
+  it "passes given a datetime and with coerce_date_times enabled on POST endpoint" do
     key_name = "update_time"
     params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium",
-        "array_property" => ARRAY_PROPERTY
+        key_name => "2016-04-01T16:00:00.000+09:00"
     }
 
     check_parameter = lambda { |env|
-      hash = env['rack.request.query_hash']
-      assert_equal DateTime, hash['array_property'].first['update_time'].class
-      assert_equal 1, hash['array_property'].first['per_page']
-      assert_equal DateTime, hash['array_property'].first['nested_coercer_object']['update_time'].class
-      assert_equal 1, hash['array_property'].first['nested_no_coercer_object']['per_page']
-      assert_equal 2, hash['array_property'].first['integer_array'][1]
-      assert_equal DateTime, hash['array_property'].first['datetime_array'][0].class
-      assert_equal DateTime, hash[key_name].class
-      [200, {}, []]
-    }
-
-    @app = new_rack_app_with_lambda(check_parameter,
-                                    coerce_query_params: true,
-                                    coerce_recursive: true,
-                                    coerce_date_times: true,
-                                    schema: hyper_schema)
-
-    get "/search/apps", params
-    assert_equal 200, last_response.status
-  end
-
-  it "passes a nested object with coerce_recursive false" do
-    key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium",
-        "array_property" => ARRAY_PROPERTY
-    }
-
-    @app = new_rack_app(coerce_query_params: true, coerce_date_times: true, coerce_recursive: false, schema: hyper_schema)
-
-    get "/search/apps", params
-    assert_equal 400, last_response.status # schema expect integer but we don't convert string to integer, so 400
-  end
-
-  it "passes a nested object with coerce_recursive default(true)" do
-    key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium",
-        "array_property" => ARRAY_PROPERTY
-    }
-
-    @app = new_rack_app(coerce_query_params: true, coerce_date_times: true, schema: hyper_schema)
-
-    get "/search/apps", params
-    assert_equal 200, last_response.status # schema expect integer but we don't convert string to integer, so 400
-  end
-
-  it "passes given a nested datetime and with coerce_recursive=true and coerce_date_times=true on POST endpoint" do
-    key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "array_property" => ARRAY_PROPERTY
-    }
-
-    check_parameter = lambda { |env|
-      hash = env['committee.params']
-      assert_equal DateTime, hash['array_property'].first['update_time'].class
-      assert_equal 1, hash['array_property'].first['per_page']
-      assert_equal DateTime, hash['array_property'].first['nested_coercer_object']['update_time'].class
-      assert_equal 1, hash['array_property'].first['nested_no_coercer_object']['per_page']
-      assert_equal 2, hash['array_property'].first['integer_array'][1]
-      assert_equal DateTime, hash['array_property'].first['datetime_array'][0].class
       assert_equal DateTime, env['committee.params'][key_name].class
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, coerce_recursive: true, schema: hyper_schema)
-
-    header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
-  end
-
-  it "passes given a nested datetime and with coerce_recursive=true and coerce_date_times=true on POST endpoint" do
-    key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "array_property" => ARRAY_PROPERTY
-    }
-
-    check_parameter = lambda { |env|
-      hash = env['committee.params']
-      assert_equal String, hash['array_property'].first['update_time'].class
-      assert_equal 1, hash['array_property'].first['per_page']
-      assert_equal String, hash['array_property'].first['nested_coercer_object']['update_time'].class
-      assert_equal 1, hash['array_property'].first['nested_no_coercer_object']['per_page']
-      assert_equal 2, hash['array_property'].first['integer_array'][1]
-      assert_equal String, hash['array_property'].first['datetime_array'][0].class
-      assert_equal String, env['committee.params'][key_name].class
-      [200, {}, []]
-    }
-
-    @app = new_rack_app_with_lambda(check_parameter, schema: hyper_schema)
-
-    header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
-  end
-
-  it "passes given a nested datetime and with coerce_recursive=false and coerce_date_times=true on POST endpoint" do
-    key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "array_property" => ARRAY_PROPERTY
-    }
-
-    check_parameter = lambda { |env|
-      hash = env['committee.params']
-      assert_equal String, hash['array_property'].first['update_time'].class
-      assert_equal 1, hash['array_property'].first['per_page']
-      assert_equal String, hash['array_property'].first['nested_coercer_object']['update_time'].class
-      assert_equal 1, hash['array_property'].first['nested_no_coercer_object']['per_page']
-      assert_equal 2, hash['array_property'].first['integer_array'][1]
-      assert_equal String, hash['array_property'].first['datetime_array'][0].class
-      assert_equal DateTime, env['committee.params'][key_name].class
-      [200, {}, []]
-    }
-
-    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, coerce_recursive: false, schema: hyper_schema)
-
-    header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
-  end
-
-  it "passes given a nested datetime and with coerce_recursive=false and coerce_date_times=false on POST endpoint" do
-    key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "array_property" => ARRAY_PROPERTY
-    }
-
-    check_parameter = lambda { |env|
-      hash = env['committee.params']
-      assert_equal String, hash['array_property'].first['update_time'].class
-      assert_equal 1, hash['array_property'].first['per_page']
-      assert_equal String, hash['array_property'].first['nested_coercer_object']['update_time'].class
-      assert_equal 1, hash['array_property'].first['nested_no_coercer_object']['per_page']
-      assert_equal 2, hash['array_property'].first['integer_array'][1]
-      assert_equal String, hash['array_property'].first['datetime_array'][0].class
-      assert_equal String, env['committee.params'][key_name].class
-      [200, {}, []]
-    }
-
-    @app = new_rack_app_with_lambda(check_parameter, schema: hyper_schema)
+    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, schema: hyper_schema)
 
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
@@ -341,12 +153,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "passes through a valid request for OpenAPI" do
-    check_parameter = lambda { |env|
-      assert_equal 3, env['rack.request.query_hash']['limit']
-      [200, {}, []]
-    }
-
-    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_2_schema)
+    @app = new_rack_app(schema: open_api_2_schema)
     get "/api/pets?limit=3"
     assert_equal 200, last_response.status
   end
