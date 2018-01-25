@@ -2,10 +2,12 @@ language: ruby
 rvm:
   - 1.9.3
   - 2.0.0-p648
-  - 2.1.8
-  - 2.2.4
-  - 2.3.0
-  - 2.4.1
+  - 2.1.10
+  - 2.2.9
+  - 2.3.6
+  - 2.4.3
+  - 2.5.0
+  - ruby-head
 
 cache: bundler
 
@@ -18,3 +20,7 @@ sudo: false
 
 git:
   depth: 10
+
+matrix:
+  allow_failures:
+    - rvm: ruby-head
