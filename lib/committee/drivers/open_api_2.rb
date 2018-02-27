@@ -190,9 +190,9 @@ module Committee::Drivers
     ].map(&:to_s).freeze
 
     def find_best_fit_response(link_data)
-      if response_data = link_data["responses"]["200"]
+      if response_data = link_data["responses"]["200"] || response_data = link_data["responses"][200]
         [200, response_data]
-      elsif response_data = link_data["responses"]["201"]
+      elsif response_data = link_data["responses"]["201"] || response_data = link_data["responses"][201]
         [201, response_data]
       else
         # Sort responses so that we can try to prefer any 3-digit status code.
