@@ -1,5 +1,8 @@
 Unreleased
 
+2.0.1 2017-02-27
+	Support either a string *or* an integer for status code responses (#125)
+
 2.0.0 2017-09-05
 	Add support for OpenAPI 2.0
 	Add support for coercing types in form bodies (default on for OpenAPI 2.0)
