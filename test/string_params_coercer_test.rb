@@ -5,7 +5,7 @@ describe Committee::StringParamsCoercer do
     @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
     # GET /search/apps
-    @link = @link = @schema.properties["app"].links[5]
+    @link = @schema.properties["app"].links[5]
   end
 
   it "doesn't coerce params not in the schema" do

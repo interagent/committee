@@ -8,7 +8,7 @@ describe Committee::RequestValidator do
       @schema = JsonSchema.parse!(hyper_schema_data)
       @schema.expand_references!
       # POST /apps/:id
-      @link = @link = @schema.properties["app"].links[0]
+      @link = @schema.properties["app"].links[0]
       @request = Rack::Request.new({
                                      "CONTENT_TYPE"   => "application/json",
                                      "rack.input"     => StringIO.new("{}"),
@@ -65,7 +65,7 @@ describe Committee::RequestValidator do
 
     it "detects an missing parameter in GET requests" do
       # GET /apps/search?query=...
-      @link = @link = @schema.properties["app"].links[5]
+      @link = @schema.properties["app"].links[5]
       @request = Rack::Request.new({})
       e = assert_raises(Committee::InvalidRequest) do
         call({})
