@@ -9,7 +9,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request).call
+    params, _ = Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -18,7 +18,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request).call
+    params, _ = Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -28,7 +28,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request).call
+    params, _ = Committee::RequestUnpacker.new(request).call
     assert_equal({}, params)
   end
 
@@ -38,7 +38,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request, optimistic_json: true).call
+    params, _ = Committee::RequestUnpacker.new(request, optimistic_json: true).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -48,7 +48,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('x=y&foo=42'),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request, optimistic_json: true).call
+    params, _ = Committee::RequestUnpacker.new(request, optimistic_json: true).call
     assert_equal({}, params)
   end
 
@@ -58,7 +58,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new(""),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request).call
+    params, _ = Committee::RequestUnpacker.new(request).call
     assert_equal({}, params)
   end
 
@@ -68,7 +68,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new("x=y"),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request).call
+    params, _ = Committee::RequestUnpacker.new(request).call
     assert_equal({}, params)
   end
 
@@ -78,7 +78,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new("x=y"),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request, allow_form_params: true).call
+    params, _ = Committee::RequestUnpacker.new(request, allow_form_params: true).call
     assert_equal({ "x" => "y" }, params)
   end
 
@@ -92,7 +92,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new("x=1"),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(
+    params, _ = Committee::RequestUnpacker.new(
       request,
       allow_form_params: true,
       coerce_form_params: true,
@@ -108,7 +108,7 @@ describe Committee::RequestUnpacker do
       "QUERY_STRING" => "a=b"
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request, allow_form_params: true, allow_query_params: true).call
+    params, _ = Committee::RequestUnpacker.new(request, allow_form_params: true, allow_query_params: true).call
     assert_equal({ "x" => "y", "a" => "b" }, params)
   end
 
@@ -118,7 +118,7 @@ describe Committee::RequestUnpacker do
       "QUERY_STRING" => "a=b"
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request, allow_query_params: true).call
+    params, _ = Committee::RequestUnpacker.new(request, allow_query_params: true).call
     assert_equal({ "a" => "b" }, params)
   end
 
@@ -139,7 +139,7 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request).call
+    params, _ = Committee::RequestUnpacker.new(request).call
     assert_equal({}, params)
   end
 
@@ -149,7 +149,17 @@ describe Committee::RequestUnpacker do
       "rack.input" => StringIO.new('{"x":[]}'),
     }
     request = Rack::Request.new(env)
-    params = Committee::RequestUnpacker.new(request).call
+    params, _ = Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => [] }, params)
+  end
+
+  it "unpacks http header" do
+    env = {
+      "HTTP_FOO_BAR" => "some header value",
+      "rack.input"   => StringIO.new(""),
+    }
+    request = Rack::Request.new(env)
+    _, headers = Committee::RequestUnpacker.new(request, { allow_header_params: true }).call
+    assert_equal({ "FOO-BAR" => "some header value" }, headers)
   end
 end

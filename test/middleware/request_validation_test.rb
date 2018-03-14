@@ -347,13 +347,13 @@ describe Committee::Middleware::RequestValidation do
     }
 
     @app = new_rack_app_with_lambda(check_parameter, schema: open_api_2_schema)
-    get "/api/pets?limit=3"
+    get "/api/pets?limit=3", nil, { "HTTP_AUTH_TOKEN" => "xxx" }
     assert_equal 200, last_response.status
   end
 
   it "detects an invalid request for OpenAPI" do
     @app = new_rack_app(schema: open_api_2_schema)
-    get "/api/pets?limit=foo"
+    get "/api/pets?limit=foo", nil, { "HTTP_AUTH_TOKEN" => "xxx" }
     assert_equal 400, last_response.status
     assert_match /invalid request/i, last_response.body
   end

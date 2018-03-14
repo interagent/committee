@@ -81,19 +81,66 @@ module Committee::Drivers
       # data.
       attr_accessor :target_schema
 
+      attr_accessor :header_schema
+
       def rel
         raise "Committee: rel not implemented for OpenAPI"
+      end
+    end
+
+    class SchemaBuilder
+      def initialize(link_data)
+        self.link_data = link_data
+      end
+
+      private
+
+      LINK_REQUIRED_FIELDS = [
+        :name
+      ].map(&:to_s).freeze
+
+      attr_accessor :link_data
+
+      def check_required_fields!(param_data)
+        LINK_REQUIRED_FIELDS.each do |field|
+          if !param_data[field]
+            raise ArgumentError,
+                  "Committee: no #{field} section in link data."
+          end
+        end
+      end
+    end
+
+    class HeaderSchemaBuilder < SchemaBuilder
+      def call
+        if link_data["parameters"]
+          link_schema = JsonSchema::Schema.new
+          link_schema.properties = {}
+          link_schema.required = []
+
+          header_parameters = link_data["parameters"].select { |param_data| param_data["in"] == "header" }
+          header_parameters.each do |param_data|
+            check_required_fields!(param_data)
+
+            param_schema = JsonSchema::Schema.new
+
+            param_schema.type = [param_data["type"]]
+
+            link_schema.properties[param_data["name"]] = param_schema
+            if param_data["required"] == true
+              link_schema.required << param_data["name"]
+            end
+          end
+
+          link_schema
+        end
       end
     end
 
     # ParameterSchemaBuilder converts OpenAPI 2 link parameters, which are not
     # quite JSON schemas (but will be in OpenAPI 3) into synthetic schemas that
     # we can use to do some basic request validation.
-    class ParameterSchemaBuilder
-      def initialize(link_data)
-        self.link_data = link_data
-      end
-
+    class ParameterSchemaBuilder < SchemaBuilder
       # Returns a tuple of (schema, schema_data) where only one of the two
       # values is present. This is either a full schema that's ready to go _or_
       # a hash of unparsed schema data.
@@ -115,7 +162,8 @@ module Committee::Drivers
             link_schema.properties = {}
             link_schema.required = []
 
-            link_data["parameters"].each do |param_data|
+            parameters = link_data["parameters"].reject { |param_data| param_data["in"] == "header" }
+            parameters.each do |param_data|
               check_required_fields!(param_data)
 
               param_schema = JsonSchema::Schema.new
@@ -140,23 +188,6 @@ module Committee::Drivers
             end
 
             [link_schema, nil]
-          end
-        end
-      end
-
-      private
-
-      LINK_REQUIRED_FIELDS = [
-        :name
-      ].map(&:to_s).freeze
-
-      attr_accessor :link_data
-
-      def check_required_fields!(param_data)
-        LINK_REQUIRED_FIELDS.each do |field|
-          if !param_data[field]
-            raise ArgumentError,
-              "Committee: no #{field} section in link data."
           end
         end
       end
@@ -266,6 +297,7 @@ module Committee::Drivers
           # Convert the spec's parameter pseudo-schemas into JSON schemas that
           # we can use for some basic request validation.
           link.schema, schema_data = ParameterSchemaBuilder.new(link_data).call
+          link.header_schema = HeaderSchemaBuilder.new(link_data).call
 
           # If data came back instead of a schema (this occurs when a route has
           # a single `body` parameter instead of a collection of URL/query/form

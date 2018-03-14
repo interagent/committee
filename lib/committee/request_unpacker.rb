@@ -40,9 +40,9 @@ module Committee
       end
 
       if @allow_query_params
-        indifferent_params(@request.GET).merge(params)
+        [indifferent_params(@request.GET).merge(params), headers]
       else
-        params
+        [params, headers]
       end
     end
 
@@ -85,6 +85,15 @@ module Committee
       # if request body is empty, we just have empty params
       else
         nil
+      end
+    end
+
+    def headers
+      env = @request.env
+      env.keys.grep(/HTTP_/).inject({}) do |headers, key|
+        headerized_key = key.gsub(/^HTTP_/, '').gsub(/_/, '-')
+        headers[headerized_key] = env[key]
+        headers
       end
     end
   end

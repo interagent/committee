@@ -6,6 +6,7 @@ module Committee::Middleware
       @allow_form_params   = options.fetch(:allow_form_params, true)
       @allow_query_params  = options.fetch(:allow_query_params, true)
       @check_content_type  = options.fetch(:check_content_type, true)
+      @check_header        = options.fetch(:check_header, true)
       @optimistic_json     = options.fetch(:optimistic_json, false)
       @strict              = options[:strict]
       @coerce_date_times   = options.fetch(:coerce_date_times, false)
@@ -39,7 +40,7 @@ module Committee::Middleware
         end
       end
 
-      request.env[@params_key] = Committee::RequestUnpacker.new(
+      request.env[@params_key], request.env[@headers_key] = Committee::RequestUnpacker.new(
         request,
         allow_form_params:  @allow_form_params,
         allow_query_params: @allow_query_params,
@@ -51,8 +52,8 @@ module Committee::Middleware
       request.env[@params_key].merge!(param_matches) if param_matches
 
       if link
-        validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
-        validator.call(request, request.env[@params_key])
+        validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type, check_header: @check_header)
+        validator.call(request, request.env[@params_key], request.env[@headers_key])
 
         parameter_coerce!(request, link, @params_key)
         parameter_coerce!(request, link, "rack.request.query_hash") if !request.GET.nil? && !link.schema.nil?

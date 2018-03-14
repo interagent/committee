@@ -50,6 +50,13 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          },
+          {
+            "name": "AUTH-TOKEN",
+            "in": "header",
+            "description": "authorization token",
+            "required": true,
+            "type": "string"
           }
         ],
         "responses": {
