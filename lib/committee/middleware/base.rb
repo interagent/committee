@@ -5,6 +5,7 @@ module Committee::Middleware
 
       @error_class = options.fetch(:error_class, Committee::ValidationError)
       @params_key = options[:params_key] || "committee.params"
+      @headers_key = options[:headers_key] || "committee.headers"
       @raise = options[:raise]
       @schema = get_schema(options[:schema] ||
         raise(ArgumentError, "Committee: need option `schema`"))

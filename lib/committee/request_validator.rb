@@ -3,12 +3,21 @@ module Committee
     def initialize(link, options = {})
       @link = link
       @check_content_type = options.fetch(:check_content_type, true)
+      @check_header = options.fetch(:check_header, true)
     end
 
-    def call(request, data)
-      check_content_type!(request, data) if @check_content_type
+    def call(request, params, headers)
+      check_content_type!(request, params) if @check_content_type
       if @link.schema
-        valid, errors = @link.schema.validate(data)
+        valid, errors = @link.schema.validate(params)
+        if !valid
+          errors = JsonSchema::SchemaError.aggregate(errors).join("\n")
+          raise InvalidRequest, "Invalid request.\n\n#{errors}"
+        end
+      end
+
+      if @check_header && @link.respond_to?(:header_schema) && @link.header_schema
+        valid, errors = @link.header_schema.validate(headers)
         if !valid
           errors = JsonSchema::SchemaError.aggregate(errors).join("\n")
           raise InvalidRequest, "Invalid request.\n\n#{errors}"

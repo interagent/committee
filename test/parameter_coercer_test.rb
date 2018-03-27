@@ -7,7 +7,7 @@ describe Committee::ParameterCoercer do
     @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
     # POST /apps/:id
-    @link = @link = @schema.properties["app"].links[0]
+    @link = @schema.properties["app"].links[0]
   end
 
   it "pass datetime string" do
