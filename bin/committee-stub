@@ -9,16 +9,14 @@ args = ARGV.dup
 bin = Committee::Bin::CommitteeStub.new
 options, parser = bin.get_options_parser
 
-if $0 == __FILE__
-  parser.parse!(args)
+parser.parse!(args)
 
-  unless args.count == 1 || options[:help] || !options[:driver]
-    puts parser.to_s
-    exit
-  end
-
-  driver = Committee::Drivers.driver_from_name(options[:driver])
-  schema = driver.parse(::YAML.load(File.read(args[0])))
-
-  Rack::Server.start(app: bin.get_app(schema, options), Port: options[:port])
+unless args.count == 1 || options[:help] || !options[:driver]
+  puts parser.to_s
+  exit
 end
+
+driver = Committee::Drivers.driver_from_name(options[:driver])
+schema = driver.parse(::YAML.load(File.read(args[0])))
+
+Rack::Server.start(app: bin.get_app(schema, options), Port: options[:port])
