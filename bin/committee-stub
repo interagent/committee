@@ -11,7 +11,7 @@ options, parser = bin.get_options_parser
 
 parser.parse!(args)
 
-unless args.count == 1 || options[:help] || !options[:driver]
+if options[:help] || !options[:driver]
   puts parser.to_s
   exit
 end
