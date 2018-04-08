@@ -13,10 +13,9 @@ parser.parse!(args)
 
 if options[:help] || !options[:driver]
   puts parser.to_s
-  exit
+else
+  driver = Committee::Drivers.driver_from_name(options[:driver])
+  schema = driver.parse(::YAML.load(File.read(args[0])))
+
+  Rack::Server.start(app: bin.get_app(schema, options), Port: options[:port])
 end
-
-driver = Committee::Drivers.driver_from_name(options[:driver])
-schema = driver.parse(::YAML.load(File.read(args[0])))
-
-Rack::Server.start(app: bin.get_app(schema, options), Port: options[:port])
