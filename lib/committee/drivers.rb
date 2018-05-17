@@ -8,6 +8,8 @@ module Committee
         Committee::Drivers::HyperSchema.new
       when :open_api_2
         Committee::Drivers::OpenAPI2.new
+      when :open_api_3
+        Committee::Drivers::OpenAPI3.new
       else
         raise ArgumentError, %{Committee: unknown driver "#{name}".}
       end

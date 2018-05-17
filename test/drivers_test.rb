@@ -4,6 +4,7 @@ describe Committee::Drivers do
   DRIVERS = [
     :hyper_schema,
     :open_api_2,
+    :open_api_3,
   ].freeze
 
   it "gets driver with .driver_from_name" do

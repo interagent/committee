@@ -146,4 +146,37 @@ describe Committee::RequestValidator do
       Committee::RequestValidator.new(@link, options).call(@request, data, headers)
     end
   end
+
+  describe 'OpenAPI 3' do
+    before do
+      @schema = open_api_3_schema
+      @link = @schema.routes['GET'][0][1]
+      @request = Rack::Request.new({
+                                     "CONTENT_TYPE"   => "application/json",
+                                     "rack.input"     => StringIO.new("{}"),
+                                     "REQUEST_METHOD" => "POST"
+                                   })
+    end
+
+
+    it "passes through a valid request" do
+      headers = {
+        "AUTH-TOKEN" => "xxx"
+      }
+      call({}, headers)
+    end
+
+    it "allows skipping header schema check" do
+      @link = @schema.routes['GET'][0][1]
+      @request = Rack::Request.new({})
+      call({}, {}, { check_header: false })
+    end
+
+    private
+
+    def call(data, headers={}, options={})
+      # hyper-schema link should be dropped into driver wrapper before it's used
+      Committee::RequestValidator.new(@link, options).call(@request, data, headers)
+    end
+  end
 end
