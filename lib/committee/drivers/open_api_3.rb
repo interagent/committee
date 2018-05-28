@@ -1,6 +1,7 @@
 module Committee::Drivers
   class OpenAPI3 < Committee::Drivers::Driver
     # Whether parameters that were form-encoded will be coerced by default.
+    # TODO: check these options below
     def default_coerce_form_params
       true
     end
@@ -55,6 +56,9 @@ module Committee::Drivers
 
     # Link abstracts an API link specifically for OpenAPI 3.
     class Link
+      # The link's input media type. i.e. How requests should be encoded.
+      attr_accessor :enc_type
+
       attr_accessor :href
 
       # The link's output media type. i.e. How responses should be encoded.
@@ -128,7 +132,7 @@ module Committee::Drivers
       end
     end
 
-    # ParameterSchemaBuilder converts OpenAPI 2 link parameters, which are not
+    # ParameterSchemaBuilder converts OpenAPI 3 link parameters, which are not
     # quite JSON schemas (but will be in OpenAPI 3) into synthetic schemas that
     # we can use to do some basic request validation.
     class ParameterSchemaBuilder < SchemaBuilder
@@ -187,10 +191,10 @@ module Committee::Drivers
     class Schema < Committee::Drivers::Schema
       # A link back to the derivative instace of Committee::Drivers::Driver
       # that create this schema.
+      attr_accessor :base_path
       attr_accessor :driver
 
       attr_accessor :components
-      attr_accessor :produces
       attr_accessor :routes
     end
 
@@ -276,7 +280,6 @@ module Committee::Drivers
 
           link = Link.new
           link.href = href
-          link.media_type = schema.produces
           link.method = method
 
           # Convert the spec's parameter pseudo-schemas into JSON schemas that
@@ -302,6 +305,7 @@ module Committee::Drivers
               target_schemas_data["properties"][href]["properties"][method] =
                 response_data["schema"]
             end
+            # link.media_type = response_data["content"]&.keys&.first
           end
 
           rx = %r{^#{href_to_regex(link.href)}$}
