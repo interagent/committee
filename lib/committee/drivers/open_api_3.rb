@@ -42,8 +42,6 @@ module Committee::Drivers
       schema = Schema.new
       schema.driver = self
 
-      schema.base_path = '' # TODO: need parse data['servers'][0].url host part
-
       schema.components, store = parse_components!(data)
       schema.routes = parse_routes!(data, schema, store)
 
@@ -141,49 +139,51 @@ module Committee::Drivers
       # a hash of unparsed schema data.
       def call
         if link_data["parameters"]
-          body_param = link_data["parameters"].detect { |p| p["in"] == "body" }
-          if body_param
-            check_required_fields!(body_param)
+          # body_param = link_data["parameters"].detect { |p| p["in"] == "body" }
+          # if body_param
+          #   check_required_fields!(body_param)
+          #
+          #   if link_data["parameters"].detect { |p| p["in"] == "form" } != nil
+          #     raise ArgumentError, "Committee: can't mix body parameter " \
+          #       "with form parameters."
+          #   end
+          #
+          #   schema_data = body_param["schema"]
+          #   [nil, schema_data]
+          # else
+          link_schema = JsonSchema::Schema.new
+          link_schema.properties = {}
+          link_schema.required = []
 
-            if link_data["parameters"].detect { |p| p["in"] == "form" } != nil
-              raise ArgumentError, "Committee: can't mix body parameter " \
-                "with form parameters."
+          parameters = link_data["parameters"].reject { |param_data| param_data["in"] == "header" }
+          parameters.each do |param_data|
+            check_required_fields!(param_data)
+
+            param_schema = JsonSchema::Schema.new
+
+            # We could probably use more validation here, but the formats of
+            # OpenAPI 2 are based off of what's available in JSON schema, and
+            # therefore this should map over quite well.
+            param_schema.type = [param_data["schema"]["type"]] if param_data["schema"].is_a?(Hash)
+
+            # And same idea: despite parameters not being schemas, the items
+            # key (if preset) is actually a schema that defines each item of an
+            # array type, so we can just reflect that directly onto our
+            # artifical schema.
+            if param_data["schema"].is_a?(Hash) && param_data["schema"]["type"] == "array" && param_data["schema"]["items"]
+              param_schema.items = param_data["schema"]["items"]
             end
 
-            schema_data = body_param["schema"]
-            [nil, schema_data]
-          else
-            link_schema = JsonSchema::Schema.new
-            link_schema.properties = {}
-            link_schema.required = []
-
-            parameters = link_data["parameters"].reject { |param_data| param_data["in"] == "header" }
-            parameters.each do |param_data|
-              check_required_fields!(param_data)
-
-              param_schema = JsonSchema::Schema.new
-
-              # We could probably use more validation here, but the formats of
-              # OpenAPI 2 are based off of what's available in JSON schema, and
-              # therefore this should map over quite well.
-              param_schema.type = [param_data["type"]]
-
-              # And same idea: despite parameters not being schemas, the items
-              # key (if preset) is actually a schema that defines each item of an
-              # array type, so we can just reflect that directly onto our
-              # artifical schema.
-              if param_data["type"] == "array" && param_data["items"]
-                param_schema.items = param_data["items"]
-              end
-
-              link_schema.properties[param_data["name"]] = param_schema
-              if param_data["required"] == true
-                link_schema.required << param_data["name"]
-              end
+            link_schema.properties[param_data["name"]] = param_schema
+            if param_data["required"] == true
+              link_schema.required << param_data["name"]
             end
-
-            [link_schema, nil]
           end
+          [link_schema, nil]
+        # elsif link_data["requestBody"]
+        #   body_param = link_data["requestBody"]
+        #   schema_data = body_param["content"]["application/json"]["schema"] # check only first item
+        #   [nil, schema_data]
         end
       end
     end
@@ -191,7 +191,6 @@ module Committee::Drivers
     class Schema < Committee::Drivers::Schema
       # A link back to the derivative instace of Committee::Drivers::Driver
       # that create this schema.
-      attr_accessor :base_path
       attr_accessor :driver
 
       attr_accessor :components
@@ -271,15 +270,14 @@ module Committee::Drivers
       target_schemas_data = { "properties" => {} }
 
       data['paths'].each do |path, methods|
-        href = schema.base_path + path
-        schemas_data["properties"][href] = { "properties" => {} }
-        target_schemas_data["properties"][href] = { "properties" => {} }
+        schemas_data["properties"][path] = { "properties" => {} }
+        target_schemas_data["properties"][path] = { "properties" => {} }
 
         methods.each do |method, link_data|
           method = method.upcase
 
           link = Link.new
-          link.href = href
+          link.href = path
           link.method = method
 
           # Convert the spec's parameter pseudo-schemas into JSON schemas that
@@ -291,7 +289,7 @@ module Committee::Drivers
           # a single `body` parameter instead of a collection of URL/query/form
           # parameters), store it for later parsing.
           if schema_data
-            schemas_data["properties"][href]["properties"][method] = schema_data
+            schemas_data["properties"][path]["properties"][method] = schema_data
           end
 
           # Arbitrarily pick one response for the time being. Prefers in order:
@@ -301,9 +299,9 @@ module Committee::Drivers
             link.status_success = status
 
             # A link need not necessarily specify a target schema.
-            if response_data["schema"]
-              target_schemas_data["properties"][href]["properties"][method] =
-                response_data["schema"]
+            if response_data
+              target_schemas_data["properties"][path]["properties"][method] =
+                response_data
             end
             # link.media_type = response_data["content"]&.keys&.first
           end
