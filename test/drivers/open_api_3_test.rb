@@ -52,8 +52,20 @@ describe Committee::Drivers::OpenAPI3 do
   # TODO: fix response
   it "prefers a 200 response first" do
     schema_data = schema_data_with_responses({
-      "201" => { "description" => "201 response", },
-      "200" => { "description" => "200 response", }
+      "201" => {
+        "content" => {
+          "application/json" => {
+            "schema" => { "description" => "201 response", }
+          }
+        }
+      },
+      "200" => {
+        "content" => {
+          "application/json" => {
+            "schema" => { "description" => "200 response", }
+          }
+        }
+      }
     })
 
     schema = @driver.parse(schema_data)
@@ -64,8 +76,20 @@ describe Committee::Drivers::OpenAPI3 do
 
   it "prefers a 201 response next" do
     schema_data = schema_data_with_responses({
-      "302" => { "description" => "302 response", },
-      "201" => { "description" => "201 response", },
+      "302" => {
+        "content" => {
+          "application/json" => {
+            "schema" => { "description" => "302 response", }
+          }
+        }
+      },
+      "201" => {
+        "content" => {
+          "application/json" => {
+            "schema" => { "description" => "201 response", }
+          }
+        }
+      }
     })
 
     schema = @driver.parse(schema_data)
@@ -76,8 +100,20 @@ describe Committee::Drivers::OpenAPI3 do
 
   it "prefers any three-digit response next" do
     schema_data = schema_data_with_responses({
-      'default' => { 'schema' => { 'description' => 'default response' } },
-      "302" => { "description" => "302 response", },
+      "default" => {
+        "content" => {
+          "application/json" => {
+            "schema" => { "description" => "default response", }
+          }
+        }
+      },
+      "302" => {
+        "content" => {
+          "application/json" => {
+            "schema" => { "description" => "302 response", }
+          }
+        }
+      }
     })
 
     schema = @driver.parse(schema_data)
@@ -252,18 +288,12 @@ describe Committee::Drivers::OpenAPI3::ParameterSchemaBuilder do
 
   # it "returns schema data for a body parameter" do
   #   data = {
-  #     "parameters" => [
-  #       {
-  #         "name" => "payload",
-  #         "in" => "body",
-  #         "schema" => {
-  #           "$ref" => "#/definitions/foo",
-  #         }
-  #       }
-  #     ]
+  #     "requestBody" => {
+  #       "description": "body",
+  #     }
   #   }
   #   schema, schema_data = call(data)
-  #
+
   #   assert_nil schema
   #   assert_equal({ "$ref" => "#/definitions/foo" }, schema_data)
   # end

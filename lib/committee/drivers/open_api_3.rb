@@ -210,17 +210,23 @@ module Committee::Drivers
     ].map(&:to_s).freeze
 
     def find_best_fit_response(link_data)
-      if response_data = link_data["responses"]["200"] || response_data = link_data["responses"][200]
-        [200, response_data]
-      elsif response_data = link_data["responses"]["201"] || response_data = link_data["responses"][201]
-        [201, response_data]
+      response_data_200 =
+        link_data["responses"]['200'] || link_data["responses"][200]
+
+      response_data_201 =
+        link_data["responses"]['201'] || link_data["responses"][201]
+
+      if response_data_200 && digged_response_data_200 = response_data_200.dig("content", "application/json", "schema")
+        [200, digged_response_data_200]
+      elsif response_data_201 && digged_response_data_201 = response_data_201.dig("content", "application/json", "schema")
+        [201, digged_response_data_201]
       else
         # Sort responses so that we can try to prefer any 3-digit status code.
         # If there are none, we'll just take anything from the list.
-        ordered_responses = link_data["responses"].
-          select { |k, v| k =~ /[0-9]{3}/ }
-        if first = ordered_responses.first
-          [first[0].to_i, first[1]]
+        first_ordered_response = link_data["responses"].
+          select { |k, v| k =~ /[0-9]{3}/ }.first
+        if first_ordered_response && digged_response = first_ordered_response[1].dig("content", "application/json", "schema")
+          [first_ordered_response[0].to_i, digged_response]
         else
           [nil, nil]
         end
