@@ -17,7 +17,7 @@ describe Committee::Drivers::OpenAPI3 do
   it "parses an OpenAPI 3 spec" do
     schema = @driver.parse(open_api_3_data)
     assert_kind_of Committee::Drivers::OpenAPI3::Schema, schema
-    assert_kind_of JsonSchema::Schema, schema.components
+    assert_kind_of JsonSchema::Schema, schema.definitions
     assert_equal @driver, schema.driver
 
     assert_kind_of Hash, schema.routes
@@ -174,7 +174,7 @@ describe Committee::Drivers::OpenAPI3 do
           },
         },
       },
-      'components' => {},
+      'definitions' => {},
     }
   end
 end

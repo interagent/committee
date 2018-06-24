@@ -28,6 +28,7 @@ module Committee::Drivers
     # The expected input format is a data hash with keys as strings (as opposed
     # to symbols) like the kind produced by JSON.parse or YAML.load.
     def parse(data)
+      data = convert_components_to_definitions(data)
       REQUIRED_FIELDS.each do |field|
         if !data[field]
           raise ArgumentError, "Committee: no #{field} section in spec data."
@@ -42,7 +43,7 @@ module Committee::Drivers
       schema = Schema.new
       schema.driver = self
 
-      schema.components, store = parse_components!(data)
+      schema.definitions, store = parse_definitions!(data)
       schema.routes = parse_routes!(data, schema, store)
 
       schema
@@ -50,6 +51,14 @@ module Committee::Drivers
 
     def schema_class
       Committee::Drivers::OpenAPI3::Schema
+    end
+
+    def convert_components_to_definitions(data)
+      JSON.parse(
+        data.to_json.
+        gsub('"components":', '"definitions":').
+        gsub("#/components/schemas", "#/definitions")
+      )
     end
 
     # Link abstracts an API link specifically for OpenAPI 3.
@@ -193,7 +202,7 @@ module Committee::Drivers
       # that create this schema.
       attr_accessor :driver
 
-      attr_accessor :components
+      attr_accessor :definitions
       attr_accessor :routes
     end
 
@@ -237,25 +246,26 @@ module Committee::Drivers
       href.gsub(/\{(.*?)\}/, '(?<\1>[^/]+)')
     end
 
-    def parse_components!(data)
-      # The "components" section of an OpenAPI 2 spec is a valid JSON schema.
+    def parse_definitions!(data)
+      # The "definitions" section of an OpenAPI 2 spec is a valid JSON schema.
       # We extract it from the spec and parse it as a schema in isolation so
       # that all references to it will still have correct paths (i.e. we can
-      # still find a resource at '#/components/resource' instead of
+      # still find a resource at '#/definitions/resource' instead of
       # '#/resource').
       schema = JsonSchema.parse!({
-        "components" => data['components'],
+        "definitions" => data['definitions']['schemas'],
       })
+      # schema = JsonSchema.parse!(data)
       schema.expand_references!
       schema.uri = DEFINITIONS_PSEUDO_URI
 
       # So this is a little weird: an OpenAPI specification is _not_ a valid
       # JSON schema and yet it self-references like it is a valid JSON schema.
-      # To work around this what we do is parse its "components" section as a
+      # To work around this what we do is parse its "definitions" section as a
       # JSON schema and then build a document store here containing that. When
       # trying to resolve a reference from elsewhere in the spec, we build a
       # synthetic schema with a JSON reference to the document created from
-      # "components" and then expand references against this store.
+      # "definitions" and then expand references against this store.
       store = JsonSchema::DocumentStore.new
       store.add_schema(schema)
 
@@ -321,8 +331,8 @@ module Committee::Drivers
       end
 
       # See the note on our DocumentStore's initialization in
-      # #parse_components!, but what we're doing here is prefixing references
-      # with a specialized internal URI so that they can reference components
+      # #parse_definitions!, but what we're doing here is prefixing references
+      # with a specialized internal URI so that they can reference definitions
       # from another document in the store.
       schemas =
         rewrite_references_and_parse(schemas_data, store)
