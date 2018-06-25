@@ -1,7 +1,6 @@
 module Committee::Drivers
   class OpenAPI3 < Committee::Drivers::Driver
     # Whether parameters that were form-encoded will be coerced by default.
-    # TODO: check these options below
     def default_coerce_form_params
       true
     end
@@ -53,6 +52,7 @@ module Committee::Drivers
       Committee::Drivers::OpenAPI3::Schema
     end
 
+    # gem json_schema seems not support #components so so far it needs to be converted to #definitions
     def convert_components_to_definitions(data)
       JSON.parse(
         data.to_json.
@@ -139,7 +139,7 @@ module Committee::Drivers
       end
     end
 
-    # ParameterSchemaBuilder converts OpenAPI 3 link parameters, which are not
+    # ParameterSchemaBuilder converts OpenAPI 2 link parameters, which are not
     # quite JSON schemas (but will be in OpenAPI 3) into synthetic schemas that
     # we can use to do some basic request validation.
     class ParameterSchemaBuilder < SchemaBuilder
@@ -148,18 +148,6 @@ module Committee::Drivers
       # a hash of unparsed schema data.
       def call
         if link_data["parameters"]
-          # body_param = link_data["parameters"].detect { |p| p["in"] == "body" }
-          # if body_param
-          #   check_required_fields!(body_param)
-          #
-          #   if link_data["parameters"].detect { |p| p["in"] == "form" } != nil
-          #     raise ArgumentError, "Committee: can't mix body parameter " \
-          #       "with form parameters."
-          #   end
-          #
-          #   schema_data = body_param["schema"]
-          #   [nil, schema_data]
-          # else
           link_schema = JsonSchema::Schema.new
           link_schema.properties = {}
           link_schema.required = []
@@ -189,10 +177,10 @@ module Committee::Drivers
             end
           end
           [link_schema, nil]
-        # elsif link_data["requestBody"]
-        #   body_param = link_data["requestBody"]
-        #   schema_data = body_param["content"]["application/json"]["schema"] # check only first item
-        #   [nil, schema_data]
+        elsif link_data["requestBody"]
+          body_param = link_data["requestBody"]
+          schema_data = body_param["content"]["application/json"]["schema"] # check only first item
+          [nil, schema_data]
         end
       end
     end

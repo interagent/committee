@@ -1,5 +1,4 @@
 require_relative "../test_helper"
-require 'pry'
 
 describe Committee::Drivers::HyperSchema do
   before do

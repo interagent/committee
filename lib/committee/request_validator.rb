@@ -1,4 +1,3 @@
-require 'pry'
 module Committee
   class RequestValidator
     def initialize(link, options = {})

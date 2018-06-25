@@ -1,5 +1,4 @@
 require_relative "../test_helper"
-require 'pry'
 
 describe Committee::Drivers::OpenAPI3 do
   before do
@@ -286,17 +285,23 @@ describe Committee::Drivers::OpenAPI3::ParameterSchemaBuilder do
     assert_equal({ "type" => "string" }, schema.properties["tags"].items)
   end
 
-  # it "returns schema data for a body parameter" do
-  #   data = {
-  #     "requestBody" => {
-  #       "description": "body",
-  #     }
-  #   }
-  #   schema, schema_data = call(data)
+  it "returns schema data for a requestBody parameter" do
+    data = {
+      "requestBody" => {
+        "content" => {
+          "application/json" => {
+            "schema" => {
+            "$ref" => "#/components/schemas/foo",
+            }
+          }
+        }
+      }
+    }
+    schema, schema_data = call(data)
 
-  #   assert_nil schema
-  #   assert_equal({ "$ref" => "#/definitions/foo" }, schema_data)
-  # end
+    assert_nil schema
+    assert_equal({ "$ref" => "#/components/schemas/foo" }, schema_data)
+  end
 
   it "requires that certain fields are present" do
     data = {
@@ -310,26 +315,6 @@ describe Committee::Drivers::OpenAPI3::ParameterSchemaBuilder do
     end
     assert_equal "Committee: no name section in link data.", e.message
   end
-  #
-  # it "requires that body parameters not be mixed with form parameters" do
-  #   data = {
-  #     "parameters" => [
-  #       {
-  #         "name" => "payload",
-  #         "in" => "body",
-  #       },
-  #       {
-  #         "name" => "limit",
-  #         "in" => "form",
-  #       },
-  #     ]
-  #   }
-  #   e = assert_raises ArgumentError do
-  #     call(data)
-  #   end
-  #   assert_equal "Committee: can't mix body parameter with form parameters.",
-  #     e.message
-  # end
 
   def call(data)
     Committee::Drivers::OpenAPI3::ParameterSchemaBuilder.new(data).call
