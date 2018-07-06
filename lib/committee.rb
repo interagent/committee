@@ -15,6 +15,7 @@ require_relative "committee/validation_error"
 require_relative "committee/drivers"
 require_relative "committee/drivers/hyper_schema"
 require_relative "committee/drivers/open_api_2"
+require_relative "committee/drivers/open_api_3"
 
 require_relative "committee/middleware/base"
 require_relative "committee/middleware/request_validation"
