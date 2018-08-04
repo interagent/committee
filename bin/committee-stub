@@ -11,7 +11,8 @@ options, parser = bin.get_options_parser
 
 parser.parse!(args)
 
-if options[:help] || !options[:driver]
+if options[:help] || !options[:driver] || args.length < 1
+  # shows help information
   puts parser.to_s
 else
   driver = Committee::Drivers.driver_from_name(options[:driver])
