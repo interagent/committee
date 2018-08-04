@@ -121,7 +121,12 @@ describe Committee::StringParamsCoercer do
   def check_convert(key, before_value, after_value)
     data = {key => before_value}
     call(data)
-    assert_equal(data[key], after_value)
+
+    if !after_value.nil?
+      assert_equal(data[key], after_value)
+    else
+      assert_nil(data[key])
+    end
   end
 
   def call(data, options={})
