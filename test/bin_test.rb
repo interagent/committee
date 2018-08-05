@@ -16,6 +16,8 @@ describe "executables in bin/" do
   end
 
   it "has roughly valid Ruby structure for committee-stub" do
-    load File.join(@bin_dir, "committee-stub")
+    assert_output(%r{Usage: rackup \[options\] \[JSON Schema file\]}) do
+      load File.join(@bin_dir, "committee-stub")
+    end
   end
 end
