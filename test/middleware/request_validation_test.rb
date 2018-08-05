@@ -249,7 +249,7 @@ describe Committee::Middleware::RequestValidation do
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 400, last_response.status
-    assert_match /invalid request/i, last_response.body
+    assert_match(/invalid request/i, last_response.body)
   end
 
   it "passes with coerce_date_times enabled and without a schema for a link" do
@@ -267,7 +267,7 @@ describe Committee::Middleware::RequestValidation do
     }
     post "/apps", JSON.generate(params)
     assert_equal 400, last_response.status
-    assert_match /invalid request/i, last_response.body
+    assert_match(/invalid request/i, last_response.body)
   end
 
   it "rescues JSON errors" do
@@ -275,7 +275,7 @@ describe Committee::Middleware::RequestValidation do
     header "Content-Type", "application/json"
     post "/apps", "{x:y}"
     assert_equal 400, last_response.status
-    assert_match /valid json/i, last_response.body
+    assert_match(/valid json/i, last_response.body)
   end
 
   it "takes a prefix" do
@@ -337,7 +337,7 @@ describe Committee::Middleware::RequestValidation do
     header "Content-Type", "application/json"
     get "/search/apps", {"per_page" => "foo", "query" => "cloudnasium"}
     assert_equal 400, last_response.status
-    assert_match /invalid request/i, last_response.body
+    assert_match(/invalid request/i, last_response.body)
   end
 
   it "passes through a valid request for OpenAPI" do
@@ -355,7 +355,7 @@ describe Committee::Middleware::RequestValidation do
     @app = new_rack_app(schema: open_api_2_schema)
     get "/api/pets?limit=foo", nil, { "HTTP_AUTH_TOKEN" => "xxx" }
     assert_equal 400, last_response.status
-    assert_match /invalid request/i, last_response.body
+    assert_match(/invalid request/i, last_response.body)
   end
 
   it "passes through a valid request for OpenAPI including path parameters" do
@@ -370,7 +370,7 @@ describe Committee::Middleware::RequestValidation do
     # not that ID is expect to be an integer
     get "/api/pets/not-integer"
     assert_equal 400, last_response.status
-    assert_match /invalid request/i, last_response.body
+    assert_match(/invalid request/i, last_response.body)
   end
 
   private

@@ -40,7 +40,7 @@ describe Committee::Test::Methods do
       e = assert_raises(Committee::InvalidResponse) do
         assert_schema_conform
       end
-      assert_match /response header must be set to/i, e.message
+      assert_match(/response header must be set to/i, e.message)
     end
 
     it "accepts schema string (legacy behavior)" do
