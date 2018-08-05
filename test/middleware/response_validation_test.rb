@@ -17,14 +17,14 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_rack_app("{}", {}, schema: hyper_schema)
     get "/apps"
     assert_equal 500, last_response.status
-    assert_match /{} is not an array/i, last_response.body
+    assert_match(/{} is not an array/i, last_response.body)
   end
 
   it "detects a response invalid due to not being JSON" do
     @app = new_rack_app("", {}, schema: hyper_schema)
     get "/apps"
     assert_equal 500, last_response.status
-    assert_match /valid JSON/i, last_response.body
+    assert_match(/valid JSON/i, last_response.body)
   end
 
   it "ignores a non-2xx invalid response" do
@@ -39,7 +39,7 @@ describe Committee::Middleware::ResponseValidation do
 
     get "/apps"
     assert_equal 500, last_response.status
-    assert_match /valid JSON/i, last_response.body
+    assert_match(/valid JSON/i, last_response.body)
   end
 
   it "passes through a 204 (no content) response" do
@@ -52,7 +52,7 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema)
     get "/apps"
     assert_equal 500, last_response.status
-    assert_match /valid json/i, last_response.body
+    assert_match(/valid json/i, last_response.body)
   end
 
   it "takes a prefix" do
@@ -80,7 +80,7 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_rack_app("", {}, schema: open_api_2_schema)
     get "/api/pets"
     assert_equal 500, last_response.status
-    assert_match /valid JSON/i, last_response.body
+    assert_match(/valid JSON/i, last_response.body)
   end
 
   private
