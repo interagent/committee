@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name          = "committee"
-  s.version       = "2.1.0"
+  s.version       = "2.1.1"
 
   s.summary       = "A collection of Rack middleware to support JSON Schema."
 
@@ -11,6 +11,8 @@ Gem::Specification.new do |s|
 
   s.executables   << "committee-stub"
   s.files         = Dir["{bin,lib,test}/**/*.rb"]
+
+  s.required_ruby_version = ">= 2.0.0"
 
   s.add_dependency "json_schema", "~> 0.14", ">= 0.14.3"
 

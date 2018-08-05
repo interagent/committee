@@ -215,17 +215,26 @@ module Committee::Drivers
       response_data_201 =
         link_data["responses"]['201'] || link_data["responses"][201]
 
-      if response_data_200 && digged_response_data_200 = response_data_200.dig("content", "application/json", "schema")
-        [200, digged_response_data_200]
-      elsif response_data_201 && digged_response_data_201 = response_data_201.dig("content", "application/json", "schema")
-        [201, digged_response_data_201]
+      if response_data_200 &&
+          response_data_200["content"] &&
+          response_data_200["content"]["application/json"] &&
+          data = response_data_200["content"]["application/json"]["schema"]
+        [200, data]
+      elsif response_data_201 &&
+          response_data_201["content"] &&
+          response_data_201["content"]["application/json"] &&
+          data = response_data_201["content"]["application/json"]["schema"]
+        [201, data]
       else
         # Sort responses so that we can try to prefer any 3-digit status code.
         # If there are none, we'll just take anything from the list.
         first_ordered_response = link_data["responses"].
           select { |k, v| k =~ /[0-9]{3}/ }.first
-        if first_ordered_response && digged_response = first_ordered_response[1].dig("content", "application/json", "schema")
-          [first_ordered_response[0].to_i, digged_response]
+        if first_ordered_response &&
+          first_ordered_response[1]["content"] &&
+          first_ordered_response[1]["content"]["application/json"] &&
+          data = first_ordered_response[1]["content"]["application/json"]["schema"]
+          [first_ordered_response[0].to_i, data]
         else
           [nil, nil]
         end
