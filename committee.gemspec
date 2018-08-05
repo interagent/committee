@@ -27,7 +27,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "minitest", "~> 5.3"
   s.add_development_dependency "rack-test", "~> 0.6"
-  s.add_development_dependency "rake", "~> 10.3"
+  s.add_development_dependency "rake", "~> 12.3"
   s.add_development_dependency "rr", "~> 1.1"
 
   # Gate gems that have trouble installing on older versions of Ruby.
