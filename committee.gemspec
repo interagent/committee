@@ -12,6 +12,8 @@ Gem::Specification.new do |s|
   s.executables   << "committee-stub"
   s.files         = Dir["{bin,lib,test}/**/*.rb"]
 
+  s.required_ruby_version = ">= 2.0.0"
+
   s.add_dependency "json_schema", "~> 0.14", ">= 0.14.3"
 
   # Rack 2.0+ requires Ruby >= 2.2.2 which is problematic for the test suite on
