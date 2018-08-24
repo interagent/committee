@@ -65,7 +65,7 @@ module Committee::Test
     end
 
     def schema_path
-      raise "Please override #commitee_schema."
+      raise "Please override #committee_schema."
     end
 
     def schema_url_prefix

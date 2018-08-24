@@ -1,5 +1,8 @@
 Unreleased
 
+2.1.1 2018-08-04
+	Fix the `committee-stub` bin so that it runs if installed as a gem (#127)
+
 2.1.0 2017-03-26
 	Support validating header schemas in OpenAPI 2 (#122)
 

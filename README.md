@@ -11,6 +11,7 @@ Committee is tested on the following MRI versions:
 - 2.2
 - 2.3
 - 2.4
+- 2.5
 
 ## Committee::Middleware::RequestValidation
 
@@ -250,7 +251,8 @@ bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
 
 1. Update the version in `committee.gemspec` as appropriate for [semantic
    versioning](http://semver.org) and add details to `CHANGELOG`.
-2. Run the `release` task:
+2. Commit those changes. Use a commit message like `Bump version to 1.2.3`.
+3. Run the `release` task:
 
     ```
     bundle exec rake release
