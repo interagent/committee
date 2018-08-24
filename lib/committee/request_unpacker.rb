@@ -25,7 +25,7 @@ module Committee
 
       params = if params
         params
-      elsif @allow_form_params && %w[application/x-www-form-urlencode multipart/form-data].include?(@request.media_type)
+      elsif @allow_form_params && %w[application/x-www-form-urlencoded multipart/form-data].include?(@request.media_type)
         # Actually, POST means anything in the request body, could be from
         # PUT or PATCH too. Silly Rack.
         p = @request.POST
