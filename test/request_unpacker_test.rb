@@ -23,33 +23,39 @@ describe Committee::RequestUnpacker do
   end
 
   it "doesn't unpack JSON under other Content-Types" do
-    env = {
-      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-      "rack.input"   => StringIO.new('{"x":"y"}'),
-    }
-    request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({}, params)
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+        "CONTENT_TYPE" => content_type,
+        "rack.input"   => StringIO.new('{"x":"y"}'),
+      }
+      request = Rack::Request.new(env)
+      params, _ = Committee::RequestUnpacker.new(request).call
+      assert_equal({}, params)
+    end
   end
 
   it "unpacks JSON under other Content-Types with optimistic_json" do
-    env = {
-      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-      "rack.input"   => StringIO.new('{"x":"y"}'),
-    }
-    request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request, optimistic_json: true).call
-    assert_equal({ "x" => "y" }, params)
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+        "CONTENT_TYPE" => content_type,
+        "rack.input"   => StringIO.new('{"x":"y"}'),
+      }
+      request = Rack::Request.new(env)
+      params, _ = Committee::RequestUnpacker.new(request, optimistic_json: true).call
+      assert_equal({ "x" => "y" }, params)
+    end
   end
 
   it "returns {} when unpacking non-JSON with optimistic_json" do
-    env = {
-      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-      "rack.input"   => StringIO.new('x=y&foo=42'),
-    }
-    request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request, optimistic_json: true).call
-    assert_equal({}, params)
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+        "CONTENT_TYPE" => content_type,
+        "rack.input"   => StringIO.new('x=y&foo=42'),
+      }
+      request = Rack::Request.new(env)
+      params, _ = Committee::RequestUnpacker.new(request, optimistic_json: true).call
+      assert_equal({}, params)
+    end
   end
 
   it "unpacks an empty hash on an empty request body" do
@@ -63,53 +69,61 @@ describe Committee::RequestUnpacker do
   end
 
   it "doesn't unpack form params" do
-    env = {
-      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-      "rack.input"   => StringIO.new("x=y"),
-    }
-    request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({}, params)
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+        "CONTENT_TYPE" => content_type,
+        "rack.input"   => StringIO.new("x=y"),
+      }
+      request = Rack::Request.new(env)
+      params, _ = Committee::RequestUnpacker.new(request).call
+      assert_equal({}, params)
+    end
   end
 
   it "unpacks form params with allow_form_params" do
-    env = {
-      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-      "rack.input"   => StringIO.new("x=y"),
-    }
-    request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request, allow_form_params: true).call
-    assert_equal({ "x" => "y" }, params)
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+        "CONTENT_TYPE" => content_type,
+        "rack.input"   => StringIO.new("x=y"),
+      }
+      request = Rack::Request.new(env)
+      params, _ = Committee::RequestUnpacker.new(request, allow_form_params: true).call
+      assert_equal({ "x" => "y" }, params)
+    end
   end
 
   it "coerces form params with coerce_form_params and a schema" do
-    schema = JsonSchema::Schema.new
-    schema.properties = { "x" => JsonSchema::Schema.new }
-    schema.properties["x"].type = ["integer"]
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      schema = JsonSchema::Schema.new
+      schema.properties = { "x" => JsonSchema::Schema.new }
+      schema.properties["x"].type = ["integer"]
 
-    env = {
-      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-      "rack.input"   => StringIO.new("x=1"),
-    }
-    request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(
-      request,
-      allow_form_params: true,
-      coerce_form_params: true,
-      schema: schema
-    ).call
-    assert_equal({ "x" => 1 }, params)
+      env = {
+        "CONTENT_TYPE" => content_type,
+        "rack.input"   => StringIO.new("x=1"),
+      }
+      request = Rack::Request.new(env)
+      params, _ = Committee::RequestUnpacker.new(
+        request,
+        allow_form_params: true,
+        coerce_form_params: true,
+        schema: schema
+      ).call
+      assert_equal({ "x" => 1 }, params)
+    end
   end
 
   it "unpacks form & query params with allow_form_params and allow_query_params" do
-    env = {
-      "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-      "rack.input"   => StringIO.new("x=y"),
-      "QUERY_STRING" => "a=b"
-    }
-    request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request, allow_form_params: true, allow_query_params: true).call
-    assert_equal({ "x" => "y", "a" => "b" }, params)
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+        "CONTENT_TYPE" => content_type,
+        "rack.input"   => StringIO.new("x=y"),
+        "QUERY_STRING" => "a=b"
+      }
+      request = Rack::Request.new(env)
+      params, _ = Committee::RequestUnpacker.new(request, allow_form_params: true, allow_query_params: true).call
+      assert_equal({ "x" => "y", "a" => "b" }, params)
+    end
   end
 
   it "unpacks query params with allow_query_params" do
