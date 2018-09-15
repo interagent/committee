@@ -61,7 +61,6 @@ module Committee::Drivers
       )
     end
 
-    # Link abstracts an API link specifically for OpenAPI 3.
     class Link
       # The link's input media type. i.e. How requests should be encoded.
       attr_accessor :enc_type
@@ -139,9 +138,12 @@ module Committee::Drivers
       end
     end
 
-    # ParameterSchemaBuilder converts OpenAPI 2 link parameters, which are not
-    # quite JSON schemas (but will be in OpenAPI 3) into synthetic schemas that
+    # ParameterSchemaBuilder converts link parameters, which are not
+    # quite JSON schemas into synthetic schemas that
     # we can use to do some basic request validation.
+    # We couldn't fully adjust to openapi3 and using converted OpenAPI 2 link parameter.
+    # so still using ParameterSchemaBuilder
+
     class ParameterSchemaBuilder < SchemaBuilder
       # Returns a tuple of (schema, schema_data) where only one of the two
       # values is present. This is either a full schema that's ready to go _or_
@@ -158,8 +160,8 @@ module Committee::Drivers
 
             param_schema = JsonSchema::Schema.new
 
-            # We could probably use more validation here, but the formats of
-            # OpenAPI 2 are based off of what's available in JSON schema, and
+            # We could probably use more validation here, but the formats
+            # are based off of what's available in JSON schema, and
             # therefore this should map over quite well.
             param_schema.type = [param_data["schema"]["type"]] if param_data["schema"].is_a?(Hash)
 
@@ -207,23 +209,33 @@ module Committee::Drivers
     ].map(&:to_s).freeze
 
     def find_best_fit_response(link_data)
+      return [nil, nil] if link_data["responses"].nil?
       response_data_200 =
         link_data["responses"]['200'] || link_data["responses"][200]
 
       response_data_201 =
         link_data["responses"]['201'] || link_data["responses"][201]
 
-      if response_data_200 && digged_response_data_200 = response_data_200.dig("content", "application/json", "schema")
-        [200, digged_response_data_200]
-      elsif response_data_201 && digged_response_data_201 = response_data_201.dig("content", "application/json", "schema")
-        [201, digged_response_data_201]
+      if response_data_200 &&
+          response_data_200["content"] &&
+          response_data_200["content"]["application/json"] &&
+          data = response_data_200["content"]["application/json"]["schema"]
+        [200, data]
+      elsif response_data_201 &&
+          response_data_201["content"] &&
+          response_data_201["content"]["application/json"] &&
+          data = response_data_201["content"]["application/json"]["schema"]
+        [201, data]
       else
         # Sort responses so that we can try to prefer any 3-digit status code.
         # If there are none, we'll just take anything from the list.
         first_ordered_response = link_data["responses"].
           select { |k, v| k =~ /[0-9]{3}/ }.first
-        if first_ordered_response && digged_response = first_ordered_response[1].dig("content", "application/json", "schema")
-          [first_ordered_response[0].to_i, digged_response]
+        if first_ordered_response &&
+          first_ordered_response[1]["content"] &&
+          first_ordered_response[1]["content"]["application/json"] &&
+          data = first_ordered_response[1]["content"]["application/json"]["schema"]
+          [first_ordered_response[0].to_i, data]
         else
           [nil, nil]
         end
@@ -235,11 +247,8 @@ module Committee::Drivers
     end
 
     def parse_definitions!(data)
-      # The "definitions" section of an OpenAPI 2 spec is a valid JSON schema.
-      # We extract it from the spec and parse it as a schema in isolation so
-      # that all references to it will still have correct paths (i.e. we can
-      # still find a resource at '#/definitions/resource' instead of
-      # '#/resource').
+      # The "components" of an OpenAPI 3 section is not valid for gem "json_schema" so convert them
+      # using convert_components_to_definitions
       schema = JsonSchema.parse!({
         "definitions" => data['definitions']['schemas'],
       })
@@ -365,6 +374,10 @@ module Committee::Drivers
           schema.each do |_, v|
             rewrite_references(v)
           end
+        end
+      elsif schema.is_a?(Array)
+        schema.each do |v|
+          rewrite_references(v)
         end
       end
       schema
