@@ -229,7 +229,7 @@ module Committee::Drivers
         # Sort responses so that we can try to prefer any 3-digit status code.
         # If there are none, we'll just take anything from the list.
         ordered_responses = link_data["responses"].
-          select { |k, v| k =~ /[0-9]{3}/ }
+          select { |k, v| k.to_s =~ /[0-9]{3}/ }
         if first = ordered_responses.first
           [first[0].to_i, first[1]]
         else

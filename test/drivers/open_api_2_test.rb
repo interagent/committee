@@ -84,6 +84,18 @@ describe Committee::Drivers::OpenAPI2 do
     assert_equal({ 'description' => '302 response' }, link.target_schema.data)
   end
 
+  it "prefers any numeric three-digit response next" do
+    schema_data = schema_data_with_responses({
+      'default' => { 'schema' => { 'description' => 'default response' } },
+      302 => { 'schema' => { 'description' => '302 response' } },
+    })
+
+    schema = @driver.parse(schema_data)
+    link = schema.routes['GET'][0][1]
+    assert_equal 302, link.status_success
+    assert_equal({ 'description' => '302 response' }, link.target_schema.data)
+  end
+
   it "falls back to no response" do
     schema_data = schema_data_with_responses({})
 
