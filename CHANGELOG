@@ -1,4 +1,5 @@
 Unreleased
+	Add numeric response status support for openapi 2 (#141)
 
 2.2.0 2018-09-06
 	Add support for `multipart/form-data` when processing requests (#127)
