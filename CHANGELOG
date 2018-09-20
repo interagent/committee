@@ -1,4 +1,6 @@
 Unreleased
+
+2.2.1 2018-09-20
 	Add numeric response status support for openapi 2 (#141)
 
 2.2.0 2018-09-06
