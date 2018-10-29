@@ -69,3 +69,7 @@ end
 def open_api_2_data
   JSON.parse(File.read("./test/data/openapi2/petstore-expanded.json"))
 end
+
+def open_api_3_data_path
+  "./test/data/openapi3/normal.yml"
+end
