@@ -25,4 +25,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "pry"
   s.add_development_dependency "pry-byebug"
   s.add_development_dependency "simplecov"
+  s.add_development_dependency "oas_parser", ">= 0.13.1"
 end
