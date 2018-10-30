@@ -46,10 +46,7 @@ describe Committee::Middleware::Base do
   end
 
   it "accepts schema JsonSchema::Schema object (legacy behavior)" do
-    # Note we don't warn here because this is a recent deprecation and passing
-    # a schema object will not be a huge performance hit. We should probably
-    # start warning on the next version.
-
+    mock(Committee).warn_deprecated.with_any_args
     @app = new_rack_app(
       schema: JsonSchema.parse!(hyper_schema_data)
     )

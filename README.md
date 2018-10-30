@@ -16,7 +16,9 @@ Committee is tested on the following MRI versions:
 ## Committee::Middleware::RequestValidation
 
 ``` ruby
-use Committee::Middleware::RequestValidation, schema: JSON.parse(File.read(...))
+json = JSON.parse(File.read(...)
+schema = Committee::Drivers::HyperSchema.new.parse(json)
+use Committee::Middleware::RequestValidation, schema: schema)
 ```
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
@@ -229,6 +231,33 @@ describe Committee::Middleware::Stub do
     end
    end
 end
+```
+
+## Updater for version 3.x from version 2.x
+
+### Set Committee::Drivers::Schema object for middleware
+schema option support JSON object and Sting and Hash object like this.  
+
+```ruby
+# valid
+use Committee::Middleware::RequestValidation, schema: JSON.parse(File.read(...))
+
+# valid
+use Committee::Middleware::RequestValidation, schema: {json: 'json_data...'}
+
+# valid
+use Committee::Middleware::RequestValidation, schema: 'json string'
+
+```
+
+But we don't support version 3.x.  
+Because 3.x support other schema and we can't define which parser we use.  
+So please wrap Committee::Drivers::Schema like this.   
+
+```ruby
+json = JSON.parse(File.read(...)
+schema = Committee::Drivers::HyperSchema.new.parse(json)
+use Committee::Middleware::RequestValidation, schema: schema)
 ```
 
 ## Development
