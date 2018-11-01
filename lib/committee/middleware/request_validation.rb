@@ -19,32 +19,15 @@ module Committee::Middleware
     end
 
     def handle(request)
-      link, param_matches = @router.find_request_link(request)
-      path_params = {}
+      schema_validator = build_schema_validator(request)
 
-      if link
-        # Attempts to coerce parameters that appear in a link's URL to Ruby
-        # types that can be validated with a schema.
-        if @coerce_path_params
-          path_params = param_matches.merge(
-            Committee::StringParamsCoercer.new(
-              param_matches,
-              link.schema
-            ).call
-          )
-        end
+      # Attempts to coerce parameters that appear in a link's URL to Ruby
+      # types that can be validated with a schema.
+      path_params = @coerce_path_params ? schema_validator.coerce_path_params : {}
 
-        # Attempts to coerce parameters that appear in a query string to Ruby
-        # types that can be validated with a schema.
-        if @coerce_query_params && !request.GET.nil? && !link.schema.nil?
-          request.env["rack.request.query_hash"].merge!(
-            Committee::StringParamsCoercer.new(
-              request.GET,
-              link.schema
-            ).call
-          )
-        end
-      end
+      # Attempts to coerce parameters that appear in a query string to Ruby
+      # types that can be validated with a schema.
+      schema_validator.coerce_query_params(request) if @coerce_query_params
 
       request.env[@params_key] = Committee::RequestUnpacker.new(
         request,
@@ -55,15 +38,11 @@ module Committee::Middleware
 
       request.env[@params_key].merge!(path_params)
 
-      if link
-        validator = Committee::RequestValidator.new(link, check_content_type: @check_content_type)
-        validator.call(request, request.env[@params_key])
-        @app.call(request.env)
-      elsif @strict
-        raise Committee::NotFound
-      else
-        @app.call(request.env)
-      end
+      raise Committee::NotFound if @strict && !schema_validator.link_exist?
+
+      schema_validator.validate_request(request, @params_key, @check_content_type)
+
+      @app.call(request.env)
     rescue Committee::BadRequest, Committee::InvalidRequest
       raise if @raise
       @error_class.new(400, :bad_request, $!.message).render
@@ -77,6 +56,10 @@ module Committee::Middleware
     rescue JSON::ParserError
       raise Committee::InvalidRequest if @raise
       @error_class.new(400, :bad_request, "Request body wasn't valid JSON.").render
+    end
+
+    def build_schema_validator(request)
+      Committee::SchemaValidator::HyperSchema.new(@router, request)
     end
   end
 end
