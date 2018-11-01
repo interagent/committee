@@ -21,6 +21,9 @@ require_relative "committee/middleware/request_validation"
 require_relative "committee/middleware/response_validation"
 require_relative "committee/middleware/stub"
 
+require_relative "committee/schema_validator/hyper_schema"
+require_relative "committee/schema_validator/option"
+
 require_relative "committee/bin/committee_stub"
 
 require_relative "committee/test/methods"
