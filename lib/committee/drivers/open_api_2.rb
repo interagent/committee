@@ -204,6 +204,11 @@ module Committee::Drivers
       attr_accessor :definitions
       attr_accessor :produces
       attr_accessor :routes
+
+      def build_router(options)
+        validator_option = Committee::SchemaValidator::Option.new(options, self)
+        Committee::SchemaValidator::HyperSchema::Router.new(self, validator_option)
+      end
     end
 
     private
