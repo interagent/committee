@@ -25,50 +25,52 @@ class Committee::SchemaValidator
       parameter_coerce!(request, link, "rack.request.query_hash") if link_exist? && !request.GET.nil? && !link.schema.nil?
     end
 
-    def coerce_path_params
-      return unless link_exist?
-
-      Committee::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
-      param_matches
-    end
-
-    def coerce_query_params(request)
-      return unless link_exist?
-      return if request.GET.nil? || link.schema.nil?
-
-      Committee::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
-    end
-
-    def request_unpack(request)
-      request.env[validator_option.params_key], request.env[validator_option.headers_key] = Committee::RequestUnpacker.new(
-          request,
-          allow_form_params:  validator_option.allow_form_params,
-          allow_query_params: validator_option.allow_query_params,
-          coerce_form_params: validator_option.coerce_form_params,
-          optimistic_json:    validator_option.optimistic_json,
-          schema:             link ? link.schema : nil
-      ).call
-    end
-
-    def request_schema_validation(request)
-      return unless link_exist?
-      validator = Committee::SchemaValidator::HyperSchema::RequestValidator.new(link, check_content_type: validator_option.check_content_type, check_header: validator_option.check_header)
-      validator.call(request, request.env[validator_option.params_key], request.env[validator_option.headers_key])
-    end
-
-    def parameter_coerce!(request, link, coerce_key)
-      return unless link_exist?
-
-      Committee::ParameterCoercer.
-          new(request.env[coerce_key],
-              link.schema,
-              coerce_date_times: validator_option.coerce_date_times,
-              coerce_recursive: validator_option.coerce_recursive).
-          call!
-    end
-
     def link_exist?
       !link.nil?
     end
+
+    private
+
+      def coerce_path_params
+        return unless link_exist?
+
+        Committee::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+        param_matches
+      end
+
+      def coerce_query_params(request)
+        return unless link_exist?
+        return if request.GET.nil? || link.schema.nil?
+
+        Committee::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+      end
+
+      def request_unpack(request)
+        request.env[validator_option.params_key], request.env[validator_option.headers_key] = Committee::RequestUnpacker.new(
+            request,
+            allow_form_params:  validator_option.allow_form_params,
+            allow_query_params: validator_option.allow_query_params,
+            coerce_form_params: validator_option.coerce_form_params,
+            optimistic_json:    validator_option.optimistic_json,
+            schema:             link ? link.schema : nil
+        ).call
+      end
+
+      def request_schema_validation(request)
+        return unless link_exist?
+        validator = Committee::SchemaValidator::HyperSchema::RequestValidator.new(link, check_content_type: validator_option.check_content_type, check_header: validator_option.check_header)
+        validator.call(request, request.env[validator_option.params_key], request.env[validator_option.headers_key])
+      end
+
+      def parameter_coerce!(request, link, coerce_key)
+        return unless link_exist?
+
+        Committee::ParameterCoercer.
+            new(request.env[coerce_key],
+                link.schema,
+                coerce_date_times: validator_option.coerce_date_times,
+                coerce_recursive: validator_option.coerce_recursive).
+            call!
+      end
   end
 end

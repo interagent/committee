@@ -13,6 +13,8 @@ module Committee::Middleware
       @router = Committee::Router.new(@schema,
         prefix: options[:prefix]
       )
+
+      @validator_option = Committee::SchemaValidator::Option.new(@params_key, @headers_key, options, @schema)
     end
 
     def call(env)
@@ -75,6 +77,10 @@ module Committee::Middleware
     def warn_string_deprecated
       Committee.warn_deprecated("Committee: passing a string to schema " \
         "option is deprecated; please send a driver object instead.")
+    end
+
+    def build_schema_validator(request)
+      Committee::SchemaValidator::HyperSchema.new(@router, request, @validator_option)
     end
   end
 end

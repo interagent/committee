@@ -7,8 +7,6 @@ module Committee::Middleware
 
       # deprecated
       @allow_extra = options[:allow_extra]
-
-      @validator_option = Committee::SchemaValidator::Option.new(@params_key, @headers_key, options, @schema)
     end
 
     def handle(request)
@@ -32,11 +30,5 @@ module Committee::Middleware
       raise Committee::InvalidRequest if @raise
       @error_class.new(400, :bad_request, "Request body wasn't valid JSON.").render
     end
-
-    private
-    
-      def build_schema_validator(request)
-        Committee::SchemaValidator::HyperSchema.new(@router, request, @validator_option)
-      end
   end
 end
