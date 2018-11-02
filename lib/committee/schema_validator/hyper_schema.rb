@@ -25,6 +25,17 @@ class Committee::SchemaValidator
       parameter_coerce!(request, link, "rack.request.query_hash") if link_exist? && !request.GET.nil? && !link.schema.nil?
     end
 
+    def response_validate(status, headers, response)
+      return unless link_exist?
+
+      full_body = ""
+      response.each do |chunk|
+        full_body << chunk
+      end
+      data = JSON.parse(full_body)
+      Committee::ResponseValidator.new(link, validate_errors: validator_option.validate_errors).call(status, headers, data)
+    end
+
     def link_exist?
       !link.nil?
     end

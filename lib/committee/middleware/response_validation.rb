@@ -10,15 +10,7 @@ module Committee::Middleware
     def handle(request)
       status, headers, response = @app.call(request.env)
 
-      link, _ = @router.find_request_link(request)
-      if validate?(status) && link
-        full_body = ""
-        response.each do |chunk|
-          full_body << chunk
-        end
-        data = JSON.parse(full_body)
-        Committee::ResponseValidator.new(link, validate_errors: validate_errors).call(status, headers, data)
-      end
+      build_schema_validator(request).response_validate(status, headers, response) if validate?(status)
 
       [status, headers, response]
     rescue Committee::InvalidResponse
@@ -30,7 +22,7 @@ module Committee::Middleware
     end
 
     def validate?(status)
-      Committee::ResponseValidator.validate?(status, validate_errors: validate_errors)
+      status != 204 and validate_errors || (200...300).include?(status)
     end
   end
 end
