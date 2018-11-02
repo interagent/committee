@@ -7,8 +7,7 @@ class Committee::SchemaValidator
       @validator_option = validator_option
     end
 
-    def call(request)
-
+    def request_validate(request)
       # Attempts to coerce parameters that appear in a link's URL to Ruby
       # types that can be validated with a schema.
       param_matches_hash = coerce_path_params ? coerce_path_params : {}
@@ -21,7 +20,7 @@ class Committee::SchemaValidator
 
       request.env[validator_option.params_key].merge!(param_matches_hash) if param_matches_hash
 
-      request_validate(request)
+      request_schema_validation(request)
       parameter_coerce!(request, link, validator_option.params_key)
       parameter_coerce!(request, link, "rack.request.query_hash") if link_exist? && !request.GET.nil? && !link.schema.nil?
     end
@@ -51,9 +50,9 @@ class Committee::SchemaValidator
       ).call
     end
 
-    def request_validate(request)
+    def request_schema_validation(request)
       return unless link_exist?
-      validator = Committee::RequestValidator.new(link, check_content_type: validator_option.check_content_type, check_header: validator_option.check_header)
+      validator = Committee::SchemaValidator::HyperSchema::RequestValidator.new(link, check_content_type: validator_option.check_content_type, check_header: validator_option.check_header)
       validator.call(request, request.env[validator_option.params_key], request.env[validator_option.headers_key])
     end
 

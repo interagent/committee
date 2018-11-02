@@ -13,7 +13,7 @@ module Committee::Middleware
 
     def handle(request)
       schema_validator = build_schema_validator(request)
-      schema_validator.call(request)
+      schema_validator.request_validate(request)
 
       raise Committee::NotFound, "That request method and path combination isn't defined." if !schema_validator.link_exist? && @strict
 

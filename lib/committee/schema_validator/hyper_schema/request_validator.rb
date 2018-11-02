@@ -1,5 +1,5 @@
 module Committee
-  class RequestValidator
+  class SchemaValidator::HyperSchema::RequestValidator
     def initialize(link, options = {})
       @link = link
       @check_content_type = options.fetch(:check_content_type, true)
