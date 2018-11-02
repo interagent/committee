@@ -1,11 +1,11 @@
 module Committee
   class SchemaValidator::HyperSchema::Router
-    def initialize(schema, options = {})
-      @prefix = options[:prefix]
+    def initialize(schema, validator_option)
+      @prefix = validator_option.prefix
       @prefix_regexp = /\A#{Regexp.escape(@prefix)}/.freeze if @prefix
       @schema = schema
 
-      @validator_option = options[:validator_option]
+      @validator_option = validator_option
     end
 
     def includes?(path)

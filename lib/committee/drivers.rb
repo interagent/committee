@@ -58,8 +58,9 @@ module Committee
         raise "needs implementation"
       end
 
-      def build_router(validator_option:, prefix:)
-        Committee::SchemaValidator::HyperSchema::Router.new(self, validator_option: validator_option, prefix: prefix)
+      def build_router(options)
+        validator_option = Committee::SchemaValidator::Option.new(options, self)
+        Committee::SchemaValidator::HyperSchema::Router.new(self, validator_option)
       end
     end
   end

@@ -4,14 +4,11 @@ module Committee::Middleware
       @app = app
 
       @error_class = options.fetch(:error_class, Committee::ValidationError)
-      @params_key = options[:params_key] || "committee.params"
-      @headers_key = options[:headers_key] || "committee.headers"
+
       @raise = options[:raise]
       @schema = get_schema(options)
 
-      @validator_option = Committee::SchemaValidator::Option.new(@params_key, @headers_key, options, @schema)
-
-      @router = @schema.build_router(validator_option: @validator_option, prefix: options[:prefix])
+      @router = @schema.build_router(options)
     end
 
     def call(env)

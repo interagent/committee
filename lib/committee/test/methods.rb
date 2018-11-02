@@ -32,8 +32,8 @@ module Committee::Test
         end
       end
 
-      @committee_router ||= Committee::SchemaValidator::HyperSchema::Router.new(@committee_schema,
-        prefix: schema_url_prefix)
+      validator_option = Committee::SchemaValidator::Option.new({prefix: schema_url_prefix}, @committee_schema)
+      @committee_router ||= Committee::SchemaValidator::HyperSchema::Router.new(@committee_schema, validator_option)
 
       link, _ = @committee_router.find_request_link(last_request)
       unless link

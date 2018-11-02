@@ -55,11 +55,15 @@ describe Committee::SchemaValidator::HyperSchema::Router do
 
   def hyper_schema_router(options = {})
     schema = Committee::Drivers::HyperSchema.new.parse(hyper_schema_data)
-    Committee::SchemaValidator::HyperSchema::Router.new(schema, options)
+    validator_option = Committee::SchemaValidator::Option.new(options, schema)
+
+    Committee::SchemaValidator::HyperSchema::Router.new(schema, validator_option)
   end
 
   def open_api_2_router(options = {})
     schema = Committee::Drivers::OpenAPI2.new.parse(open_api_2_data)
-    Committee::SchemaValidator::HyperSchema::Router.new(schema, options)
+    validator_option = Committee::SchemaValidator::Option.new(options, schema)
+
+    Committee::SchemaValidator::HyperSchema::Router.new(schema, validator_option)
   end
 end
