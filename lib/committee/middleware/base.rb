@@ -10,11 +10,9 @@ module Committee::Middleware
       @schema = get_schema(options[:schema] ||
         raise(ArgumentError, "Committee: need option `schema`"))
 
-      @router = Committee::Router.new(@schema,
-        prefix: options[:prefix]
-      )
-
       @validator_option = Committee::SchemaValidator::Option.new(@params_key, @headers_key, options, @schema)
+
+      @router = @schema.build_router(validator_option: @validator_option, prefix: options[:prefix])
     end
 
     def call(env)
@@ -80,7 +78,7 @@ module Committee::Middleware
     end
 
     def build_schema_validator(request)
-      Committee::SchemaValidator::HyperSchema.new(@router, request, @validator_option)
+      @router.build_schema_validator(request)
     end
   end
 end

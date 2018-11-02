@@ -32,7 +32,7 @@ module Committee::Test
         end
       end
 
-      @committee_router ||= Committee::Router.new(@committee_schema,
+      @committee_router ||= Committee::SchemaValidator::HyperSchema::Router.new(@committee_schema,
         prefix: schema_url_prefix)
 
       link, _ = @committee_router.find_request_link(last_request)
