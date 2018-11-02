@@ -43,7 +43,7 @@ module Committee::Test
 
       if validate_response?(last_response.status)
         data = JSON.parse(last_response.body)
-        Committee::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
+        Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
       end
     end
 
@@ -85,7 +85,7 @@ module Committee::Test
     end
 
     def validate_response?(status)
-      Committee::ResponseValidator.validate?(status)
+      Committee::SchemaValidator::HyperSchema::ResponseValidator.validate?(status)
     end
   end
 end
