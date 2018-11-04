@@ -35,3 +35,42 @@ paths:
                 type: array
                 items:
                   type: string
+  /string_params_coercer:
+    get:
+      description: string_params_coercer test data
+      parameters:
+      - name: integer_1
+        in: query
+        description: integer 32
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: string_1
+        in: query
+        description: string data
+        required: false
+        schema:
+          type: string
+      - name: boolean_1
+        in: query
+        description: boolean data
+        required: false
+        schema:
+          type: boolean
+      - name: number_1
+        in: query
+        description: number data
+        required: false
+        schema:
+          nullable: true
+          type: number
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string

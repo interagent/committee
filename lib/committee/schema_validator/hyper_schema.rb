@@ -42,7 +42,7 @@ class Committee::SchemaValidator
 
     def coerce_form_params(parameter)
       return unless link.schema
-      Committee::StringParamsCoercer.new(parameter, link.schema).call!
+      Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(parameter, link.schema).call!
     end
 
     private
@@ -50,7 +50,7 @@ class Committee::SchemaValidator
       def coerce_path_params
         return unless link_exist?
 
-        Committee::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
         param_matches
       end
 
@@ -58,7 +58,7 @@ class Committee::SchemaValidator
         return unless link_exist?
         return if request.GET.nil? || link.schema.nil?
 
-        Committee::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
       end
 
       def request_unpack(request)

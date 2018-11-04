@@ -122,6 +122,54 @@ describe Committee::RequestUnpacker do
     end
   end
 
+  it "coerces form params with coerce_form_params and a OpenAPI3 schema" do
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+          "CONTENT_TYPE" => content_type,
+          "rack.input"   => StringIO.new("limit=20"),
+          "PATH_INFO" => "/characters",
+          "SCRIPT_NAME" => "",
+          "REQUEST_METHOD" => "GET",
+      }
+      request = Rack::Request.new(env)
+
+      router = open_api_3_schema.build_router({})
+      validator = router.build_schema_validator(request)
+
+      params, _ = Committee::RequestUnpacker.new(
+          request,
+          allow_form_params: true,
+          coerce_form_params: true,
+          schema_validator: validator,
+          ).call
+      assert_equal({ "limit" => 20 }, params)
+    end
+  end
+
+  it "coerces error params with coerce_form_params and a OpenAPI3 schema" do
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+          "CONTENT_TYPE" => content_type,
+          "rack.input"   => StringIO.new("limit=twenty"),
+          "PATH_INFO" => "/characters",
+          "SCRIPT_NAME" => "",
+          "REQUEST_METHOD" => "GET",
+      }
+      request = Rack::Request.new(env)
+
+      router = open_api_3_schema.build_router({})
+      validator = router.build_schema_validator(request)
+
+      params, _ = Committee::RequestUnpacker.new(
+          request,
+          allow_form_params: true,
+          coerce_form_params: true,
+          schema_validator: validator,
+          ).call
+      assert_equal({ "limit" => "twenty" }, params)
+    end
+  end
+
   it "unpacks form & query params with allow_form_params and allow_query_params" do
     %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
       env = {
