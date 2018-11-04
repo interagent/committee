@@ -40,6 +40,11 @@ class Committee::SchemaValidator
       !link.nil?
     end
 
+    def coerce_form_params(parameter)
+      return unless link.schema
+      Committee::StringParamsCoercer.new(parameter, link.schema).call!
+    end
+
     private
 
       def coerce_path_params
@@ -63,7 +68,7 @@ class Committee::SchemaValidator
             allow_query_params: validator_option.allow_query_params,
             coerce_form_params: validator_option.coerce_form_params,
             optimistic_json:    validator_option.optimistic_json,
-            schema:             link ? link.schema : nil
+            schema_validator:   self
         ).call
       end
 
