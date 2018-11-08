@@ -115,3 +115,29 @@ paths:
                 type: array
                 items:
                   type: string
+  /validate:
+    post:
+      description: validate test data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                string_1:
+                  type: string
+                integer_1:
+                  type: integer
+                boolean_1:
+                  type: boolean
+                number_1:
+                  type: number
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string

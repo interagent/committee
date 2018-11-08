@@ -35,8 +35,23 @@ module Committee
     end
 
     def check_parameter_type(name, value, parameter)
+      return unless parameter # not definition in OpenAPI3
+
       # TODO: check object parameter and nested object parameter
-      raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}" if parameter.type == "string" && !value.is_a?(String)
+      case parameter.type
+      when "string"
+        return if value.is_a?(String)
+      when "integer"
+        return if value.is_a?(Integer)
+      when "boolean"
+        return if value.is_a?(TrueClass)
+        return if value.is_a?(FalseClass)
+      when "number"
+        return if value.is_a?(Integer)
+        return if value.is_a?(Numeric)
+      end
+
+      raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
     end
 
     def request_body_properties
