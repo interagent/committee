@@ -12,11 +12,11 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
     end
 
     SCHEMA_PROPERTIES_PAIR = [
-        ['string_1', 'str'],
-        ['integer_1', 1],
-        ['boolean_1', true],
-        ['boolean_1', false],
-        ['number_1', 0.1],
+        ['string', 'str'],
+        ['integer', 1],
+        ['boolean', true],
+        ['boolean', false],
+        ['number', 0.1],
     ]
 
     it 'correct data' do
@@ -28,10 +28,10 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
       @operation_object.validate({
                                      "object_1" =>
                                          {
-                                             "string_2" => nil,
-                                             "integer_2" => nil,
-                                             "boolean_2" => nil,
-                                             "number_2" => nil
+                                             "string_1" => nil,
+                                             "integer_1" => nil,
+                                             "boolean_1" => nil,
+                                             "number_1" => nil
                                          }
                                  })
 
@@ -40,21 +40,21 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
 
     it 'invalid params' do
       invalids = [
-          ['string_1', 1],
-          ['string_1', true],
-          ['string_1', false],
-          ['string_1', nil],
-          ['integer_1', '1'],
-          ['integer_1', 0.1],
-          ['integer_1', true],
-          ['integer_1', false],
-          ['boolean_1', 1],
-          ['boolean_1', 'true'],
-          ['boolean_1', 'false'],
-          ['boolean_1', '0.1'],
-          ['number_1', '0.1'],
-          ['number_1', true],
-          ['number_1', false],
+          ['string', 1],
+          ['string', true],
+          ['string', false],
+          ['string', nil],
+          ['integer', '1'],
+          ['integer', 0.1],
+          ['integer', true],
+          ['integer', false],
+          ['boolean', 1],
+          ['boolean', 'true'],
+          ['boolean', 'false'],
+          ['boolean', '0.1'],
+          ['number', '0.1'],
+          ['number', true],
+          ['number', false],
       ]
 
       invalids.each do |key, value|
@@ -64,6 +64,30 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
 
         assert e.message.start_with?("invalid parameter type #{key}")
       end
+    end
+
+    it 'required params' do
+      object_2 = {
+          "string_2" => "str",
+          "integer_2" => 1,
+          "boolean_2" => true,
+          "number_2" => 0.1
+      }
+
+      object_2.keys.each do |key|
+        deleted_object = object_2.reject{|k, _v| k == key}
+        e = assert_raises(Committee::InvalidRequest) {
+          @operation_object.validate({"object_2" => deleted_object})
+        }
+
+        assert e.message.start_with?("required parameters #{key} not exist")
+      end
+
+      e = assert_raises(Committee::InvalidRequest) {
+        @operation_object.validate({"object_2" => {}})
+      }
+
+      assert e.message.start_with?("required parameters #{object_2.keys.join(",")} not exist")
     end
 
     it 'unknown param' do

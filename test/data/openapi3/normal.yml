@@ -124,28 +124,44 @@ paths:
             schema:
               type: object
               properties:
-                string_1:
+                string:
                   type: string
-                integer_1:
+                integer:
                   type: integer
-                boolean_1:
+                boolean:
                   type: boolean
-                number_1:
+                number:
                   type: number
                 object_1:
                   type: object
                   properties:
-                    string_2:
+                    string_1:
                       nullable: true
                       type: string
-                    integer_2:
+                    integer_1:
                       nullable: true
                       type: integer
-                    boolean_2:
+                    boolean_1:
                       nullable: true
                       type: boolean
-                    number_2:
+                    number_1:
                       nullable: true
+                      type: number
+                object_2:
+                  type: object
+                  required:
+                    - string_2
+                    - integer_2
+                    - boolean_2
+                    - number_2
+                  properties:
+                    string_2:
+                      type: string
+                    integer_2:
+                      type: integer
+                    boolean_2:
+                      type: boolean
+                    number_2:
                       type: number
 
       responses:

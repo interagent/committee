@@ -38,7 +38,7 @@ module Committee
       return unless parameter # not definition in OpenAPI3
 
       if value.nil?
-        return if parameter.raw['nullable']
+        return if parameter.raw["nullable"]
 
         raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
       end
@@ -56,18 +56,27 @@ module Committee
         return if value.is_a?(Integer)
         return if value.is_a?(Numeric)
       when "object"
-        return if value.is_a?(Hash) && validate_object(name, value, parameter.properties)
+        return if value.is_a?(Hash) && validate_object(name, value, parameter)
+      else
+        # TODO: unknown type support
       end
 
       raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
     end
 
-    def validate_object(_object_name, values, object_properties)
-      properties_hash = object_properties.map{ |po| [po.name, po]}.to_h
+    def validate_object(_object_name, values, parameter)
+      properties_hash = parameter.properties.map{ |po| [po.name, po]}.to_h
+      requireds_hash = properties_hash.select{ |_k,v| v.required}
 
       values.each do |name, value|
         parameter = properties_hash[name]
         check_parameter_type(name, value, parameter)
+
+        requireds_hash.delete(name)
+      end
+
+      unless requireds_hash.empty?
+        raise InvalidRequest, "required parameters #{requireds_hash.keys.join(",")} not exist"
       end
 
       true
