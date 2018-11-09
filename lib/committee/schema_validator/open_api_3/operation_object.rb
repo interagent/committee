@@ -37,7 +37,13 @@ module Committee
     def check_parameter_type(name, value, parameter)
       return unless parameter # not definition in OpenAPI3
 
-      # TODO: check object parameter and nested object parameter
+      if value.nil?
+        return if parameter.raw['nullable']
+
+        raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
+      end
+
+      # TODO: check array parameter
       case parameter.type
       when "string"
         return if value.is_a?(String)
@@ -49,9 +55,22 @@ module Committee
       when "number"
         return if value.is_a?(Integer)
         return if value.is_a?(Numeric)
+      when "object"
+        return if value.is_a?(Hash) && validate_object(name, value, parameter.properties)
       end
 
       raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
+    end
+
+    def validate_object(_object_name, values, object_properties)
+      properties_hash = object_properties.map{ |po| [po.name, po]}.to_h
+
+      values.each do |name, value|
+        parameter = properties_hash[name]
+        check_parameter_type(name, value, parameter)
+      end
+
+      true
     end
 
     def request_body_properties

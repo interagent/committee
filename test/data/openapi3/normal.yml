@@ -132,6 +132,22 @@ paths:
                   type: boolean
                 number_1:
                   type: number
+                object_1:
+                  type: object
+                  properties:
+                    string_2:
+                      nullable: true
+                      type: string
+                    integer_2:
+                      nullable: true
+                      type: integer
+                    boolean_2:
+                      nullable: true
+                      type: boolean
+                    number_2:
+                      nullable: true
+                      type: number
+
       responses:
         '200':
           description: success

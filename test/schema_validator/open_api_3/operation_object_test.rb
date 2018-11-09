@@ -16,11 +16,25 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
         ['integer_1', 1],
         ['boolean_1', true],
         ['boolean_1', false],
-        ['number_1', 0.1]
+        ['number_1', 0.1],
     ]
 
     it 'correct data' do
-      @operation_object.validate(SCHEMA_PROPERTIES_PAIR)
+      @operation_object.validate(SCHEMA_PROPERTIES_PAIR.to_h)
+      assert true
+    end
+
+    it 'correct object data' do
+      @operation_object.validate({
+                                     "object_1" =>
+                                         {
+                                             "string_2" => nil,
+                                             "integer_2" => nil,
+                                             "boolean_2" => nil,
+                                             "number_2" => nil
+                                         }
+                                 })
+
       assert true
     end
 
@@ -29,7 +43,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
           ['string_1', 1],
           ['string_1', true],
           ['string_1', false],
-          # ['string_1', nil], TODO: support nillable
+          ['string_1', nil],
           ['integer_1', '1'],
           ['integer_1', 0.1],
           ['integer_1', true],
