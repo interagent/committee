@@ -16,9 +16,9 @@ Committee is tested on the following MRI versions:
 ## Committee::Middleware::RequestValidation
 
 ``` ruby
-json = JSON.parse(File.read(...)
+json = JSON.parse(File.read(...))
 schema = Committee::Drivers::HyperSchema.new.parse(json)
-use Committee::Middleware::RequestValidation, schema: schema)
+use Committee::Middleware::RequestValidation, schema: schema
 ```
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
@@ -255,9 +255,9 @@ Because 3.x support other schema and we can't define which parser we use.
 So please wrap Committee::Drivers::Schema like this.   
 
 ```ruby
-json = JSON.parse(File.read(...)
+json = JSON.parse(File.read(...))
 schema = Committee::Drivers::HyperSchema.new.parse(json)
-use Committee::Middleware::RequestValidation, schema: schema)
+use Committee::Middleware::RequestValidation, schema: schema
 ```
 
 ## Development
