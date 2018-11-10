@@ -55,6 +55,10 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
           ['number', '0.1'],
           ['number', true],
           ['number', false],
+          ['array', false],
+          ['array', 1],
+          ['array', true],
+          ['array', '1'],
       ]
 
       invalids.each do |key, value|
@@ -89,6 +93,35 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
 
       assert e.message.start_with?("required parameters #{object_2.keys.join(",")} not exist")
     end
+
+    describe 'array' do
+      it 'correct' do
+        @operation_object.validate({"array" => [1]})
+        assert true
+      end
+
+      it 'other value include' do
+        e = assert_raises(Committee::InvalidRequest) {
+          @operation_object.validate({"array" => [1, 1.1]})
+        }
+
+        assert e.message.start_with?("invalid parameter type array 1.1 Float integer")
+      end
+
+      it 'empty' do
+        @operation_object.validate({"array" => []})
+        assert true
+      end
+
+      it 'nil' do
+        e = assert_raises(Committee::InvalidRequest) {
+          @operation_object.validate({"array" => [nil]})
+        }
+
+        assert e.message.start_with?("invalid parameter type array  NilClass integer")
+      end
+    end
+
 
     it 'unknown param' do
       @operation_object.validate({"unknown" => 1})

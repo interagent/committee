@@ -1,5 +1,7 @@
 module Committee
   class SchemaValidator::OpenAPI3::OperationObject
+    # TODO: anyOf support
+
     # @param oas_parser_endpoint [OasParser::Endpoint]
     def initialize(oas_parser_endpoint)
       @oas_parser_endpoint = oas_parser_endpoint
@@ -43,7 +45,6 @@ module Committee
         raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
       end
 
-      # TODO: check array parameter
       case parameter.type
       when "string"
         return if value.is_a?(String)
@@ -57,11 +58,24 @@ module Committee
         return if value.is_a?(Numeric)
       when "object"
         return if value.is_a?(Hash) && validate_object(name, value, parameter)
+      when "array"
+        return if value.is_a?(Array) && validate_array(name, value, parameter)
       else
         # TODO: unknown type support
       end
 
       raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
+    end
+
+    # @param [OasParser::Parameter] parameter parameter.type = array
+    # @param [Array<Object>] values
+    def validate_array(object_name, values, parameter)
+      items = [OasParser::Parameter.new(parameter, parameter.items)] # TODO: multi pattern items support (anyOf, allOf)
+
+      values.each do |v|
+        item = items.first # TODO: multi pattern items support (anyOf, allOf)
+        check_parameter_type(object_name, v, item)
+      end
     end
 
     def validate_object(_object_name, values, parameter)

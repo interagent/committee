@@ -132,6 +132,10 @@ paths:
                   type: boolean
                 number:
                   type: number
+                array:
+                  type: array
+                  items:
+                    type: integer
                 object_1:
                   type: object
                   properties:
