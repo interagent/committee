@@ -10,7 +10,7 @@ module Committee
       # TODO: support @check_content_type
       # check_content_type!(request, params) if @check_content_type
 
-      @operation_object.validate(params)
+      @operation_object.validate_request_params(params)
 
       # TODO: support header
     end

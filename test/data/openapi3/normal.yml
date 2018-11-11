@@ -32,9 +32,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                type: object
+                properties:
+                  string_1:
+                    type: string
+                  array_1:
+                    type: array
+                    items:
+                      type: string
     post:
       description: new characters
       responses:
@@ -154,10 +159,10 @@ paths:
                 object_2:
                   type: object
                   required:
-                    - string_2
-                    - integer_2
-                    - boolean_2
-                    - number_2
+                  - string_2
+                  - integer_2
+                  - boolean_2
+                  - number_2
                   properties:
                     string_2:
                       type: string
@@ -167,7 +172,20 @@ paths:
                       type: boolean
                     number_2:
                       type: number
-
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  string:
+                    type: string
+        '204':
+          description: no content
+  /validate_response_array:
+    get:
       responses:
         '200':
           description: success

@@ -2,6 +2,8 @@ require_relative "../../test_helper"
 
 require "stringio"
 
+# TODO: fix
+
 describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
   describe 'open_api_3' do
     before do
