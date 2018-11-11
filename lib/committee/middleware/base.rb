@@ -43,6 +43,8 @@ module Committee::Middleware
         warn_string_deprecated
       elsif schema.is_a?(Hash)
         warn_hash_deprecated
+      elsif schema.is_a?(JsonSchema::Schema)
+        warn_json_schema_deprecated
       end
 
       if schema.is_a?(String)
@@ -65,6 +67,11 @@ module Committee::Middleware
       end
 
       schema
+    end
+
+    def warn_json_schema_deprecated
+      Committee.warn_deprecated("Committee: passing a JsonSchema::Schema to schema " \
+        "option is deprecated; please send a driver object instead.")
     end
 
     def warn_hash_deprecated
