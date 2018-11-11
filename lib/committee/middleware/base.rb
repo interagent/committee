@@ -24,10 +24,12 @@ module Committee::Middleware
     private
 
     def get_schema(options)
+      open_api_3 = options[:open_api_3]
+      return open_api_3 if open_api_3
+
       schema = options[:schema]
 
       if schema
-
         # Expect the type we want by now. If we don't have it, the user passed
         # something else non-standard in.
         if !schema.is_a?(Committee::Drivers::Schema)
@@ -37,7 +39,7 @@ module Committee::Middleware
         return schema
       end
 
-      raise(ArgumentError, "Committee: need option `schema`")
+      raise(ArgumentError, "Committee: need option `schema` or `open_api_3`")
     end
 
     def build_schema_validator(request)

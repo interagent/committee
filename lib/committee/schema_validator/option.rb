@@ -5,7 +5,7 @@ class Committee::SchemaValidator
     def initialize(options, schema)
       @headers_key = options[:headers_key] || "committee.headers"
       @params_key = options[:params_key] || "committee.params"
-      
+
       @coerce_recursive = options.fetch(:coerce_recursive, true)
 
       @allow_form_params   = options.fetch(:allow_form_params, true)

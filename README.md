@@ -241,7 +241,7 @@ And pass definition object to committee
 require 'oas_parser'
 
 definition = OasParser::Definition.resolve('petstore.yml')
-use Committee::Middleware::ResponseValidation, openapi3: definition
+use Committee::Middleware::ResponseValidation, open_api_3: definition
 ```
 
 ## Development

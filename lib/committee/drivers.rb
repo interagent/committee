@@ -8,6 +8,8 @@ module Committee
         Committee::Drivers::HyperSchema.new
       when :open_api_2
         Committee::Drivers::OpenAPI2.new
+      when :open_api_3
+        Committee::Drivers::OpenAPI3.new
       else
         raise ArgumentError, %{Committee: unknown driver "#{name}".}
       end
@@ -59,8 +61,7 @@ module Committee
       end
 
       def build_router(options)
-        validator_option = Committee::SchemaValidator::Option.new(options, self)
-        Committee::SchemaValidator::HyperSchema::Router.new(self, validator_option)
+        raise "needs implementation"
       end
     end
   end
