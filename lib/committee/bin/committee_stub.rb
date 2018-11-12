@@ -1,3 +1,5 @@
+# Don't Support OpenAPI3
+
 module Committee
   module Bin
     # CommitteeStub internalizes the functionality of bin/committee-stub so

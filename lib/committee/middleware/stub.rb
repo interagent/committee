@@ -1,3 +1,5 @@
+# Don't Support OpenAPI3
+
 module Committee::Middleware
   class Stub < Base
     def initialize(app, options={})
@@ -22,7 +24,7 @@ module Committee::Middleware
         headers = { "Content-Type" => "application/json" }
 
         data, schema = cache(link) do
-          Committee::ResponseGenerator.new.call(link)
+          Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
         end
 
         if @call

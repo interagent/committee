@@ -1,3 +1,4 @@
+# TODO: Support OpenAPI3
 module Committee::Test
   module Methods
     def assert_schema_conform

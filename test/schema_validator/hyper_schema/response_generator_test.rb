@@ -1,6 +1,6 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
-describe Committee::ResponseGenerator do
+describe Committee::SchemaValidator::HyperSchema::ResponseGenerator do
   before do
     @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
@@ -75,7 +75,7 @@ describe Committee::ResponseGenerator do
     link.target_schema = JsonSchema::Schema.new
     link.target_schema.enum = ["foo"]
     link.target_schema.type = ["string"]
-    data, _schema = Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal("foo", data)
   end
 
@@ -84,15 +84,15 @@ describe Committee::ResponseGenerator do
     link.target_schema = JsonSchema::Schema.new
 
     link.target_schema.type = ["integer"]
-    data, _schema = Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal 0, data
 
     link.target_schema.type = ["null"]
-    data, _schema = Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_nil data
 
     link.target_schema.type = ["string"]
-    data, _schema = Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal "", data
   end
 
@@ -100,7 +100,7 @@ describe Committee::ResponseGenerator do
     link = Committee::Drivers::OpenAPI2::Link.new
     link.target_schema = JsonSchema::Schema.new
     link.target_schema.type = ["array"]
-    data, _schema = Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal([], data)
   end
 
@@ -108,7 +108,7 @@ describe Committee::ResponseGenerator do
     link = Committee::Drivers::OpenAPI2::Link.new
     link.target_schema = JsonSchema::Schema.new
     link.target_schema.type = ["object"]
-    data, _schema = Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal({}, data)
   end
 
@@ -119,7 +119,7 @@ describe Committee::ResponseGenerator do
     link.target_schema.data = { "example" => 123 }
     link.target_schema.type = ["integer"]
 
-    data, _schema = Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal 123, data
   end
 
@@ -128,13 +128,13 @@ describe Committee::ResponseGenerator do
     link.target_schema = JsonSchema::Schema.new
 
     link.target_schema.type = ["null", "integer"]
-    data, _schema = Committee::ResponseGenerator.new.call(link)
+    data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal 0, data
   end
 
   def call
     # hyper-schema link should be dropped into driver wrapper before it's used
     link = Committee::Drivers::HyperSchema::Link.new(@link)
-    Committee::ResponseGenerator.new.call(link)
+    Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
   end
 end
