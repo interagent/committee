@@ -8,6 +8,8 @@ module Committee
       def get_app(schema, options)
         cache = {}
 
+        raise Committee::NotSupportOpenAPI3.new("OpenAPI3 not support stub") unless schema.support_stub?
+
         Rack::Builder.new {
           unless options[:tolerant]
             use Committee::Middleware::RequestValidation, schema: schema

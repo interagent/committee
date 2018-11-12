@@ -244,6 +244,12 @@ definition = OasParser::Definition.resolve('petstore.yml')
 use Committee::Middleware::ResponseValidation, open_api_3: definition
 ```
 
+### limitations of OpenAPI3 mode
+
+* Not support stub
+** 'Committee::Middleware::Stub' and 'Committee::Bin::CommitteeStub' don't work now.
+
+
 ## Development
 
 Run tests with the following:
