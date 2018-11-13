@@ -1,92 +1,36 @@
-# TODO: Support OpenAPI3
 module Committee::Test
   module Methods
     def assert_schema_conform
-      @committee_schema ||= begin
-        # The preferred option. The user has already parsed a schema elsewhere
-        # and we therefore don't have to worry about any performance
-        # implications of having to do it for every single test suite.
-        if committee_schema
-          committee_schema
-        else
-          schema = schema_contents
+      @schema ||= Committee::Middleware::Base.get_schema(committee_options)
+      @router ||= @schema.build_router(committee_options)
+      @validate_errors ||= committee_options[:validate_errors]
 
-          if schema.is_a?(String)
-            warn_string_deprecated
-          elsif schema.is_a?(Hash)
-            warn_hash_deprecated
-          end
+      v = @router.build_schema_validator(request_object)
 
-          if schema.is_a?(String)
-            schema = JSON.parse(schema)
-          end
-
-          if schema.is_a?(Hash) || schema.is_a?(JsonSchema::Schema)
-            driver = Committee::Drivers::HyperSchema.new
-
-            # The driver itself has its own special cases to be able to parse
-            # either a hash or JsonSchema::Schema object.
-            schema = driver.parse(schema)
-          end
-
-          schema
-        end
-      end
-
-      validator_option = Committee::SchemaValidator::Option.new({prefix: schema_url_prefix}, @committee_schema, :hyper_schema)
-      @committee_router ||= Committee::SchemaValidator::HyperSchema::Router.new(@committee_schema, validator_option)
-
-      link, _ = @committee_router.find_request_link(last_request)
-      unless link
-        response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
+      unless v.link_exist?
+        response = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema."
         raise Committee::InvalidResponse.new(response)
       end
 
-      if validate_response?(last_response.status)
-        data = JSON.parse(last_response.body)
-        Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
-      end
+      status, headers, body = response_data
+      v.response_validate(status, headers, [body]) if validate?(status)
     end
 
-    def assert_schema_content_type
-      Committee.warn_deprecated("Committee: use of #assert_schema_content_type is deprecated; use #assert_schema_conform instead.")
+    def committee_options
+      raise "please set options"
     end
 
-    # Can be overridden with a different driver name for other API definition
-    # formats.
-    def committee_schema
-      nil
+    def request_object
+      raise "please set object like 'last_request'"
     end
 
-    # can be overridden alternatively to #schema_path in case the schema is
-    # easier to access as a string
-    # blob
-    def schema_contents
-      JSON.parse(File.read(schema_path))
+    def response_data
+      raise "please set response data like 'last_response.status, last_response.headers, last_response.body'"
     end
 
-    def schema_path
-      raise "Please override #committee_schema."
-    end
-
-    def schema_url_prefix
-      nil
-    end
-
-    def warn_hash_deprecated
-      Committee.warn_deprecated("Committee: returning a hash from " \
-        "#schema_contents and using #schema_path is deprecated; please " \
-        "override #committee_schema instead.")
-    end
-
-    def warn_string_deprecated
-      Committee.warn_deprecated("Committee: returning a string from " \
-        "#schema_contents is deprecated; please override #committee_schema " \
-        "instead.")
-    end
-
-    def validate_response?(status)
-      Committee::SchemaValidator::HyperSchema::ResponseValidator.validate?(status)
+    # TODO: refactoring
+    def validate?(status)
+      status != 204 and @validate_errors || (200...300).include?(status)
     end
   end
 end
