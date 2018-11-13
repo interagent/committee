@@ -1,6 +1,6 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
-describe Committee::Router do
+describe Committee::SchemaValidator::HyperSchema::Router do
   it "builds routes without parameters" do
     link, _ = hyper_schema_router.find_link("GET", "/apps")
     refute_nil link
@@ -55,11 +55,15 @@ describe Committee::Router do
 
   def hyper_schema_router(options = {})
     schema = Committee::Drivers::HyperSchema.new.parse(hyper_schema_data)
-    Committee::Router.new(schema, options)
+    validator_option = Committee::SchemaValidator::Option.new(options, schema)
+
+    Committee::SchemaValidator::HyperSchema::Router.new(schema, validator_option)
   end
 
   def open_api_2_router(options = {})
     schema = Committee::Drivers::OpenAPI2.new.parse(open_api_2_data)
-    Committee::Router.new(schema, options)
+    validator_option = Committee::SchemaValidator::Option.new(options, schema)
+
+    Committee::SchemaValidator::HyperSchema::Router.new(schema, validator_option)
   end
 end

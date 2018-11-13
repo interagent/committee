@@ -1,6 +1,6 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
-describe Committee::ResponseValidator do
+describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
   before do
     @status = 200
     @headers = {
@@ -101,6 +101,6 @@ describe Committee::ResponseValidator do
   def call
     # hyper-schema link should be dropped into driver wrapper before it's used
     link = Committee::Drivers::HyperSchema::Link.new(@link)
-    Committee::ResponseValidator.new(link).call(@status, @headers, @data)
+    Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link).call(@status, @headers, @data)
   end
 end

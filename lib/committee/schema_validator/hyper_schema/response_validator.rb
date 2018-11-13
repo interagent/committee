@@ -1,5 +1,5 @@
 module Committee
-  class ResponseValidator
+  class SchemaValidator::HyperSchema::ResponseValidator
     attr_reader :validate_errors
 
     def initialize(link, options = {})

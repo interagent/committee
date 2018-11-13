@@ -6,10 +6,8 @@ require_relative "committee/errors"
 require_relative "committee/string_params_coercer"
 require_relative "committee/parameter_coercer"
 require_relative "committee/request_unpacker"
-require_relative "committee/request_validator"
 require_relative "committee/response_generator"
-require_relative "committee/response_validator"
-require_relative "committee/router"
+
 require_relative "committee/validation_error"
 
 require_relative "committee/drivers"
@@ -20,6 +18,12 @@ require_relative "committee/middleware/base"
 require_relative "committee/middleware/request_validation"
 require_relative "committee/middleware/response_validation"
 require_relative "committee/middleware/stub"
+
+require_relative "committee/schema_validator/option"
+require_relative "committee/schema_validator/hyper_schema"
+require_relative "committee/schema_validator/hyper_schema/request_validator"
+require_relative "committee/schema_validator/hyper_schema/response_validator"
+require_relative "committee/schema_validator/hyper_schema/router"
 
 require_relative "committee/bin/committee_stub"
 

@@ -57,6 +57,11 @@ module Committee
       def driver
         raise "needs implementation"
       end
+
+      def build_router(options)
+        validator_option = Committee::SchemaValidator::Option.new(options, self)
+        Committee::SchemaValidator::HyperSchema::Router.new(self, validator_option)
+      end
     end
   end
 end

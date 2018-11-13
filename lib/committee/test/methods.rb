@@ -32,8 +32,8 @@ module Committee::Test
         end
       end
 
-      @committee_router ||= Committee::Router.new(@committee_schema,
-        prefix: schema_url_prefix)
+      validator_option = Committee::SchemaValidator::Option.new({prefix: schema_url_prefix}, @committee_schema)
+      @committee_router ||= Committee::SchemaValidator::HyperSchema::Router.new(@committee_schema, validator_option)
 
       link, _ = @committee_router.find_request_link(last_request)
       unless link
@@ -43,7 +43,7 @@ module Committee::Test
 
       if validate_response?(last_response.status)
         data = JSON.parse(last_response.body)
-        Committee::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
+        Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
       end
     end
 
@@ -85,7 +85,7 @@ module Committee::Test
     end
 
     def validate_response?(status)
-      Committee::ResponseValidator.validate?(status)
+      Committee::SchemaValidator::HyperSchema::ResponseValidator.validate?(status)
     end
   end
 end

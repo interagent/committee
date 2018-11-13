@@ -19,8 +19,7 @@ describe Committee::Middleware::Base do
     assert_equal 200, last_response.status
   end
 
-  it "accepts schema string (legacy behavior)" do
-    mock(Committee).warn_deprecated.with_any_args
+  it "don't accepts schema string" do
     @app = new_rack_app(
       schema: JSON.dump(hyper_schema_data)
     )
@@ -28,12 +27,16 @@ describe Committee::Middleware::Base do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
+
+    e = assert_raises(ArgumentError) do
+      post "/apps", JSON.generate(params)
+    end
+
+    assert_equal "Committee: schema expected to be an instance " +
+                     "of Committee::Drivers::Schema.", e.message
   end
 
-  it "accepts schema hash (legacy behavior)" do
-    mock(Committee).warn_deprecated.with_any_args
+  it "don't accepts schema hash" do
     @app = new_rack_app(
       schema: hyper_schema_data
     )
@@ -41,15 +44,16 @@ describe Committee::Middleware::Base do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
+
+    e = assert_raises(ArgumentError) do
+      post "/apps", JSON.generate(params)
+    end
+
+    assert_equal "Committee: schema expected to be an instance " +
+                     "of Committee::Drivers::Schema.", e.message
   end
 
-  it "accepts schema JsonSchema::Schema object (legacy behavior)" do
-    # Note we don't warn here because this is a recent deprecation and passing
-    # a schema object will not be a huge performance hit. We should probably
-    # start warning on the next version.
-
+  it "don't accepts schema JsonSchema::Schema object" do
     @app = new_rack_app(
       schema: JsonSchema.parse!(hyper_schema_data)
     )
@@ -57,8 +61,13 @@ describe Committee::Middleware::Base do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
+
+    e = assert_raises(ArgumentError) do
+      post "/apps", JSON.generate(params)
+    end
+
+    assert_equal "Committee: schema expected to be an instance " +
+                     "of Committee::Drivers::Schema.", e.message
   end
 
   it "doesn't accept other schema types" do
@@ -68,8 +77,18 @@ describe Committee::Middleware::Base do
     e = assert_raises(ArgumentError) do
       post "/apps"
     end
-    assert_equal "Committee: schema expected to be a hash or an instance " +
-      "of Committee::Drivers::Schema.", e.message
+
+    assert_equal "Committee: schema expected to be an instance " +
+                     "of Committee::Drivers::Schema.", e.message
+  end
+
+  it "schema not exist" do
+    @app = new_rack_app
+    e = assert_raises(ArgumentError) do
+      post "/apps"
+    end
+
+    assert_equal "Committee: need option `schema`", e.message
   end
 
   private
