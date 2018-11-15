@@ -10,7 +10,7 @@ class Committee::SchemaValidator
     def request_validate(request)
       # Attempts to coerce parameters that appear in a link's URL to Ruby
       # types that can be validated with a schema.
-      param_matches_hash = coerce_path_params ? coerce_path_params : {}
+      param_matches_hash = validator_option.coerce_path_params ? coerce_path_params : {}
 
       # Attempts to coerce parameters that appear in a query string to Ruby
       # types that can be validated with a schema.
