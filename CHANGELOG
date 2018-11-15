@@ -1,5 +1,9 @@
 Unreleased
 
+2.3.0 2018-11-15
+	Deprecate use of `JsonSchema::Schema` object (#147)
+	Update minimum Rack dependencies to mitigate CVE-2018-16471 (#155)
+
 2.2.1 2018-09-20
 	Add numeric response status support for openapi 2 (#141)
 
