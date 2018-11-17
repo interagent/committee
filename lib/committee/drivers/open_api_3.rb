@@ -36,6 +36,7 @@ module Committee::Drivers
       def initialize(driver, definitions)
         @definitions = definitions
         @driver = driver
+        @templated_paths = Committee::SchemaValidator::OpenAPI3::TemplatedPaths.new(definitions)
       end
 
       def support_stub?
@@ -53,11 +54,14 @@ module Committee::Drivers
 
       # OpenAPI3 only
       def operation_object(path, method)
-        return nil unless definitions.raw['paths'][path]
-        path_item_object = definitions.path_by_path(path)
+        endpoint = nil
+        if definitions.raw['paths'][path]
+          path_item_object = definitions.path_by_path(path)
+          endpoint = path_item_object.endpoint_by_method(method) if path_item_object.raw[method]
+        end
 
-        return nil unless path_item_object.raw[method]
-        endpoint = path_item_object.endpoint_by_method(method)
+        endpoint = @templated_paths.operation_object(path, method) if endpoint.nil?
+        return nil unless endpoint
 
         Committee::SchemaValidator::OpenAPI3::OperationObject.new(endpoint)
       end

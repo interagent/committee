@@ -256,3 +256,90 @@ paths:
                 type: array
                 items:
                   type: string
+
+  /path_template_test/no_template:
+    get:
+      responses:
+        '204':
+          description: no content
+  /path_template_test/{template_name}:
+    parameters:
+    - name: template_name
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      responses:
+        '204':
+          description: no content
+  /path_template_test/{template_name}/nested:
+    parameters:
+    - name: template_name
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      responses:
+        '204':
+          description: no content
+  /path_template_test/{template_name}/nested/{nested_parameter}:
+    parameters:
+    - name: template_name
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: nested_parameter
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      responses:
+        '204':
+          description: no content
+  /path_template_test/{template_name}/{nested_parameter}:
+    parameters:
+    - name: template_name
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: nested_parameter
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      responses:
+        '204':
+          description: no content
+  /path_template_test/{template_name}/{nested_parameter}/finish:
+    parameters:
+    - name: template_name
+      in: path
+      required: true
+      schema:
+        type: string
+    - name: nested_parameter
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      responses:
+        '204':
+          description: no content
+  /{ambiguous}/no_template:
+    parameters:
+    - name: ambiguous
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      responses:
+        '204':
+          description: no content

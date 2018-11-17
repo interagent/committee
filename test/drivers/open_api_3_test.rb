@@ -32,4 +32,45 @@ describe Committee::Drivers::OpenAPI3 do
   it "defaults to query parameters" do
     assert_equal true, @driver.default_query_params
   end
+
+  describe "Schema" do
+    describe "#operation_object" do
+      describe "path template" do
+        it "get normal path" do
+          obj = open_api_3_schema.operation_object("/path_template_test/no_template", "get")
+          assert_equal "/path_template_test/no_template", obj.send(:oas_parser_endpoint).path.path
+        end
+
+        it "get template path" do
+          obj = open_api_3_schema.operation_object("/path_template_test/test", "get")
+          assert_equal "/path_template_test/{template_name}", obj.send(:oas_parser_endpoint).path.path
+        end
+
+        it "get nested template path" do
+          obj = open_api_3_schema.operation_object("/path_template_test/abc/nested", "get")
+          assert_equal "/path_template_test/{template_name}/nested", obj.send(:oas_parser_endpoint).path.path
+        end
+
+        it "get double nested template path" do
+          obj = open_api_3_schema.operation_object("/path_template_test/test/nested/abc", "get")
+          assert_equal "/path_template_test/{template_name}/nested/{nested_parameter}", obj.send(:oas_parser_endpoint).path.path
+        end
+
+        it "get twice nested template path" do
+          obj = open_api_3_schema.operation_object("/path_template_test/test/abc", "get")
+          assert_equal "/path_template_test/{template_name}/{nested_parameter}", obj.send(:oas_parser_endpoint).path.path
+        end
+
+        it "get twice nested concrete path" do
+          obj = open_api_3_schema.operation_object("/path_template_test/test/abc/finish", "get")
+          assert_equal "/path_template_test/{template_name}/{nested_parameter}/finish", obj.send(:oas_parser_endpoint).path.path
+        end
+
+        it "get ambiguous path" do
+          obj = open_api_3_schema.operation_object("/ambiguous/no_template", "get")
+          assert_equal "/{ambiguous}/no_template", obj.send(:oas_parser_endpoint).path.path
+        end
+      end
+    end
+  end
 end
