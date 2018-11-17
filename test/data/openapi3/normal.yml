@@ -172,6 +172,26 @@ paths:
                       type: boolean
                     number_2:
                       type: number
+                required_object:
+                  type: object
+                  required:
+                  - need_object
+                  properties:
+                    need_object:
+                      type: object
+                      required:
+                      - string
+                      properties:
+                        string:
+                          type: string
+                    no_need_object:
+                      type: object
+                      required:
+                      - integer
+                      properties:
+                        integer:
+                          type: integer
+
       responses:
         '200':
           description: success

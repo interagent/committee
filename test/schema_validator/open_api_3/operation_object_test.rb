@@ -94,6 +94,42 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
       assert e.message.start_with?("required parameters #{object_2.keys.join(",")} not exist")
     end
 
+    it 'nested required params' do
+      required_object = {
+          need_object: {
+              string: 'abc'
+          },
+          no_need_object: {
+              integer: 1
+          }
+      }.deep_transform_keys(&:to_s)
+
+      @operation_object.validate_request_params({"required_object" => required_object})
+      assert true
+
+      required_object.delete "no_need_object"
+      @operation_object.validate_request_params({"required_object" => required_object})
+
+      required_object['need_object'].delete "string"
+      e = assert_raises(Committee::InvalidRequest) {
+        @operation_object.validate_request_params({"required_object" => required_object})
+      }
+
+      assert e.message.start_with?("required parameters string not exist")
+
+      delete_need_object = {
+          no_need_object: {
+              integer: 1
+          }
+      }.deep_transform_keys(&:to_s)
+
+      e = assert_raises(Committee::InvalidRequest) {
+        @operation_object.validate_request_params({"required_object" => delete_need_object})
+      }
+
+      assert e.message.start_with?("required parameters need_object not exist")
+    end
+
     describe 'array' do
       it 'correct' do
         @operation_object.validate_request_params({"array" => [1]})

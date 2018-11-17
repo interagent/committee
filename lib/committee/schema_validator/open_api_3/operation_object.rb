@@ -94,17 +94,17 @@ module Committee
 
     def validate_object(_object_name, values, parameter)
       properties_hash = parameter.properties.map{ |po| [po.name, po]}.to_h
-      requireds_hash = properties_hash.select{ |_k,v| v.required}
+      required_set = parameter.raw['required'] ? parameter.raw['required'].to_set : Set.new
 
       values.each do |name, value|
         parameter = properties_hash[name]
         check_parameter_type(name, value, parameter)
 
-        requireds_hash.delete(name)
+        required_set.delete(name)
       end
 
-      unless requireds_hash.empty?
-        raise InvalidRequest, "required parameters #{requireds_hash.keys.join(",")} not exist"
+      unless required_set.empty?
+        raise InvalidRequest, "required parameters #{required_set.to_a.join(",")} not exist"
       end
 
       true
