@@ -159,6 +159,18 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
 
         assert e.message.start_with?("invalid parameter type array  NilClass integer")
       end
+
+
+      it 'anyOf' do
+        operation_object.validate_request_params({"any_of" => ['test', true]})
+        assert true
+
+        e = assert_raises(Committee::InvalidRequest) {
+          operation_object.validate_request_params({"any_of" => [1]})
+        }
+
+        assert e.message.start_with?("Invalid parameter 1 isn't any of")
+      end
     end
 
     it 'support put method' do

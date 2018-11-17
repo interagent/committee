@@ -191,6 +191,12 @@ paths:
                       properties:
                         integer:
                           type: integer
+                any_of:
+                  type: array
+                  items:
+                    anyOf:
+                    - type: string
+                    - type: boolean
 
       responses:
         '200':

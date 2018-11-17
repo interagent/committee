@@ -15,20 +15,21 @@ module Committee
     end
 
     def validate_request_params(params)
-      case oas_parser_endpoint.method
-      when 'get'
-        # TODO: get validation support
-      when 'post'
-        validate_post_request_params(params)
-      when 'put'
-        validate_post_request_params(params)
-      when 'patch'
-        validate_post_request_params(params)
-      #when 'delete'
-      # TODO: delete validation support
-      else
-        raise "OpenAPI3 not support #{oas_parser_endpoint.method} method"
-      end
+      err = case oas_parser_endpoint.method
+            when 'get'
+              # TODO: get validation support
+            when 'post'
+              validate_post_request_params(params)
+            when 'put'
+              validate_post_request_params(params)
+            when 'patch'
+              validate_post_request_params(params)
+              #when 'delete'
+              # TODO: delete validation support
+            else
+              raise "OpenAPI3 not support #{oas_parser_endpoint.method} method"
+            end
+      raise err if err
     end
 
     def validate_response_params(status, content_type, data)
@@ -41,7 +42,9 @@ module Committee
       # But, array object 'items' properties check ['schema']['items'] so we mustn't flatten :(
       media_type_object = media_type_object['schema'] if media_type_object['schema'] && media_type_object['schema']['type'] == 'object'
       parameter = OasParser::Parameter.new(ro, media_type_object)
-      check_parameter_type('response', data, parameter)
+
+      error = check_parameter_type('response', data, parameter)
+      raise error if error
     end
 
     private
@@ -52,8 +55,11 @@ module Committee
     def validate_post_request_params(params)
       params.each do |name, value|
         parameter = request_body_properties[name]
-        check_parameter_type(name, value, parameter)
+        err = check_parameter_type(name, value, parameter)
+        return err if err
       end
+
+      nil
     end
 
     def check_parameter_type(name, value, parameter)
@@ -62,7 +68,7 @@ module Committee
       if value.nil?
         return if parameter.raw["nullable"]
 
-        raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
+        return InvalidRequest.new("invalid parameter type #{name} #{value} #{value.class} #{parameter.type}")
       end
 
       case parameter.type
@@ -77,25 +83,38 @@ module Committee
         return if value.is_a?(Integer)
         return if value.is_a?(Numeric)
       when "object"
-        return if value.is_a?(Hash) && validate_object(name, value, parameter)
+        return validate_object(name, value, parameter) if value.is_a?(Hash)
       when "array"
-        return if value.is_a?(Array) && validate_array(name, value, parameter)
+        return validate_array(name, value, parameter) if value.is_a?(Array)
       else
         # TODO: unknown type support
       end
 
-      raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}"
+      InvalidRequest.new("invalid parameter type #{name} #{value} #{value.class} #{parameter.type}")
     end
 
     # @param [OasParser::Parameter] parameter parameter.type = array
     # @param [Array<Object>] values
     def validate_array(object_name, values, parameter)
-      items = [OasParser::Parameter.new(parameter, parameter.items)] # TODO: multi pattern items support (anyOf, allOf)
+      is_any_of = parameter.items['anyOf']
+
+      items = if is_any_of
+                parameter.items['anyOf'].map{ |item| OasParser::Parameter.new(parameter, item) }
+              else
+                [OasParser::Parameter.new(parameter, parameter.items)] # TODO: multi pattern items support (allOf)
+              end
 
       values.each do |v|
-        item = items.first # TODO: multi pattern items support (anyOf, allOf)
-        check_parameter_type(object_name, v, item)
+        if is_any_of
+          next if items.any? { |item| check_parameter_type(object_name, v, item).nil? }
+          return InvalidRequest.new("Invalid parameter #{v} isn't any of #{items}")
+        else
+          err = check_parameter_type(object_name, v, items.first)
+          return err if err
+        end
       end
+
+      nil
     end
 
     def validate_object(_object_name, values, parameter)
@@ -104,16 +123,14 @@ module Committee
 
       values.each do |name, value|
         parameter = properties_hash[name]
-        check_parameter_type(name, value, parameter)
+        err = check_parameter_type(name, value, parameter)
+        return err if err
 
         required_set.delete(name)
       end
 
-      unless required_set.empty?
-        raise InvalidRequest, "required parameters #{required_set.to_a.join(",")} not exist"
-      end
-
-      true
+      return InvalidRequest.new("required parameters #{required_set.to_a.join(",")} not exist") unless required_set.empty?
+      nil
     end
 
     def request_body_properties
