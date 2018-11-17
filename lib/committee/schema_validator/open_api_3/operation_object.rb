@@ -20,6 +20,12 @@ module Committee
         # TODO: get validation support
       when 'post'
         validate_post_request_params(params)
+      when 'put'
+        validate_post_request_params(params)
+      when 'patch'
+        validate_post_request_params(params)
+      #when 'delete'
+      # TODO: delete validation support
       else
         raise "OpenAPI3 not support #{oas_parser_endpoint.method} method"
       end

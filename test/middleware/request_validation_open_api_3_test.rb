@@ -440,10 +440,10 @@ describe Committee::Middleware::RequestValidation do
     @app = new_rack_app(open_api_3: open_api_3_schema)
 
     e = assert_raises(RuntimeError) {
-      put "/characters", {}
+      delete "/characters", {}
     }
 
-    assert_equal 'OpenAPI3 not support put method', e.message
+    assert_equal 'OpenAPI3 not support delete method', e.message
   end
 
   private

@@ -5,10 +5,13 @@ require "stringio"
 describe Committee::SchemaValidator::OpenAPI3::OperationObject do
   describe 'validate' do
     before do
-      path = '/validate'
-      method = 'post'
-      @operation_object = open_api_3_schema.operation_object(path, method)
+      @path = '/validate'
+      @method = 'post'
       @validator_option = Committee::SchemaValidator::Option.new({}, open_api_3_schema, :open_api_3)
+    end
+
+    def operation_object
+      open_api_3_schema.operation_object(@path, @method)
     end
 
     SCHEMA_PROPERTIES_PAIR = [
@@ -20,12 +23,12 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
     ]
 
     it 'correct data' do
-      @operation_object.validate_request_params(SCHEMA_PROPERTIES_PAIR.to_h)
+      operation_object.validate_request_params(SCHEMA_PROPERTIES_PAIR.to_h)
       assert true
     end
 
     it 'correct object data' do
-      @operation_object.validate_request_params({
+      operation_object.validate_request_params({
                                      "object_1" =>
                                          {
                                              "string_1" => nil,
@@ -63,7 +66,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
 
       invalids.each do |key, value|
         e = assert_raises(Committee::InvalidRequest) {
-          @operation_object.validate_request_params({"#{key}" => value})
+          operation_object.validate_request_params({"#{key}" => value})
         }
 
         assert e.message.start_with?("invalid parameter type #{key}")
@@ -81,14 +84,14 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
       object_2.keys.each do |key|
         deleted_object = object_2.reject{|k, _v| k == key}
         e = assert_raises(Committee::InvalidRequest) {
-          @operation_object.validate_request_params({"object_2" => deleted_object})
+          operation_object.validate_request_params({"object_2" => deleted_object})
         }
 
         assert e.message.start_with?("required parameters #{key} not exist")
       end
 
       e = assert_raises(Committee::InvalidRequest) {
-        @operation_object.validate_request_params({"object_2" => {}})
+        operation_object.validate_request_params({"object_2" => {}})
       }
 
       assert e.message.start_with?("required parameters #{object_2.keys.join(",")} not exist")
@@ -104,15 +107,15 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
           }
       }.deep_transform_keys(&:to_s)
 
-      @operation_object.validate_request_params({"required_object" => required_object})
+      operation_object.validate_request_params({"required_object" => required_object})
       assert true
 
       required_object.delete "no_need_object"
-      @operation_object.validate_request_params({"required_object" => required_object})
+      operation_object.validate_request_params({"required_object" => required_object})
 
       required_object['need_object'].delete "string"
       e = assert_raises(Committee::InvalidRequest) {
-        @operation_object.validate_request_params({"required_object" => required_object})
+        operation_object.validate_request_params({"required_object" => required_object})
       }
 
       assert e.message.start_with?("required parameters string not exist")
@@ -124,7 +127,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
       }.deep_transform_keys(&:to_s)
 
       e = assert_raises(Committee::InvalidRequest) {
-        @operation_object.validate_request_params({"required_object" => delete_need_object})
+        operation_object.validate_request_params({"required_object" => delete_need_object})
       }
 
       assert e.message.start_with?("required parameters need_object not exist")
@@ -132,35 +135,56 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
 
     describe 'array' do
       it 'correct' do
-        @operation_object.validate_request_params({"array" => [1]})
+        operation_object.validate_request_params({"array" => [1]})
         assert true
       end
 
       it 'other value include' do
         e = assert_raises(Committee::InvalidRequest) {
-          @operation_object.validate_request_params({"array" => [1, 1.1]})
+          operation_object.validate_request_params({"array" => [1, 1.1]})
         }
 
         assert e.message.start_with?("invalid parameter type array 1.1 Float integer")
       end
 
       it 'empty' do
-        @operation_object.validate_request_params({"array" => []})
+        operation_object.validate_request_params({"array" => []})
         assert true
       end
 
       it 'nil' do
         e = assert_raises(Committee::InvalidRequest) {
-          @operation_object.validate_request_params({"array" => [nil]})
+          operation_object.validate_request_params({"array" => [nil]})
         }
 
         assert e.message.start_with?("invalid parameter type array  NilClass integer")
       end
     end
 
+    it 'support put method' do
+      @method = "put"
+      operation_object.validate_request_params({"string" => "str"})
+
+      e = assert_raises(Committee::InvalidRequest) {
+        operation_object.validate_request_params({"string" => 1})
+      }
+
+      assert e.message.start_with?("invalid parameter type string 1 Integer string")
+    end
+
+    it 'support patch method' do
+      @method = "patch"
+      operation_object.validate_request_params({"integer" => 1})
+
+      e = assert_raises(Committee::InvalidRequest) {
+        operation_object.validate_request_params({"integer" => "str"})
+      }
+
+      assert e.message.start_with?("invalid parameter type integer str String integer")
+    end
 
     it 'unknown param' do
-      @operation_object.validate_request_params({"unknown" => 1})
+      operation_object.validate_request_params({"unknown" => 1})
     end
   end
 end

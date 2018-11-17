@@ -60,7 +60,7 @@ paths:
               properties:
                 string_post_1:
                   type: string
-    put:
+    delete:
       description: new characters
       responses:
         '200':
@@ -72,14 +72,14 @@ paths:
                 properties:
                   response_1:
                     type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                string_post_1:
-                  type: string
+      parameters:
+      - name: limit
+        in: query
+        description: maximum number of characters
+        required: false
+        schema:
+          type: integer
+          format: int32
 
   /string_params_coercer:
     get:
@@ -204,6 +204,47 @@ paths:
                     type: string
         '204':
           description: no content
+    put:
+      description: validate put metodhd
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                string:
+                  type: string
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  string:
+                    type: string
+    patch:
+      description: validate patch metodhd
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                integer:
+                  type: integer
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  string:
+                    type: string
+
   /validate_response_array:
     get:
       responses:
