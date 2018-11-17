@@ -46,6 +46,12 @@ module Committee::Drivers
         validator_option = Committee::SchemaValidator::Option.new(options, self)
         Committee::SchemaValidator::OpenAPI3::Router.new(self, validator_option)
       end
+
+      # OpenAPI3 only
+      def path_object(path)
+        return nil unless definitions.raw['paths'][path]
+        definitions.path_by_path(path)
+      end
     end
   end
 end

@@ -64,7 +64,7 @@ end
 def open_api_3_schema
   @open_api_3_schema ||= begin
     driver = Committee::Drivers::OpenAPI3.new
-    driver.parse(open_api_2_data)
+    driver.parse(open_api_3_data)
   end
 end
 
