@@ -173,6 +173,44 @@ describe Committee::SchemaValidator::OpenAPI3::OperationObject do
       end
     end
 
+    describe 'enum' do
+      it 'enum string' do
+        ['a', 'b'].each do |str|
+          operation_object.validate_request_params({"enum_string" => str})
+        end
+
+        e = assert_raises(Committee::InvalidRequest) {
+          operation_object.validate_request_params({"enum_string" => 'x'})
+        }
+
+        assert e.message.start_with?("Invalid parameter enum_string x isn't in enum")
+      end
+
+      it 'enum integer' do
+        [1, 2].each do |n|
+          operation_object.validate_request_params({"enum_integer" => n})
+        end
+
+        e = assert_raises(Committee::InvalidRequest) {
+          operation_object.validate_request_params({"enum_integer" => 3})
+        }
+
+        assert e.message.start_with?("Invalid parameter enum_integer 3 isn't in enum")
+      end
+
+      it 'enum number' do
+        [1.0, 2.1].each do |n|
+          operation_object.validate_request_params({"enum_number" => n})
+        end
+
+        e = assert_raises(Committee::InvalidRequest) {
+          operation_object.validate_request_params({"enum_number" => 1.1})
+        }
+
+        assert e.message.start_with?("Invalid parameter enum_number 1.1 isn't in enum")
+      end
+    end
+
     it 'support put method' do
       @method = "put"
       operation_object.validate_request_params({"string" => "str"})

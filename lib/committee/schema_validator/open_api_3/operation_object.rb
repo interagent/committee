@@ -73,15 +73,15 @@ module Committee
 
       case parameter.type
       when "string"
-        return if value.is_a?(String)
+        return string_check(name, value, parameter) if value.is_a?(String)
       when "integer"
-        return if value.is_a?(Integer)
+        return integer_check(name, value, parameter) if value.is_a?(Integer)
       when "boolean"
         return if value.is_a?(TrueClass)
         return if value.is_a?(FalseClass)
       when "number"
-        return if value.is_a?(Integer)
-        return if value.is_a?(Numeric)
+        return integer_check(name, value, parameter) if value.is_a?(Integer)
+        return number_check(name, value, parameter) if value.is_a?(Numeric)
       when "object"
         return validate_object(name, value, parameter) if value.is_a?(Hash)
       when "array"
@@ -91,6 +91,25 @@ module Committee
       end
 
       InvalidRequest.new("invalid parameter type #{name} #{value} #{value.class} #{parameter.type}")
+    end
+
+    def number_check(name, value, parameter)
+      check_enum_include(name, value, parameter)
+    end
+
+    def integer_check(name, value, parameter)
+      check_enum_include(name, value, parameter)
+    end
+
+    def string_check(name, value, parameter)
+      check_enum_include(name, value, parameter)
+    end
+
+    def check_enum_include(name, value, parameter)
+      return unless parameter.enum
+      return if parameter.enum.include?(value)
+
+      InvalidRequest.new("Invalid parameter #{name} #{value} isn't in enum")
     end
 
     # @param [OasParser::Parameter] parameter parameter.type = array

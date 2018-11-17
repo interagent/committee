@@ -197,6 +197,21 @@ paths:
                     anyOf:
                     - type: string
                     - type: boolean
+                enum_string:
+                  type: string
+                  enum:
+                    - a
+                    - b
+                enum_integer:
+                  type: integer
+                  enum:
+                  - 1
+                  - 2
+                enum_number:
+                  type: number
+                  enum:
+                  - 1.0
+                  - 2.1
 
       responses:
         '200':
