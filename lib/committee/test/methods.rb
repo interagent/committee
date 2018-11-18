@@ -41,7 +41,7 @@ module Committee::Test
         raise Committee::InvalidResponse.new(response)
       end
 
-      if validate_response?(last_response.status)
+      if validate?(last_response.status)
         data = JSON.parse(last_response.body)
         Committee::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
       end
@@ -51,9 +51,21 @@ module Committee::Test
       Committee.warn_deprecated("Committee: use of #assert_schema_content_type is deprecated; use #assert_schema_conform instead.")
     end
 
+    # we use this method 3.0 or later
+    def committee_options
+      Committee.warn_deprecated("Committee: committee 3.0 require overwrite committee options so please use this method.")
+
+      {}
+    end
+
     # Can be overridden with a different driver name for other API definition
     # formats.
     def committee_schema
+      schema = committee_options[:schema]
+      return schema if schema
+
+      Committee.warn_deprecated("Committee: we'll remove committee_schema method in committee 3.0;" \
+        "please use committee_options.")
       nil
     end
 
@@ -61,14 +73,26 @@ module Committee::Test
     # easier to access as a string
     # blob
     def schema_contents
+      Committee.warn_deprecated("Committee: we'll remove schema_contents method in committee 3.0;" \
+        "please use committee_options.")
       JSON.parse(File.read(schema_path))
     end
 
     def schema_path
+      Committee.warn_deprecated("Committee: we'll remove schema_path method in committee 3.0;" \
+        "please use committee_options.")
       raise "Please override #committee_schema."
     end
 
     def schema_url_prefix
+      prefix = committee_options[:prefix]
+      return prefix if prefix
+
+      schema = committee_options[:schema]
+      return nil if schema # committee_options set so we don't show warn message
+
+      Committee.warn_deprecated("Committee: we'll remove schema_url_prefix method in committee 3.0;" \
+        "please use committee_options.")
       nil
     end
 
@@ -85,7 +109,15 @@ module Committee::Test
     end
 
     def validate_response?(status)
+      Committee.warn_deprecated("Committee: w'll remove validate_response? method in committee 3.0")
+
       Committee::ResponseValidator.validate?(status)
     end
+
+    private
+
+      def validate?(status)
+        Committee::ResponseValidator.validate?(status)
+      end
   end
 end
