@@ -121,6 +121,35 @@ paths:
                 items:
                   type: string
   /validate:
+    get:
+      description: get characters
+      parameters:
+      - name: query_string
+        in: query
+        required: true
+        style: form
+        schema:
+          type: string
+      - name: query_string
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: query_integer_list
+        in: query
+        required: true
+        schema:
+          type: array
+          items:
+            type: integer
+      - name: optional_integer
+        in: query
+        required: false
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: no content
     post:
       description: validate test data
       requestBody:
@@ -200,8 +229,8 @@ paths:
                 enum_string:
                   type: string
                   enum:
-                    - a
-                    - b
+                  - a
+                  - b
                 enum_integer:
                   type: integer
                   enum:

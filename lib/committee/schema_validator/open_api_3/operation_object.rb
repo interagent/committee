@@ -17,7 +17,7 @@ module Committee
     def validate_request_params(params)
       err = case oas_parser_endpoint.method
             when 'get'
-              # TODO: get validation support
+              validate_get_request_params(params)
             when 'post'
               validate_post_request_params(params)
             when 'put'
@@ -48,6 +48,29 @@ module Committee
     end
 
     private
+
+    def validate_get_request_params(params)
+      # TODO: check path parameter
+
+      parameter_object_hash = oas_parser_endpoint.
+          parameters.
+          map { |parameter| parameter.in == "query" ? [parameter.name, parameter] : nil }.
+          compact.
+          to_h
+
+      no_exist_required_params = parameter_object_hash.select{ |_, v| v.required }.keys - params.keys
+      return InvalidRequest.new("required parameters #{no_exist_required_params.to_a.join(",")} not exist") unless no_exist_required_params.empty?
+
+      params.each do |name, value|
+        parameter_object = parameter_object_hash[name]
+        next unless parameter_object
+
+        err = check_parameter_type(name, value, parameter_object)
+        return err if err
+      end
+
+      nil
+    end
 
     # @return [OasParser::Endpoint]
     attr_reader :oas_parser_endpoint
