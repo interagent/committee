@@ -1,11 +1,11 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
-describe Committee::StringParamsCoercer do
+describe Committee::SchemaValidator::OpenAPI3::StringParamsCoercer do
   before do
-    @schema = JsonSchema.parse!(hyper_schema_data)
-    @schema.expand_references!
-    # GET /search/apps
-    @link = @schema.properties["app"].links[5]
+    path = '/string_params_coercer'
+    method = 'get'
+    @operation_object = open_api_3_schema.operation_object(path, method)
+    @validator_option = Committee::SchemaValidator::Option.new({}, open_api_3_schema, :open_api_3)
   end
 
   it "doesn't coerce params not in the schema" do
@@ -13,43 +13,49 @@ describe Committee::StringParamsCoercer do
   end
 
   it "skips values for string param" do
-    check_convert("name", "foo", "foo")
+    check_convert("string_1", "foo", "foo")
   end
 
   it "coerces valid values for boolean param" do
-    check_convert("deleted", "true", true)
-    check_convert("deleted", "false", false)
-    check_convert("deleted", "1", true)
-    check_convert("deleted", "0", false)
+    key = "boolean_1"
+    check_convert(key, "true", true)
+    check_convert(key, "false", false)
+    check_convert(key, "1", true)
+    check_convert(key, "0", false)
   end
 
   it "skips invalid values for boolean param" do
-    check_convert("deleted", "foo", "foo")
+    key = "boolean_1"
+    check_convert(key, "foo", "foo")
   end
 
   it "coerces valid values for integer param" do
-    check_convert("per_page", "3", 3)
+    check_convert("integer_1", "3", 3)
   end
 
   it "skips invalid values for integer param" do
-    check_convert("per_page", "3.5", "3.5")
-    check_convert("per_page", "false", "false")
-    check_convert("per_page", "", "")
+    key = "integer_1"
+    check_convert(key, "3.5", "3.5")
+    check_convert(key, "false", "false")
+    check_convert(key, "", "")
   end
 
   it "coerces valid values for number param" do
-    check_convert("threshold", "3", 3.0)
-    check_convert("threshold", "3.5", 3.5)
+    key = "number_1"
+    check_convert(key, "3", 3.0)
+    check_convert(key, "3.5", 3.5)
   end
 
   it "skips invalid values for number param" do
-    check_convert("threshold", "false", "false")
+    check_convert("number_1", "false", "false")
   end
 
   it "coerces valid values for null param" do
-    check_convert("threshold", "", nil)
+    check_convert("number_1", "", nil)
   end
 
+  # TODO: support recursive
+=begin
   it "pass array property" do
     params = {
         "array_property" => [
@@ -115,6 +121,7 @@ describe Committee::StringParamsCoercer do
     assert_kind_of Integer, first_data["nested_no_coercer_array"].first["per_page"]
     assert_kind_of Float, first_data["nested_no_coercer_array"].first["threshold"]
   end
+=end
 
   private
 
@@ -129,7 +136,7 @@ describe Committee::StringParamsCoercer do
     end
   end
 
-  def call(data, options={})
-    Committee::StringParamsCoercer.new(data, @link.schema, options).call!
+  def call(data)
+    Committee::SchemaValidator::OpenAPI3::StringParamsCoercer.new(data, @operation_object, @validator_option).call!
   end
 end

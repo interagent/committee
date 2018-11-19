@@ -40,12 +40,17 @@ class Committee::SchemaValidator
       !link.nil?
     end
 
+    def coerce_form_params(parameter)
+      return unless link.schema
+      Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(parameter, link.schema).call!
+    end
+
     private
 
       def coerce_path_params
         return unless link_exist?
 
-        Committee::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
         param_matches
       end
 
@@ -53,7 +58,7 @@ class Committee::SchemaValidator
         return unless link_exist?
         return if request.GET.nil? || link.schema.nil?
 
-        Committee::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
       end
 
       def request_unpack(request)
@@ -63,7 +68,7 @@ class Committee::SchemaValidator
             allow_query_params: validator_option.allow_query_params,
             coerce_form_params: validator_option.coerce_form_params,
             optimistic_json:    validator_option.optimistic_json,
-            schema:             link ? link.schema : nil
+            schema_validator:   self
         ).call
       end
 

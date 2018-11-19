@@ -2,10 +2,12 @@ class Committee::SchemaValidator
   class Option
     attr_reader :coerce_recursive, :params_key, :allow_form_params, :allow_query_params, :optimistic_json, :coerce_form_params, :headers_key, :coerce_query_params, :coerce_path_params, :check_content_type, :check_header, :coerce_date_times, :validate_errors, :prefix
 
-    def initialize(options, schema)
+    def initialize(options, schema, schema_type)
+      @schema_type = schema_type
       @headers_key = options[:headers_key] || "committee.headers"
       @params_key = options[:params_key] || "committee.params"
 
+      raise 'OpenAPI3 not support @coerce_recursive option' if schema_type == :open_api_3 && options[:coerce_recursive]
       @coerce_recursive = options.fetch(:coerce_recursive, true)
 
       @allow_form_params   = options.fetch(:allow_form_params, true)

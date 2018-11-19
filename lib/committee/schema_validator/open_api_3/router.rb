@@ -16,9 +16,11 @@ module Committee
       Committee::SchemaValidator::OpenAPI3.new(self, request, @validator_option)
     end
 
-    def path_object(request)
+    def operation_object(request)
       path = request.path
-      @schema.path_object(path)
+      request_method = request.request_method.downcase
+
+      @schema.operation_object(path, request_method)
     end
   end
 end

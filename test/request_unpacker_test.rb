@@ -94,22 +94,79 @@ describe Committee::RequestUnpacker do
 
   it "coerces form params with coerce_form_params and a schema" do
     %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+          "CONTENT_TYPE" => content_type,
+          "rack.input"   => StringIO.new("x=1"),
+      }
+      request = Rack::Request.new(env)
+
+      router = hyper_schema.build_router({})
+      validator = router.build_schema_validator(request)
+
       schema = JsonSchema::Schema.new
       schema.properties = { "x" => JsonSchema::Schema.new }
       schema.properties["x"].type = ["integer"]
 
-      env = {
-        "CONTENT_TYPE" => content_type,
-        "rack.input"   => StringIO.new("x=1"),
-      }
-      request = Rack::Request.new(env)
+      link_class = Struct.new(:schema)
+      link_object = link_class.new(schema)
+
+      validator.instance_variable_set(:@link, link_object)
+
       params, _ = Committee::RequestUnpacker.new(
         request,
         allow_form_params: true,
         coerce_form_params: true,
-        schema: schema
+        schema_validator: validator,
       ).call
       assert_equal({ "x" => 1 }, params)
+    end
+  end
+
+  it "coerces form params with coerce_form_params and a OpenAPI3 schema" do
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+          "CONTENT_TYPE" => content_type,
+          "rack.input"   => StringIO.new("limit=20"),
+          "PATH_INFO" => "/characters",
+          "SCRIPT_NAME" => "",
+          "REQUEST_METHOD" => "GET",
+      }
+      request = Rack::Request.new(env)
+
+      router = open_api_3_schema.build_router({})
+      validator = router.build_schema_validator(request)
+
+      params, _ = Committee::RequestUnpacker.new(
+          request,
+          allow_form_params: true,
+          coerce_form_params: true,
+          schema_validator: validator,
+          ).call
+      assert_equal({ "limit" => 20 }, params)
+    end
+  end
+
+  it "coerces error params with coerce_form_params and a OpenAPI3 schema" do
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      env = {
+          "CONTENT_TYPE" => content_type,
+          "rack.input"   => StringIO.new("limit=twenty"),
+          "PATH_INFO" => "/characters",
+          "SCRIPT_NAME" => "",
+          "REQUEST_METHOD" => "GET",
+      }
+      request = Rack::Request.new(env)
+
+      router = open_api_3_schema.build_router({})
+      validator = router.build_schema_validator(request)
+
+      params, _ = Committee::RequestUnpacker.new(
+          request,
+          allow_form_params: true,
+          coerce_form_params: true,
+          schema_validator: validator,
+          ).call
+      assert_equal({ "limit" => "twenty" }, params)
     end
   end
 

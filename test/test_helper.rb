@@ -22,6 +22,7 @@ require "minitest/autorun"
 require "rack/test"
 require "rr"
 require "oas_parser"
+require "pry"
 
 require_relative "../lib/committee"
 

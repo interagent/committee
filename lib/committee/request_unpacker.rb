@@ -7,7 +7,7 @@ module Committee
       @allow_query_params = options[:allow_query_params]
       @coerce_form_params = options[:coerce_form_params]
       @optimistic_json    = options[:optimistic_json]
-      @schema             = options[:schema]
+      @schema_validator   = options[:schema_validator]
     end
 
     def call
@@ -30,9 +30,7 @@ module Committee
         # PUT or PATCH too. Silly Rack.
         p = @request.POST
 
-        if @coerce_form_params && @schema
-          Committee::StringParamsCoercer.new(p, @schema).call!
-        end
+        @schema_validator.coerce_form_params(p) if @coerce_form_params
 
         p
       else

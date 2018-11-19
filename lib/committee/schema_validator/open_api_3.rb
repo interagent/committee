@@ -3,7 +3,7 @@ class Committee::SchemaValidator
     def initialize(router, request, validator_option)
       @router = router
       @request = request
-      @path_object = router.path_object(request)
+      @operation_object = router.operation_object(request)
       @validator_option = validator_option
     end
 
@@ -12,7 +12,12 @@ class Committee::SchemaValidator
     end
 
     def link_exist?
-      !@path_object.nil?
+      !@operation_object.nil?
+    end
+
+    def coerce_form_params(parameter)
+      return unless @operation_object
+      Committee::SchemaValidator::OpenAPI3::StringParamsCoercer.new(parameter, @operation_object, @validator_option).call!
     end
   end
 end
