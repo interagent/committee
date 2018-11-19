@@ -221,8 +221,11 @@ describe Committee::Middleware::Stub do
     end
   end
 
-  def schema_path
-    "./my-schema.json"
+  def committee_options
+    json = JSON.parse(File.read("./my-schema.json"))
+    json = Committee::Drivers::HyperSchema.new.parse(json)
+    
+    {schema: schema}
   end
 
   describe "GET /" do
@@ -258,6 +261,21 @@ So please wrap Committee::Drivers::Schema like this.
 json = JSON.parse(File.read(...))
 schema = Committee::Drivers::HyperSchema.new.parse(json)
 use Committee::Middleware::RequestValidation, schema: schema
+```
+
+### Change Test Assertions
+In committee 3.0 we'll drop many method in method.rb.  
+So please overwrite committee_options and return schema data and prefix option.  
+This method should return same data in ResponseValidation option.
+
+```ruby
+def committee_options
+  json = JSON.parse(File.read("./my-schema.json"))
+  schema = Committee::Drivers::HyperSchema.new.parse(json)
+
+  {schema: schema, prefix: "/v1"}
+  # {open_api_3: schema, prefix: "/v1"}
+end
 ```
 
 ## Development
