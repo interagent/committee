@@ -8,10 +8,13 @@ class Committee::SchemaValidator
     end
 
     def request_validate(request)
-      # TODO: coerce_path_params
+      path_params = validator_option.coerce_path_params ? coerce_path_params : {}
+
       # TODO: coerce_query_params
 
       request_unpack(request)
+
+      request.env[validator_option.params_key]&.merge!(path_params) unless path_params.blank?
 
       request_schema_validation(request)
       # parameter_coerce!(request, link, validator_option.params_key)
@@ -39,6 +42,11 @@ class Committee::SchemaValidator
     private
 
     attr_reader :validator_option
+
+    def coerce_path_params
+      return {} unless link_exist?
+      Committee::SchemaValidator::OpenAPI3::StringPathParamsCoercer.new(@operation_object.path_params, @operation_object, validator_option).call!
+    end
 
     def request_schema_validation(request)
       return unless @operation_object

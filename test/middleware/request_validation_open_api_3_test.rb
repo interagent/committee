@@ -436,6 +436,36 @@ describe Committee::Middleware::RequestValidation do
   end
 =end
 
+  describe "coerce_path_params" do
+    it "coerce string to integer" do
+      check_parameter_string = lambda { |env|
+        assert env['committee.params']['integer'].is_a?(Integer)
+        [200, {}, []]
+      }
+
+      @app = new_rack_app_with_lambda(check_parameter_string, open_api_3: open_api_3_schema, coerce_path_params: true)
+      get "/coerce_path_params/1"
+    end
+
+    # TODO: support parameter validation
+    it "path parameter validation" do
+      @app = new_rack_app(open_api_3: open_api_3_schema, coerce_path_params: false)
+      get "/coerce_path_params/1"
+
+      assert true
+    end
+=begin
+    it "path parameter validation" do
+      @app = new_rack_app_with_lambda(check_parameter_string, open_api_3: open_api_3_schema, coerce_path_params: false)
+      e = assert_raises(RuntimeError) {
+        get "/coerce_path_params/1"
+      }
+
+      assert_equal 'OpenAPI3 not support @coerce_query_params option', e.message
+    end
+=end
+  end
+
   it "OpenAPI3 raise not support method" do
     @app = new_rack_app(open_api_3: open_api_3_schema)
 

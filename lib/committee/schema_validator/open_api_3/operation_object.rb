@@ -2,9 +2,12 @@ module Committee
   class SchemaValidator::OpenAPI3::OperationObject
     # TODO: anyOf support
 
+    attr_reader :path_params
+
     # @param oas_parser_endpoint [OasParser::Endpoint]
-    def initialize(oas_parser_endpoint)
+    def initialize(oas_parser_endpoint, path_params)
       @oas_parser_endpoint = oas_parser_endpoint
+      @path_params = path_params
     end
 
     def coerce_query_parameter_object(name, value)
@@ -12,6 +15,13 @@ module Committee
       return [nil, false] unless query_parameter_object
 
       coerce_value(value, query_parameter_object)
+    end
+
+    def coerce_path_parameter_object(name, value)
+      path_parameter_object = path_parameters[name]
+      return [nil, false] unless path_parameter_object
+
+      coerce_value(value, path_parameter_object)
     end
 
     def validate_request_params(params)
@@ -182,6 +192,10 @@ module Committee
 
     def query_parameters
       @query_parameters ||= oas_parser_endpoint.query_parameters.map{ |parameter| [parameter.name, parameter] }.to_h
+    end
+
+    def path_parameters
+      @path_parameters ||= oas_parser_endpoint.path_parameters.map{ |parameter| [parameter.name, parameter] }.to_h
     end
 
     def coerce_value(value, query_parameter_object)

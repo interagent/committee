@@ -57,13 +57,13 @@ module Committee::Drivers
         endpoint = nil
         if definitions.raw['paths'][path]
           path_item_object = definitions.path_by_path(path)
-          endpoint = path_item_object.endpoint_by_method(method) if path_item_object.raw[method]
+          endpoint, path_params = path_item_object.endpoint_by_method(method) if path_item_object.raw[method]
         end
 
-        endpoint = @templated_paths.operation_object(path, method) if endpoint.nil?
+        endpoint, path_params = @templated_paths.operation_object(path, method) if endpoint.nil?
         return nil unless endpoint
 
-        Committee::SchemaValidator::OpenAPI3::OperationObject.new(endpoint)
+        Committee::SchemaValidator::OpenAPI3::OperationObject.new(endpoint, path_params)
       end
     end
   end

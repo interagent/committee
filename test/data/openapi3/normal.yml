@@ -393,3 +393,15 @@ paths:
       responses:
         '204':
           description: no content
+  /coerce_path_params/{integer}:
+    get:
+      description: get characters
+      parameters:
+      - name: integer
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: no content
