@@ -185,7 +185,10 @@ module Committee
 
     def request_body_properties
       # TODO: use original format
-      @request_body_properties ||= oas_parser_endpoint.request_body.properties_for_format('application/json').map{ |po| [po.name, po]}.to_h
+      return @request_body_properties  if defined?(@request_body_properties )
+
+      requset_body = oas_parser_endpoint.request_body
+      @request_body_properties = requset_body ? requset_body.properties_for_format('application/json').map{ |po| [po.name, po]}.to_h : {}
     end
 
     def query_parameters

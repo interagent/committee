@@ -70,6 +70,15 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  it "not parameter requset" do
+    @app = new_response_rack({integer: '1'}.to_json, {}, open_api_3: open_api_3_schema)
+
+    # TODO: error change
+    assert_raises(Committee::InvalidRequest) do
+      patch "/validate_no_parameter", {no_schema: 'no'}
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})

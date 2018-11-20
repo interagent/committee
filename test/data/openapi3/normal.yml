@@ -309,6 +309,20 @@ paths:
                   string:
                     type: string
 
+  /validate_no_parameter:
+    patch:
+      description: validate no body
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integer:
+                    type: integer
+
   /validate_response_array:
     get:
       responses:

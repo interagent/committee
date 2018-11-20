@@ -63,6 +63,16 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "not parameter requset" do
+    check_parameter_string = lambda { |_|
+      [200, {integer: 1}, []]
+    }
+
+    @app = new_rack_app_with_lambda(check_parameter_string, open_api_3: open_api_3_schema)
+
+    put "/validate_no_parameter", {no_schema: 'no'}
+  end
+
   # TODO: support coerce_date_times
   it "OpenAPI not support coerce_date_times" do
     @app = new_rack_app(open_api_3: open_api_3_schema, coerce_date_times: true)
