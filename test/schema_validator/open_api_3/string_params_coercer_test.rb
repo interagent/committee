@@ -137,6 +137,6 @@ describe Committee::SchemaValidator::OpenAPI3::StringParamsCoercer do
   end
 
   def call(data)
-    Committee::SchemaValidator::OpenAPI3::StringParamsCoercer.new(data, @operation_object, @validator_option).call!
+    @operation_object.coerce_query_parameter(data, @validator_option)
   end
 end

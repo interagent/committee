@@ -36,7 +36,7 @@ class Committee::SchemaValidator
 
     def coerce_form_params(parameter)
       return unless @operation_object
-      Committee::SchemaValidator::OpenAPI3::StringParamsCoercer.new(parameter, @operation_object, @validator_option).call!
+      @operation_object.coerce_query_parameter(parameter, @validator_option)
     end
 
     private
@@ -45,7 +45,7 @@ class Committee::SchemaValidator
 
     def coerce_path_params
       return {} unless link_exist?
-      Committee::SchemaValidator::OpenAPI3::StringPathParamsCoercer.new(@operation_object.path_params, @operation_object, validator_option).call!
+      @operation_object.coerce_path_parameter(@operation_object.path_params, @validator_option)
     end
 
     def request_schema_validation(request)
