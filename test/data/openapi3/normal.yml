@@ -111,6 +111,20 @@ paths:
         schema:
           nullable: true
           type: number
+      - name: normal_array
+        in: query
+        description: number data
+        required: false
+        schema:
+          type: array
+          items:
+            type: integer
+      - name: nested_array
+        in: query
+        description: nested_array
+        required: false
+        schema:
+          "$ref": '#/components/schemas/nested_array'
       responses:
         '200':
           description: success
@@ -405,3 +419,42 @@ paths:
       responses:
         '204':
           description: no content
+
+components:
+  schemas:
+    nested_array:
+      type: array
+      items:
+        type: object
+        properties:
+          update_time:
+            type: string
+            format: date-time
+          per_page:
+            type: integer
+          threshold:
+            type: number
+          nested_coercer_object:
+            type: object
+            properties:
+              update_time:
+                type: string
+                format: date-time
+              threshold:
+                type: number
+          nested_no_coercer_object:
+            type: object
+          nested_coercer_array:
+            type: array
+            items:
+              type: object
+              properties:
+                update_time:
+                  type: string
+                  format: date-time
+                threshold:
+                  type: number
+          nested_no_coercer_array:
+            type: array
+            items:
+              type: object

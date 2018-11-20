@@ -112,46 +112,36 @@ describe Committee::Middleware::RequestValidation do
   end
 =end
 
-  # TODO: support coerce_recursive
-  it "OpenAPI not support coerce_date_times" do
-    @app = new_rack_app(open_api_3: open_api_3_schema, coerce_recursive: true)
-
-    e = assert_raises(RuntimeError) {
-      post "/characters", {}
-    }
-
-    assert_equal 'OpenAPI3 not support @coerce_recursive option', e.message
-  end
-
 =begin
   it "passes a nested object with recursive option" do
-    key_name = "update_time"
     params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium",
-        "array_property" => ARRAY_PROPERTY
+        "nested_array" => [
+            {
+                "update_time" => "2016-04-01T16:00:00.000+09:00",
+                "per_page" => "1",
+            }
+        ],
     }
 
     check_parameter = lambda { |env|
       hash = env['rack.request.query_hash']
-      assert_equal DateTime, hash['array_property'].first['update_time'].class
-      assert_equal 1, hash['array_property'].first['per_page']
-      assert_equal DateTime, hash['array_property'].first['nested_coercer_object']['update_time'].class
-      assert_equal 1, hash['array_property'].first['nested_no_coercer_object']['per_page']
-      assert_equal 2, hash['array_property'].first['integer_array'][1]
-      assert_equal DateTime, hash['array_property'].first['datetime_array'][0].class
-      assert_equal DateTime, hash[key_name].class
+      # TODO: support datetime coerce
+      # assert_equal DateTime, hash['array_property'].first['update_time'].class
+      assert_equal String, hash['nested_array'].first['update_time'].class
+      assert_equal 1, hash['nested_array'].first['per_page']
+
       [200, {}, []]
     }
 
     @app = new_rack_app_with_lambda(check_parameter,
-                                    coerce_query_params: true,
+                                    # coerce_query_params: true,
                                     coerce_recursive: true,
-                                    coerce_date_times: true,
-                                    schema: hyper_schema)
+                                    # coerce_date_times: true,
+                                    open_api_3: open_api_3_schema)
 
-    get "/search/apps", params
-    assert_equal 200, last_response.status
+    get "/string_params_coercer", params
+
+    assert_equal 200, last_response.body
   end
 
   it "passes a nested object with coerce_recursive false" do

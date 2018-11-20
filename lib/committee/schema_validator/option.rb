@@ -7,7 +7,6 @@ class Committee::SchemaValidator
       @headers_key = options[:headers_key] || "committee.headers"
       @params_key = options[:params_key] || "committee.params"
 
-      raise 'OpenAPI3 not support @coerce_recursive option' if schema_type == :open_api_3 && options[:coerce_recursive]
       @coerce_recursive = options.fetch(:coerce_recursive, true)
 
       @allow_form_params   = options.fetch(:allow_form_params, true)

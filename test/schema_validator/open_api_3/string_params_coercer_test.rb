@@ -54,74 +54,88 @@ describe Committee::SchemaValidator::OpenAPI3::StringParamsCoercer do
     check_convert("number_1", "", nil)
   end
 
-  # TODO: support recursive
-=begin
-  it "pass array property" do
-    params = {
-        "array_property" => [
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-                "per_page" => "1",
-                "nested_coercer_object" => {
-                    "update_time" => "2016-04-01T16:00:00.000+09:00",
-                    "threshold" => "1.5"
-                },
-                "nested_no_coercer_object" => {
-                    "per_page" => "1",
-                    "threshold" => "1.5"
-                },
-                "nested_coercer_array" => [
-                    {
-                        "update_time" => "2016-04-01T16:00:00.000+09:00",
-                        "threshold" => "1.5"
-                    }
-                ],
-                "nested_no_coercer_array" => [
-                    {
-                        "per_page" => "1",
-                        "threshold" => "1.5"
-                    }
-                ]
-            },
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-                "per_page" => "1",
-                "threshold" => "1.5"
-            },
-            {
-                "threshold" => "1.5",
-                "per_page" => "1"
-            }
-        ],
-    }
-    call(params, coerce_recursive: true)
+  describe "array" do
+    it "normal array" do
+      params = {
+          "normal_array" => [
+              "1"
+          ]
+      }
+      call(params)
 
-    first_data = params["array_property"][0]
-    assert_kind_of String, first_data["update_time"]
-    assert_kind_of Integer, first_data["per_page"]
+      normal_array = params["normal_array"]
+      assert_kind_of Integer, normal_array[0]
+    end
 
-    second_data = params["array_property"][1]
-    assert_kind_of String, second_data["update_time"]
-    assert_kind_of Integer, second_data["per_page"]
-    assert_kind_of Float, second_data["threshold"]
+    it "nested array" do
+      @validator_option = Committee::SchemaValidator::Option.new({coerce_recursive: true}, open_api_3_schema, :open_api_3)
 
-    third_data = params["array_property"][1]
-    assert_kind_of Integer, third_data["per_page"]
-    assert_kind_of Float, third_data["threshold"]
+      params = {
+          "nested_array" => [
+              {
+                  "update_time" => "2016-04-01T16:00:00.000+09:00",
+                  "per_page" => "1",
+                  "nested_coercer_object" => {
+                      "update_time" => "2016-04-01T16:00:00.000+09:00",
+                      "threshold" => "1.5"
+                  },
+                  "nested_no_coercer_object" => {
+                      "per_page" => "1",
+                      "threshold" => "1.5"
+                  },
+                  "nested_coercer_array" => [
+                      {
+                          "update_time" => "2016-04-01T16:00:00.000+09:00",
+                          "threshold" => "1.5"
+                      }
+                  ],
+                  "nested_no_coercer_array" => [
+                      {
+                          "per_page" => "1",
+                          "threshold" => "1.5"
+                      }
+                  ]
+              },
+              {
+                  "update_time" => "2016-04-01T16:00:00.000+09:00",
+                  "per_page" => "1",
+                  "threshold" => "1.5"
+              },
+              {
+                  "threshold" => "1.5",
+                  "per_page" => "1"
+              }
+          ],
+      }
+      call(params)
 
-    assert_kind_of String, first_data["nested_coercer_object"]["update_time"]
-    assert_kind_of Float, first_data["nested_coercer_object"]["threshold"]
+      nested_array = params["nested_array"]
+      first_data = nested_array[0]
+      assert_kind_of String, first_data["update_time"]
+      assert_kind_of Integer, first_data["per_page"]
 
-    assert_kind_of Integer, first_data["nested_no_coercer_object"]["per_page"]
-    assert_kind_of Float, first_data["nested_no_coercer_object"]["threshold"]
+      second_data = nested_array[1]
+      assert_kind_of String, second_data["update_time"]
+      assert_kind_of Integer, second_data["per_page"]
+      assert_kind_of Float, second_data["threshold"]
 
-    assert_kind_of String, first_data["nested_coercer_array"].first["update_time"]
-    assert_kind_of Float, first_data["nested_coercer_array"].first["threshold"]
+      third_data = nested_array[2]
+      assert_kind_of Integer, third_data["per_page"]
+      assert_kind_of Float, third_data["threshold"]
 
-    assert_kind_of Integer, first_data["nested_no_coercer_array"].first["per_page"]
-    assert_kind_of Float, first_data["nested_no_coercer_array"].first["threshold"]
+      assert_kind_of String, first_data["nested_coercer_object"]["update_time"]
+      assert_kind_of Float, first_data["nested_coercer_object"]["threshold"]
+
+      assert_kind_of String, first_data["nested_no_coercer_object"]["per_page"]
+      assert_kind_of String, first_data["nested_no_coercer_object"]["threshold"]
+
+      assert_kind_of String, first_data["nested_coercer_array"].first["update_time"]
+      assert_kind_of Float, first_data["nested_coercer_array"].first["threshold"]
+
+      assert_kind_of String, first_data["nested_no_coercer_array"].first["per_page"]
+      assert_kind_of String, first_data["nested_no_coercer_array"].first["threshold"]
+    end
   end
-=end
 
   private
 

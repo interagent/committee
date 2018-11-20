@@ -13,7 +13,8 @@ module Committee
         parameter_object = parameter_hash[k]
         next unless parameter_object
 
-        new_value, is_change = coerce_value(v, parameter_object)
+        # parameter_object.schema is hash not object... :(
+        new_value, is_change = coerce_value(v, parameter_object.schema)
 
         query_hash[k] = new_value if is_change
       end
@@ -22,13 +23,11 @@ module Committee
 
     private
 
-    def coerce_value(value, query_parameter_object)
+    def coerce_value(value, schema_hash)
       return [nil, false] unless value
+      return [value, false] unless schema_hash
 
-      schema = query_parameter_object.schema
-      return [value, false] unless schema
-
-      case schema["type"]
+      case schema_hash["type"]
       when "integer"
         begin
           return Integer(value), true
@@ -48,13 +47,56 @@ module Committee
         rescue ArgumentError => e
           raise e unless e.message =~ /invalid value for Float/
         end
+      when "array"
+        if @coerce_recursive && coerce_array(value, schema_hash)
+          return value, true # change original value
+        end
+      when "object"
+        if @coerce_recursive && coerce_object(value, schema_hash)
+          return value, true # change original value
+        end
       else
         # nothing to do
       end
 
-      return [nil, true] if schema["nullable"] && value == ""
+      return [nil, true] if schema_hash["nullable"] && value == ""
 
       [nil, false]
+    end
+
+    def coerce_array(value, schema_hash)
+      return false unless schema_hash['items']
+      return false unless value.is_a?(Array)
+
+      is_coerced = false
+      value.each_with_index do |d, index|
+        new_value, is_changed = coerce_value(d, schema_hash['items'])
+        next unless is_changed
+
+        value[index] = new_value
+        is_coerced = true
+      end
+
+      is_coerced
+    end
+
+    def coerce_object(hash, schema_hash)
+      return false unless schema_hash['properties']
+      return false unless hash.respond_to?(:[])
+
+      is_coerced = false
+      schema_hash['properties'].each do |k, s|
+        original_val = hash[k]
+        next if original_val.nil?
+
+        new_value, is_changed = coerce_value(original_val, s)
+        next unless is_changed
+
+        hash[k] = new_value
+        is_coerced = true
+      end
+
+      is_coerced
     end
   end
 end
