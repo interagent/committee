@@ -17,6 +17,10 @@ module Committee::Drivers
       true
     end
 
+    def default_coerce_date_times
+      true
+    end
+
     def name
       :open_api_3
     end
