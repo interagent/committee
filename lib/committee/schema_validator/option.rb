@@ -17,9 +17,7 @@ class Committee::SchemaValidator
       @coerce_form_params = options.fetch(:coerce_form_params,
                                           schema.driver.default_coerce_form_params)
 
-      raise 'OpenAPI3 not support @coerce_query_params option' if schema_type == :open_api_3 && options[:coerce_query_params]
-      @coerce_query_params = options.fetch(:coerce_query_params,
-                                           schema.driver.default_query_params)
+      @coerce_query_params = options.fetch(:coerce_query_params, schema.driver.default_query_params)
 
       @coerce_path_params = options.fetch(:coerce_path_params,
                                           schema.driver.default_path_params)

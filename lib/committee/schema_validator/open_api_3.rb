@@ -9,8 +9,7 @@ class Committee::SchemaValidator
 
     def request_validate(request)
       path_params = validator_option.coerce_path_params ? coerce_path_params : {}
-
-      # TODO: coerce_query_params
+      coerce_query_params(request) if validator_option.coerce_query_params
 
       request_unpack(request)
 
@@ -42,6 +41,12 @@ class Committee::SchemaValidator
     private
 
     attr_reader :validator_option
+
+    def coerce_query_params(request)
+      return unless link_exist?
+      return if request.GET.nil?
+      @operation_object.coerce_query_parameter(request.GET, validator_option)
+    end
 
     def coerce_path_params
       return {} unless link_exist?

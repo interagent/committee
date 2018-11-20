@@ -376,24 +376,14 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  # TODO: support coerce_query_params
-  it "OpenAPI3 not support coerce_query_params" do
-    @app = new_rack_app(open_api_3: open_api_3_schema, coerce_query_params: true)
-
-    e = assert_raises(RuntimeError) {
-      post "/characters", {}
-    }
-
-    assert_equal 'OpenAPI3 not support @coerce_query_params option', e.message
-  end
-=begin
   it "optionally coerces query params" do
     @app = new_rack_app(coerce_query_params: true, open_api_3: open_api_3_schema)
     header "Content-Type", "application/json"
-    get "/search/apps", {"per_page" => "10", "query" => "cloudnasium"}
+    get "/string_params_coercer", {"integer_1" => "1"}
     assert_equal 200, last_response.status
   end
 
+=begin
   it "still raises an error if query param coercion is not possible" do
     @app = new_rack_app(coerce_query_params: true, schema: hyper_schema)
     header "Content-Type", "application/json"
