@@ -111,6 +111,12 @@ paths:
         schema:
           nullable: true
           type: number
+      - name: datetime_string
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
       - name: normal_array
         in: query
         description: number data
@@ -125,6 +131,25 @@ paths:
         required: false
         schema:
           "$ref": '#/components/schemas/nested_array'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      description: string_params_coercer test data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nested_array:
+                  "$ref": '#/components/schemas/nested_array'
       responses:
         '200':
           description: success

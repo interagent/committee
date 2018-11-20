@@ -1,7 +1,8 @@
 module Committee
   class SchemaValidator::OpenAPI3::StringParamsCoercer
-    def initialize(validator_option)
+    def initialize(validator_option, coerce_date_times)
       @coerce_recursive = validator_option.coerce_recursive
+      @coerce_date_times = coerce_date_times
     end
 
     def coerce_parameter_object(query_hash, parameter_hash)
@@ -21,6 +22,23 @@ module Committee
       query_hash
     end
 
+    def coerce_request_body_object(params, request_body_hash)
+      return {} unless params
+
+      params.each do |k,v|
+        next if v.nil?
+
+        schema_object = request_body_hash[k]
+        next unless schema_object
+
+        # refactoring....
+        new_value, is_change = coerce_value(v, schema_object.raw)
+
+        params[k] = new_value if is_change
+      end
+      params
+    end
+
     private
 
     def coerce_value(value, schema_hash)
@@ -28,6 +46,10 @@ module Committee
       return [value, false] unless schema_hash
 
       case schema_hash["type"]
+      when "string"
+        if @coerce_date_times && schema_hash['format'] == "date-time"
+          return parse_date_time(value)
+        end
       when "integer"
         begin
           return Integer(value), true
@@ -97,6 +119,16 @@ module Committee
       end
 
       is_coerced
+    end
+
+    def parse_date_time(original_val)
+      begin
+        return DateTime.parse(original_val), true
+      rescue ArgumentError => e
+        raise ::Committee::InvalidResponse unless e.message =~ /invalid date/
+      end
+
+      [original_val, false]
     end
   end
 end

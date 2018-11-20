@@ -27,7 +27,6 @@ class Committee::SchemaValidator
       raise 'OpenAPI3 not support @check_header option' if schema_type == :open_api_3 && options[:check_header]
       @check_header        = options.fetch(:check_header, true)
 
-      raise 'OpenAPI3 not support @coerce_date_times option' if schema_type == :open_api_3 && options[:coerce_date_times]
       @coerce_date_times   = options.fetch(:coerce_date_times, false)
 
       @prefix = options[:prefix]

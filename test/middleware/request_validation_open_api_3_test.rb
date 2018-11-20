@@ -73,56 +73,86 @@ describe Committee::Middleware::RequestValidation do
     put "/validate_no_parameter", {no_schema: 'no'}
   end
 
-  # TODO: support coerce_date_times
-  it "OpenAPI not support coerce_date_times" do
-    @app = new_rack_app(open_api_3: open_api_3_schema, coerce_date_times: true)
-
-    e = assert_raises(RuntimeError) {
-      post "/characters", {}
-    }
-
-    assert_equal 'OpenAPI3 not support @coerce_date_times option', e.message
-  end
-
-=begin
   it "passes given a datetime and with coerce_date_times enabled on GET endpoint" do
-    key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium"
-    }
+    params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
 
     check_parameter = lambda { |env|
-      assert_equal DateTime, env['rack.request.query_hash'][key_name].class
+      assert_equal DateTime, env['rack.request.query_hash']["datetime_string"].class
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, schema: hyper_schema)
+    @app = new_rack_app_with_lambda(check_parameter, open_api_3: open_api_3_schema, coerce_date_times: true)
 
-    get "/search/apps", params
+    get "/string_params_coercer", params
     assert_equal 200, last_response.status
   end
 
-  it "passes given an invalid datetime string with coerce_date_times enabled" do
-    @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
+  it "passes given a datetime and with coerce_date_times enabled on POST endpoint" do
     params = {
-        "update_time" => "invalid_datetime_format"
+        "nested_array" => [
+            {
+                "update_time" => "2016-04-01T16:00:00.000+09:00",
+                "nested_coercer_object" => {
+                    "update_time" => "2016-04-01T16:00:00.000+09:00",
+                },
+                "nested_no_coercer_object" => {
+                    "update_time" => "2016-04-01T16:00:00.000+09:00",
+                },
+                "nested_coercer_array" => [
+                    {
+                        "update_time" => "2016-04-01T16:00:00.000+09:00",
+                    }
+                ],
+                "nested_no_coercer_array" => [
+                    {
+                        "update_time" => "2016-04-01T16:00:00.000+09:00",
+                    }
+                ]
+            },
+            {
+                "update_time" => "2016-04-01T16:00:00.000+09:00",
+            }
+        ]
     }
-    header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
+
+    check_parameter = lambda { |env|
+      nested_array = env['committee.params']["nested_array"]
+      first_data = nested_array[0]
+      assert_kind_of DateTime, first_data["update_time"]
+
+      second_data = nested_array[1]
+      assert_kind_of DateTime, second_data["update_time"]
+
+      assert_kind_of DateTime, first_data["nested_coercer_object"]["update_time"]
+
+      assert_kind_of String, first_data["nested_no_coercer_object"]["update_time"]
+
+      assert_kind_of DateTime, first_data["nested_coercer_array"].first["update_time"]
+      assert_kind_of String, first_data["nested_no_coercer_array"].first["update_time"]
+      [200, {}, []]
+    }
+
+    @app = new_rack_app_with_lambda(check_parameter, open_api_3: open_api_3_schema, coerce_date_times: true, coerce_recursive: true)
+
+    post "/string_params_coercer", params
+
+    assert_equal 200, last_response.status
+  end
+
+  # TODO: support date-time object format check
+=begin
+  it "passes given an invalid datetime string with coerce_date_times enabled" do
+    @app = new_rack_app(open_api_3: open_api_3_schema, coerce_date_times: true)
+    params = {
+        "datetime_string" => "invalid_datetime_format"
+    }
+    get "/string_params_coercer", JSON.generate(params)
+
     assert_equal 400, last_response.status
     assert_match(/invalid request/i, last_response.body)
   end
-
-  it "passes with coerce_date_times enabled and without a schema for a link" do
-    @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
-    header "Content-Type", "application/json"
-    get "/apps", JSON.generate({})
-    assert_equal 200, last_response.status
-  end
 =end
 
-=begin
   it "passes a nested object with recursive option" do
     params = {
         "nested_array" => [
@@ -135,39 +165,24 @@ describe Committee::Middleware::RequestValidation do
 
     check_parameter = lambda { |env|
       hash = env['rack.request.query_hash']
-      # TODO: support datetime coerce
-      # assert_equal DateTime, hash['array_property'].first['update_time'].class
-      assert_equal String, hash['nested_array'].first['update_time'].class
+      assert_equal DateTime, hash['nested_array'].first['update_time'].class
       assert_equal 1, hash['nested_array'].first['per_page']
 
       [200, {}, []]
     }
 
     @app = new_rack_app_with_lambda(check_parameter,
-                                    # coerce_query_params: true,
+                                    coerce_query_params: true,
                                     coerce_recursive: true,
-                                    # coerce_date_times: true,
+                                    coerce_date_times: true,
                                     open_api_3: open_api_3_schema)
 
     get "/string_params_coercer", params
 
-    assert_equal 200, last_response.body
+    assert_equal 200, last_response.status
   end
 
-  it "passes a nested object with coerce_recursive false" do
-    key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium",
-        "array_property" => ARRAY_PROPERTY
-    }
-
-    @app = new_rack_app(coerce_query_params: true, coerce_date_times: true, coerce_recursive: false, schema: hyper_schema)
-
-    get "/search/apps", params
-    assert_equal 400, last_response.status # schema expect integer but we don't convert string to integer, so 400
-  end
-
+=begin
   it "passes a nested object with coerce_recursive default(true)" do
     key_name = "update_time"
     params = {

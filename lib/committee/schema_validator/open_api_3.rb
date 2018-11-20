@@ -16,8 +16,8 @@ class Committee::SchemaValidator
       request.env[validator_option.params_key]&.merge!(path_params) unless path_params.blank?
 
       request_schema_validation(request)
-      # parameter_coerce!(request, link, validator_option.params_key)
-      # parameter_coerce!(request, link, "rack.request.query_hash") if link_exist? && !request.GET.nil? && !link.schema.nil?
+      parameter_coerce(request, validator_option.params_key, validator_option)
+      parameter_coerce(request, "rack.request.query_hash", validator_option) if !request.GET.nil?
     end
 
     def response_validate(status, headers, response)
@@ -71,6 +71,12 @@ class Committee::SchemaValidator
           optimistic_json:    validator_option.optimistic_json,
           schema_validator:   self
       ).call
+    end
+
+    def parameter_coerce(request, params_key, validator_option)
+      return unless link_exist?
+
+      @operation_object.coerce_parameter(request.env[params_key], validator_option)
     end
   end
 end

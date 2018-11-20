@@ -12,14 +12,26 @@ module Committee
 
     def coerce_path_parameter(query_hash, validator_option)
       Committee::SchemaValidator::OpenAPI3::StringParamsCoercer.
-          new(validator_option).
+          new(validator_option, false).
           coerce_parameter_object(query_hash, path_parameters)
     end
 
     def coerce_query_parameter(query_hash, validator_option)
       Committee::SchemaValidator::OpenAPI3::StringParamsCoercer.
-          new(validator_option).
+          new(validator_option, false).
           coerce_parameter_object(query_hash, query_parameters)
+    end
+
+    def coerce_parameter(params, validator_option)
+      # FIXME
+      # check_parameter_type doesn't support datetime check so first, we should string, and after validate we convert datetime.
+      coerce_date_times = validator_option.coerce_date_times
+      return unless coerce_date_times
+
+      # TODO: check open_api_3_ allow path and query parameter same name
+      coercer = Committee::SchemaValidator::OpenAPI3::StringParamsCoercer.new(validator_option, coerce_date_times)
+      coercer.coerce_parameter_object(params, path_parameters.merge(query_parameters))
+      coercer.coerce_request_body_object(params, request_body_properties)
     end
 
     def validate_request_params(params)
