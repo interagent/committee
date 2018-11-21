@@ -17,15 +17,21 @@ class Committee::SchemaValidator
       @coerce_form_params = options.fetch(:coerce_form_params,
                                           schema.driver.default_coerce_form_params)
 
+      raise 'OpenAPI3 not support @coerce_query_params option' if schema_type == :open_api_3 && options[:coerce_query_params]
       @coerce_query_params = options.fetch(:coerce_query_params,
                                            schema.driver.default_query_params)
 
+      raise 'OpenAPI3 not support @coerce_path_params option' if schema_type == :open_api_3 && options[:coerce_path_params]
       @coerce_path_params = options.fetch(:coerce_path_params,
                                           schema.driver.default_path_params)
 
+      raise 'OpenAPI3 not support @check_content_type option' if schema_type == :open_api_3 && options[:check_content_type]
       @check_content_type  = options.fetch(:check_content_type, true)
+
+      raise 'OpenAPI3 not support @check_header option' if schema_type == :open_api_3 && options[:check_header]
       @check_header        = options.fetch(:check_header, true)
 
+      raise 'OpenAPI3 not support @coerce_date_times option' if schema_type == :open_api_3 && options[:coerce_date_times]
       @coerce_date_times   = options.fetch(:coerce_date_times, false)
 
       @prefix = options[:prefix]

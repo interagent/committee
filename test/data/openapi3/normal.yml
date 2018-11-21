@@ -35,6 +35,47 @@ paths:
                 type: array
                 items:
                   type: string
+    post:
+      description: new characters
+      responses:
+        '200':
+          description: correct
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response_1:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                string_post_1:
+                  type: string
+    put:
+      description: new characters
+      responses:
+        '200':
+          description: correct
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response_1:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                string_post_1:
+                  type: string
+
   /string_params_coercer:
     get:
       description: string_params_coercer test data

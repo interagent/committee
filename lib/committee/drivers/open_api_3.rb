@@ -43,7 +43,7 @@ module Committee::Drivers
       end
 
       def build_router(options)
-        validator_option = Committee::SchemaValidator::Option.new(options, self, :hyper_schema)
+        validator_option = Committee::SchemaValidator::Option.new(options, self, :open_api_3)
         Committee::SchemaValidator::OpenAPI3::Router.new(self, validator_option)
       end
 
