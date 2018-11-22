@@ -13,6 +13,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "doesn't call error_handler when response is valid" do
+    called = false
+    pr = ->(e) { called = true }
+    @app = new_rack_app(JSON.generate([ValidApp]), {}, schema: hyper_schema)
+    get "/apps"
+    assert !called, "error_handler is called"
+  end
+
   it "detects a response invalid due to schema" do
     @app = new_rack_app("{}", {}, schema: hyper_schema)
     get "/apps"
@@ -55,6 +63,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_match(/valid json/i, last_response.body)
   end
 
+  it "calls error_handler when it rescues JSON errors" do
+    called_err = nil
+    pr = ->(e) { called_err = e }
+    @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema, error_handler: pr)
+    get "/apps"
+    assert_kind_of JSON::ParserError, called_err
+  end
+
   it "takes a prefix" do
     @app = new_rack_app(JSON.generate([ValidApp]), {}, prefix: "/v1",
       schema: hyper_schema)
@@ -66,6 +82,16 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_rack_app("[{x:y}]", {}, raise: true, schema: hyper_schema)
     assert_raises(Committee::InvalidResponse) do
       get "/apps"
+    end
+  end
+
+  it "calls error_handler when it rescues JSON errors" do
+    called_err = nil
+    pr = ->(e) { called_err = e }
+    @app = new_rack_app("[{x:y}]", {}, raise: true, schema: hyper_schema, error_handler: pr)
+    assert_raises(Committee::InvalidResponse) do
+      get "/apps"
+      assert_kind_of JSON::ParserError, called_err
     end
   end
 
