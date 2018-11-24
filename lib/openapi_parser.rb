@@ -1,4 +1,4 @@
-require "openapi_parser/version"
+require 'openapi_parser/version'
 
 module OpenapiParser
   # Your code goes here...
