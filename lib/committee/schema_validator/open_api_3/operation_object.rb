@@ -12,9 +12,37 @@ module Committee
       coerce_value(value, query_parameter_object)
     end
 
+    def validate(params)
+      case oas_parser_endpoint.method
+      when 'get'
+        # TODO: get validation support
+      when 'post'
+        validate_post_params(params)
+      else
+        raise "OpenAPI3 not support #{oas_parser_endpoint.method} method"
+      end
+    end
+
     private
 
     attr_reader :oas_parser_endpoint
+
+    def validate_post_params(params)
+      params.each do |name, value|
+        parameter = request_body_properties[name]
+        check_parameter_type(name, value, parameter)
+      end
+    end
+
+    def check_parameter_type(name, value, parameter)
+      # TODO: check object parameter and nested object parameter
+      raise InvalidRequest, "invalid parameter type #{name} #{value} #{value.class} #{parameter.type}" if parameter.type == "string" && !value.is_a?(String)
+    end
+
+    def request_body_properties
+      # TODO: use original format
+      @request_body_properties ||= oas_parser_endpoint.request_body.properties_for_format('application/json').map{ |po| [po.name, po]}.to_h
+    end
 
     def query_parameters
       @query_parameters ||= oas_parser_endpoint.query_parameters.map{ |parameter| [parameter.name, parameter] }.to_h
