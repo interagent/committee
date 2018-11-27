@@ -1,4 +1,7 @@
 require 'bundler/setup'
+require 'yaml'
+require 'pry'
+
 require 'openapi_parser'
 
 RSpec.configure do |config|
@@ -11,4 +14,12 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+end
+
+def normal_schema
+  YAML.load_file('./spec/data/normal.yml')
+end
+
+def petstore_schema
+  YAML.load_file('./spec/data/petstore-expanded.yaml')
 end

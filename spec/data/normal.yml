@@ -7,6 +7,8 @@ servers:
 - url: https://github.com/interagent/committee/
 paths:
   /characters:
+    summary: summary_text
+    description: desc
     get:
       description: get characters
       parameters:
@@ -111,6 +113,45 @@ paths:
         schema:
           nullable: true
           type: number
+      - name: datetime_string
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: normal_array
+        in: query
+        description: number data
+        required: false
+        schema:
+          type: array
+          items:
+            type: integer
+      - name: nested_array
+        in: query
+        description: nested_array
+        required: false
+        schema:
+          "$ref": '#/components/schemas/nested_array'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+    post:
+      description: string_params_coercer test data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nested_array:
+                  "$ref": '#/components/schemas/nested_array'
       responses:
         '200':
           description: success
@@ -295,6 +336,20 @@ paths:
                   string:
                     type: string
 
+  /validate_no_parameter:
+    patch:
+      description: validate no body
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integer:
+                    type: integer
+
   /validate_response_array:
     get:
       responses:
@@ -405,3 +460,42 @@ paths:
       responses:
         '204':
           description: no content
+
+components:
+  schemas:
+    nested_array:
+      type: array
+      items:
+        type: object
+        properties:
+          update_time:
+            type: string
+            format: date-time
+          per_page:
+            type: integer
+          threshold:
+            type: number
+          nested_coercer_object:
+            type: object
+            properties:
+              update_time:
+                type: string
+                format: date-time
+              threshold:
+                type: number
+          nested_no_coercer_object:
+            type: object
+          nested_coercer_array:
+            type: array
+            items:
+              type: object
+              properties:
+                update_time:
+                  type: string
+                  format: date-time
+                threshold:
+                  type: number
+          nested_no_coercer_array:
+            type: array
+            items:
+              type: object

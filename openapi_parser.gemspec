@@ -4,13 +4,13 @@ require 'openapi_parser/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'openapi_parser'
-  spec.version       = OpenapiParser::VERSION
+  spec.version       = OpenAPIParser::VERSION
   spec.authors       = ['ota42y']
   spec.email         = ['ota42y@gmail.com']
 
   spec.summary       = 'OpenAPI3 parser'
   spec.description   = 'parser for OpenAPI 3.0 or later'
-  spec.homepage      = 'https://ota42y.com'
+  spec.homepage      = 'https://github.com/ota42y/openapi_parser'
   spec.license       = 'MIT'
 
   # Specify which files should be added to the gem when it is released.
@@ -26,4 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'fincop'
   spec.add_development_dependency 'rake', '~> 10.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
+  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry-byebug'
 end
