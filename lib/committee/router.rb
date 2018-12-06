@@ -18,6 +18,7 @@ module Committee
       path = path.gsub(@prefix_regexp, "") if @prefix
       (@schema.routes[method] || []).map do |pattern, link|
         if matches = pattern.match(path)
+          # prefer path which has fewer matches (eg. `/pets/dog` than `/pets/{uuid}` for path `/pets/dog` )
           [matches.captures.size, link, Hash[matches.names.zip(matches.captures)]]
         else
           nil
