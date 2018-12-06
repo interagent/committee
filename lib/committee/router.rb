@@ -18,11 +18,11 @@ module Committee
       path = path.gsub(@prefix_regexp, "") if @prefix
       (@schema.routes[method] || []).map do |pattern, link|
         if matches = pattern.match(path)
-          [link, Hash[matches.names.zip(matches.captures)]]
+          [matches.captures.size, link, Hash[matches.names.zip(matches.captures)]]
         else
           nil
         end
-      end.compact.first
+      end.compact.sort.first&.slice(1, 2)
     end
 
     def find_request_link(request)
