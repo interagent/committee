@@ -16,15 +16,13 @@ module Committee
 
     def find_link(method, path)
       path = path.gsub(@prefix_regexp, "") if @prefix
-      if method_routes = @schema.routes[method]
-        method_routes.each do |pattern, link|
-          if matches = pattern.match(path)
-            hash = Hash[matches.names.zip(matches.captures)]
-            return link, hash
-          end
+      (@schema.routes[method] || []).map do |pattern, link|
+        if matches = pattern.match(path)
+          [link, Hash[matches.names.zip(matches.captures)]]
+        else
+          nil
         end
-      end
-      nil
+      end.compact.first
     end
 
     def find_request_link(request)
