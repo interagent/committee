@@ -32,9 +32,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
+                type: object
+                properties:
+                  string_1:
+                    type: string
+                  array_1:
+                    type: array
+                    items:
+                      type: string
     post:
       description: new characters
       responses:
@@ -106,6 +111,81 @@ paths:
         schema:
           nullable: true
           type: number
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /validate:
+    post:
+      description: validate test data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                string:
+                  type: string
+                integer:
+                  type: integer
+                boolean:
+                  type: boolean
+                number:
+                  type: number
+                array:
+                  type: array
+                  items:
+                    type: integer
+                object_1:
+                  type: object
+                  properties:
+                    string_1:
+                      nullable: true
+                      type: string
+                    integer_1:
+                      nullable: true
+                      type: integer
+                    boolean_1:
+                      nullable: true
+                      type: boolean
+                    number_1:
+                      nullable: true
+                      type: number
+                object_2:
+                  type: object
+                  required:
+                  - string_2
+                  - integer_2
+                  - boolean_2
+                  - number_2
+                  properties:
+                    string_2:
+                      type: string
+                    integer_2:
+                      type: integer
+                    boolean_2:
+                      type: boolean
+                    number_2:
+                      type: number
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  string:
+                    type: string
+        '204':
+          description: no content
+  /validate_response_array:
+    get:
       responses:
         '200':
           description: success
