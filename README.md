@@ -135,6 +135,7 @@ Options:
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
 * `validate_errors`: Also validate non-2xx responses (defaults to `false`).
+* `error_handler`: A proc which will be called when error occurs. Take an Error instance as first argument.
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
 
