@@ -4,10 +4,17 @@ module Committee
 
     attr_reader :path_params
 
+    attr_reader :request_operation
+
+    # @!attribute [r] operation_request
+    #   @return [OpenAPIParser::OperationRequest]
+
     # @param oas_parser_endpoint [OasParser::Endpoint]
-    def initialize(oas_parser_endpoint, path_params)
+    # # @param request_operation [OpenAPIParser::RequestOperation]
+    def initialize(oas_parser_endpoint, path_params, request_operation)
       @oas_parser_endpoint = oas_parser_endpoint
       @path_params = path_params
+      @request_operation = request_operation
     end
 
     def coerce_path_parameter(query_hash, validator_option)
@@ -96,13 +103,11 @@ module Committee
     attr_reader :oas_parser_endpoint
 
     def validate_post_request_params(params)
-      params.each do |name, value|
-        parameter = request_body_properties[name]
-        err = check_parameter_type(name, value, parameter)
-        return err if err
-      end
-
-      nil
+      # TODO: performance problem
+      # TODO: support other content type
+        return request_operation.validate_request_body('application/json', params)
+    rescue => e
+      raise Committee::InvalidRequest.new(e.message)
     end
 
     def check_parameter_type(name, value, parameter)

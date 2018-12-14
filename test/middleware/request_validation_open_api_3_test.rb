@@ -311,7 +311,7 @@ describe Committee::Middleware::RequestValidation do
     }
     post "/characters", JSON.generate(params)
     assert_equal 400, last_response.status
-    assert_match(/invalid parameter type/i, last_response.body)
+    assert_match(/1 class is Integer/i, last_response.body)
   end
 
   it "rescues JSON errors" do

@@ -37,10 +37,16 @@ module Committee::Drivers
     class Schema < Committee::Drivers::Schema
       attr_reader :definitions
 
+      attr_reader :open_api
+
+      # @!attribute [r] open_api
+      #   @return [OpenAPIParser::Schemas::OpenAPI]
+
       def initialize(driver, definitions)
         @definitions = definitions
         @driver = driver
         @templated_paths = Committee::SchemaValidator::OpenAPI3::TemplatedPaths.new(definitions)
+        @open_api = ::OpenAPIParser.parse(definitions.raw)
       end
 
       def support_stub?
@@ -67,7 +73,8 @@ module Committee::Drivers
         endpoint, path_params = @templated_paths.operation_object(path, method) if endpoint.nil?
         return nil unless endpoint
 
-        Committee::SchemaValidator::OpenAPI3::OperationObject.new(endpoint, path_params)
+        request_operation = open_api.request_operation(method, path)
+        Committee::SchemaValidator::OpenAPI3::OperationObject.new(endpoint, path_params, request_operation)
       end
     end
   end

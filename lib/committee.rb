@@ -1,6 +1,7 @@
 require "json"
 require "json_schema"
 require "rack"
+require 'openapi_parser'
 
 require_relative "committee/errors"
 require_relative "committee/parameter_coercer"
