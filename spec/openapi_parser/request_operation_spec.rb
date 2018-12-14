@@ -7,12 +7,12 @@ RSpec.describe OpenAPIParser::RequestOperation do
   describe 'find' do
     it 'no path items' do
       ro = OpenAPIParser::RequestOperation.create(:get, '/pets', path_item_finder)
-      expect(ro.endpoint.object_reference).to eq '#/paths/~1pets/get'
+      expect(ro.operation_object.object_reference).to eq '#/paths/~1pets/get'
     end
 
     it 'path items' do
       ro = OpenAPIParser::RequestOperation.create(:get, '/pets/1', path_item_finder)
-      expect(ro.endpoint.object_reference).to eq '#/paths/~1pets~1{id}/get'
+      expect(ro.operation_object.object_reference).to eq '#/paths/~1pets~1{id}/get'
     end
 
     it 'no path' do
@@ -29,7 +29,7 @@ RSpec.describe OpenAPIParser::RequestOperation do
   describe 'OpenAPI#request_operation' do
     it 'no path items' do
       ro = root.request_operation(:get, '/pets')
-      expect(ro.endpoint.object_reference).to eq '#/paths/~1pets/get'
+      expect(ro.operation_object.object_reference).to eq '#/paths/~1pets/get'
 
       ro = OpenAPIParser::RequestOperation.create(:head, '/pets/1', path_item_finder)
       expect(ro).to eq nil
