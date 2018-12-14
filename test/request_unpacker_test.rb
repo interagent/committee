@@ -113,6 +113,30 @@ describe Committee::RequestUnpacker do
     end
   end
 
+  it "coerces form params with coerce_form_params, coerce_recursive and a schema" do
+    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
+      schema = JsonSchema::Schema.new
+      schema.properties = { "x" => JsonSchema::Schema.new }
+      schema.properties["x"].type = ["object"]
+      schema.properties["x"].properties = { "y" => JsonSchema::Schema.new }
+      schema.properties["x"].properties["y"].type = ["integer"]
+
+      env = {
+        "CONTENT_TYPE" => content_type,
+        "rack.input"   => StringIO.new("x[y]=1"),
+      }
+      request = Rack::Request.new(env)
+      params, _ = Committee::RequestUnpacker.new(
+        request,
+        allow_form_params: true,
+        coerce_form_params: true,
+        coerce_recursive: true,
+        schema: schema
+      ).call
+      assert_equal({ "x" => { "y" => 1 } }, params)
+    end
+  end
+
   it "unpacks form & query params with allow_form_params and allow_query_params" do
     %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
       env = {

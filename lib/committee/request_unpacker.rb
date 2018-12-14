@@ -7,6 +7,7 @@ module Committee
       @allow_query_params = options[:allow_query_params]
       @coerce_form_params = options[:coerce_form_params]
       @optimistic_json    = options[:optimistic_json]
+      @coerce_recursive   = options[:coerce_recursive]
       @schema             = options[:schema]
     end
 
@@ -31,7 +32,7 @@ module Committee
         p = @request.POST
 
         if @coerce_form_params && @schema
-          Committee::StringParamsCoercer.new(p, @schema).call!
+          Committee::StringParamsCoercer.new(p, @schema, coerce_recursive: @coerce_recursive).call!
         end
 
         p
