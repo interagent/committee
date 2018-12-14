@@ -46,6 +46,7 @@ module Committee::Middleware
         allow_query_params: @allow_query_params,
         coerce_form_params: @coerce_form_params,
         optimistic_json:    @optimistic_json,
+        coerce_recursive:   @coerce_recursive,
         schema:             link ? link.schema : nil
       ).call
 
