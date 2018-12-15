@@ -35,4 +35,49 @@ RSpec.describe OpenAPIParser::RequestOperation do
       expect(ro).to eq nil
     end
   end
+
+  describe 'validate_response_body' do
+    subject { request_operation.validate_response_body(status_code, content_type, data) }
+
+    let(:status_code) { 200 }
+    let(:root) { OpenAPIParser::Schemas::OpenAPI.new(normal_schema) }
+    let(:request_operation) { root.request_operation(:post, '/validate')}
+    let(:content_type) { 'application/json' }
+
+    context 'correct' do
+      let(:data) { {"string" => "Honoka.Kousaka"} }
+
+      it { expect(subject).to eq nil }
+    end
+
+    context 'no content type' do
+      let(:content_type) { nil }
+      let(:data) { {"string" => 1} }
+
+      it { expect(subject).to eq nil }
+    end
+
+    context 'invalid schema' do
+      let(:data) { {"string" => 1} }
+
+      it do
+        expect{ subject }.to raise_error do |e|
+          expect(e.is_a?(OpenAPIParser::SchemaValidator::ValidateError)).to eq true
+          expect(e.message.start_with?("1 class is Integer")).to eq true
+        end
+      end
+    end
+
+    context 'no status code use default' do
+      let(:status_code) { 419 }
+      let(:data) { {"integer" => '1'} }
+
+      it do
+        expect{ subject }.to raise_error do |e|
+          expect(e.is_a?(OpenAPIParser::SchemaValidator::ValidateError)).to eq true
+          expect(e.message.start_with?("1 class is String")).to eq true
+        end
+      end
+    end
+  end
 end

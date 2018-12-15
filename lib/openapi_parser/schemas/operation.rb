@@ -20,5 +20,9 @@ module OpenAPIParser::Schemas
     def validate_request_body(content_type, params)
       request_body&.validate_request_body(content_type, params)
     end
+
+    def validate_response_body(status_code, content_type, data)
+      responses&.validate_response_body(status_code, content_type, data)
+    end
   end
 end

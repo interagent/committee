@@ -295,6 +295,15 @@ paths:
                     type: string
         '204':
           description: no content
+        default:
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integer:
+                    type: integer
     put:
       description: validate put metodhd
       requestBody:
