@@ -31,4 +31,8 @@ class OpenAPIParser::RequestOperation
   def validate_response_body(status_code, content_type, data)
     operation_object&.validate_response_body(status_code, content_type, data)
   end
+
+  def validate_request_parameter(params)
+    operation_object&.validate_request_parameter(params)
+  end
 end

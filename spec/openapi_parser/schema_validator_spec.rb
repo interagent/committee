@@ -252,54 +252,5 @@ RSpec.describe OpenAPIParser::SchemaValidator do
     it 'unknown param' do
       expect(request_operation.validate_request_body(content_type, {"unknown" => 1})).to eq nil
     end
-
-=begin
-      describe 'support get method' do
-        before do
-          @method = "get"
-        end
-
-        it 'correct' do
-          operation_object.validate_request_params({"query_string" => "query", "query_integer_list" => [1, 2]})
-          operation_object.validate_request_params({"query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => 1})
-
-          assert true
-        end
-
-        it 'not exist required' do
-          e = assert_raises(Committee::InvalidRequest) {
-            operation_object.validate_request_params({"query_integer_list" => [1, 2]})
-          }
-
-          assert e.message.start_with?("required parameters query_string not exist")
-
-          e = assert_raises(Committee::InvalidRequest) {
-            operation_object.validate_request_params({"query_string" => "query"})
-          }
-
-          assert e.message.start_with?("required parameters query_integer_list not exist")
-        end
-
-        it 'invalid type' do
-          e = assert_raises(Committee::InvalidRequest) {
-            operation_object.validate_request_params({"query_string" => 1, "query_integer_list" => [1, 2], "optional_integer" => 1})
-          }
-
-          assert e.message.start_with?("invalid parameter type query_string 1 Integer string")
-
-          e = assert_raises(Committee::InvalidRequest) {
-            operation_object.validate_request_params({"query_string" => "query", "query_integer_list" => ['1', 2], "optional_integer" => 1})
-          }
-
-          assert e.message.start_with?("invalid parameter type query_integer_list 1 String integer")
-
-          e = assert_raises(Committee::InvalidRequest) {
-            operation_object.validate_request_params({"query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => '1'})
-          }
-
-          assert e.message.start_with?("invalid parameter type optional_integer 1 String integer")
-        end
-      end
-=end
   end
 end

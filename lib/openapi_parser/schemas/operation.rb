@@ -24,5 +24,18 @@ module OpenAPIParser::Schemas
     def validate_response_body(status_code, content_type, data)
       responses&.validate_response_body(status_code, content_type, data)
     end
+
+    def validate_request_parameter(params)
+      OpenAPIParser::ParameterValidator.validate_parameter(query_parameter_hash, params, object_reference)
+    end
+
+    private
+
+    def query_parameter_hash
+      @query_parameter_hash ||= (parameters || []).
+          select(&:in_query?).
+          map{ |param| [param.name, param] }.
+          to_h
+    end
   end
 end

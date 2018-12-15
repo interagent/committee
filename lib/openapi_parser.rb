@@ -5,6 +5,7 @@ require 'openapi_parser/schemas'
 require 'openapi_parser/path_item_finder'
 require 'openapi_parser/request_operation'
 require 'openapi_parser/schema_validator'
+require 'openapi_parser/parameter_validator'
 
 module OpenAPIParser
   class << self
