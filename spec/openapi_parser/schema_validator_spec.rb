@@ -66,7 +66,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         params = {"#{key}" => value}
 
         expect{ request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
-          expect(e.is_a?(OpenAPIParser::SchemaValidator::ValidateError)).to eq true
+          expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
           expect(e.message.start_with?("#{value} class is #{value.class}")).to eq true
         end
       end
@@ -84,14 +84,14 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         deleted_object = object_2.reject{|k, _v| k == key}
         params = {"object_2" => deleted_object}
         expect{ request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
-          expect(e.is_a?(OpenAPIParser::SchemaValidator::NotExistRequiredKey)).to eq true
+          expect(e.is_a?(OpenAPIParser::NotExistRequiredKey)).to eq true
           expect(e.message.start_with?("required parameters #{key} not exist")).to eq true
         end
       end
 
       params = {"object_2" => {}}
       expect{ request_operation.validate_request_body(content_type, params)  }.to raise_error do |e|
-        expect(e.is_a?(OpenAPIParser::SchemaValidator::NotExistRequiredKey)).to eq true
+        expect(e.is_a?(OpenAPIParser::NotExistRequiredKey)).to eq true
         expect(e.message.start_with?("required parameters #{object_2.keys.join(",")} not exist")).to eq true
       end
     end
@@ -132,7 +132,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
         it do
           expect{ subject }.to raise_error do |e|
-            expect(e.is_a?(OpenAPIParser::SchemaValidator::NotExistRequiredKey)).to eq true
+            expect(e.is_a?(OpenAPIParser::NotExistRequiredKey)).to eq true
             expect(e.message.start_with?("required parameters string not exist")).to eq true
           end
         end
@@ -145,7 +145,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
         it do
           expect{ subject }.to raise_error do |e|
-            expect(e.is_a?(OpenAPIParser::SchemaValidator::NotExistRequiredKey)).to eq true
+            expect(e.is_a?(OpenAPIParser::NotExistRequiredKey)).to eq true
             expect(e.message.start_with?("required parameters need_object not exist")).to eq true
           end
         end
@@ -166,7 +166,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it do
           expect{ subject }.to raise_error do |e|
-            expect(e.is_a?(OpenAPIParser::SchemaValidator::ValidateError)).to eq true
+            expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
             expect(e.message.start_with?("1.1 class is Float")).to eq true
           end
         end
@@ -182,7 +182,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it do
           expect{ subject }.to raise_error do |e|
-            expect(e.is_a?(OpenAPIParser::SchemaValidator::NotNullError)).to eq true
+            expect(e.is_a?(OpenAPIParser::NotNullError)).to eq true
             expect(e.message.include?("don't allow null")).to eq true
           end
         end
@@ -195,7 +195,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it 'invalid' do
           expect{ request_operation.validate_request_body(content_type, {"any_of" => [1]}) }.to raise_error do |e|
-            expect(e.is_a?(OpenAPIParser::SchemaValidator::NotAnyOf)).to eq true
+            expect(e.is_a?(OpenAPIParser::NotAnyOf)).to eq true
             expect(e.message.start_with?("1 isn't any of")).to eq true
           end
         end
@@ -212,7 +212,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it 'not include enum' do
           expect{ request_operation.validate_request_body(content_type, {"enum_string" => 'x'}) }.to raise_error do |e|
-            expect(e.is_a?(OpenAPIParser::SchemaValidator::NotEnumInclude)).to eq true
+            expect(e.is_a?(OpenAPIParser::NotEnumInclude)).to eq true
             expect(e.message.start_with?("x isn't include enum")).to eq true
           end
         end
@@ -227,7 +227,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it 'not include enum' do
           expect{ request_operation.validate_request_body(content_type, {"enum_integer" => 3}) }.to raise_error do |e|
-            expect(e.is_a?(OpenAPIParser::SchemaValidator::NotEnumInclude)).to eq true
+            expect(e.is_a?(OpenAPIParser::NotEnumInclude)).to eq true
             expect(e.message.start_with?("3 isn't include enum")).to eq true
           end
         end
@@ -242,7 +242,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it 'not include enum' do
           expect{ request_operation.validate_request_body(content_type, {"enum_number" => 1.1}) }.to raise_error do |e|
-            expect(e.is_a?(OpenAPIParser::SchemaValidator::NotEnumInclude)).to eq true
+            expect(e.is_a?(OpenAPIParser::NotEnumInclude)).to eq true
             expect(e.message.start_with?("1.1 isn't include enum")).to eq true
           end
         end

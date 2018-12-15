@@ -1,59 +1,4 @@
 class OpenAPIParser::SchemaValidator
-  class ValidateError < StandardError
-    def initialize(data, type, reference)
-      @data = data
-      @type = type
-      @reference = reference
-    end
-
-    def message
-      "#{@data} class is #{@data.class} but it's not valid #{@type} in #{@reference}"
-    end
-  end
-
-  class NotNullError < StandardError
-    def initialize(reference)
-      @reference = reference
-    end
-
-    def message
-      "#{@reference} don't allow null"
-    end
-  end
-
-  class NotExistRequiredKey < StandardError
-    def initialize(keys, reference)
-      @keys = keys
-      @reference = reference
-    end
-
-    def message
-      "required parameters #{@keys.join(",")} not exist in #{@reference}"
-    end
-  end
-
-  class NotAnyOf < StandardError
-    def initialize(value, reference)
-      @value = value
-      @reference = reference
-    end
-
-    def message
-      "#{@value} isn't any of in #{@reference}"
-    end
-  end
-
-  class NotEnumInclude < StandardError
-    def initialize(value, reference)
-      @value = value
-      @reference = reference
-    end
-
-    def message
-      "#{@value} isn't include enum in #{@reference}"
-    end
-  end
-
   class << self
     # @param [Hash] value
     # @param [OpenAPIParser::Schemas::Schema]
@@ -85,7 +30,7 @@ class OpenAPIParser::SchemaValidator
 
     if value.nil?
       return if schema.nullable
-      return NotNullError.new(schema.object_reference)
+      return OpenAPIParser::NotNullError.new(schema.object_reference)
     end
 
     case schema.type
@@ -107,14 +52,14 @@ class OpenAPIParser::SchemaValidator
       # TODO: unknown type support
     end
 
-    ValidateError.new(value, schema.type, schema.object_reference)
+    OpenAPIParser::ValidateError.new(value, schema.type, schema.object_reference)
   end
 
   # @param [Object] value
   # @param [OpenAPIParser::Schemas::Schema] schema
   def validate_any_of(value, schema)
     # in all schema return error (=true) not any of data
-    schema.any_of.all? { |s| validate_schema(value, s) } ? NotAnyOf.new(value, schema.object_reference) : nil
+    schema.any_of.all? { |s| validate_schema(value, s) } ? OpenAPIParser::NotAnyOf.new(value, schema.object_reference) : nil
   end
 
   def validate_string(value, schema)
@@ -135,7 +80,7 @@ class OpenAPIParser::SchemaValidator
     return unless schema.enum
     return if schema.enum.include?(value)
 
-    NotEnumInclude.new(value, schema.object_reference)
+    OpenAPIParser::NotEnumInclude.new(value, schema.object_reference)
   end
 
   # @param [Hash] value
@@ -152,7 +97,7 @@ class OpenAPIParser::SchemaValidator
       required_set.delete(name)
     end
 
-    return NotExistRequiredKey.new(required_set.to_a, schema.object_reference) unless required_set.empty?
+    return OpenAPIParser::NotExistRequiredKey.new(required_set.to_a, schema.object_reference) unless required_set.empty?
     nil
   end
 

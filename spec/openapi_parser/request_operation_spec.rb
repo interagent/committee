@@ -62,7 +62,7 @@ RSpec.describe OpenAPIParser::RequestOperation do
 
       it do
         expect{ subject }.to raise_error do |e|
-          expect(e.is_a?(OpenAPIParser::SchemaValidator::ValidateError)).to eq true
+          expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
           expect(e.message.start_with?("1 class is Integer")).to eq true
         end
       end
@@ -74,7 +74,7 @@ RSpec.describe OpenAPIParser::RequestOperation do
 
       it do
         expect{ subject }.to raise_error do |e|
-          expect(e.is_a?(OpenAPIParser::SchemaValidator::ValidateError)).to eq true
+          expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
           expect(e.message.start_with?("1 class is String")).to eq true
         end
       end
