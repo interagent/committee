@@ -37,7 +37,7 @@ describe Committee::Middleware::ResponseValidation do
       get "/characters"
     }
 
-    assert_match(/invalid parameter type response/i, e.message)
+    assert_match(/class is Array but it's not valid object/i, e.message)
   end
 
   it "passes through a 204 (no content) response" do

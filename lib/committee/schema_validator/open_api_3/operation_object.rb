@@ -6,8 +6,8 @@ module Committee
 
     attr_reader :request_operation
 
-    # @!attribute [r] operation_request
-    #   @return [OpenAPIParser::OperationRequest]
+    # @!attribute [r] request_operation
+    #   @return [OpenAPIParser::RequestOperation]
 
     # @param oas_parser_endpoint [OasParser::Endpoint]
     # # @param request_operation [OpenAPIParser::RequestOperation]
@@ -59,26 +59,17 @@ module Committee
       raise err if err
     end
 
-    def validate_response_params(status, content_type, data)
-      ro = response_object(status)
-      media_type_object = ro.content[content_type] # TODO: support media type range like `text/*` because it's OpenAPI3 definition
-      return unless media_type_object # TODO: raise error option
-
-      # media_type_object like {schema: {type: 'object', properties: {....}}}
-      # OasParser::Parameter check root hash 'properties' so we should flatten.
-      # But, array object 'items' properties check ['schema']['items'] so we mustn't flatten :(
-      media_type_object = media_type_object['schema'] if media_type_object['schema'] && media_type_object['schema']['type'] == 'object'
-      parameter = OasParser::Parameter.new(ro, media_type_object)
-
-      error = check_parameter_type('response', data, parameter)
-      raise error if error
+    def validate_response_params(status_code, content_type, params)
+      return request_operation.validate_response_body(status_code, content_type, params)
+    rescue => e
+      raise Committee::InvalidRequest.new(e.message)
     end
 
     private
 
     def validate_get_request_params(params)
       # TODO: check path parameter
-
+      
       parameter_object_hash = oas_parser_endpoint.
           parameters.
           map { |parameter| parameter.in == "query" ? [parameter.name, parameter] : nil }.
@@ -214,14 +205,6 @@ module Committee
 
     def path_parameters
       @path_parameters ||= oas_parser_endpoint.path_parameters.map{ |parameter| [parameter.name, parameter] }.to_h
-    end
-
-    # check responses object
-    def response_object(code)
-      # TODO: support error field
-      # TODO: support ignore response because oas_parser ignore default and raise error
-      # unless oas_parser_endpoint.raw['responses'][code] && ignore_not_exist_response_definition
-      oas_parser_endpoint.response_by_code(code.to_s)
     end
   end
 end
