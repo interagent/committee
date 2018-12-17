@@ -2,22 +2,36 @@ class OpenAPIParser::SchemaValidator
   class StringValidator < Base
     include ::OpenAPIParser::SchemaValidator::Enumable
 
-    def initialize(validator, coerce_value, coerce_datetime)
+    def initialize(validator, coerce_value, datetime_coerce_class)
       super(validator, coerce_value)
-      @coerce_datetime = coerce_datetime
+      @datetime_coerce_class = datetime_coerce_class
     end
 
     def coerce_and_validate(value, schema)
-      value = coerce(value) if @coerce_value
-
       return validator.validate_error(value, schema) unless value.is_a?(String)
 
-      check_enum_include(value, schema)
+      value, err = check_enum_include(value, schema)
+      return [nil, err] if err
+
+      value = coerce_date_time(value, schema) unless @datetime_coerce_class.nil?
+
+      [value, nil]
     end
 
     private
 
-    def coerce(value)
+    # @param [OpenAPIParser::Schemas::Schema] schema
+    def coerce_date_time(value, schema)
+      schema.format == "date-time" ? parse_date_time(value) : value
+    end
+
+    def parse_date_time(value)
+      begin
+        return @datetime_coerce_class.parse(value)
+      rescue ArgumentError => e
+        raise e unless e.message =~ /invalid date/
+      end
+
       value
     end
   end

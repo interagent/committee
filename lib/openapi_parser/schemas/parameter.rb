@@ -20,8 +20,9 @@ module OpenAPIParser::Schemas
     end
 
     # @return [Object] coerced or original params
-    def validate_params(params, coerce_value)
-      ::OpenAPIParser::SchemaValidator.validate(params, schema, coerce_value)
+    # @param [OpenAPIParser::SchemaValidator::Options] options
+    def validate_params(params, options)
+      ::OpenAPIParser::SchemaValidator.validate(params, schema, options)
     end
   end
 end

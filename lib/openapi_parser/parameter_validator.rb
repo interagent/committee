@@ -3,12 +3,13 @@ class OpenAPIParser::ParameterValidator
     # @param [Hash{String => Parameter}] parameters_hash
     # @param [Hash] params
     # @param [String] object_reference
-    def validate_parameter(parameters_hash, params, object_reference, coerce_value)
+    # @param [OpenAPIParser::SchemaValidator::Options] options
+    def validate_parameter(parameters_hash, params, object_reference, options)
       no_exist_required_key = []
       parameters_hash.each do |k, v|
         if (data = params[k])
-          coerced = v.validate_params(data, coerce_value)
-          params[k] = coerced if coerce_value
+          coerced = v.validate_params(data, options)
+          params[k] = coerced if options.coerce_value
         elsif v.required
           no_exist_required_key << k
         end

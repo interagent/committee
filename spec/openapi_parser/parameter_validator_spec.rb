@@ -1,10 +1,11 @@
 require_relative '../spec_helper'
 
 RSpec.describe OpenAPIParser::ParameterValidator do
-  let(:root) { OpenAPIParser::Schemas::OpenAPI.new(normal_schema) }
+  let(:root) {OpenAPIParser.parse(normal_schema, config) }
+  let(:config) { {} }
 
   describe 'validate' do
-    subject { request_operation.validate_request_parameter(params, false) }
+    subject { request_operation.validate_request_parameter(params) }
 
     let(:content_type) { 'application/json' }
     let(:http_method) { :get }

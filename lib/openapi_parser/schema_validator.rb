@@ -1,3 +1,4 @@
+require_relative 'schema_validators/options'
 require_relative 'schema_validators/enumable'
 require_relative 'schema_validators/base'
 require_relative 'schema_validators/string_validator'
@@ -10,24 +11,28 @@ require_relative 'schema_validators/any_of_validator'
 require_relative 'schema_validators/nil_validator'
 
 class OpenAPIParser::SchemaValidator
+  class ValidatorOption
+
+  end
+
   class << self
     # @param [Hash] value
     # @param [OpenAPIParser::Schemas::Schema]
-    # @param [Boolean] coerce_value
+    # @param [OpenAPIParser::SchemaValidator::Options] options
     # @return [Object] coerced or original params
-    def validate(value, schema, coerce_value)
-      new(value, schema, coerce_value).validate_data
+    def validate(value, schema, options)
+      new(value, schema, options).validate_data
     end
   end
 
   # @param [Hash] value
   # @param [OpenAPIParser::Schemas::Schema] schema
-  # @param [Boolean] coerce_value
-  def initialize(value, schema, coerce_value)
+  # @param [OpenAPIParser::SchemaValidator::Options] options
+  def initialize(value, schema, options)
     @value = value
     @schema = schema
-    @coerce_value = coerce_value
-    @coerce_datetime = false # not support yet
+    @coerce_value = options.coerce_value
+    @datetime_coerce_class = options.datetime_coerce_class
   end
 
   # @return [Object] coerced or original params
@@ -42,7 +47,7 @@ class OpenAPIParser::SchemaValidator
   end
 
   def validate_string(value, schema)
-    (@string_validator ||= OpenAPIParser::SchemaValidator::StringValidator.new(self, @coerce_value, @coerce_datetime)).coerce_and_validate(value, schema)
+    (@string_validator ||= OpenAPIParser::SchemaValidator::StringValidator.new(self, @coerce_value, @datetime_coerce_class)).coerce_and_validate(value, schema)
   end
 
   def validate_integer(value, schema)

@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
 RSpec.describe OpenAPIParser::Schemas::OpenAPI do
-  subject { OpenAPIParser::Schemas::OpenAPI.new(petstore_schema) }
+  subject { OpenAPIParser.parse(petstore_schema, {}) }
 
   describe 'init' do
     it 'correct init' do

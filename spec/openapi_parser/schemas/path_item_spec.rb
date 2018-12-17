@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
 RSpec.describe OpenAPIParser::Schemas::PathItem do
-  let(:root) { OpenAPIParser::Schemas::OpenAPI.new(normal_schema) }
+  let(:root) { OpenAPIParser.parse(normal_schema, {}) }
 
   describe "#init" do
     subject{ path_item }
@@ -21,7 +21,7 @@ RSpec.describe OpenAPIParser::Schemas::PathItem do
   describe "#parameters" do
     subject{ path_item }
 
-    let(:root) { OpenAPIParser::Schemas::OpenAPI.new(petstore_schema) }
+    let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/animals/{id}'] }
 

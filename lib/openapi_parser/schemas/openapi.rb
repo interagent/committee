@@ -5,10 +5,11 @@
 
 module OpenAPIParser::Schemas
   class OpenAPI < Base
-    def initialize(raw_schema)
+    def initialize(raw_schema, config)
       super('#', nil, self, raw_schema)
       @find_object_cache = {}
       @path_item_finder = OpenAPIParser::PathItemFinder.new(paths)
+      @config = config
     end
 
     # @!attribute [r] openapi
@@ -25,7 +26,7 @@ module OpenAPIParser::Schemas
 
     # @return [OpenAPIParser::RequestOperation]
     def request_operation(http_method, request_path)
-      OpenAPIParser::RequestOperation.create(http_method, request_path, @path_item_finder)
+      OpenAPIParser::RequestOperation.create(http_method, request_path, @path_item_finder, @config)
     end
   end
 end
