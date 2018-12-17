@@ -4,7 +4,7 @@ RSpec.describe OpenAPIParser::ParameterValidator do
   let(:root) { OpenAPIParser::Schemas::OpenAPI.new(normal_schema) }
 
   describe 'validate' do
-    subject { request_operation.validate_request_parameter(params) }
+    subject { request_operation.validate_request_parameter(params, false) }
 
     let(:content_type) { 'application/json' }
     let(:http_method) { :get }
@@ -15,12 +15,12 @@ RSpec.describe OpenAPIParser::ParameterValidator do
     context 'correct' do
       context 'no optional' do
         let(:params) { {"query_string" => "query", "query_integer_list" => [1, 2]} }
-        it { expect(subject).to eq nil }
+        it { expect(subject).to eq({"query_string" => "query", "query_integer_list" => [1, 2]}) }
       end
 
       context 'with optional' do
         let(:params) { {"query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => 1} }
-        it { expect(subject).to eq nil }
+        it { expect(subject).to eq({"optional_integer"=>1, "query_integer_list"=>[1, 2], "query_string"=>"query"}) }
       end
     end
 

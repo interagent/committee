@@ -17,16 +17,16 @@ module OpenAPIParser::Schemas
 
     openapi_attr_object :responses, Responses, reference: false
 
-    def validate_request_body(content_type, params)
-      request_body&.validate_request_body(content_type, params)
+    def validate_request_body(content_type, params, coerce)
+      request_body&.validate_request_body(content_type, params, coerce)
     end
 
-    def validate_response_body(status_code, content_type, data)
-      responses&.validate_response_body(status_code, content_type, data)
+    def validate_response_body(status_code, content_type, data, coerce)
+      responses&.validate_response_body(status_code, content_type, data, coerce)
     end
 
-    def validate_request_parameter(params)
-      OpenAPIParser::ParameterValidator.validate_parameter(query_parameter_hash, params, object_reference)
+    def validate_request_parameter(params, coerce)
+      OpenAPIParser::ParameterValidator.validate_parameter(query_parameter_hash, params, object_reference, coerce)
     end
 
     private

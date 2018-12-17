@@ -9,13 +9,13 @@ module OpenAPIParser::Schemas
     #   @return [Hash{String => MediaType}, nil]
     openapi_attr_hash_object :content, MediaType, reference: false
 
-    def validate_parameter(content_type, params)
+    def validate_parameter(content_type, params, coerce)
       # TODO: support wildcard type like application/* (OpenAPI3 definition)
 
       media_type = content[content_type]
       return nil unless media_type
 
-      media_type.validate_parameter(params)
+      media_type.validate_parameter(params, coerce)
     end
   end
 end

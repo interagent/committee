@@ -19,8 +19,9 @@ module OpenAPIParser::Schemas
       self.in == "path"
     end
 
-    def validate_params(params)
-      ::OpenAPIParser::SchemaValidator.validate(params, schema)
+    # @return [Object] coerced or original params
+    def validate_params(params, coerce_value)
+      ::OpenAPIParser::SchemaValidator.validate(params, schema, coerce_value)
     end
   end
 end

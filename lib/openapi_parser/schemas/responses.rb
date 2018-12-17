@@ -10,15 +10,15 @@ module OpenAPIParser::Schemas
     #   @return [Hash{String => Response, Reference}, nil]
     openapi_attr_hash_body_objects 'response', Response, reject_keys: [:default], allow_reference: true, allow_data_type: false
 
-    def validate_response_body(status_code, content_type, params)
+    def validate_response_body(status_code, content_type, params, coerce)
       # TODO: support wildcard status code like 2XX
       return nil unless response
 
       res = response[status_code.to_s]
-      return res.validate_parameter(content_type, params) if res
+      return res.validate_parameter(content_type, params, coerce) if res
 
 
-      default&.validate_parameter(content_type, params)
+      default&.validate_parameter(content_type, params, coerce)
     end
   end
 end

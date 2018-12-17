@@ -24,15 +24,15 @@ class OpenAPIParser::RequestOperation
   end
 
   # support application/json only :(
-  def validate_request_body(content_type, params)
-    operation_object&.validate_request_body(content_type, params)
+  def validate_request_body(content_type, params, coerce)
+    operation_object&.validate_request_body(content_type, params, coerce)
   end
 
-  def validate_response_body(status_code, content_type, data)
-    operation_object&.validate_response_body(status_code, content_type, data)
+  def validate_response_body(status_code, content_type, data, coerce)
+    operation_object&.validate_response_body(status_code, content_type, data, coerce)
   end
 
-  def validate_request_parameter(params)
-    operation_object&.validate_request_parameter(params)
+  def validate_request_parameter(params, coerce)
+    operation_object&.validate_request_parameter(params, coerce)
   end
 end

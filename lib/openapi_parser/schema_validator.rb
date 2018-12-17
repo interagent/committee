@@ -1,117 +1,104 @@
+require_relative 'schema_validators/enumable'
+require_relative 'schema_validators/base'
+require_relative 'schema_validators/string_validator'
+require_relative 'schema_validators/integer_validator'
+require_relative 'schema_validators/float_validator'
+require_relative 'schema_validators/boolean_validator'
+require_relative 'schema_validators/object_validator'
+require_relative 'schema_validators/array_validator'
+require_relative 'schema_validators/any_of_validator'
+require_relative 'schema_validators/nil_validator'
+
 class OpenAPIParser::SchemaValidator
   class << self
     # @param [Hash] value
     # @param [OpenAPIParser::Schemas::Schema]
-    def validate(value, schema)
-      new(value, schema).validate_data
+    # @param [Boolean] coerce_value
+    # @return [Object] coerced or original params
+    def validate(value, schema, coerce_value)
+      new(value, schema, coerce_value).validate_data
     end
   end
 
   # @param [Hash] value
   # @param [OpenAPIParser::Schemas::Schema] schema
-  def initialize(value, schema)
+  # @param [Boolean] coerce_value
+  def initialize(value, schema, coerce_value)
     @value = value
     @schema = schema
+    @coerce_value = coerce_value
+    @coerce_datetime = false # not support yet
   end
 
+  # @return [Object] coerced or original params
   def validate_data
-    err = validate_schema(@value, @schema)
+    coerced, err = validate_schema(@value, @schema)
     raise err if err
-    nil
+    coerced
   end
 
-  private
+  def validate_error(value, schema)
+    [nil, OpenAPIParser::ValidateError.new(value, schema.type, schema.object_reference)]
+  end
+
+  def validate_string(value, schema)
+    (@string_validator ||= OpenAPIParser::SchemaValidator::StringValidator.new(self, @coerce_value, @coerce_datetime)).coerce_and_validate(value, schema)
+  end
+
+  def validate_integer(value, schema)
+    (@integer_validator ||= OpenAPIParser::SchemaValidator::IntegerValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
+  end
+
+  def validate_float(value, schema)
+    (@float_validator ||= OpenAPIParser::SchemaValidator::FloatValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
+  end
+
+  def validate_boolean(value, schema)
+    (@boolean_validator ||= OpenAPIParser::SchemaValidator::BooleanValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
+  end
+
+  def validate_object(value, schema)
+    (@object_validator ||= OpenAPIParser::SchemaValidator::ObjectValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
+  end
+
+  def validate_array(value, schema)
+    (@array_validator ||= OpenAPIParser::SchemaValidator::ArrayValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
+  end
+
+  def validate_any_of(value, schema)
+    (@any_of_validator ||= OpenAPIParser::SchemaValidator::AnyOfValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
+  end
+
+  def validate_nil(value, schema)
+    (@nil_validator ||= OpenAPIParser::SchemaValidator::NilValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
+  end
 
   # @param [Object] value
   # @param [OpenAPIParser::Schemas::Schema] schema
   def validate_schema(value, schema)
-    return unless schema
+    return [value, nil] unless schema # no schema
+
     return validate_any_of(value, schema) if schema.any_of
 
-    if value.nil?
-      return if schema.nullable
-      return OpenAPIParser::NotNullError.new(schema.object_reference)
-    end
+    return validate_nil(value, schema) if value.nil?
 
     case schema.type
     when "string"
-      return validate_string(value, schema) if value.is_a?(String)
+      return validate_string(value, schema)
     when "integer"
-      return validate_integer(value, schema) if value.is_a?(Integer)
+      return validate_integer(value, schema)
     when "boolean"
-      return if value.is_a?(TrueClass)
-      return if value.is_a?(FalseClass)
+      return validate_boolean(value, schema)
     when "number"
-      return validate_integer(value, schema) if value.is_a?(Integer)
-      return validate_number(value, schema) if value.is_a?(Numeric)
+      return validate_float(value, schema)
     when "object"
-      return validate_object(value, schema) if value.is_a?(Hash)
+      return validate_object(value, schema)
     when "array"
-      return validate_array(value, schema) if value.is_a?(Array)
+      return validate_array(value, schema)
     else
       # TODO: unknown type support
     end
 
-    OpenAPIParser::ValidateError.new(value, schema.type, schema.object_reference)
-  end
-
-  # @param [Object] value
-  # @param [OpenAPIParser::Schemas::Schema] schema
-  def validate_any_of(value, schema)
-    # in all schema return error (=true) not any of data
-    schema.any_of.all? { |s| validate_schema(value, s) } ? OpenAPIParser::NotAnyOf.new(value, schema.object_reference) : nil
-  end
-
-  def validate_string(value, schema)
-    check_enum_include(value, schema)
-  end
-
-  def validate_integer(value, schema)
-    check_enum_include(value, schema)
-  end
-
-  def validate_number(value, schema)
-    check_enum_include(value, schema)
-  end
-
-  # @param [Object] value
-  # @param [OpenAPIParser::Schemas::Schema] schema
-  def check_enum_include(value, schema)
-    return unless schema.enum
-    return if schema.enum.include?(value)
-
-    OpenAPIParser::NotEnumInclude.new(value, schema.object_reference)
-  end
-
-  # @param [Hash] value
-  # @param [OpenAPIParser::Schemas::Schema] schema
-  def validate_object(value, schema)
-    return unless schema.properties
-    required_set = schema.required ? schema.required.to_set : Set.new
-
-    value.each do |name, v|
-      s = schema.properties[name]
-      err = validate_schema(v, s)
-      return err if err
-
-      required_set.delete(name)
-    end
-
-    return OpenAPIParser::NotExistRequiredKey.new(required_set.to_a, schema.object_reference) unless required_set.empty?
-    nil
-  end
-
-  # @param [Array] value
-  # @param [OpenAPIParser::Schemas::Schema] schema
-  def validate_array(value, schema)
-    # array type have an schema in items property
-    items_schema = schema.items
-
-    value.each do |v|
-      err = validate_schema(v, items_schema)
-      return err if err
-    end
-
-    nil
+    validate_error(value, schema)
   end
 end

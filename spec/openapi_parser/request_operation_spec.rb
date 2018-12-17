@@ -37,7 +37,7 @@ RSpec.describe OpenAPIParser::RequestOperation do
   end
 
   describe 'validate_response_body' do
-    subject { request_operation.validate_response_body(status_code, content_type, data) }
+    subject { request_operation.validate_response_body(status_code, content_type, data, false) }
 
     let(:status_code) { 200 }
     let(:root) { OpenAPIParser::Schemas::OpenAPI.new(normal_schema) }
@@ -47,7 +47,7 @@ RSpec.describe OpenAPIParser::RequestOperation do
     context 'correct' do
       let(:data) { {"string" => "Honoka.Kousaka"} }
 
-      it { expect(subject).to eq nil }
+      it { expect(subject).to eq({"string"=>"Honoka.Kousaka"}) }
     end
 
     context 'no content type' do

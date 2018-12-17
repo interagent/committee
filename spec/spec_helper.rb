@@ -1,6 +1,7 @@
 require 'bundler/setup'
 require 'yaml'
 require 'pry'
+require 'rspec-parameterized'
 
 require 'openapi_parser'
 
