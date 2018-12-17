@@ -9,7 +9,6 @@ module OpenAPIParser::Schemas
     openapi_attr_object :schema, Schema, reference: true
 
     # @param [Hash] params
-    # @param [OpenAPIParser::SchemaValidator::Options] options
     def validate_parameter(params, options)
       OpenAPIParser::SchemaValidator.validate(params, schema, options)
     end

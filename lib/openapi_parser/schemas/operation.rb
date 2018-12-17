@@ -21,8 +21,8 @@ module OpenAPIParser::Schemas
       request_body&.validate_request_body(content_type, params, options)
     end
 
-    def validate_response_body(status_code, content_type, data, options)
-      responses&.validate_response_body(status_code, content_type, data, options)
+    def validate_response_body(status_code, content_type, data)
+      responses&.validate_response_body(status_code, content_type, data)
     end
 
     # @param [OpenAPIParser::SchemaValidator::Options] options
@@ -30,7 +30,18 @@ module OpenAPIParser::Schemas
       OpenAPIParser::ParameterValidator.validate_parameter(query_parameter_hash, params, object_reference, options)
     end
 
+    def validate_path_params(path_params, options)
+      OpenAPIParser::ParameterValidator.validate_parameter(path_parameter_hash, path_params, object_reference, options)
+    end
+
     private
+
+    def path_parameter_hash
+      @path_parameter_hash ||= (parameters || []).
+          select(&:in_path?).
+          map{ |param| [param.name, param] }.
+          to_h
+    end
 
     def query_parameter_hash
       @query_parameter_hash ||= (parameters || []).

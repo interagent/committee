@@ -11,6 +11,7 @@ RSpec.describe OpenAPIParser::Expandable do
       expect(subject.find_object('#/paths/~1reference/get/parameters/0').class).to eq OpenAPIParser::Schemas::Parameter
       expect(subject.find_object('#/paths/~1reference/get/responses/default').class).to eq OpenAPIParser::Schemas::Response
       expect(subject.find_object('#/paths/~1reference/post/responses/default').class).to eq OpenAPIParser::Schemas::Response
+      expect(subject.find_object('#/paths/~1string_params_coercer/post/requestBody/content/application~1json/schema/properties/nested_array').class).to eq OpenAPIParser::Schemas::Schema
     end
   end
 end

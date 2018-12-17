@@ -11,11 +11,13 @@ RSpec.describe OpenAPIParser::PathItemFinder do
 
       expect(subject.instance_variable_get(:@root).send(:children).size).to eq 1
 
-      op, matched_parameters = subject.operation_object(:get, '/pets')
+      op, original_path, matched_parameters = subject.operation_object(:get, '/pets')
+      expect(original_path).to eq('/pets')
       expect(op.object_reference).to eq root.find_object('#/paths/~1pets/get').object_reference
       expect(matched_parameters.empty?).to eq true
 
-      op, matched_parameters = subject.operation_object(:get, '/pets/1')
+      op, original_path, matched_parameters = subject.operation_object(:get, '/pets/1')
+      expect(original_path).to eq('/pets/{id}')
       expect(op.object_reference).to eq root.find_object('#/paths/~1pets~1{id}/get').object_reference
       expect(matched_parameters['id']).to eq '1'
     end

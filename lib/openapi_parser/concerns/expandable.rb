@@ -15,7 +15,7 @@ module OpenAPIParser::Expandable
       h = send(name)
       next if h.nil?
 
-      update_values = h.each do |k, v|
+      update_values = h.map do |k, v|
         next [k, referenced_object(root, v)] if v.is_a?(OpenAPIParser::Schemas::Reference)
         v.expand_reference(root) if v.is_a?(OpenAPIParser::Expandable)
 

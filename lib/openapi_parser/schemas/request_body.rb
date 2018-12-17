@@ -8,7 +8,6 @@ module OpenAPIParser::Schemas
     #   @return [Hash{String => MediaType}, nil]
     openapi_attr_hash_object :content, MediaType, reference: false
 
-    # @param [OpenAPIParser::SchemaValidator::Options] options
     def validate_request_body(_content_type, params, options)
       # TODO: now support application/json only :(
 

@@ -4,10 +4,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
   let(:root) { OpenAPIParser.parse(normal_schema, config) }
   let(:config) { {} }
 
-  describe 'validate' do
-    subject { request_operation.validate_request_body('application/json', params, options) }
-
-    let(:options) { OpenAPIParser::SchemaValidator::Options.new(coerce_value: false)}
+  describe 'validate_request_body' do
+    subject { request_operation.validate_request_body('application/json', params) }
 
     let(:content_type) { 'application/json' }
     let(:http_method) { :post }
@@ -24,7 +22,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
           ['number', 0.1],
       ].to_h
 
-      ret = request_operation.validate_request_body(content_type, params, options)
+      ret = request_operation.validate_request_body(content_type, params)
       expect(ret).to eq({"boolean"=>false, "integer"=>1, "number"=>0.1, "string"=>"str"})
     end
 
@@ -39,7 +37,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
               }
       }
 
-      ret = request_operation.validate_request_body(content_type, params, options)
+      ret = request_operation.validate_request_body(content_type, params)
       expect(ret).to eq({"object_1"=>{"boolean_1"=>nil, "integer_1"=>nil, "number_1"=>nil, "string_1"=>nil}})
     end
 
@@ -68,7 +66,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       invalids.each do |key, value|
         params = {"#{key}" => value}
 
-        expect{ request_operation.validate_request_body(content_type, params, options) }.to raise_error do |e|
+        expect{ request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
           expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
           expect(e.message.start_with?("#{value} class is #{value.class}")).to eq true
         end
@@ -86,21 +84,21 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       object_2.keys.each do |key|
         deleted_object = object_2.reject{|k, _v| k == key}
         params = {"object_2" => deleted_object}
-        expect{ request_operation.validate_request_body(content_type, params, options) }.to raise_error do |e|
+        expect{ request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
           expect(e.is_a?(OpenAPIParser::NotExistRequiredKey)).to eq true
           expect(e.message.start_with?("required parameters #{key} not exist")).to eq true
         end
       end
 
       params = {"object_2" => {}}
-      expect{ request_operation.validate_request_body(content_type, params, options)  }.to raise_error do |e|
+      expect{ request_operation.validate_request_body(content_type, params)  }.to raise_error do |e|
         expect(e.is_a?(OpenAPIParser::NotExistRequiredKey)).to eq true
         expect(e.message.start_with?("required parameters #{object_2.keys.join(",")} not exist")).to eq true
       end
     end
 
     context 'nested required params' do
-      subject { request_operation.validate_request_body(content_type, {"required_object" => required_object}, options) }
+      subject { request_operation.validate_request_body(content_type, {"required_object" => required_object}) }
 
       let(:required_object_base) do
         JSON.load(
@@ -155,9 +153,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       end
     end
 
-
     describe 'array' do
-      subject { request_operation.validate_request_body(content_type, {"array" => array_data}, options) }
+      subject { request_operation.validate_request_body(content_type, {"array" => array_data}) }
 
       context 'correct' do
         let(:array_data) { [1] }
@@ -193,14 +190,34 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
       context 'anyOf' do
         it do
-          expect(request_operation.validate_request_body(content_type, {"any_of" => ['test', true]}, options)).
+          expect(request_operation.validate_request_body(content_type, {"any_of" => ['test', true]})).
               to eq({"any_of" => ['test', true]})
         end
 
         it 'invalid' do
-          expect{ request_operation.validate_request_body(content_type, {"any_of" => [1]}, options) }.to raise_error do |e|
+          expect{ request_operation.validate_request_body(content_type, {"any_of" => [1]}) }.to raise_error do |e|
             expect(e.is_a?(OpenAPIParser::NotAnyOf)).to eq true
             expect(e.message.start_with?("1 isn't any of")).to eq true
+          end
+        end
+      end
+    end
+
+    describe 'object' do
+      subject { request_operation.validate_request_body(content_type, {"object_1" => object_data}) }
+
+      context 'correct' do
+        let(:object_data) { {} }
+        it { expect(subject).to eq ({"object_1" => {}}) }
+      end
+
+      context 'not object' do
+        let(:object_data) { [] }
+
+        it do
+          expect{ subject }.to raise_error do |e|
+            expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
+            expect(e.message.start_with?("[] class is Array")).to eq true
           end
         end
       end
@@ -210,13 +227,13 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       context 'enum string' do
         it 'include enum' do
           ['a', 'b'].each do |str|
-            expect(request_operation.validate_request_body(content_type, {"enum_string" => str}, options)).
+            expect(request_operation.validate_request_body(content_type, {"enum_string" => str})).
                 to eq({"enum_string" => str})
           end
         end
 
         it 'not include enum' do
-          expect{ request_operation.validate_request_body(content_type, {"enum_string" => 'x'}, options) }.to raise_error do |e|
+          expect{ request_operation.validate_request_body(content_type, {"enum_string" => 'x'}) }.to raise_error do |e|
             expect(e.is_a?(OpenAPIParser::NotEnumInclude)).to eq true
             expect(e.message.start_with?("x isn't include enum")).to eq true
           end
@@ -226,13 +243,13 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       context 'enum integer' do
         it 'include enum' do
           [1, 2].each do |str|
-            expect(request_operation.validate_request_body(content_type, {"enum_integer" => str}, options)).
+            expect(request_operation.validate_request_body(content_type, {"enum_integer" => str})).
                 to eq({"enum_integer" => str})
           end
         end
 
         it 'not include enum' do
-          expect{ request_operation.validate_request_body(content_type, {"enum_integer" => 3}, options) }.to raise_error do |e|
+          expect{ request_operation.validate_request_body(content_type, {"enum_integer" => 3}) }.to raise_error do |e|
             expect(e.is_a?(OpenAPIParser::NotEnumInclude)).to eq true
             expect(e.message.start_with?("3 isn't include enum")).to eq true
           end
@@ -242,13 +259,13 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       context 'enum number' do
         it 'include enum' do
           [1.0, 2.1].each do |str|
-            expect(request_operation.validate_request_body(content_type, {"enum_number" => str}, options)).
+            expect(request_operation.validate_request_body(content_type, {"enum_number" => str})).
                 to eq({"enum_number" => str})
           end
         end
 
         it 'not include enum' do
-          expect{ request_operation.validate_request_body(content_type, {"enum_number" => 1.1}, options) }.to raise_error do |e|
+          expect{ request_operation.validate_request_body(content_type, {"enum_number" => 1.1}) }.to raise_error do |e|
             expect(e.is_a?(OpenAPIParser::NotEnumInclude)).to eq true
             expect(e.message.start_with?("1.1 isn't include enum")).to eq true
           end
@@ -257,7 +274,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
     end
 
     it 'unknown param' do
-      expect(request_operation.validate_request_body(content_type, {"unknown" => 1}, options)).to eq({"unknown"=>1})
+      expect(request_operation.validate_request_body(content_type, {"unknown" => 1})).to eq({"unknown"=>1})
     end
   end
 
@@ -308,6 +325,36 @@ RSpec.describe OpenAPIParser::SchemaValidator do
                 "per_page" => "1"
             }
         ]
+    end
+
+    context 'request_body' do
+      subject { request_operation.validate_request_body(content_type, params) }
+
+      let(:http_method) { :post }
+      let(:params) { { "nested_array" => nested_array } }
+      let(:config) { {coerce_value: true, datetime_coerce_class: DateTime} }
+
+      context 'correct' do
+        it do
+          subject
+
+          nested_array = params["nested_array"]
+          first_data = nested_array[0]
+          expect(first_data["update_time"].class).to eq DateTime
+          expect(first_data["per_page"].class).to eq Integer
+        end
+      end
+
+      context 'overwrite initialize option' do
+        subject { request_operation.validate_request_body(params, options) }
+
+        let(:options) { OpenAPIParser::SchemaValidator::Options.new(coerce_value: false) }
+
+        it do
+          expect{ subject }.to raise_error(OpenAPIParser::ValidateError)
+        end
+      end
+
     end
 
     context 'string' do
@@ -374,6 +421,16 @@ RSpec.describe OpenAPIParser::SchemaValidator do
           expect(subject).to eq({"#{key}" => 3})
           expect(params[key]).to eq 3
         end
+
+        context 'overwrite initialize option' do
+          subject { request_operation.validate_request_parameter(params, options) }
+
+          let(:options) { OpenAPIParser::SchemaValidator::Options.new(coerce_value: false) }
+
+          it do
+            expect{ subject }.to raise_error(OpenAPIParser::ValidateError)
+          end
+        end
       end
 
       context "skips invalid values for integer param" do
@@ -435,7 +492,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
       end
 
-      xcontext 'nested_array' do
+      context 'nested_array' do
         let(:params) do
           { "nested_array" => nested_array }
         end
@@ -458,17 +515,17 @@ RSpec.describe OpenAPIParser::SchemaValidator do
           expect(third_data["per_page"].class).to eq Integer
           expect(third_data["threshold"].class).to eq Float
 
-          expect(first_data["nested_coercer_object"]["update_time"]).to eq String
-          expect(first_data["nested_coercer_object"]["threshold"]).to eq Float
+          expect(first_data["nested_coercer_object"]["update_time"].class).to eq String
+          expect(first_data["nested_coercer_object"]["threshold"].class).to eq Float
 
-          expect(first_data["nested_no_coercer_object"]["per_page"]).to eq String
-          expect(first_data["nested_no_coercer_object"]["threshold"]).to eq String
+          expect(first_data["nested_no_coercer_object"]["per_page"].class).to eq String
+          expect(first_data["nested_no_coercer_object"]["threshold"].class).to eq String
 
-          expect(first_data["nested_coercer_array"].first["update_time"]).to eq String
-          expect(first_data["nested_coercer_array"].first["threshold"]).to eq Float
+          expect(first_data["nested_coercer_array"].first["update_time"].class).to eq String
+          expect(first_data["nested_coercer_array"].first["threshold"].class).to eq Float
 
-          expect(first_data["nested_no_coercer_array"].first["per_page"]).to eq String
-          expect(first_data["nested_no_coercer_array"].first["threshold"]).to eq String
+          expect(first_data["nested_no_coercer_array"].first["per_page"].class).to eq String
+          expect(first_data["nested_no_coercer_array"].first["threshold"].class).to eq String
         end
       end
     end
@@ -516,7 +573,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
          end
        end
 
-      xcontext "nested array" do
+      context "nested array" do
         let(:params) { { "nested_array" => nested_array } }
         it do
           subject
@@ -529,8 +586,28 @@ RSpec.describe OpenAPIParser::SchemaValidator do
           expect(second_data["update_time"].class).to eq DateTime
 
           expect(first_data["nested_coercer_object"]["update_time"].class).to eq DateTime
-          expect(first_data["nested_coercer_array"]["update_time"].class).to eq DateTime
+          expect(first_data["nested_coercer_array"][0]["update_time"].class).to eq DateTime
         end
+      end
+    end
+  end
+
+  describe 'coerce path parameter' do
+    subject { request_operation.validate_path_params }
+
+    let(:content_type) { 'application/json' }
+    let(:request_operation) { root.request_operation(http_method, request_path) }
+    let(:http_method) { :get }
+    let(:request_path) { '/coerce_path_params/1' }
+    let(:config) { {coerce_value: true} }
+
+    context 'correct' do
+      it do
+        expect(request_operation.path_params).to eq({"integer" => "1"})
+
+        subject
+
+        expect(request_operation.path_params).to eq({"integer" => 1})
       end
     end
   end

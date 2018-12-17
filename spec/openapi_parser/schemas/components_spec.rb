@@ -12,7 +12,7 @@ RSpec.describe OpenAPIParser::Schemas::Components do
       expect(subject.object_reference).to eq '#/components'
 
       expect(subject.parameters['test'].class).to eq OpenAPIParser::Schemas::Parameter
-      expect(subject.parameters['test_ref'].class).to eq OpenAPIParser::Schemas::Reference
+      expect(subject.parameters['test_ref'].class).to eq OpenAPIParser::Schemas::Parameter
 
       expect(subject.schemas['Pet'].class).to eq OpenAPIParser::Schemas::Schema
 

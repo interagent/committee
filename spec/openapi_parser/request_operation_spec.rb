@@ -9,6 +9,7 @@ RSpec.describe OpenAPIParser::RequestOperation do
     it 'no path items' do
       ro = OpenAPIParser::RequestOperation.create(:get, '/pets', path_item_finder, config.request_validator_options)
       expect(ro.operation_object.object_reference).to eq '#/paths/~1pets/get'
+      expect(ro.http_method).to eq('get')
     end
 
     it 'path items' do
@@ -38,9 +39,7 @@ RSpec.describe OpenAPIParser::RequestOperation do
   end
 
   describe 'validate_response_body' do
-    subject { request_operation.validate_response_body(status_code, content_type, data, options) }
-
-    let(:options) { OpenAPIParser::SchemaValidator::Options.new(coerce_value: false)}
+    subject { request_operation.validate_response_body(status_code, content_type, data) }
 
     let(:status_code) { 200 }
     let(:root) { OpenAPIParser.parse(normal_schema, {}) }

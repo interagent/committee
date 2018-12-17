@@ -24,7 +24,7 @@ module OpenAPIParser::Schemas
     #   @return [Components, nil]
     openapi_attr_object :components, Components, reference: false
 
-    # @return [OpenAPIParser::RequestOperation]
+    # @return [OpenAPIParser::RequestOperation, nil]
     def request_operation(http_method, request_path)
       OpenAPIParser::RequestOperation.create(http_method, request_path, @path_item_finder, @config)
     end

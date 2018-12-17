@@ -9,11 +9,11 @@ class OpenAPIParser::PathItemFinder
 
   # @param [String, Symbol] http_method like (get, post .... allow symbol)
   # @param [String] request_path
-  # @return [OpenAPIParser::Schemas::Paths]
+  # return operation_object, original_path, path_params
   def operation_object(http_method, request_path)
     if (path_item_object = @paths.path[request_path])
       if (op = path_item_object.operation(http_method))
-        return op, {} # find no path_params path
+        return op, request_path, {} # find no path_params path
       end
     end
 
@@ -83,11 +83,11 @@ class OpenAPIParser::PathItemFinder
 
   def parse_request_path(http_method, request_path)
     original_path, path_params = @root.find_full_path(request_path.split("/"))
-    return nil, path_params unless original_path
+    return nil, nil, {} unless original_path # # can't find
 
     path_item_object = @paths.path[original_path]
     obj = path_item_object.operation(http_method.to_s)
 
-    [obj, path_params]
+    [obj, original_path, path_params]
   end
 end

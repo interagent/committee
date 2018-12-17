@@ -12,11 +12,15 @@ class OpenAPIParser::SchemaValidator
     private
 
     def coerce(value)
+      return value if value.is_a?(Integer)
+
       begin
         return Integer(value)
       rescue ArgumentError => e
         raise e unless e.message =~ /invalid value for Integer/
       end
+
+      value
     end
   end
 end
