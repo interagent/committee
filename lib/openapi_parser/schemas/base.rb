@@ -2,6 +2,7 @@ module OpenAPIParser::Schemas
   class Base
     include OpenAPIParser::Parseable
     include OpenAPIParser::Findable
+    include OpenAPIParser::Expandable
 
     attr_reader :parent, :raw_schema, :object_reference, :root
 

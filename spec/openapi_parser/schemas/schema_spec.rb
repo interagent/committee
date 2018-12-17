@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
 RSpec.describe OpenAPIParser::Schemas::Schema do
-  let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
+  let(:root) { OpenAPIParser.parse(petstore_schema, {expand_reference: false}) }
 
   describe 'correct init' do
     let(:paths) { root.paths }

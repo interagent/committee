@@ -10,7 +10,12 @@ module OpenAPIParser::Findable
       return obj
     end
 
-    _openapi_all_child_objects.each do |c|
+    if (child = _openapi_all_child_objects[reference])
+      @find_object_cache[reference] = child
+      return child
+    end
+
+    _openapi_all_child_objects.values.each do |c|
       if (obj = c.find_object(reference))
         @find_object_cache[reference] = obj
         return obj
@@ -18,5 +23,11 @@ module OpenAPIParser::Findable
     end
 
     nil
+  end
+
+  def purge_object_cache
+    @find_object_cache = {}
+
+    _openapi_all_child_objects.values.each(&:purge_object_cache)
   end
 end

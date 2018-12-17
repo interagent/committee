@@ -9,12 +9,18 @@ require 'openapi_parser/path_item_finder'
 require 'openapi_parser/request_operation'
 require 'openapi_parser/schema_validator'
 require 'openapi_parser/parameter_validator'
+require 'openapi_parser/reference_expander'
 
 module OpenAPIParser
   class << self
-    # @param [OpenAPIParser::Schemas::OpenAPI]
+    # @return [OpenAPIParser::Schemas::OpenAPI]
     def parse(schema, config = {})
-      Schemas::OpenAPI.new(schema, Config.new(config))
+      c = Config.new(config)
+      root = Schemas::OpenAPI.new(schema, c)
+
+      OpenAPIParser::ReferenceExpander.expand(root) if c.expand_reference
+
+      root
     end
   end
 end

@@ -57,16 +57,22 @@ module OpenAPIParser::Parseable
     end
   end
 
+  def child_from_reference(reference)
+    _openapi_all_child_objects[reference]
+  end
 
   def _openapi_all_child_objects
-    @_openapi_all_child_objects ||= []
+    @_openapi_all_child_objects ||= {}
   end
 
   def _add_child_object(object)
     return unless object.is_a?(OpenAPIParser::Parseable)
-    _openapi_all_child_objects << object
+    _openapi_all_child_objects[object.object_reference] = object
   end
 
+  def _update_child_object(old, new)
+    _openapi_all_child_objects[old.object_reference] = new
+  end
 
   def load_data
     create_attr_values(self.class._openapi_attr_values)

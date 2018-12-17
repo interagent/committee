@@ -11,6 +11,10 @@ class OpenAPIParser::Config
     @config[:coerce_value]
   end
 
+  def expand_reference
+    @config.fetch(:expand_reference, true)
+  end
+
   def request_validator_options
     @request_options ||= OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value, datetime_coerce_class: datetime_coerce_class)
   end
