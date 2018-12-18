@@ -30,23 +30,19 @@ module Committee::Drivers
       Committee::Drivers::OpenAPI3::Schema
     end
 
-    def parse(definitions)
-      Schema.new(self, definitions)
+    def parse(open_api)
+      Schema.new(self, open_api)
     end
 
     class Schema < Committee::Drivers::Schema
-      attr_reader :definitions
-
       attr_reader :open_api
 
       # @!attribute [r] open_api
       #   @return [OpenAPIParser::Schemas::OpenAPI]
 
-      def initialize(driver, definitions)
-        @definitions = definitions
+      def initialize(driver, open_api)
+        @open_api = open_api
         @driver = driver
-        @templated_paths = Committee::SchemaValidator::OpenAPI3::TemplatedPaths.new(definitions)
-        @open_api = ::OpenAPIParser.parse(definitions.raw)
       end
 
       def support_stub?
@@ -64,17 +60,10 @@ module Committee::Drivers
 
       # OpenAPI3 only
       def operation_object(path, method)
-        endpoint = nil
-        if definitions.raw['paths'][path]
-          path_item_object = definitions.path_by_path(path)
-          endpoint, path_params = path_item_object.endpoint_by_method(method) if path_item_object.raw[method]
-        end
-
-        endpoint, path_params = @templated_paths.operation_object(path, method) if endpoint.nil?
-        return nil unless endpoint
-
         request_operation = open_api.request_operation(method, path)
-        Committee::SchemaValidator::OpenAPI3::OperationObject.new(endpoint, path_params, request_operation)
+        return nil unless request_operation
+
+        Committee::SchemaValidator::OpenAPI3::OperationWrapper.new(request_operation)
       end
     end
   end

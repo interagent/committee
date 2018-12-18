@@ -2,9 +2,9 @@ module Committee
   class SchemaValidator::OpenAPI3::ResponseValidator
     attr_reader :validate_errors
 
-    # @param [Committee::SchemaValidator::OpenAPI3::OperationObject] operation_object
-    def initialize(operation_object, validator_option)
-      @operation_object = operation_object
+    # @param [Committee::SchemaValidator::OpenAPI3::OperationWrapper] operation_wrapper
+    def initialize(operation_wrapper, validator_option)
+      @operation_wrapper = operation_wrapper
       @validate_errors = validator_option.validate_errors
     end
 
@@ -18,13 +18,13 @@ module Committee
       return unless self.class.validate?(status, validate_errors: validate_errors)
 
       content_type = headers['Content-Type'].to_s.split(";").first.to_s
-      operation_object.validate_response_params(status, content_type, data)
+      operation_wrapper.validate_response_params(status, content_type, data)
     end
 
     private
 
-    # @return [Committee::SchemaValidator::OpenAPI3::OperationObject]
-    attr_reader :operation_object
+    # @return [Committee::SchemaValidator::OpenAPI3::OperationWrapper]
+    attr_reader :operation_wrapper
 
     def check_content_type!(response)
       # TODO: fix

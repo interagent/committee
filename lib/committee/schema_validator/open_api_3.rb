@@ -9,15 +9,15 @@ class Committee::SchemaValidator
 
     def request_validate(request)
       path_params = validator_option.coerce_path_params ? coerce_path_params : {}
-      coerce_query_params(request) if validator_option.coerce_query_params
+      # coerce_query_params(request) if validator_option.coerce_query_params
 
       request_unpack(request)
 
-      request.env[validator_option.params_key]&.merge!(path_params) unless path_params.blank?
+      request.env[validator_option.params_key]&.merge!(path_params) unless path_params.empty?
 
       request_schema_validation(request)
-      parameter_coerce(request, validator_option.params_key, validator_option)
-      parameter_coerce(request, "rack.request.query_hash", validator_option) if !request.GET.nil?
+
+      @operation_object&.coerce_request_parameter(request.env["rack.request.query_hash"], validator_option) if !request.GET.nil?
     end
 
     def response_validate(status, headers, response)
@@ -33,32 +33,23 @@ class Committee::SchemaValidator
       !@operation_object.nil?
     end
 
-    def coerce_form_params(parameter)
-      return unless @operation_object
-      @operation_object.coerce_query_parameter(parameter, @validator_option)
+    def coerce_form_params(_parameter)
+      # nothing because when request_schema_validation, check and coerce
     end
 
     private
 
     attr_reader :validator_option
 
-    def coerce_query_params(request)
-      return unless link_exist?
-      return if request.GET.nil?
-      @operation_object.coerce_query_parameter(request.GET, validator_option)
-    end
-
     def coerce_path_params
       return {} unless link_exist?
-      @operation_object.coerce_path_parameter(@operation_object.path_params, @validator_option)
+      @operation_object.coerce_path_parameter(@validator_option)
     end
 
     def request_schema_validation(request)
       return unless @operation_object
 
-      validator = Committee::SchemaValidator::OpenAPI3::RequestValidator.new(@operation_object,
-                                                                             check_content_type: validator_option.check_content_type,
-                                                                             check_header: validator_option.check_header)
+      validator = Committee::SchemaValidator::OpenAPI3::RequestValidator.new(@operation_object, validator_option: validator_option)
       validator.call(request, request.env[validator_option.params_key], request.env[validator_option.headers_key])
     end
 
@@ -71,12 +62,6 @@ class Committee::SchemaValidator
           optimistic_json:    validator_option.optimistic_json,
           schema_validator:   self
       ).call
-    end
-
-    def parameter_coerce(request, params_key, validator_option)
-      return unless link_exist?
-
-      @operation_object.coerce_parameter(request.env[params_key], validator_option)
     end
   end
 end
