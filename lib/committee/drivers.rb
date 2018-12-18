@@ -63,6 +63,11 @@ module Committee
       def build_router(options)
         raise "needs implementation"
       end
+
+      # OpenAPI3 not support stub but JSON Hyper-Schema and OpenAPI2 support
+      def support_stub?
+        true
+      end
     end
   end
 end

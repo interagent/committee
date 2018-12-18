@@ -6,7 +6,7 @@ module Committee::Middleware
       @error_class = options.fetch(:error_class, Committee::ValidationError)
 
       @raise = options[:raise]
-      @schema = get_schema(options)
+      @schema = self.class.get_schema(options)
 
       @router = @schema.build_router(options)
     end
@@ -21,26 +21,28 @@ module Committee::Middleware
       end
     end
 
-    private
+    class << self
+      def get_schema(options)
+        open_api_3 = options[:open_api_3]
+        return open_api_3 if open_api_3
 
-    def get_schema(options)
-      open_api_3 = options[:open_api_3]
-      return open_api_3 if open_api_3
+        schema = options[:schema]
 
-      schema = options[:schema]
+        if schema
+          # Expect the type we want by now. If we don't have it, the user passed
+          # something else non-standard in.
+          if !schema.is_a?(Committee::Drivers::Schema)
+            raise ArgumentError, "Committee: schema expected to be an instance of Committee::Drivers::Schema."
+          end
 
-      if schema
-        # Expect the type we want by now. If we don't have it, the user passed
-        # something else non-standard in.
-        if !schema.is_a?(Committee::Drivers::Schema)
-          raise ArgumentError, "Committee: schema expected to be an instance of Committee::Drivers::Schema."
+          return schema
         end
 
-        return schema
+        raise(ArgumentError, "Committee: need option `schema` or `open_api_3`")
       end
-
-      raise(ArgumentError, "Committee: need option `schema` or `open_api_3`")
     end
+
+    private
 
     def build_schema_validator(request)
       @router.build_schema_validator(request)

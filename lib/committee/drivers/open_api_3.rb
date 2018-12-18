@@ -38,6 +38,10 @@ module Committee::Drivers
         @driver = driver
       end
 
+      def support_stub?
+        false
+      end
+
       def driver # we don't use attr_reader because this method override super class
         @driver
       end
