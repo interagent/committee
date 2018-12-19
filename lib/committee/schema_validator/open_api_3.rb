@@ -8,14 +8,16 @@ class Committee::SchemaValidator
     end
 
     def request_validate(request)
-      # TODO: coerce_path_params
-      # TODO: coerce_query_params
+      path_params = validator_option.coerce_path_params ? coerce_path_params : {}
+      # coerce_query_params(request) if validator_option.coerce_query_params
 
       request_unpack(request)
 
+      request.env[validator_option.params_key]&.merge!(path_params) unless path_params.empty?
+
       request_schema_validation(request)
-      # parameter_coerce!(request, link, validator_option.params_key)
-      # parameter_coerce!(request, link, "rack.request.query_hash") if link_exist? && !request.GET.nil? && !link.schema.nil?
+
+      @operation_object&.coerce_request_parameter(request.env["rack.request.query_hash"], validator_option) if !request.GET.nil?
     end
 
     def response_validate(status, headers, response)
@@ -31,21 +33,23 @@ class Committee::SchemaValidator
       !@operation_object.nil?
     end
 
-    def coerce_form_params(parameter)
-      return unless @operation_object
-      Committee::SchemaValidator::OpenAPI3::StringParamsCoercer.new(parameter, @operation_object, @validator_option).call!
+    def coerce_form_params(_parameter)
+      # nothing because when request_schema_validation, check and coerce
     end
 
     private
 
     attr_reader :validator_option
 
+    def coerce_path_params
+      return {} unless link_exist?
+      @operation_object.coerce_path_parameter(@validator_option)
+    end
+
     def request_schema_validation(request)
       return unless @operation_object
 
-      validator = Committee::SchemaValidator::OpenAPI3::RequestValidator.new(@operation_object,
-                                                                             check_content_type: validator_option.check_content_type,
-                                                                             check_header: validator_option.check_header)
+      validator = Committee::SchemaValidator::OpenAPI3::RequestValidator.new(@operation_object, validator_option: validator_option)
       validator.call(request, request.env[validator_option.params_key], request.env[validator_option.headers_key])
     end
 

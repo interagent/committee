@@ -37,7 +37,7 @@ describe Committee::Middleware::ResponseValidation do
       get "/characters"
     }
 
-    assert_match(/invalid parameter type response/i, e.message)
+    assert_match(/class is Array but it's not valid object/i, e.message)
   end
 
   it "passes through a 204 (no content) response" do
@@ -67,6 +67,15 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_response_rack("_42", {}, open_api_3: open_api_3_schema, raise: true)
     assert_raises(Committee::InvalidResponse) do
       get "/characters"
+    end
+  end
+
+  it "not parameter requset" do
+    @app = new_response_rack({integer: '1'}.to_json, {}, open_api_3: open_api_3_schema)
+
+    # TODO: error change
+    assert_raises(Committee::InvalidRequest) do
+      patch "/validate_no_parameter", {no_schema: 'no'}
     end
   end
 

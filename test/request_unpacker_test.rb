@@ -142,7 +142,8 @@ describe Committee::RequestUnpacker do
           coerce_form_params: true,
           schema_validator: validator,
           ).call
-      assert_equal({ "limit" => 20 }, params)
+      # openapi3 not support coerce in request unpacker
+      assert_equal({ "limit" => '20' }, params)
     end
   end
 

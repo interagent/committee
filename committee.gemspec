@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.add_dependency "json_schema", "~> 0.14", ">= 0.14.3"
 
   s.add_dependency "rack", ">= 1.5"
+  s.add_dependency "openapi_parser", ">= 0.1.3"
 
   s.add_development_dependency "minitest", "~> 5.3"
   s.add_development_dependency "rack-test", "~> 0.6"
@@ -25,5 +26,4 @@ Gem::Specification.new do |s|
   s.add_development_dependency "pry"
   s.add_development_dependency "pry-byebug"
   s.add_development_dependency "simplecov"
-  s.add_development_dependency "oas_parser", ">= 0.13.1"
 end

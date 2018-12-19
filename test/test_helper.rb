@@ -21,7 +21,6 @@ require "minitest/spec"
 require "minitest/autorun"
 require "rack/test"
 require "rr"
-require "oas_parser"
 require "pry"
 
 require_relative "../lib/committee"
@@ -80,7 +79,7 @@ def open_api_2_data
 end
 
 def open_api_3_data
-  OasParser::Definition.resolve(open_api_3_data_path)
+  OpenAPIParser.parse(YAML.load_file(open_api_3_data_path))
 end
 
 def open_api_3_data_path

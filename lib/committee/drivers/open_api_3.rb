@@ -17,6 +17,10 @@ module Committee::Drivers
       true
     end
 
+    def default_coerce_date_times
+      true
+    end
+
     def name
       :open_api_3
     end
@@ -26,15 +30,18 @@ module Committee::Drivers
       Committee::Drivers::OpenAPI3::Schema
     end
 
-    def parse(definitions)
-      Schema.new(self, definitions)
+    def parse(open_api)
+      Schema.new(self, open_api)
     end
 
     class Schema < Committee::Drivers::Schema
-      attr_reader :definitions
+      attr_reader :open_api
 
-      def initialize(driver, definitions)
-        @definitions = definitions
+      # @!attribute [r] open_api
+      #   @return [OpenAPIParser::Schemas::OpenAPI]
+
+      def initialize(driver, open_api)
+        @open_api = open_api
         @driver = driver
       end
 
@@ -53,13 +60,10 @@ module Committee::Drivers
 
       # OpenAPI3 only
       def operation_object(path, method)
-        return nil unless definitions.raw['paths'][path]
-        path_item_object = definitions.path_by_path(path)
+        request_operation = open_api.request_operation(method, path)
+        return nil unless request_operation
 
-        return nil unless path_item_object.raw[method]
-        endpoint = path_item_object.endpoint_by_method(method)
-
-        Committee::SchemaValidator::OpenAPI3::OperationObject.new(endpoint)
+        Committee::SchemaValidator::OpenAPI3::OperationWrapper.new(request_operation)
       end
     end
   end

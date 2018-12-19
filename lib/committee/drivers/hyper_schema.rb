@@ -17,6 +17,10 @@ module Committee::Drivers
       false
     end
 
+    def default_coerce_date_times
+      false
+    end
+
     def name
       :hyper_schema
     end
