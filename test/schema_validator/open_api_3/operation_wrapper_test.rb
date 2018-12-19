@@ -47,7 +47,8 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         operation_object.validate_request_params({"string" => 1}, @validator_option)
       }
 
-      assert e.message.start_with?("1 class is Integer but it's not valid")
+      # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
+      assert e.message.start_with?("1 class is #{1.class} but it's not valid")
     end
 
     it 'support put method' do
@@ -57,7 +58,9 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       e = assert_raises(Committee::InvalidRequest) {
         operation_object.validate_request_params({"string" => 1}, @validator_option)
       }
-      assert e.message.start_with?("1 class is Integer but it's not valid")
+
+      # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
+      assert e.message.start_with?("1 class is #{1.class} but it's not valid")
     end
 
     it 'support patch method' do
@@ -99,7 +102,9 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         e = assert_raises(Committee::InvalidRequest) {
           operation_object.validate_request_params({"query_string" => 1, "query_integer_list" => [1, 2], "optional_integer" => 1}, @validator_option)
         }
-        assert e.message.start_with?("1 class is Integer but")
+
+        # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
+        assert e.message.start_with?("1 class is #{1.class} but")
       end
     end
   end
