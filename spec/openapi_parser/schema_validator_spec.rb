@@ -383,13 +383,13 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       let(:key) { "boolean_1" }
 
       context "coerces valid values for boolean param" do
-        using RSpec::Parameterized::TableSyntax
-
         where( :before_value, :result_value) do
-          "true" | true
-          "false" | false
-          "1" | true
-          "0" | false
+          [
+              ["true", true],
+              ["false", false],
+              ["1", true],
+              ["0", false],
+          ]
         end
 
         with_them do
@@ -451,11 +451,11 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       let(:key) { "number_1" }
 
       context "coerces valid values for number param" do
-        using RSpec::Parameterized::TableSyntax
-
         where( :before_value, :result_value) do
-          "3" | 3.0
-          "3.5" | 3.5
+          [
+              ["3", 3.0],
+              ["3.5", 3.5],
+          ]
         end
 
         with_them do
