@@ -236,24 +236,22 @@ end
 
 ## Using OpenAPI3
 
-Please install [oas_parser](https://github.com/Nexmo/oas_parser)
-```
-gem 'oas_parser'
-```
-
-And pass definition object to committee
+And pass 'openapi_parser' object to committee.
+This gem added gem dependency so you can use always
 
 ```ruby
-require 'oas_parser'
-
-definition = OasParser::Definition.resolve('petstore.yml')
-use Committee::Middleware::ResponseValidation, open_api_3: definition
+open_api = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yml'))
+schema = Committee::Drivers::OpenAPI3.new.parse(open_api)
+use Committee::Middleware::RequestValidation, open_api_3: schema
 ```
 
 ### limitations of OpenAPI3 mode
 
 * Not support stub
 ** 'Committee::Middleware::Stub' and 'Committee::Bin::CommitteeStub' don't work now.
+
+* Not support coerce_recursive option
+** Always set coerce_recursive=true
 
 ## Updater for version 3.x from version 2.x
 
