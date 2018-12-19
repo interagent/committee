@@ -5,6 +5,7 @@ module Committee::Middleware
     def initialize(app, options = {})
       super
       @validate_errors = options[:validate_errors]
+      @error_handler = options[:error_handler]
     end
 
     def handle(request)
@@ -15,9 +16,11 @@ module Committee::Middleware
 
       [status, headers, response]
     rescue Committee::InvalidResponse
+      @error_handler.call($!) if @error_handler
       raise if @raise
       @error_class.new(500, :invalid_response, $!.message).render
     rescue JSON::ParserError
+      @error_handler.call($!) if @error_handler
       raise Committee::InvalidResponse if @raise
       @error_class.new(500, :invalid_response, "Response wasn't valid JSON.").render
     end

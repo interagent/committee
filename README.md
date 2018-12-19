@@ -13,7 +13,9 @@ Committee is tested on the following MRI versions:
 ## Committee::Middleware::RequestValidation
 
 ``` ruby
-use Committee::Middleware::RequestValidation, schema: JSON.parse(File.read(...))
+json = JSON.parse(File.read(...))
+schema = Committee::Drivers::HyperSchema.new.parse(json)
+use Committee::Middleware::RequestValidation, schema: schema
 ```
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
@@ -130,6 +132,7 @@ Options:
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
 * `validate_errors`: Also validate non-2xx responses (defaults to `false`).
+* `error_handler`: A proc which will be called when error occurs. Take an Error instance as first argument.
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
 
@@ -216,8 +219,11 @@ describe Committee::Middleware::Stub do
     end
   end
 
-  def schema_path
-    "./my-schema.json"
+  def committee_options
+    json = JSON.parse(File.read("./my-schema.json"))
+    json = Committee::Drivers::HyperSchema.new.parse(json)
+    
+    {schema: schema}
   end
 
   describe "GET /" do
@@ -249,6 +255,47 @@ use Committee::Middleware::ResponseValidation, open_api_3: definition
 * Not support stub
 ** 'Committee::Middleware::Stub' and 'Committee::Bin::CommitteeStub' don't work now.
 
+## Updater for version 3.x from version 2.x
+
+### Set Committee::Drivers::Schema object for middleware
+schema option support JSON object and Sting and Hash object like this.  
+
+```ruby
+# valid
+use Committee::Middleware::RequestValidation, schema: JSON.parse(File.read(...))
+
+# valid
+use Committee::Middleware::RequestValidation, schema: {json: 'json_data...'}
+
+# valid
+use Committee::Middleware::RequestValidation, schema: 'json string'
+
+```
+
+But we don't support version 3.x.  
+Because 3.x support other schema and we can't define which parser we use.  
+So please wrap Committee::Drivers::Schema like this.   
+
+```ruby
+json = JSON.parse(File.read(...))
+schema = Committee::Drivers::HyperSchema.new.parse(json)
+use Committee::Middleware::RequestValidation, schema: schema
+```
+
+### Change Test Assertions
+In committee 3.0 we'll drop many method in method.rb.  
+So please overwrite committee_options and return schema data and prefix option.  
+This method should return same data in ResponseValidation option.
+
+```ruby
+def committee_options
+  json = JSON.parse(File.read("./my-schema.json"))
+  schema = Committee::Drivers::HyperSchema.new.parse(json)
+
+  {schema: schema, prefix: "/v1"}
+  # {open_api_3: schema, prefix: "/v1"}
+end
+```
 
 ## Development
 
