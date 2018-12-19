@@ -1,6 +1,6 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
-describe Committee::StringParamsCoercer do
+describe Committee::SchemaValidator::HyperSchema::StringParamsCoercer do
   before do
     @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
@@ -130,6 +130,6 @@ describe Committee::StringParamsCoercer do
   end
 
   def call(data, options={})
-    Committee::StringParamsCoercer.new(data, @link.schema, options).call!
+    Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(data, @link.schema, options).call!
   end
 end

@@ -228,6 +228,28 @@ describe Committee::Middleware::Stub do
 end
 ```
 
+## Using OpenAPI3
+
+Please install [oas_parser](https://github.com/Nexmo/oas_parser)
+```
+gem 'oas_parser'
+```
+
+And pass definition object to committee
+
+```ruby
+require 'oas_parser'
+
+definition = OasParser::Definition.resolve('petstore.yml')
+use Committee::Middleware::ResponseValidation, open_api_3: definition
+```
+
+### limitations of OpenAPI3 mode
+
+* Not support stub
+** 'Committee::Middleware::Stub' and 'Committee::Bin::CommitteeStub' don't work now.
+
+
 ## Development
 
 Run tests with the following:

@@ -21,6 +21,7 @@ require "minitest/spec"
 require "minitest/autorun"
 require "rack/test"
 require "rr"
+require "pry"
 
 require_relative "../lib/committee"
 
@@ -60,6 +61,13 @@ def open_api_2_schema
   end
 end
 
+def open_api_3_schema
+  @open_api_3_schema ||= begin
+    driver = Committee::Drivers::OpenAPI3.new
+    driver.parse(open_api_3_data)
+  end
+end
+
 # Don't cache this because we'll often manipulate the created hash in tests.
 def hyper_schema_data
   JSON.parse(File.read("./test/data/hyperschema/paas.json"))
@@ -68,4 +76,12 @@ end
 # Don't cache this because we'll often manipulate the created hash in tests.
 def open_api_2_data
   JSON.parse(File.read("./test/data/openapi2/petstore-expanded.json"))
+end
+
+def open_api_3_data
+  OpenAPIParser.parse(YAML.load_file(open_api_3_data_path))
+end
+
+def open_api_3_data_path
+  "./test/data/openapi3/normal.yml"
 end

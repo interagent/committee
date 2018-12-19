@@ -10,7 +10,8 @@ module Committee::Middleware
     def handle(request)
       status, headers, response = @app.call(request.env)
 
-      build_schema_validator(request).response_validate(status, headers, response) if validate?(status)
+      v = build_schema_validator(request)
+      v.response_validate(status, headers, response) if v.link_exist? && validate?(status)
 
       [status, headers, response]
     rescue Committee::InvalidResponse

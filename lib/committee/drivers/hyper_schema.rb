@@ -17,6 +17,10 @@ module Committee::Drivers
       false
     end
 
+    def default_coerce_date_times
+      false
+    end
+
     def name
       :hyper_schema
     end
@@ -114,6 +118,11 @@ module Committee::Drivers
       attr_accessor :driver
 
       attr_accessor :routes
+
+      def build_router(options)
+        validator_option = Committee::SchemaValidator::Option.new(options, self, :hyper_schema)
+        Committee::SchemaValidator::HyperSchema::Router.new(self, validator_option)
+      end
     end
 
     private
