@@ -4,6 +4,7 @@ describe Committee::Drivers do
   DRIVERS = [
     :hyper_schema,
     :open_api_2,
+    :open_api_3,
   ].freeze
 
   it "gets driver with .driver_from_name" do
@@ -46,6 +47,7 @@ end
 describe Committee::Drivers::Schema do
   SCHEMA_METHODS = {
     :driver => [],
+    :build_router => [validator_option: nil, prefix: nil]
   }
 
   it "has a set of abstract methods" do

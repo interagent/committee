@@ -9,7 +9,7 @@ module Committee
   # +call+ returns a hash of all params which could be coerced - coercion
   # errors are simply ignored and expected to be handled later by schema
   # validation.
-  class StringParamsCoercer
+  class SchemaValidator::HyperSchema::StringParamsCoercer
     def initialize(query_hash, schema, options = {})
       @query_hash = query_hash
       @schema = schema

@@ -1,3 +1,4 @@
+# TODO: Support OpenAPI3
 module Committee
   class ParameterCoercer
     def initialize(params, schema, options = {})
