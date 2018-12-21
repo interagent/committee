@@ -44,6 +44,7 @@ describe Committee::Router do
   it "provides named parameters" do
     link, param_matches = open_api_2_router.find_link("GET", "/api/pets/fido")
     refute_nil link
+    assert_equal '/api/pets/{id}', link.href
     assert_equal({ "id" => "fido" }, param_matches)
   end
 
@@ -51,6 +52,12 @@ describe Committee::Router do
     link, param_matches = open_api_2_router.find_link("GET", "/api/pets")
     refute_nil link
     assert_equal({}, param_matches)
+  end
+
+  it "finds a path which has fewer matches" do
+    link, _ = open_api_2_router.find_link("GET", "/api/pets/dog")
+    refute_nil link
+    assert_equal '/api/pets/dog', link.href
   end
 
   def hyper_schema_router(options = {})
