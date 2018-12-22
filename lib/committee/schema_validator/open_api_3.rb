@@ -17,7 +17,7 @@ class Committee::SchemaValidator
 
       request_schema_validation(request)
 
-      @operation_object&.coerce_request_parameter(request.env["rack.request.query_hash"], validator_option) if !request.GET.nil?
+      @operation_object&.coerce_request_parameter(request.env["rack.request.query_hash"], validator_option) if !request.GET.nil? && !request.env["rack.request.query_hash"].empty?
     end
 
     def response_validate(status, headers, response)
