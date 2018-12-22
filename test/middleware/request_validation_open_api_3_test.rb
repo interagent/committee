@@ -476,10 +476,10 @@ describe Committee::Middleware::RequestValidation do
     @app = new_rack_app(open_api_3: open_api_3_schema)
 
     e = assert_raises(RuntimeError) {
-      delete "/characters", {}
+      head "/characters", {}
     }
 
-    assert_equal 'OpenAPI3 not support delete method', e.message
+    assert_equal 'Committee OpenAPI3 not support head method', e.message
   end
 
   private

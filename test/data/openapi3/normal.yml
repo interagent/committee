@@ -80,6 +80,18 @@ paths:
         schema:
           type: integer
           format: int32
+    head:
+      description: new characters
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integer:
+                    type: integer
 
   /string_params_coercer:
     get:

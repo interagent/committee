@@ -107,5 +107,26 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         assert e.message.start_with?("1 class is #{1.class} but")
       end
     end
+
+    describe 'support delete method' do
+      before do
+        @path = '/characters'
+        @method = "delete"
+      end
+
+      it 'correct' do
+        operation_object.validate_request_params({"limit" => "1"}, @validator_option)
+
+        assert true
+      end
+
+      it 'invalid type' do
+        e = assert_raises(Committee::InvalidRequest) {
+          operation_object.validate_request_params({"limit" => "a"}, @validator_option)
+        }
+
+        assert e.message.start_with?("a class is String but")
+      end
+    end
   end
 end
