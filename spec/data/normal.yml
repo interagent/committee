@@ -201,6 +201,9 @@ paths:
               properties:
                 string:
                   type: string
+                datetime:
+                  type: string
+                  format: date-time
                 integer:
                   type: integer
                 boolean:

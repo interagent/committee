@@ -20,7 +20,7 @@ class OpenAPIParser::SchemaValidator
 
       return [nil, OpenAPIParser::NotExistRequiredKey.new(required_set.to_a, schema.object_reference)] unless required_set.empty?
 
-      value = value.merge(coerced_values.to_h) if @coerce_value
+      value.merge!(coerced_values.to_h) if @coerce_value
 
       [value, nil]
     end
