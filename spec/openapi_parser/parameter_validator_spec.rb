@@ -49,6 +49,18 @@ RSpec.describe OpenAPIParser::ParameterValidator do
           end
         end
       end
+
+      context 'non null check' do
+        context 'optional' do
+          let(:params) { {"query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => nil} }
+          it { expect{subject}.to raise_error(OpenAPIParser::NotNullError) }
+        end
+
+        context 'optional' do
+          let(:params) { {"query_string" => "query", "query_integer_list" => nil} }
+          it { expect{subject}.to raise_error(OpenAPIParser::NotNullError) }
+        end
+      end
     end
   end
 end

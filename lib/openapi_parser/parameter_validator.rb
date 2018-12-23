@@ -7,8 +7,8 @@ class OpenAPIParser::ParameterValidator
     def validate_parameter(parameters_hash, params, object_reference, options)
       no_exist_required_key = []
       parameters_hash.each do |k, v|
-        if (data = params[k])
-          coerced = v.validate_params(data, options)
+        if params.include?(k)
+          coerced = v.validate_params(params[k], options)
           params[k] = coerced if options.coerce_value
         elsif v.required
           no_exist_required_key << k
