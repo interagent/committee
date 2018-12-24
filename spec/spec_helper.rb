@@ -2,6 +2,9 @@ require 'bundler/setup'
 require 'yaml'
 require 'pry'
 require 'rspec-parameterized'
+require 'simplecov'
+
+SimpleCov.start 'rails'
 
 require 'openapi_parser'
 
