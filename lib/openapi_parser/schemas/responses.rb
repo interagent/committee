@@ -17,7 +17,6 @@ module OpenAPIParser::Schemas
       res = response[status_code.to_s]
       return res.validate_parameter(content_type, params) if res
 
-
       default&.validate_parameter(content_type, params)
     end
   end

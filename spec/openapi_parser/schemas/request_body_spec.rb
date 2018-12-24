@@ -5,7 +5,7 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
 
   describe 'correct init' do
     subject { operation.request_body }
-    
+
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/pets'] }
     let(:operation) { path_item.post }

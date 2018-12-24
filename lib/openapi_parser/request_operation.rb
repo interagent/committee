@@ -36,13 +36,13 @@ class OpenAPIParser::RequestOperation
   end
 
   def validate_path_params(options = nil)
-    options = config.path_params_options unless options
+    options ||= config.path_params_options
     operation_object&.validate_path_params(path_params, options)
   end
 
   # support application/json only :(
   def validate_request_body(content_type, params, options = nil)
-    options = config.request_body_options unless options
+    options ||= config.request_body_options
     operation_object&.validate_request_body(content_type, params, options)
   end
 
@@ -51,7 +51,7 @@ class OpenAPIParser::RequestOperation
   end
 
   def validate_request_parameter(params, options = nil)
-    options = config.request_validator_options unless options
+    options ||= config.request_validator_options
     operation_object&.validate_request_parameter(params, options)
   end
 end

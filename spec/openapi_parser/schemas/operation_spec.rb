@@ -1,10 +1,10 @@
 require_relative '../../spec_helper'
 
 RSpec.describe OpenAPIParser::Schemas::Operation do
-  let(:root) { OpenAPIParser.parse(petstore_schema, {expand_reference: false}) }
+  let(:root) { OpenAPIParser.parse(petstore_schema, { expand_reference: false }) }
 
-  describe "#init" do
-    subject{ path_item.get }
+  describe '#init' do
+    subject { path_item.get }
 
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/pets'] }
@@ -16,7 +16,7 @@ RSpec.describe OpenAPIParser::Schemas::Operation do
     end
   end
 
-  describe "attributes" do
+  describe 'attributes' do
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/pets'] }
     let(:operation) { path_item.get }
@@ -32,19 +32,19 @@ RSpec.describe OpenAPIParser::Schemas::Operation do
     end
   end
 
-  describe "parameters" do
+  describe 'parameters' do
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/pets'] }
     let(:operation) { path_item.get }
 
     it do
       expect(operation.parameters.size).to eq 4
-      expect(operation.parameters[0].is_a?(OpenAPIParser::Schemas::Parameter)).to eq true
-      expect(operation.parameters[2].is_a?(OpenAPIParser::Schemas::Reference)).to eq true
+      expect(operation.parameters[0].kind_of?(OpenAPIParser::Schemas::Parameter)).to eq true
+      expect(operation.parameters[2].kind_of?(OpenAPIParser::Schemas::Reference)).to eq true
     end
   end
 
-  describe "findable" do
+  describe 'findable' do
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/pets'] }
     let(:operation) { path_item.get }

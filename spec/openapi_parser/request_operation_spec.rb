@@ -43,32 +43,32 @@ RSpec.describe OpenAPIParser::RequestOperation do
 
     let(:status_code) { 200 }
     let(:root) { OpenAPIParser.parse(normal_schema, {}) }
-    let(:request_operation) { root.request_operation(:post, '/validate')}
+    let(:request_operation) { root.request_operation(:post, '/validate') }
     let(:content_type) { 'application/json' }
 
     context 'correct' do
-      let(:data) { {"string" => "Honoka.Kousaka"} }
+      let(:data) { { 'string' => 'Honoka.Kousaka' } }
 
-      it { expect(subject).to eq({"string"=>"Honoka.Kousaka"}) }
+      it { expect(subject).to eq({ 'string' => 'Honoka.Kousaka' }) }
     end
 
     context 'no content type' do
       let(:content_type) { nil }
-      let(:data) { {"string" => 1} }
+      let(:data) { { 'string' => 1 } }
 
       it { expect(subject).to eq nil }
     end
 
     context 'invalid schema' do
-      let(:data) { {"string" => 1} }
+      let(:data) { { 'string' => 1 } }
 
       it do
-        expect{ subject }.to raise_error do |e|
-          expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
-          if Gem::Version.create(RUBY_VERSION) <= Gem::Version.create("2.4.0")
-            expect(e.message.start_with?("1 class is Fixnum")).to eq true
+        expect { subject }.to raise_error do |e|
+          expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
+          if Gem::Version.create(RUBY_VERSION) <= Gem::Version.create('2.4.0')
+            expect(e.message.start_with?('1 class is Fixnum')).to eq true
           else
-            expect(e.message.start_with?("1 class is Integer")).to eq true
+            expect(e.message.start_with?('1 class is Integer')).to eq true
           end
         end
       end
@@ -76,12 +76,12 @@ RSpec.describe OpenAPIParser::RequestOperation do
 
     context 'no status code use default' do
       let(:status_code) { 419 }
-      let(:data) { {"integer" => '1'} }
+      let(:data) { { 'integer' => '1' } }
 
       it do
-        expect{ subject }.to raise_error do |e|
-          expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
-          expect(e.message.start_with?("1 class is String")).to eq true
+        expect { subject }.to raise_error do |e|
+          expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
+          expect(e.message.start_with?('1 class is String')).to eq true
         end
       end
     end

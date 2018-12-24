@@ -16,7 +16,7 @@ class OpenAPIParser::Config
   end
 
   def request_validator_options
-    @request_options ||= OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value, datetime_coerce_class: datetime_coerce_class)
+    @request_validator_options ||= OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value, datetime_coerce_class: datetime_coerce_class)
   end
 
   alias_method :request_body_options, :request_validator_options
