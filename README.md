@@ -1,8 +1,38 @@
 # OpenAPI Parser
+[![Build Status](https://travis-ci.org/ota42y/openapi_parser.svg?branch=master)](https://travis-ci.org/ota42y/openapi_parser)
+[![Gem Version](https://badge.fury.io/rb/openapi_parser.svg)](https://badge.fury.io/rb/openapi_parser)
+[![Yard Docs](https://img.shields.io/badge/yard-docs-blue.svg)](https://www.rubydoc.info/gems/openapi_parser)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/openapi_parser`. To experiment with that code, run `bin/console` for an interactive prompt.
+This is OpenAPI3 parser and validator. 
 
-TODO: Delete this and the text above, and describe your gem
+## Usage
+
+```ruby
+root = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yml'))
+
+# request operation combine path parameters and OpenAPI3's Operation Object
+request_operation = root.request_operation(:post, '/validate')
+
+ret = request_operation.validate_request_body('application/json', {"integer" => 1})
+# => {"integer" => 1}
+
+# invalid parameter
+request_operation.validate_request_body('application/json', {"integer" => '1'})
+# => OpenAPIParser::ValidateError: 1 class is String but it's not valid integer in #/paths/~1validate/post/requestBody/content/application~1json/schema/properties/integer
+
+# path parameter
+request_operation = root.request_operation(:get, '/path_template_test/1')
+request_operation.path_params
+# => {"template_name"=>"1"}
+
+# coerce parameter
+root = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yml'), {coerce_value: true, datetime_coerce_class: DateTime}) 
+request_operation = root.request_operation(:get, '/string_params_coercer') 
+request_operation.validate_request_parameter({'integer_1' => '1', 'datetime_string' => '2016-04-01T16:00:00+09:00'})
+# => {"integer_1"=>1, "datetime_string"=>#<DateTime: 2016-04-01T16:00:00+09:00 ((2457480j,25200s,0n),+32400s,2299161j)>
+# convert number string to Integer and datetime string to DateTime class
+
+```
 
 ## Installation
 
@@ -20,9 +50,12 @@ Or install it yourself as:
 
     $ gem install openapi_parser
 
-## Usage
-
-TODO: Write usage instructions here
+## ToDo
+- other content type
+- wild card content type
+- wild card status code
+- correct schema checker
+- more detailed validator
 
 ## Development
 
@@ -32,7 +65,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/openapi_parser. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/ota42y/openapi_parser. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
