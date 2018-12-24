@@ -4,7 +4,7 @@ RSpec.describe OpenAPIParser::Schemas::Paths do
   let(:root) { OpenAPIParser.parse(normal_schema, {}) }
 
   describe 'correct init' do
-    subject{ root.paths }
+    subject { root.paths }
 
     it do
       expect(subject).not_to be nil
@@ -21,7 +21,7 @@ RSpec.describe OpenAPIParser::Schemas::Paths do
 
     it do
       expect(subject).not_to eq nil
-      expect(subject.is_a?(OpenAPIParser::Schemas::PathItem)).to eq true
+      expect(subject.kind_of?(OpenAPIParser::Schemas::PathItem)).to eq true
     end
   end
 end

@@ -8,69 +8,69 @@ module OpenAPIParser::Expandable
 
   private
 
-  def expand_hash_objects(root, attribute_names)
-    return unless attribute_names
+    def expand_hash_objects(root, attribute_names)
+      return unless attribute_names
 
-    attribute_names.each do |name|
-      h = send(name)
-      next if h.nil?
+      attribute_names.each do |name|
+        h = send(name)
+        next if h.nil?
 
-      update_values = h.map do |k, v|
-        next [k, referenced_object(root, v)] if v.is_a?(OpenAPIParser::Schemas::Reference)
-        v.expand_reference(root) if v.is_a?(OpenAPIParser::Expandable)
+        update_values = h.map do |k, v|
+          next [k, referenced_object(root, v)] if v.kind_of?(OpenAPIParser::Schemas::Reference)
 
-        nil
-      end
+          v.expand_reference(root) if v.kind_of?(OpenAPIParser::Expandable)
 
-      update_values.compact.each do |k, v|
-        _update_child_object(h[k], v)
-        h[k] = v
-      end
-    end
-  end
+          nil
+        end
 
-  def expand_objects(root, attribute_names)
-    return unless attribute_names
-
-    attribute_names.each do |name|
-      v = send(name)
-      next if v.nil?
-
-      if v.is_a?(OpenAPIParser::Schemas::Reference)
-        obj = referenced_object(root, v)
-        _update_child_object(v, obj)
-        self.instance_variable_set("@#{name}", obj)
-      elsif v.is_a?(OpenAPIParser::Expandable)
-        v.expand_reference(root)
+        update_values.compact.each do |k, v|
+          _update_child_object(h[k], v)
+          h[k] = v
+        end
       end
     end
-  end
 
-  def expand_list_objects(root, attribute_names)
-    return unless attribute_names
+    def expand_objects(root, attribute_names)
+      return unless attribute_names
 
-    attribute_names.each do |name|
-      l = send(name)
-      next if l.nil?
+      attribute_names.each do |name|
+        v = send(name)
+        next if v.nil?
 
-      l.each_with_index do |v, idx|
-        if v.is_a?(OpenAPIParser::Schemas::Reference)
+        if v.kind_of?(OpenAPIParser::Schemas::Reference)
           obj = referenced_object(root, v)
           _update_child_object(v, obj)
-          l[idx] = obj
-        elsif v.is_a?(OpenAPIParser::Expandable)
+          self.instance_variable_set("@#{name}", obj)
+        elsif v.kind_of?(OpenAPIParser::Expandable)
           v.expand_reference(root)
         end
       end
     end
-  end
 
+    def expand_list_objects(root, attribute_names)
+      return unless attribute_names
 
-  # @param [OpenAPIParser::Schemas::OpenAPI] root
-  # @param [OpenAPIParser::Schemas::Reference] reference
-  def referenced_object(root, reference)
-    obj = root.find_object(reference.ref)
+      attribute_names.each do |name|
+        l = send(name)
+        next if l.nil?
 
-    obj.is_a?(OpenAPIParser::Schemas::Reference) ? referenced_object(root, obj) : obj
-  end
+        l.each_with_index do |v, idx|
+          if v.kind_of?(OpenAPIParser::Schemas::Reference)
+            obj = referenced_object(root, v)
+            _update_child_object(v, obj)
+            l[idx] = obj
+          elsif v.kind_of?(OpenAPIParser::Expandable)
+            v.expand_reference(root)
+          end
+        end
+      end
+    end
+
+    # @param [OpenAPIParser::Schemas::OpenAPI] root
+    # @param [OpenAPIParser::Schemas::Reference] reference
+    def referenced_object(root, reference)
+      obj = root.find_object(reference.ref)
+
+      obj.kind_of?(OpenAPIParser::Schemas::Reference) ? referenced_object(root, obj) : obj
+    end
 end

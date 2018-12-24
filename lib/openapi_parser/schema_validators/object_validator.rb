@@ -1,12 +1,12 @@
 class OpenAPIParser::SchemaValidator
   class ObjectValidator < Base
-
     # @param [Hash] value
     # @param [OpenAPIParser::Schemas::Schema] schema
     def coerce_and_validate(value, schema)
-      return validator.validate_error(value, schema) unless value.is_a?(Hash)
+      return validator.validate_error(value, schema) unless value.kind_of?(Hash)
 
       return [value, nil] unless schema.properties
+
       required_set = schema.required ? schema.required.to_set : Set.new
 
       coerced_values = value.map do |name, v|

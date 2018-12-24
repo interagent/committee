@@ -1,7 +1,7 @@
 require_relative '../../spec_helper'
 
 RSpec.describe OpenAPIParser::Schemas::Schema do
-  let(:root) { OpenAPIParser.parse(petstore_schema, {expand_reference: false}) }
+  let(:root) { OpenAPIParser.parse(petstore_schema, { expand_reference: false }) }
 
   describe 'correct init' do
     let(:paths) { root.paths }
@@ -14,7 +14,7 @@ RSpec.describe OpenAPIParser::Schemas::Schema do
       # @type OpenAPIParser::Schemas::Schema s
 
       expect(s).not_to be nil
-      expect(s.is_a?(OpenAPIParser::Schemas::Schema)).to eq true
+      expect(s.kind_of?(OpenAPIParser::Schemas::Schema)).to eq true
       expect(s.root.object_id).to be root.object_id
       expect(s.object_reference).to eq '#/paths/~1pets/get/parameters/0/schema'
       expect(s.type).to eq 'array'

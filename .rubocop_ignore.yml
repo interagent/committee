@@ -1,0 +1,6 @@
+Metrics/ParameterLists:
+  Exclude:
+    - lib/openapi_parser/concerns/parseable.rb
+
+RSpec/FilePath:
+  Enabled: false

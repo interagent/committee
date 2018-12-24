@@ -1,22 +1,24 @@
 class OpenAPIParser::SchemaValidator
   class BooleanValidator < Base
+    TRUE_VALUES = ['true', '1'].freeze
+    FALSE_VALUES = ['false', '0'].freeze
+
     def coerce_and_validate(value, schema)
       value = coerce(value) if @coerce_value
 
-      return validator.validate_error(value, schema) unless value.is_a?(TrueClass) || value.is_a?(FalseClass)
+      return validator.validate_error(value, schema) unless value.kind_of?(TrueClass) || value.kind_of?(FalseClass)
+
       [value, nil]
     end
 
     private
 
-    def coerce(value)
-      if value == "true" || value == "1"
-        return true
+      def coerce(value)
+        return true if TRUE_VALUES.include?(value)
+
+        return false if FALSE_VALUES.include?(value)
+
+        value
       end
-      if value == "false" || value == "0"
-        return false
-      end
-      value
-    end
   end
 end

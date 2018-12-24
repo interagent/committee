@@ -4,7 +4,7 @@ RSpec.describe OpenAPIParser::Findable do
   let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
 
   describe 'openapi object' do
-    subject{ root }
+    subject { root }
 
     it do
       expect(subject.find_object('#/paths/~1pets/get').object_reference).to eq root.paths.path['/pets'].get.object_reference
@@ -15,7 +15,7 @@ RSpec.describe OpenAPIParser::Findable do
   end
 
   describe 'schema object' do
-    subject{ root.paths }
+    subject { root.paths }
 
     it do
       expect(subject.find_object('#/paths/~1pets/get').object_reference).to eq root.paths.path['/pets'].get.object_reference

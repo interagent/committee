@@ -1,10 +1,13 @@
 inherit_gem:
   fincop:
-    - 'config/rails.yml'
+    # - 'config/rails.yml'
     - 'config/rspec.yml'
     - 'config/rubocop.yml'
-    # If you are using Rails 4, activate this cop.
+     # If you are using Rails 4, activate this cop.
     # - 'config/disabled_for_rails_4.yml'
+
+inherit_from:
+  - '.rubocop_ignore.yml'
 
 AllCops:
   TargetRubyVersion: 2.5

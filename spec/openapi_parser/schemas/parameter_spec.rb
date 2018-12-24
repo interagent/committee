@@ -26,14 +26,14 @@ RSpec.describe OpenAPIParser::Schemas::Parameter do
 
     it do
       results = {
-          name: 'tags',
-          in: 'query',
-          description: 'tags to filter by',
-          required: false,
-          style: 'form',
+        name: 'tags',
+        in: 'query',
+        description: 'tags to filter by',
+        required: false,
+        style: 'form',
       }
 
-      results.each { |k, v| expect(subject.send(k)).to eq v}
+      results.each { |k, v| expect(subject.send(k)).to eq v }
 
       expect(subject.allow_empty_value).to eq true
     end

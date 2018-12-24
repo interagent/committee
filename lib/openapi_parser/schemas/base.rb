@@ -19,7 +19,6 @@ module OpenAPIParser::Schemas
 
     # override
     def after_init
-
     end
 
     def inspect

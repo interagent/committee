@@ -36,18 +36,18 @@ module OpenAPIParser::Schemas
 
     private
 
-    def path_parameter_hash
-      @path_parameter_hash ||= (parameters || []).
-          select(&:in_path?).
-          map{ |param| [param.name, param] }.
-          to_h
-    end
+      def path_parameter_hash
+        @path_parameter_hash ||= (parameters || []).
+                                   select(&:in_path?).
+                                   map { |param| [param.name, param] }.
+                                   to_h
+      end
 
-    def query_parameter_hash
-      @query_parameter_hash ||= (parameters || []).
-          select(&:in_query?).
-          map{ |param| [param.name, param] }.
-          to_h
-    end
+      def query_parameter_hash
+        @query_parameter_hash ||= (parameters || []).
+                                    select(&:in_query?).
+                                    map { |param| [param.name, param] }.
+                                    to_h
+      end
   end
 end

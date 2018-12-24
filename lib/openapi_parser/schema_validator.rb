@@ -12,7 +12,6 @@ require_relative 'schema_validators/nil_validator'
 
 class OpenAPIParser::SchemaValidator
   class ValidatorOption
-
   end
 
   class << self
@@ -39,6 +38,7 @@ class OpenAPIParser::SchemaValidator
   def validate_data
     coerced, err = validate_schema(@value, @schema)
     raise err if err
+
     coerced
   end
 
@@ -88,19 +88,19 @@ class OpenAPIParser::SchemaValidator
     return validate_nil(value, schema) if value.nil?
 
     case schema.type
-    when "string"
+    when 'string'
       return validate_string(value, schema)
-    when "integer"
+    when 'integer'
       return validate_integer(value, schema)
-    when "boolean"
+    when 'boolean'
       return validate_boolean(value, schema)
-    when "number"
+    when 'number'
       return validate_float(value, schema)
-    when "object"
+    when 'object'
       return validate_object(value, schema)
-    when "array"
+    when 'array'
       return validate_array(value, schema)
-    else
+    else # rubocop:disable Style/EmptyElse
       # TODO: unknown type support
     end
 

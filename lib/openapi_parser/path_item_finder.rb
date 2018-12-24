@@ -4,7 +4,7 @@ class OpenAPIParser::PathItemFinder
     @root = PathNode.new('/')
     @paths = paths
 
-    @paths.path.each { |path, _path_item_object| @root.register_path_node(path.split("/"), path) }
+    @paths.path.each { |path, _path_item_object| @root.register_path_node(path.split('/'), path) }
   end
 
   # @param [String, Symbol] http_method like (get, post .... allow symbol)
@@ -26,7 +26,7 @@ class OpenAPIParser::PathItemFinder
 
     def initialize(name)
       @name = name
-      @children = Hash.new {|h, k| h[k] = PathNode.new(k) }
+      @children = Hash.new { |h, k| h[k] = PathNode.new(k) }
       @path_template_node = nil # we can't initialize because recursive initialize...
       @full_path = nil
     end
@@ -55,11 +55,11 @@ class OpenAPIParser::PathItemFinder
       # OpenAPI3 depend on the tooling so we use concrete one (using /books/)
 
       path_params = {}
-      if children.key?(path_name)
+      if children.has_key?(path_name)
         child = children[path_name]
       else
         child = path_template_node(path_name)
-        path_params = {"#{child.name}" =>path_name}
+        path_params = { child.name.to_s => path_name }
       end
 
       ret, other_path_params = child.find_full_path(splited_path)
@@ -68,26 +68,26 @@ class OpenAPIParser::PathItemFinder
 
     private
 
-    attr_reader :children
+      attr_reader :children
 
-    def path_template_node(path_name)
-      @path_template_node ||= PathNode.new(path_name[1..(path_name.length-2)]) # delete {} from {name}
-    end
+      def path_template_node(path_name)
+        @path_template_node ||= PathNode.new(path_name[1..(path_name.length - 2)]) # delete {} from {name}
+      end
 
-    def path_template?(path_name)
-      path_name.start_with?('{') && path_name.end_with?('}')
-    end
+      def path_template?(path_name)
+        path_name.start_with?('{') && path_name.end_with?('}')
+      end
   end
 
   private
 
-  def parse_request_path(http_method, request_path)
-    original_path, path_params = @root.find_full_path(request_path.split("/"))
-    return nil, nil, {} unless original_path # # can't find
+    def parse_request_path(http_method, request_path)
+      original_path, path_params = @root.find_full_path(request_path.split('/'))
+      return nil, nil, {} unless original_path # # can't find
 
-    path_item_object = @paths.path[original_path]
-    obj = path_item_object.operation(http_method.to_s)
+      path_item_object = @paths.path[original_path]
+      obj = path_item_object.operation(http_method.to_s)
 
-    [obj, original_path, path_params]
-  end
+      [obj, original_path, path_params]
+    end
 end

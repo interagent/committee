@@ -1,4 +1,4 @@
-module OpenAPIParser::Parseable
+module OpenAPIParser::Parseable # rubocop:disable Metrics/ModuleLength
   def self.included(base)
     base.extend(ClassMethods)
   end
@@ -18,7 +18,7 @@ module OpenAPIParser::Parseable
       @_openapi_attr_values = {} unless defined?(@_openapi_attr_values)
 
       attr_reader name
-      @_openapi_attr_values[name] =  options
+      @_openapi_attr_values[name] = options
     end
 
     # no option support
@@ -27,7 +27,7 @@ module OpenAPIParser::Parseable
     end
 
     def openapi_attr_object(name, klass, options = {})
-      @_openapi_attr_objects = {} unless defined?(@_openapi_attr_objects )
+      @_openapi_attr_objects = {} unless defined?(@_openapi_attr_objects)
 
       attr_reader name
       @_openapi_attr_objects[name] = options.merge(klass: klass)
@@ -62,11 +62,12 @@ module OpenAPIParser::Parseable
   end
 
   def _openapi_all_child_objects
-    @_openapi_all_child_objects ||= {}
+    @_openapi_all_child_objects ||= {} # rubocop:disable Naming/MemoizedInstanceVariableName
   end
 
   def _add_child_object(object)
-    return unless object.is_a?(OpenAPIParser::Parseable)
+    return unless object.kind_of?(OpenAPIParser::Parseable)
+
     _openapi_all_child_objects[object.object_reference] = object
   end
 
@@ -87,11 +88,11 @@ module OpenAPIParser::Parseable
     return unless settings
 
     settings.each do |variable_name, options|
-      ref_name_base = options[:schema_key] ? options[:schema_key] : variable_name
+      ref_name_base = options[:schema_key] || variable_name
       klass = options[:klass]
       allow_reference = options[:reference] || false
       allow_data_type = options[:allow_data_type]
-      
+
       create_attr_list_object(variable_name, raw_schema[ref_name_base.to_s], ref_name_base, klass, allow_reference, allow_data_type)
     end
   end
@@ -100,11 +101,11 @@ module OpenAPIParser::Parseable
     return unless settings
 
     settings.each do |variable_name, options|
-      ref_name_base = options[:schema_key] ? options[:schema_key] : variable_name
+      ref_name_base = options[:schema_key] || variable_name
       klass = options[:klass]
       allow_reference = options[:reference] || false
       allow_data_type = options[:allow_data_type]
-      
+
       create_attr_hash_object(variable_name, raw_schema[ref_name_base .to_s], ref_name_base, klass, allow_reference, allow_data_type)
     end
   end
@@ -113,11 +114,11 @@ module OpenAPIParser::Parseable
     return unless values
 
     values.each do |name, options|
-      key = options[:schema_key] ? options[:schema_key] : name
+      key = options[:schema_key] || name
       klass = options[:klass]
       allow_reference = options[:reference] || false
       allow_data_type = options[:allow_data_type]
-      
+
       obj = create_attr_object(name, key, raw_schema[key.to_s], klass, allow_reference, allow_data_type)
       _add_child_object(obj)
     end
@@ -140,12 +141,11 @@ module OpenAPIParser::Parseable
     return unless values
 
     values.each do |variable_name, options|
-      key = options[:schema_key] ? options[:schema_key] : variable_name
+      key = options[:schema_key] || variable_name
 
       create_variable(variable_name, raw_schema[key.to_s])
     end
   end
-
 
   # for responses and paths object
   def create_hash_body_objects(name, schema, klass, allow_reference, allow_data_type, reject_keys)
@@ -154,13 +154,14 @@ module OpenAPIParser::Parseable
       return
     end
 
-    objects = schema.reject{|k, _| reject_keys.include?(k)}.map do |name, child_schema|
+    object_list = schema.reject { |k, _| reject_keys.include?(k) }.map do |child_name, child_schema|
       [
-          name.to_s, # support string key only in OpenAPI3
-          build_openapi_object(escape_reference(name), child_schema, klass, allow_reference, allow_data_type)
+        child_name.to_s, # support string key only in OpenAPI3
+        build_openapi_object(escape_reference(child_name), child_schema, klass, allow_reference, allow_data_type),
       ]
-    end.to_h
+    end
 
+    objects = object_list.to_h
     create_variable(name, objects)
     objects.values.each { |o| _add_child_object(o) }
   end
@@ -174,7 +175,7 @@ module OpenAPIParser::Parseable
 
   def create_attr_hash_object(variable_name, hash_schema, ref_name_base, klass, allow_reference, allow_data_type)
     data = if hash_schema
-             hash_schema.map { |key, s| [key, build_openapi_object([ref_name_base, key], s, klass, allow_reference, allow_data_type) ]}.to_h
+             hash_schema.map { |key, s| [key, build_openapi_object([ref_name_base, key], s, klass, allow_reference, allow_data_type)] }.to_h
            else
              nil
            end
@@ -193,7 +194,6 @@ module OpenAPIParser::Parseable
     create_variable(variable_name, data)
     data.each { |obj| _add_child_object(obj) } if data
   end
-
 
   # create instance variable @variable_name using data
   # @param [String] variable_name
@@ -221,7 +221,7 @@ module OpenAPIParser::Parseable
   end
 
   def check_object_schema?(check_schema)
-    check_schema.is_a?(Hash)
+    check_schema.kind_of?(Hash)
   end
 
   def escape_reference(str)
@@ -230,8 +230,8 @@ module OpenAPIParser::Parseable
 
   # @return [String]
   def build_object_reference(names)
-    names = [names] unless names.is_a?(Array)
-    ref = names.map{ |n| escape_reference(n)}.join('/')
+    names = [names] unless names.kind_of?(Array)
+    ref = names.map { |n| escape_reference(n) }.join('/')
 
     "#{object_reference}/#{ref}"
   end

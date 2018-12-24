@@ -5,7 +5,7 @@ RSpec.describe OpenAPIParser do
 
   describe 'parse' do
     it do
-      parsed =OpenAPIParser.parse(petstore_schema)
+      parsed = OpenAPIParser.parse(petstore_schema)
       root = OpenAPIParser.parse(petstore_schema, {})
       expect(parsed.openapi).to eq root.openapi
     end

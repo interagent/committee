@@ -12,11 +12,11 @@ module OpenAPIParser::Schemas
     openapi_attr_object :schema, Schema, reference: true
 
     def in_query?
-      self.in == "query"
+      self.in == 'query'
     end
 
     def in_path?
-      self.in == "path"
+      self.in == 'path'
     end
 
     # @return [Object] coerced or original params
