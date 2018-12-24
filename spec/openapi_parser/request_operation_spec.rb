@@ -65,7 +65,11 @@ RSpec.describe OpenAPIParser::RequestOperation do
       it do
         expect{ subject }.to raise_error do |e|
           expect(e.is_a?(OpenAPIParser::ValidateError)).to eq true
-          expect(e.message.start_with?("1 class is Integer")).to eq true
+          if Gem::Version.create(RUBY_VERSION) <= Gem::Version.create("2.4.0")
+            expect(e.message.start_with?("1 class is Fixnum")).to eq true
+          else
+            expect(e.message.start_with?("1 class is Integer")).to eq true
+          end
         end
       end
     end
