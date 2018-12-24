@@ -1,7 +1,23 @@
----
-sudo: false
 language: ruby
-cache: bundler
+
 rvm:
+  - 2.3.8
+  - 2.4.5
   - 2.5.3
-before_install: gem install bundler -v 1.16.6
+  - ruby-head
+
+cache: bundler
+
+script: bundle exec rake
+
+notifications:
+  email: false
+
+sudo: false
+
+git:
+  depth: 10
+
+matrix:
+  allow_failures:
+    - rvm: ruby-head

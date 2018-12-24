@@ -341,7 +341,10 @@ RSpec.describe OpenAPIParser::SchemaValidator do
           nested_array = params["nested_array"]
           first_data = nested_array[0]
           expect(first_data["update_time"].class).to eq DateTime
-          expect(first_data["per_page"].class).to eq Integer
+
+          # TODO: fix when dropped ruby 2.3
+          # expect(first_data["per_page"].class).to eq Integer
+          expect(first_data["per_page"].class).to eq Fixnum
         end
       end
 
@@ -517,15 +520,27 @@ RSpec.describe OpenAPIParser::SchemaValidator do
           nested_array = params["nested_array"]
           first_data = nested_array[0]
           expect(first_data["update_time"].class).to eq String
-          expect(first_data["per_page"].class).to eq Integer
+          if Gem::Version.create(RUBY_VERSION) <= Gem::Version.create("2.4.0")
+            expect(first_data["per_page"].class).to eq Fixnum
+          else
+            expect(first_data["per_page"].class).to eq Integer
+          end
 
           second_data = nested_array[1]
           expect(second_data["update_time"].class).to eq String
-          expect(second_data["per_page"].class).to eq Integer
+          if Gem::Version.create(RUBY_VERSION) <= Gem::Version.create("2.4.0")
+            expect(first_data["per_page"].class).to eq Fixnum
+          else
+            expect(first_data["per_page"].class).to eq Integer
+          end
           expect(second_data["threshold"].class).to eq Float
 
           third_data = nested_array[2]
-          expect(third_data["per_page"].class).to eq Integer
+          if Gem::Version.create(RUBY_VERSION) <= Gem::Version.create("2.4.0")
+            expect(first_data["per_page"].class).to eq Fixnum
+          else
+            expect(first_data["per_page"].class).to eq Integer
+          end
           expect(third_data["threshold"].class).to eq Float
 
           expect(first_data["nested_coercer_object"]["update_time"].class).to eq String
