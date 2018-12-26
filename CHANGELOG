@@ -1,5 +1,8 @@
 Unreleased
-    Drop old ruby version (#146)
+	Drop old ruby version (#146)
+
+3.0.0.alpha 2018-12-26
+	OpenAPI 3.0 support (#164)
 
 2.3.0 2018-11-15
 	Deprecate use of `JsonSchema::Schema` object (#147)
