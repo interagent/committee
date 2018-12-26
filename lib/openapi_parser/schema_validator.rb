@@ -89,21 +89,20 @@ class OpenAPIParser::SchemaValidator
 
     case schema.type
     when 'string'
-      return validate_string(value, schema)
+      validate_string(value, schema)
     when 'integer'
-      return validate_integer(value, schema)
+      validate_integer(value, schema)
     when 'boolean'
-      return validate_boolean(value, schema)
+      validate_boolean(value, schema)
     when 'number'
-      return validate_float(value, schema)
+      validate_float(value, schema)
     when 'object'
-      return validate_object(value, schema)
+      validate_object(value, schema)
     when 'array'
-      return validate_array(value, schema)
-    else # rubocop:disable Style/EmptyElse
-      # TODO: unknown type support
+      validate_array(value, schema)
+    else
+      # unknown return error
+      validate_error(value, schema)
     end
-
-    validate_error(value, schema)
   end
 end
