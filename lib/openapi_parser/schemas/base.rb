@@ -1,6 +1,6 @@
 module OpenAPIParser::Schemas
   class Base
-    include OpenAPIParser::Parseable
+    include OpenAPIParser::Parser
     include OpenAPIParser::Findable
     include OpenAPIParser::Expandable
 
