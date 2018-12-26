@@ -161,6 +161,29 @@
           }
         }
       }
+    },
+    "/pets/dog": {
+      "get": {
+        "description": "Returns pets which are dogs",
+        "operationId": "find pets which are dogs",
+        "responses": {
+          "200": {
+            "description": "pet response",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Pet"
+              }
+            }
+          },
+          "default": {
+            "description": "unexpected error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
