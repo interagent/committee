@@ -1,6 +1,6 @@
 # Committee  [![Travis Status](https://travis-ci.org/interagent/committee.svg)](https://travis-ci.org/interagent/committee)
 
-A collection of middleware to help build services with JSON Schema.
+A collection of middleware to help build services with JSON Schema, OpenAPI2, OpenAPI3.
 
 ## Supported Ruby Versions
 
@@ -12,11 +12,18 @@ Committee is tested on the following MRI versions:
 - 2.6
 
 ## Committee::Middleware::RequestValidation
+Hyper-Schema and OpenAPI3 support this feature.
 
 ``` ruby
+# JSON Hyper-Schema
 json = JSON.parse(File.read(...))
 schema = Committee::Drivers::HyperSchema.new.parse(json)
 use Committee::Middleware::RequestValidation, schema: schema
+
+# Open API3
+open_api_yml = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yml'))
+open_api_3 = Committee::Drivers::OpenAPI3.new.parse(open_api_yml)
+use Committee::Middleware::RequestValidation, open_api_3: open_api_3
 ```
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
@@ -36,6 +43,28 @@ Options:
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
 * `strict`: Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run (default to `false`).
+
+
+Default option values:
+
+| name | Hyper-Schema | OpenAPI3 |
+|-----------:|------------:|------------:|
+|allow_form_params | true | true |
+|allow_query_params | true | true |
+|coerce_date_times | false | true |
+|coerce_form_params| false | true |
+|coerce_query_params| false | true  |
+|coerce_path_params| false | true |
+|coerce_recursive| false | always true |
+|check_content_type | true | not support yet |
+|optimistic_json| false | not support yet|
+|raise| false | false|
+|strict| false | false|
+|prefix| support | not support yet|
+|error_class| support | support |
+
+(Hyper-Schema and OpenAPI2 is same default)
+
 
 Some examples of use:
 
@@ -66,6 +95,7 @@ $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d
 ```
 
 ## Committee::Middleware::Stub
+When you use OpenAPI3, you can't use this feature yet.
 
 ``` ruby
 use Committee::Middleware::Stub, schema: JSON.parse(File.read(...))
@@ -120,6 +150,7 @@ committee-stub -p <port> <path to JSON schema>
 ```
 
 ## Committee::Middleware::ResponseValidation
+Hyper-Schema and OpenAPI3 support this feature.
 
 ``` ruby
 use Committee::Middleware::ResponseValidation, schema: JSON.parse(File.read(...))
@@ -201,6 +232,7 @@ end
 ```
 
 ## Test Assertions
+Hyper-Schema and OpenAPI3 support this feature.
 
 Committee ships with a small set of schema validation test assertions designed to be used along with `rack-test`.
 
@@ -237,7 +269,7 @@ end
 
 ## Using OpenAPI3
 
-And pass 'openapi_parser' object to committee.
+Please pass 'openapi_parser' object to committee.
 This gem added gem dependency so you can use always
 
 ```ruby
@@ -249,10 +281,10 @@ use Committee::Middleware::RequestValidation, open_api_3: schema
 ### limitations of OpenAPI3 mode
 
 * Not support stub
-** 'Committee::Middleware::Stub' and 'Committee::Bin::CommitteeStub' don't work now.
+  * 'Committee::Middleware::Stub' and 'Committee::Bin::CommitteeStub' don't work now.
 
 * Not support coerce_recursive option
-** Always set coerce_recursive=true
+  * Always set coerce_recursive=true
 
 ## Updater for version 3.x from version 2.x
 
