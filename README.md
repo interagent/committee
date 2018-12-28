@@ -4,6 +4,7 @@
 [![Yard Docs](https://img.shields.io/badge/yard-docs-blue.svg)](https://www.rubydoc.info/gems/openapi_parser)
 [![Maintainability](https://api.codeclimate.com/v1/badges/62bad4bcb3f691d46487/maintainability)](https://codeclimate.com/github/ota42y/openapi_parser/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/62bad4bcb3f691d46487/test_coverage)](https://codeclimate.com/github/ota42y/openapi_parser/test_coverage)
+[![Inch CI](https://inch-ci.org/github/ota42y/openapi_parser.svg?branch=master)](https://inch-ci.org/github/ota42y/openapi_parser)
 
 This is OpenAPI3 parser and validator. 
 
