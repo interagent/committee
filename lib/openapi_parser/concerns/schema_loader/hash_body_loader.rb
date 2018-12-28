@@ -1,33 +1,41 @@
-class OpenAPIParser::SchemaLoader::HashBodyLoader < OpenAPIParser::SchemaLoader::Base
-  def create_attr_hash_body_objects(values)
-    return unless values
+# hash body object loader
+class OpenAPIParser::SchemaLoader::HashBodyLoader < OpenAPIParser::SchemaLoader::Creator
+  # @param [String] variable_name
+  # @param [Hash] options
+  def initialize(variable_name, options)
+    super(variable_name, options)
 
-    values.each do |name, options|
-      klass = options[:klass]
-      allow_reference = options[:reference] || false
-      allow_data_type = options[:allow_data_type]
-      reject_keys = options[:reject_keys]
-
-      create_hash_body_objects(name, raw_schema, klass, allow_reference, allow_data_type, reject_keys)
-    end
+    @reject_keys = options[:reject_keys] ? options[:reject_keys].map(&:to_s) : []
   end
 
-  # for responses and paths object
-  def create_hash_body_objects(name, schema, klass, allow_reference, allow_data_type, reject_keys) # rubocop:disable Metrics/ParameterLists
-    unless schema
-      create_variable(name, nil)
-      return
-    end
-
-    object_list = schema.reject { |k, _| reject_keys.include?(k) }.map do |child_name, child_schema|
-      [
-        child_name.to_s, # support string key only in OpenAPI3
-        build_openapi_object(escape_reference(child_name), child_schema, klass, allow_reference, allow_data_type),
-      ]
-    end
-
-    objects = object_list.to_h
-    create_variable(name, objects)
-    objects.values.each { |o| register_child_to_loader(o) }
+  # @param [OpenAPIParser::Schemas::Base] target_object
+  # @param [Hash] raw_schema
+  # @return [Array<OpenAPIParser::Schemas::Base>, nil]
+  def load_data(target_object, raw_schema)
+    create_hash_body_objects(target_object, raw_schema)
   end
+
+  private
+
+    # for responses and paths object
+    def create_hash_body_objects(target_object, raw_schema)
+      unless raw_schema
+        variable_set(target_object, variable_name, nil)
+        return
+      end
+
+      object_list = raw_schema.reject { |k, _| reject_keys.include?(k) }.map do |child_name, child_schema|
+        ref = build_object_reference_from_base(target_object.object_reference, escape_reference(child_name))
+        [
+          child_name.to_s, # support string key only in OpenAPI3
+          build_openapi_object_from_option(target_object, ref, child_schema),
+        ]
+      end
+
+      objects = object_list.to_h
+      variable_set(target_object, variable_name, objects)
+      objects.values
+    end
+
+    attr_reader :reject_keys
 end

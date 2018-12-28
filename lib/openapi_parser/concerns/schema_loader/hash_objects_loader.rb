@@ -1,25 +1,29 @@
-class OpenAPIParser::SchemaLoader::HashObjectsLoader < OpenAPIParser::SchemaLoader::Base
-  def create_attr_hash_objects(settings)
-    return unless settings
+# hash object loader
+class OpenAPIParser::SchemaLoader::HashObjectsLoader < OpenAPIParser::SchemaLoader::Creator
+  # @param [OpenAPIParser::Schemas::Base] target_object
+  # @param [Hash] raw_schema
+  # @return [Array<OpenAPIParser::Schemas::Base>, nil]
+  def load_data(target_object, raw_schema)
+    create_attr_hash_object(target_object, raw_schema[ref_name_base.to_s])
+  end
 
-    settings.each do |variable_name, options|
-      ref_name_base = options[:schema_key] || variable_name
-      klass = options[:klass]
-      allow_reference = options[:reference] || false
-      allow_data_type = options[:allow_data_type]
+  private
 
-      create_attr_hash_object(variable_name, raw_schema[ref_name_base .to_s], ref_name_base, klass, allow_reference, allow_data_type)
+    def create_attr_hash_object(target_object, hash_schema)
+      unless hash_schema
+        variable_set(target_object, variable_name, nil)
+        return
+      end
+
+      data_list = hash_schema.map do |key, s|
+        ref = build_object_reference_from_base(target_object.object_reference, [ref_name_base, key])
+        [key, build_openapi_object_from_option(target_object, ref, s)]
+      end
+
+      data = data_list.to_h
+      variable_set(target_object, variable_name, data)
+      data.values
     end
-  end
 
-  def create_attr_hash_object(variable_name, hash_schema, ref_name_base, klass, allow_reference, allow_data_type) # rubocop:disable Metrics/ParameterLists
-    data = if hash_schema
-             hash_schema.map { |key, s| [key, build_openapi_object([ref_name_base, key], s, klass, allow_reference, allow_data_type)] }.to_h
-           else
-             nil
-           end
-
-    create_variable(variable_name, data)
-    data.values.each { |obj| register_child_to_loader(obj) } if data
-  end
+    alias_method :ref_name_base, :schema_key
 end

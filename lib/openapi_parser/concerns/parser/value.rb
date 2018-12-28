@@ -9,6 +9,6 @@ module OpenAPIParser::Parser::Value
 
   def openapi_attr_value(name, options = {})
     target_klass.send(:attr_reader, name)
-    _openapi_attr_values[name] = options
+    _openapi_attr_values[name] = OpenAPIParser::SchemaLoader::ValuesLoader.new(name, options)
   end
 end
