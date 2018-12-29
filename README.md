@@ -54,9 +54,6 @@ Or install it yourself as:
     $ gem install openapi_parser
 
 ## ToDo
-- other content type
-- wild card content type
-- wild card status code
 - correct schema checker
 - more detailed validator
 

@@ -420,7 +420,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       end
 
       context 'overwrite initialize option' do
-        subject { request_operation.validate_request_body(params, options) }
+        subject { request_operation.validate_request_body(content_type, params, options) }
 
         let(:options) { OpenAPIParser::SchemaValidator::Options.new(coerce_value: false) }
 

@@ -40,7 +40,6 @@ class OpenAPIParser::RequestOperation
     operation_object&.validate_path_params(path_params, options)
   end
 
-  # support application/json only :(
   def validate_request_body(content_type, params, options = nil)
     options ||= config.request_body_options
     operation_object&.validate_request_body(content_type, params, options)

@@ -12,9 +12,11 @@ module OpenAPIParser::Schemas
     openapi_attr_list_object :parameters, Parameter, reference: true
 
     # @!attribute [r] request_body
-    #   @return [OpenAPIParser::Schemas::RequestBody, nil]
+    #   @return [OpenAPIParser::Schemas::RequestBody, nil] return OpenAPI3 object
     openapi_attr_object :request_body, RequestBody, reference: true, schema_key: :requestBody
 
+    # @!attribute [r] responses
+    #   @return [OpenAPIParser::Schemas::Responses, nil] return OpenAPI3 object
     openapi_attr_object :responses, Responses, reference: false
 
     def validate_request_body(content_type, params, options)
