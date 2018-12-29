@@ -13,6 +13,19 @@ RSpec.describe OpenAPIParser::Schemas::Paths do
     end
   end
 
+  describe 'invalid schema' do
+    subject { root.paths }
+
+    let(:invalid_schema) do
+      data = normal_schema
+      data.delete 'paths'
+      data
+    end
+    let(:root) { OpenAPIParser.parse(invalid_schema, {}) }
+
+    it { expect(subject).to eq nil }
+  end
+
   describe '#path' do
     subject { paths.path[path_name] }
 

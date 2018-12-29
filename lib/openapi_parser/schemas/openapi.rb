@@ -8,7 +8,7 @@ module OpenAPIParser::Schemas
     def initialize(raw_schema, config)
       super('#', nil, self, raw_schema)
       @find_object_cache = {}
-      @path_item_finder = OpenAPIParser::PathItemFinder.new(paths)
+      @path_item_finder = OpenAPIParser::PathItemFinder.new(paths) if paths # invalid definition
       @config = config
     end
 

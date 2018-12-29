@@ -4,7 +4,11 @@ require 'pry'
 require 'rspec-parameterized'
 require 'simplecov'
 
-SimpleCov.start 'rails'
+SimpleCov.start do
+  add_filter "spec"
+end
+
+SimpleCov.minimum_coverage 100
 
 require 'openapi_parser'
 
