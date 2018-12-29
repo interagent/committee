@@ -207,7 +207,8 @@ components:
     Pet:
       allOf:
       - $ref: '#/components/schemas/NewPet'
-      - required:
+      - type: object
+        required:
         - id
         properties:
           id:
@@ -215,6 +216,7 @@ components:
             format: int64
 
     NewPet:
+      type: object
       required:
       - name
       properties:
@@ -224,6 +226,7 @@ components:
           type: string
 
     Error:
+      type: object
       required:
       - code
       - message

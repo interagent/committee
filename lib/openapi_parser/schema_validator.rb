@@ -8,13 +8,12 @@ require_relative 'schema_validators/boolean_validator'
 require_relative 'schema_validators/object_validator'
 require_relative 'schema_validators/array_validator'
 require_relative 'schema_validators/any_of_validator'
+require_relative 'schema_validators/all_of_validator'
 require_relative 'schema_validators/nil_validator'
 
 class OpenAPIParser::SchemaValidator
-  class ValidatorOption
-  end
-
   class << self
+    # validate schema data
     # @param [Hash] value
     # @param [OpenAPIParser::Schemas::Schema]
     # @param [OpenAPIParser::SchemaValidator::Options] options
@@ -34,6 +33,7 @@ class OpenAPIParser::SchemaValidator
     @datetime_coerce_class = options.datetime_coerce_class
   end
 
+  # execute validate data
   # @return [Object] coerced or original params
   def validate_data
     coerced, err = validate_schema(@value, @schema)
@@ -42,6 +42,9 @@ class OpenAPIParser::SchemaValidator
     coerced
   end
 
+  # create ValidateError
+  # @param [Object] value
+  # @param [OpenAPIParser::Schemas::Base] schema
   def validate_error(value, schema)
     [nil, OpenAPIParser::ValidateError.new(value, schema.type, schema.object_reference)]
   end
@@ -74,16 +77,22 @@ class OpenAPIParser::SchemaValidator
     (@any_of_validator ||= OpenAPIParser::SchemaValidator::AnyOfValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
   end
 
+  def validate_all_of(value, schema)
+    (@all_of_validator ||= OpenAPIParser::SchemaValidator::AllOfValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
+  end
+
   def validate_nil(value, schema)
     (@nil_validator ||= OpenAPIParser::SchemaValidator::NilValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
   end
 
+  # validate value eby schema
   # @param [Object] value
   # @param [OpenAPIParser::Schemas::Schema] schema
   def validate_schema(value, schema)
     return [value, nil] unless schema # no schema
 
     return validate_any_of(value, schema) if schema.any_of
+    return validate_all_of(value, schema) if schema.all_of
 
     return validate_nil(value, schema) if value.nil?
 
