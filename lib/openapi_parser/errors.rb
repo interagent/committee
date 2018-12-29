@@ -15,6 +15,15 @@ module OpenAPIParser
     def message
       "#{@data} class is #{@data.class} but it's not valid #{@type} in #{@reference}"
     end
+
+    class << self
+      # create ValidateError for SchemaValidator return data
+      # @param [Object] value
+      # @param [OpenAPIParser::Schemas::Base] schema
+      def build_error_result(value, schema)
+        [nil, OpenAPIParser::ValidateError.new(value, schema.type, schema.object_reference)]
+      end
+    end
   end
 
   class NotNullError < OpenAPIError

@@ -214,6 +214,16 @@ paths:
                   type: array
                   items:
                     type: integer
+                all_of_data:
+                  allOf:
+                    - $ref: '#/components/schemas/all_of_base'
+                    - type: object
+                      required:
+                        - id
+                      properties:
+                        id:
+                          type: integer
+                          format: int64
                 object_1:
                   type: object
                   properties:
@@ -514,6 +524,15 @@ components:
     ref2:
       "$ref": '#/components/responses/ref1'
   schemas:
+    all_of_base:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        tag:
+          type: string
     nested_array:
       type: array
       items:

@@ -273,6 +273,62 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       end
     end
 
+    describe 'all_of' do
+      subject { request_operation.validate_request_body(content_type, { 'all_of_data' => params }) }
+
+      let(:correct_params) do
+        {
+          'id' => 1,
+          'name' => 'name_dana',
+          'tag' => 'tag_data',
+        }
+      end
+      let(:params) { correct_params }
+
+      it { expect(subject).not_to eq nil }
+
+      context 'option value deleted' do
+        let(:params) do
+          d = correct_params
+          d.delete('tag')
+          d
+        end
+
+        it { expect(subject).not_to eq nil }
+      end
+
+      context 'not any_of schema in first' do
+        let(:params) do
+          d = correct_params
+          d.delete('name')
+          d
+        end
+
+        it { expect { subject }.to raise_error(::OpenAPIParser::NotExistRequiredKey) }
+      end
+
+      context 'not any_of schema in second' do
+        context 'not exist required key' do
+          let(:params) do
+            d = correct_params
+            d.delete('id')
+            d
+          end
+
+          it { expect { subject }.to raise_error(::OpenAPIParser::NotExistRequiredKey) }
+        end
+
+        context 'type error' do
+          let(:params) do
+            correct_params['id'] = 'abc'
+            correct_params
+          end
+
+          it { expect { subject }.to raise_error(::OpenAPIParser::ValidateError) }
+        end
+      end
+    end
+
     it 'unknown param' do
       expect(request_operation.validate_request_body(content_type, { 'unknown' => 1 })).to eq({ 'unknown' => 1 })
     end
