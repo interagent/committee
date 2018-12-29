@@ -9,6 +9,6 @@ module OpenAPIParser::Parser::Object
 
   def openapi_attr_object(name, klass, options = {})
     target_klass.send(:attr_reader, name)
-    _openapi_attr_objects[name] = options.merge(klass: klass)
+    _openapi_attr_objects[name] = OpenAPIParser::SchemaLoader::ObjectsLoader.new(name, options.merge(klass: klass))
   end
 end

@@ -33,10 +33,11 @@ module OpenAPIParser::Parser
     @_openapi_all_child_objects ||= {}
   end
 
+  # load data by schema definition in core and set children to _openapi_all_child_objects
+  # @return nil
   def load_data
     loader = ::OpenAPIParser::SchemaLoader.new(self, self.class._parser_core)
-    loader.load_data
-
-    @_openapi_all_child_objects = loader.children
+    @_openapi_all_child_objects = loader.load_data
+    nil
   end
 end

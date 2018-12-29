@@ -1,25 +1,28 @@
-class OpenAPIParser::SchemaLoader::ListLoader < OpenAPIParser::SchemaLoader::Base
-  def create_attr_list_objects(settings)
-    return unless settings
+# list object loader
+class OpenAPIParser::SchemaLoader::ListLoader < OpenAPIParser::SchemaLoader::Creator
+  # @param [OpenAPIParser::Schemas::Base] target_object
+  # @param [Hash] raw_schema
+  # @return [Array<OpenAPIParser::Schemas::Base>, nil]
+  def load_data(target_object, raw_schema)
+    create_attr_list_object(target_object, raw_schema[ref_name_base.to_s])
+  end
 
-    settings.each do |variable_name, options|
-      ref_name_base = options[:schema_key] || variable_name
-      klass = options[:klass]
-      allow_reference = options[:reference] || false
-      allow_data_type = options[:allow_data_type]
+  private
 
-      create_attr_list_object(variable_name, raw_schema[ref_name_base.to_s], ref_name_base, klass, allow_reference, allow_data_type)
+    def create_attr_list_object(target_object, array_schema)
+      unless array_schema
+        variable_set(target_object, variable_name, nil)
+        return
+      end
+
+      data = array_schema.map.with_index do |s, idx|
+        ref = build_object_reference_from_base(target_object.object_reference, [ref_name_base, idx])
+        build_openapi_object_from_option(target_object, ref, s)
+      end
+
+      variable_set(target_object, variable_name, data)
+      data
     end
-  end
 
-  def create_attr_list_object(variable_name, array_schema, ref_name_base, klass, allow_reference, allow_data_type) # rubocop:disable Metrics/ParameterLists
-    data = if array_schema
-             array_schema.map.with_index { |s, idx| build_openapi_object([ref_name_base, idx], s, klass, allow_reference, allow_data_type) }
-           else
-             nil
-           end
-
-    create_variable(variable_name, data)
-    data.each { |obj| register_child_to_loader(obj) } if data
-  end
+    alias_method :ref_name_base, :schema_key
 end
