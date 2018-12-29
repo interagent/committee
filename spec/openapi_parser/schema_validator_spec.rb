@@ -332,6 +332,20 @@ RSpec.describe OpenAPIParser::SchemaValidator do
     it 'unknown param' do
       expect(request_operation.validate_request_body(content_type, { 'unknown' => 1 })).to eq({ 'unknown' => 1 })
     end
+
+    describe 'invalid type' do
+      let(:root) { OpenAPIParser.parse(invalid_schema, config) }
+      let(:invalid_schema) do
+        data = normal_schema
+        data['paths']['/validate']['post']['requestBody']['content']['application/json']['schema'].delete 'type'
+        data
+      end
+
+      it do
+        params = { 'string' => 'str'}
+        expect{ request_operation.validate_request_body(content_type, params) }.to raise_error(OpenAPIParser::ValidateError)
+      end
+    end
   end
 
   describe 'coerce' do
@@ -695,5 +709,15 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         expect(request_operation.path_params).to eq({ 'integer' => 1 })
       end
     end
+  end
+
+  describe 'validatable' do
+    class ValidatableTest
+      include OpenAPIParser::SchemaValidator::Validatable
+    end
+
+    subject { ValidatableTest.new.validate_schema(nil, nil) }
+
+    it { expect{subject}.to raise_error(StandardError).with_message('implement')}
   end
 end
