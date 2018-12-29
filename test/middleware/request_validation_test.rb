@@ -391,6 +391,21 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 404, last_response.status
   end
 
+  it "not exist path and options" do
+    options = {
+        coerce_form_params: true,
+        coerce_date_times: true,
+        coerce_query_params: true,
+        coerce_path_params: true,
+        coerce_recursive: true
+    }
+
+    @app = new_rack_app({schema: hyper_schema}.merge(options))
+    header "Content-Type", "application/x-www-form-urlencoded"
+    post "/unknown"
+    assert_equal 200, last_response.status
+  end
+
   private
 
   def new_rack_app(options = {})

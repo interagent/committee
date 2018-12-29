@@ -41,6 +41,7 @@ class Committee::SchemaValidator
     end
 
     def coerce_form_params(parameter)
+      return unless link_exist?
       return unless link.schema
       Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(parameter, link.schema).call!
     end
