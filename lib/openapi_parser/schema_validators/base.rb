@@ -1,14 +1,15 @@
 class OpenAPIParser::SchemaValidator
   class Base
-    def initialize(validator, coerce_value)
-      @validator = validator
+    # @param [OpenAPIParser::SchemaValidator::Validatable] validatable
+    def initialize(validatable, coerce_value)
+      @validatable = validatable
       @coerce_value = coerce_value
     end
 
-    attr_reader :validator
+    attr_reader :validatable
 
-    # @!attribute [r] validator
-    #   @return [OpenAPIParser::SchemaValidator]
+    # @!attribute [r] validatable
+    #   @return [OpenAPIParser::SchemaValidator::Validatable]
 
     # return  [coerced_value, error]
     def coerce_and_validate(_value, _schema)

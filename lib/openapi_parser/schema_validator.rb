@@ -12,6 +12,18 @@ require_relative 'schema_validators/all_of_validator'
 require_relative 'schema_validators/nil_validator'
 
 class OpenAPIParser::SchemaValidator
+  # validate value by schema
+  # this module for SchemaValidators::Base
+  # @param [Object] value
+  # @param [OpenAPIParser::Schemas::Schema] schema
+  module Validatable
+    def validate_schema(value, schema)
+      raise 'implement'
+    end
+  end
+
+  include Validatable
+
   class << self
     # validate schema data
     # @param [Hash] value
@@ -42,76 +54,79 @@ class OpenAPIParser::SchemaValidator
     coerced
   end
 
-  # create ValidateError
-  # @param [Object] value
-  # @param [OpenAPIParser::Schemas::Base] schema
-  def validate_error(value, schema)
-    [nil, OpenAPIParser::ValidateError.new(value, schema.type, schema.object_reference)]
-  end
-
-  def validate_string(value, schema)
-    (@string_validator ||= OpenAPIParser::SchemaValidator::StringValidator.new(self, @coerce_value, @datetime_coerce_class)).coerce_and_validate(value, schema)
-  end
-
-  def validate_integer(value, schema)
-    (@integer_validator ||= OpenAPIParser::SchemaValidator::IntegerValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
-  end
-
-  def validate_float(value, schema)
-    (@float_validator ||= OpenAPIParser::SchemaValidator::FloatValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
-  end
-
-  def validate_boolean(value, schema)
-    (@boolean_validator ||= OpenAPIParser::SchemaValidator::BooleanValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
-  end
-
-  def validate_object(value, schema)
-    (@object_validator ||= OpenAPIParser::SchemaValidator::ObjectValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
-  end
-
-  def validate_array(value, schema)
-    (@array_validator ||= OpenAPIParser::SchemaValidator::ArrayValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
-  end
-
-  def validate_any_of(value, schema)
-    (@any_of_validator ||= OpenAPIParser::SchemaValidator::AnyOfValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
-  end
-
-  def validate_all_of(value, schema)
-    (@all_of_validator ||= OpenAPIParser::SchemaValidator::AllOfValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
-  end
-
-  def validate_nil(value, schema)
-    (@nil_validator ||= OpenAPIParser::SchemaValidator::NilValidator.new(self, @coerce_value)).coerce_and_validate(value, schema)
-  end
-
   # validate value eby schema
   # @param [Object] value
   # @param [OpenAPIParser::Schemas::Schema] schema
   def validate_schema(value, schema)
-    return [value, nil] unless schema # no schema
+    return [value, nil] unless schema
 
-    return validate_any_of(value, schema) if schema.any_of
-    return validate_all_of(value, schema) if schema.all_of
-
-    return validate_nil(value, schema) if value.nil?
-
-    case schema.type
-    when 'string'
-      validate_string(value, schema)
-    when 'integer'
-      validate_integer(value, schema)
-    when 'boolean'
-      validate_boolean(value, schema)
-    when 'number'
-      validate_float(value, schema)
-    when 'object'
-      validate_object(value, schema)
-    when 'array'
-      validate_array(value, schema)
-    else
-      # unknown return error
-      validate_error(value, schema)
+    if (v = validator(value, schema))
+      return v.coerce_and_validate(value, schema)
     end
+
+    # unknown return error
+    OpenAPIParser::ValidateError.build_error_result(value, schema)
   end
+
+  private
+
+    # @return [OpenAPIParser::SchemaValidator::Base, nil]
+    def validator(value, schema)
+      return any_of_validator if schema.any_of
+      return all_of_validator if schema.all_of
+      return nil_validator if value.nil?
+
+      case schema.type
+      when 'string'
+        string_validator
+      when 'integer'
+        integer_validator
+      when 'boolean'
+        boolean_validator
+      when 'number'
+        float_validator
+      when 'object'
+        object_validator
+      when 'array'
+        array_validator
+      else
+        nil
+      end
+    end
+
+    def string_validator
+      @string_validator ||= OpenAPIParser::SchemaValidator::StringValidator.new(self, @coerce_value, @datetime_coerce_class)
+    end
+
+    def integer_validator
+      @integer_validator ||= OpenAPIParser::SchemaValidator::IntegerValidator.new(self, @coerce_value)
+    end
+
+    def float_validator
+      @float_validator ||= OpenAPIParser::SchemaValidator::FloatValidator.new(self, @coerce_value)
+    end
+
+    def boolean_validator
+      @boolean_validator ||= OpenAPIParser::SchemaValidator::BooleanValidator.new(self, @coerce_value)
+    end
+
+    def object_validator
+      @object_validator ||= OpenAPIParser::SchemaValidator::ObjectValidator.new(self, @coerce_value)
+    end
+
+    def array_validator
+      @array_validator ||= OpenAPIParser::SchemaValidator::ArrayValidator.new(self, @coerce_value)
+    end
+
+    def any_of_validator
+      @any_of_validator ||= OpenAPIParser::SchemaValidator::AnyOfValidator.new(self, @coerce_value)
+    end
+
+    def all_of_validator
+      @all_of_validator ||= OpenAPIParser::SchemaValidator::AllOfValidator.new(self, @coerce_value)
+    end
+
+    def nil_validator
+      @nil_validator ||= OpenAPIParser::SchemaValidator::NilValidator.new(self, @coerce_value)
+    end
 end
