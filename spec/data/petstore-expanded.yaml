@@ -84,6 +84,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Pet'
+            'application/unknown':
+              schema:
+                type: object
+            'application/*':
+              schema:
+                type: object
+            '*/*':
+              schema:
+                type: object
         '4XX':
           description: error response
           content:
