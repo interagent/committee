@@ -12,6 +12,7 @@ class OpenAPIParser::SchemaLoader::HashBodyLoader < OpenAPIParser::SchemaLoader:
   # @param [Hash] raw_schema
   # @return [Array<OpenAPIParser::Schemas::Base>, nil]
   def load_data(target_object, raw_schema)
+    # raw schema always exist because if not exist' this object don't create
     create_hash_body_objects(target_object, raw_schema)
   end
 
@@ -19,11 +20,6 @@ class OpenAPIParser::SchemaLoader::HashBodyLoader < OpenAPIParser::SchemaLoader:
 
     # for responses and paths object
     def create_hash_body_objects(target_object, raw_schema)
-      unless raw_schema
-        variable_set(target_object, variable_name, nil)
-        return
-      end
-
       object_list = raw_schema.reject { |k, _| reject_keys.include?(k) }.map do |child_name, child_schema|
         ref = build_object_reference_from_base(target_object.object_reference, escape_reference(child_name))
         [
