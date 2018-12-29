@@ -18,7 +18,7 @@ RSpec.describe OpenAPIParser::Schemas::Responses do
       expect(subject.default.class).to eq OpenAPIParser::Schemas::Response
       expect(subject.response['200'].class).to eq OpenAPIParser::Schemas::Response
 
-      # TODO: references check
+      expect(subject.response['200'].object_reference).to eq '#/paths/~1pets/get/responses/200'
     end
   end
 end
