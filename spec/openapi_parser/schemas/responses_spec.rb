@@ -37,5 +37,54 @@ RSpec.describe OpenAPIParser::Schemas::Responses do
 
       it { expect(subject).to eq([{ 'id' => 1, 'name' => 'name' }]) }
     end
+
+    context '4XX' do
+      let(:status_code) { 400 }
+
+      context 'correct' do
+        let(:params) { { 'message' => 'error' } }
+
+        it { expect(subject).to eq({ 'message' => 'error' }) }
+      end
+
+      context 'invalid (200 response)' do
+        let(:params) { [{ 'id' => 1, 'name' => 'name' }] }
+
+        it { expect { subject }.to raise_error(OpenAPIParser::ValidateError) }
+      end
+    end
+
+    context '404 (prefer use 4xx)' do
+      let(:status_code) { 404 }
+
+      context 'correct' do
+        let(:params) { { 'id' => 1 } }
+
+        it { expect(subject).to eq({ 'id' => 1 }) }
+      end
+
+      context 'invalid (4xx response)' do
+        let(:params) { { 'message' => 'error' } }
+
+        it { expect { subject }.to raise_error(OpenAPIParser::NotExistRequiredKey) }
+      end
+    end
+
+    context 'invalid status code use default' do
+      context 'bigger' do
+        let(:status_code) { 1400 }
+        let(:params) { { 'message' => 'error' } }
+
+        it { expect { subject }.to raise_error(OpenAPIParser::NotExistRequiredKey) }
+      end
+
+      context 'smaller' do
+        let(:status_code) { 40 }
+
+        let(:params) { { 'message' => 'error' } }
+
+        it { expect { subject }.to raise_error(OpenAPIParser::NotExistRequiredKey) }
+      end
+    end
   end
 end

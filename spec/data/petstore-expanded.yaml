@@ -84,6 +84,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Pet'
+        '4XX':
+          description: error response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: 404 response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: integer
         default:
           description: unexpected error
           content:
