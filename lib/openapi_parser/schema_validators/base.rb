@@ -11,7 +11,9 @@ class OpenAPIParser::SchemaValidator
     # @!attribute [r] validatable
     #   @return [OpenAPIParser::SchemaValidator::Validatable]
 
-    # return  [coerced_value, error]
+    # need override
+    # @param [Array] _value
+    # @param [OpenAPIParser::Schemas::Schema] _schema
     def coerce_and_validate(_value, _schema)
       raise 'need implement'
     end
