@@ -26,6 +26,13 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       expect(ret).to eq({ 'boolean' => false, 'integer' => 1, 'number' => 0.1, 'string' => 'str' })
     end
 
+    it 'number allow integer' do
+      params = { 'number' => 1 }
+
+      ret = request_operation.validate_request_body(content_type, params)
+      expect(ret).to eq({ 'number' => 1 })
+    end
+
     it 'correct object data' do
       params = {
         'object_1' =>
@@ -342,8 +349,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       end
 
       it do
-        params = { 'string' => 'str'}
-        expect{ request_operation.validate_request_body(content_type, params) }.to raise_error(OpenAPIParser::ValidateError)
+        params = { 'string' => 'str' }
+        expect { request_operation.validate_request_body(content_type, params) }.to raise_error(OpenAPIParser::ValidateError)
       end
     end
   end
@@ -716,8 +723,16 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       include OpenAPIParser::SchemaValidator::Validatable
     end
 
-    subject { ValidatableTest.new.validate_schema(nil, nil) }
+    describe 'validate_schema' do
+      subject { ValidatableTest.new.validate_schema(nil, nil) }
 
-    it { expect{subject}.to raise_error(StandardError).with_message('implement')}
+      it { expect { subject }.to raise_error(StandardError).with_message('implement') }
+    end
+
+    describe 'validate_integer(value, schema)' do
+      subject { ValidatableTest.new.validate_integer(nil, nil) }
+
+      it { expect { subject }.to raise_error(StandardError).with_message('implement') }
+    end
   end
 end
