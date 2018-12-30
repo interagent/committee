@@ -2,10 +2,13 @@ class OpenAPIParser::SchemaValidator
   class FloatValidator < Base
     include ::OpenAPIParser::SchemaValidator::Enumable
 
+    # validate float value by schema
+    # @param [Object] value
+    # @param [OpenAPIParser::Schemas::Schema] schema
     def coerce_and_validate(value, schema)
       value = coerce(value) if @coerce_value
 
-      return OpenAPIParser::ValidateError.build_error_result(value, schema) if value.kind_of?(Integer)
+      return validatable.validate_integer(value, schema) if value.kind_of?(Integer)
 
       coercer_and_validate_numeric(value, schema)
     end

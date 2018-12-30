@@ -20,6 +20,14 @@ class OpenAPIParser::SchemaValidator
     def validate_schema(value, schema)
       raise 'implement'
     end
+
+    # validate integer value by schema
+    # this method use from float_validator because number allow float and integer
+    # @param [Object] _value
+    # @param [OpenAPIParser::Schemas::Schema] _schema
+    def validate_integer(_value, _schema)
+      raise 'implement'
+    end
   end
 
   include Validatable
@@ -27,7 +35,7 @@ class OpenAPIParser::SchemaValidator
   class << self
     # validate schema data
     # @param [Hash] value
-    # @param [OpenAPIParser::Schemas::Schema]
+    # @param [OpenAPIParser::Schemas:v:Schema]
     # @param [OpenAPIParser::SchemaValidator::Options] options
     # @return [Object] coerced or original params
     def validate(value, schema, options)
@@ -66,6 +74,14 @@ class OpenAPIParser::SchemaValidator
 
     # unknown return error
     OpenAPIParser::ValidateError.build_error_result(value, schema)
+  end
+
+  # validate integer value by schema
+  # this method use from float_validator because number allow float and integer
+  # @param [Object] value
+  # @param [OpenAPIParser::Schemas::Schema] schema
+  def validate_integer(value, schema)
+    integer_validator.coerce_and_validate(value, schema)
   end
 
   private

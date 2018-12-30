@@ -2,6 +2,9 @@ class OpenAPIParser::SchemaValidator
   class IntegerValidator < Base
     include ::OpenAPIParser::SchemaValidator::Enumable
 
+    # validate integer value by schema
+    # @param [Object] value
+    # @param [OpenAPIParser::Schemas::Schema] schema
     def coerce_and_validate(value, schema)
       value = coerce(value) if @coerce_value
 
