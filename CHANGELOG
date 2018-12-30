@@ -1,8 +1,9 @@
 Unreleased
-	Drop old ruby version (#146)
+	Fix bug when non defined link with form content type and coerce option (#173)
 
 3.0.0.alpha 2018-12-26
 	OpenAPI 3.0 support (#164)
+	Drop old ruby version (#146)
 
 2.3.0 2018-11-15
 	Deprecate use of `JsonSchema::Schema` object (#147)
