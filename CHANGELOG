@@ -1,5 +1,6 @@
 Unreleased
 	Fix bug when non defined link with form content type and coerce option (#173)
+	support check_content_type option for OpenAPI3 (#174)
 
 3.0.0.alpha 2018-12-26
 	OpenAPI 3.0 support (#164)
