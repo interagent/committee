@@ -18,10 +18,17 @@ module OpenAPIParser::Schemas
     # @param [Hash] params
     # @param [OpenAPIParser::SchemaValidator::Options] options
     def validate_request_body(content_type, params, options)
-      media_type = select_media_type(content_type, content)
+      media_type = select_media_type(content_type)
       return params unless media_type
 
       media_type.validate_parameter(params, options)
+    end
+
+    # select media type by content_type (consider wild card definition)
+    # @param [String] content_type
+    # @return [OpenAPIParser::Schemas::MediaType, nil]
+    def select_media_type(content_type)
+      select_media_type_from_content(content_type, content)
     end
   end
 end

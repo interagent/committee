@@ -4,9 +4,7 @@ RSpec.describe OpenAPIParser::MediaTypeSelectable do
   let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
 
   describe '#select_media_type(content_type, content)' do
-    subject { media_type_selectable.select_media_type(content_type, content) }
-
-    let(:content) { media_type_selectable.content }
+    subject { media_type_selectable.select_media_type(content_type) }
 
     context '*/* exist' do
       let(:paths) { root.paths }
