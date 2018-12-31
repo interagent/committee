@@ -33,16 +33,16 @@ module Committee
       raise Committee::InvalidRequest.new(e.message)
     end
 
-    def validate_request_params(params, validator_option)
+    def validate_request_params(params, content_type, validator_option)
       ret, err = case request_operation.http_method
             when 'get'
               validate_get_request_params(params, validator_option)
             when 'post'
-              validate_post_request_params(params, validator_option)
+              validate_post_request_params(params, content_type, validator_option)
             when 'put'
-              validate_post_request_params(params, validator_option)
+              validate_post_request_params(params, content_type, validator_option)
             when 'patch'
-              validate_post_request_params(params, validator_option)
+              validate_post_request_params(params, content_type, validator_option)
             when 'delete'
               validate_get_request_params(params, validator_option)
             else
@@ -50,6 +50,10 @@ module Committee
             end
       raise err if err
       ret
+    end
+
+    def request_bodies_media_type(request_content_type)
+      request_operation.operation_object&.request_body&.select_media_type(request_content_type)
     end
 
     private
@@ -87,10 +91,9 @@ module Committee
       raise Committee::InvalidRequest.new(e.message)
     end
 
-    def validate_post_request_params(params, validator_option)
+    def validate_post_request_params(params, content_type, validator_option)
       # bad performance because when we coerce value, same check
-      # TODO: support other content type
-        return request_operation.validate_request_body('application/json', params, build_openapi_parser_post_option(validator_option))
+      return request_operation.validate_request_body(content_type, params, build_openapi_parser_post_option(validator_option))
     rescue => e
       raise Committee::InvalidRequest.new(e.message)
     end

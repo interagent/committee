@@ -1,5 +1,6 @@
 module Committee
   class SchemaValidator::OpenAPI3::Router
+    # @param [Committee::SchemaValidator::Option] validator_option
     def initialize(schema, validator_option)
       @schema = schema
       @prefix = validator_option.prefix
