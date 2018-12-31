@@ -509,3 +509,8 @@ components:
             type: array
             items:
               type: object
+          datetime_array:
+            type: array
+            items:
+              type: string
+              format: date-time
