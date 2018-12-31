@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.1.8 (2018-12-31)
+* add select_media_type method(#16)
+
 ## 0.1.7 (2018-12-30)
 * Float value validate bugfix (#15)
 
