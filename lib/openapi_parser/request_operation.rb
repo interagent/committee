@@ -40,14 +40,21 @@ class OpenAPIParser::RequestOperation
     operation_object&.validate_path_params(path_params, options)
   end
 
+  # @param [String] content_type
+  # @param [Hash] params
+  # @param [OpenAPIParser::SchemaValidator::Options] options
   def validate_request_body(content_type, params, options = nil)
     options ||= config.request_body_options
     operation_object&.validate_request_body(content_type, params, options)
   end
 
+  # @param [String] content_type
   # @param [Integer] status_code
-  def validate_response_body(status_code, content_type, data)
-    operation_object&.validate_response_body(status_code, content_type, data)
+  # @param [Hash] data
+  # @param [OpenAPIParser::SchemaValidator::ResponseValidateOptions] response_validate_options
+  def validate_response_body(status_code, content_type, data, response_validate_options = nil)
+    response_validate_options ||= config.response_validate_options
+    operation_object&.validate_response_body(status_code, content_type, data, response_validate_options)
   end
 
   def validate_request_parameter(params, options = nil)
