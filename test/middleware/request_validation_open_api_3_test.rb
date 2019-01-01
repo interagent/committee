@@ -237,10 +237,34 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "take a prefix with invalid data" do
+    @app = new_rack_app(prefix: "/v1", open_api_3: open_api_3_schema)
+    params = {
+        "string_post_1" => 1
+    }
+    header "Content-Type", "application/json"
+    post "/v1/characters", JSON.generate(params)
+    assert_equal 400, last_response.status
+    assert_match(/1 class is/i, last_response.body)
+  end
+
   it "ignores paths outside the prefix" do
     @app = new_rack_app(prefix: "/v1", open_api_3: open_api_3_schema)
-    header "Content-Type", "text/html"
-    get "/hello"
+    params = {
+        "string_post_1" => 1
+    }
+    header "Content-Type", "application/json"
+    post "/characters", JSON.generate(params)
+    assert_equal 200, last_response.status
+  end
+
+  it "don't check prefix with no option" do
+    @app = new_rack_app(open_api_3: open_api_3_schema)
+    params = {
+        "string_post_1" => 1
+    }
+    header "Content-Type", "application/json"
+    post "/v1/characters", JSON.generate(params)
     assert_equal 200, last_response.status
   end
 

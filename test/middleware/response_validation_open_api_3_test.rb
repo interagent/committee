@@ -57,10 +57,8 @@ describe Committee::Middleware::ResponseValidation do
 
     get "/v1/characters"
 
-    # TODO: support prefix
-    assert_equal 200, last_response.status
-    # assert_equal 500, last_response.status
-    # assert_equal "{\"id\":\"invalid_response\",\"message\":\"Response wasn't valid JSON.\"}", last_response.body
+    assert_equal 500, last_response.status
+    assert_equal "{\"id\":\"invalid_response\",\"message\":\"Response wasn't valid JSON.\"}", last_response.body
   end
 
   it "rescues JSON errors" do
