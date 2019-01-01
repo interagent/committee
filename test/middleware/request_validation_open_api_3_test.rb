@@ -288,26 +288,6 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
-  it "optionally content_type check" do
-    @app = new_rack_app(check_content_type: true, open_api_3: open_api_3_schema)
-    params = {
-        "string_post_1" => "cloudnasium"
-    }
-    header "Content-Type", "text/html"
-    post "/characters", JSON.generate(params)
-    assert_equal 400, last_response.status
-  end
-
-  it "optionally skip content_type check" do
-    @app = new_rack_app(check_content_type: false, open_api_3: open_api_3_schema)
-    params = {
-      "string_post_1" => "cloudnasium"
-    }
-    header "Content-Type", "text/html"
-    post "/characters", JSON.generate(params)
-    assert_equal 200, last_response.status
-  end
-
   it "optionally coerces query params" do
     @app = new_rack_app(coerce_query_params: true, open_api_3: open_api_3_schema)
     header "Content-Type", "application/json"
