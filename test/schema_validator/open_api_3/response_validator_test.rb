@@ -29,7 +29,7 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
 
   it "passes through a valid response with no registered Content-Type with strict = true" do
     @headers = { "Content-Type" => "application/xml" }
-    assert_raises(Committee::InvalidRequest) {
+    assert_raises(Committee::InvalidResponse) {
       call_response_validator(true)
     }
   end

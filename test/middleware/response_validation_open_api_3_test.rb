@@ -31,9 +31,9 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "detects a response invalid due to schema" do
-    @app = new_response_rack("[]", {}, open_api_3: open_api_3_schema)
+    @app = new_response_rack("[]", {}, open_api_3: open_api_3_schema, raise: true)
 
-    e = assert_raises(Committee::InvalidRequest) { # TODO: change invalid request
+    e = assert_raises(Committee::InvalidResponse) {
       get "/characters"
     }
 
@@ -71,10 +71,9 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "not parameter requset" do
-    @app = new_response_rack({integer: '1'}.to_json, {}, open_api_3: open_api_3_schema)
+    @app = new_response_rack({integer: '1'}.to_json, {}, open_api_3: open_api_3_schema, raise: true)
 
-    # TODO: error change
-    assert_raises(Committee::InvalidRequest) do
+    assert_raises(Committee::InvalidResponse) do
       patch "/validate_no_parameter", {no_schema: 'no'}
     end
   end

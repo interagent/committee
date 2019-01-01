@@ -70,24 +70,35 @@ describe Committee::Test::Methods do
         assert_schema_conform
       end
 
-      # TODO: raise don't exist content-type error option
       it "detects an invalid response Content-Type" do
         @app = new_rack_app(JSON.generate([@correct_response]), {})
         get "/characters"
-        e = assert_raises(Committee::InvalidRequest) do
+        e = assert_raises(Committee::InvalidResponse) do
           assert_schema_conform
         end
         assert_match(/don't exist response definition/i, e.message)
       end
+
+      # TODO: we need add all status code check option (we'll implement later)
+=begin
+      it "detects an invalid response status code" do
+        @app = new_rack_app(JSON.generate([@correct_response]), {}, 419)
+        get "/characters"
+        e = assert_raises(Committee::InvalidResponse) do
+          assert_schema_conform
+        end
+        assert_match(/don't exist status code definition/i, e.message)
+      end
+=end
     end
   end
 
   private
 
-  def new_rack_app(response, headers={ "Content-Type" => "application/json" })
+  def new_rack_app(response, headers={ "Content-Type" => "application/json" }, status_code = 200)
     Rack::Builder.new {
       run lambda { |_|
-        [200, headers, [response]]
+        [status_code, headers, [response]]
       }
     }
   end
