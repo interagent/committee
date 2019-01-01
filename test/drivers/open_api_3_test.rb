@@ -14,7 +14,8 @@ describe Committee::Drivers::OpenAPI3 do
   end
 
   it "override methods" do
-    schema = @driver.parse(open_api_3_data)
+    parser = OpenAPIParser.parse(open_api_3_data)
+    schema = @driver.parse(parser)
 
     assert_kind_of Committee::Drivers::OpenAPI3::Schema, schema
     assert_kind_of OpenAPIParser::Schemas::OpenAPI, schema.open_api

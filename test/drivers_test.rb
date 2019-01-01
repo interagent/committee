@@ -36,7 +36,21 @@ describe Committee::Drivers do
     end
   end
 
+  describe 'load_from_yaml(filepath)' do
+    it 'load OpenAPI3' do
+      s = Committee::Drivers.load_from_yaml(open_api_3_filepath)
+      assert_kind_of Committee::Drivers::Schema, s
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+  end
+
   describe 'load_from_data(filepath)' do
+    it 'load OpenAPI3' do
+      s = Committee::Drivers.load_from_data(open_api_3_data)
+      assert_kind_of Committee::Drivers::Schema, s
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+
     it 'load OpenAPI2' do
       s = Committee::Drivers.load_from_data(open_api_2_data)
       assert_kind_of Committee::Drivers::Schema, s

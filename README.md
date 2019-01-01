@@ -15,7 +15,11 @@ Committee is tested on the following MRI versions:
 Hyper-Schema and OpenAPI3 support this feature.
 
 ``` ruby
+# load from json file
 use Committee::Middleware::RequestValidation, json_file: 'docs/schema.json', strict: false
+
+# load from yaml file
+use Committee::Middleware::RequestValidation, yaml_file: 'open_api_3/schema.yml', strict: false
 ```
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
@@ -296,10 +300,11 @@ Because 3.x support other schema and we can't define which parser we use.
 So please wrap Committee::Drivers::Schema like this.   
 
 ```ruby
-# auto select Hyper-Schema/OpenAPI2 from file
+# auto select Hyper-Schema/OpenAPI2/OpenAPI3 from file
 use Committee::Middleware::RequestValidation, json_file: 'docs/schema.json'
+use Committee::Middleware::RequestValidation, yaml_file: 'open_api_3/schema.yml'
 
-# auto select Hyper-Schema/OpenAPI2 from hash
+# auto select Hyper-Schema/OpenAPI2/OpenAPI3 from hash
 json = JSON.parse(File.read('docs/schema.json'))
 use Committee::Middleware::RequestValidation, schema: Committee::Drivers::load_data(json)
 
@@ -314,7 +319,9 @@ The auto select algorithm like this.
 ```ruby
 hash = JSON.load(json_path)
 
-if hash['swagger'] == '2.0' # OpenAPI2 require swagger key
+if hash['openapi']&.start_with?('3.') # OpenAPI3 specification require this key and version
+  return Committee::Drivers::OpenAPI3.new.parse(hash)
+elsif hash['swagger'] == '2.0' # OpenAPI2 require swagger key
   return Committee::Drivers::OpenAPI2.new.parse(hash)
 else 
   return Committee::Drivers::HyperSchema.new.parse(hash)

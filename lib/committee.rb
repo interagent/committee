@@ -1,4 +1,5 @@
 require "json"
+require "yaml"
 require "json_schema"
 require "rack"
 require 'openapi_parser'

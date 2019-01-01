@@ -56,10 +56,7 @@ def open_api_2_schema
 end
 
 def open_api_3_schema
-  @open_api_3_schema ||= begin
-    driver = Committee::Drivers::OpenAPI3.new
-    driver.parse(open_api_3_data)
-  end
+  @open_api_3_schema ||= Committee::Drivers.load_from_data(open_api_3_data)
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.
@@ -73,7 +70,7 @@ def open_api_2_data
 end
 
 def open_api_3_data
-  OpenAPIParser.parse(YAML.load_file(open_api_3_data_path))
+  YAML.load_file(open_api_3_filepath)
 end
 
 def hyper_schema_filepath
@@ -84,6 +81,6 @@ def open_api_2_filepath
   "./test/data/openapi2/petstore-expanded.json"
 end
 
-def open_api_3_data_path
+def open_api_3_filepath
   "./test/data/openapi3/normal.yml"
 end
