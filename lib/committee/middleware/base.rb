@@ -23,10 +23,12 @@ module Committee::Middleware
 
     class << self
       def get_schema(options)
-        open_api_3 = options[:open_api_3]
-        return open_api_3 if open_api_3
-
         schema = options[:schema]
+        unless schema
+          schema = Committee::Drivers::load_from_json(options[:json_file]) if options[:json_file]
+
+          raise(ArgumentError, "Committee: need option `schema` or json_file") unless schema
+        end
 
         if schema
           # Expect the type we want by now. If we don't have it, the user passed
@@ -38,7 +40,7 @@ module Committee::Middleware
           return schema
         end
 
-        raise(ArgumentError, "Committee: need option `schema` or `open_api_3`")
+        raise(ArgumentError, "Committee: need option `schema` or `json_file`")
       end
     end
 

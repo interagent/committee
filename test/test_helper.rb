@@ -48,17 +48,11 @@ ValidPet = {
 }.freeze
 
 def hyper_schema
-  @hyper_schema ||= begin
-    driver = Committee::Drivers::HyperSchema.new
-    driver.parse(hyper_schema_data)
-  end
+  @hyper_schema ||= Committee::Drivers.load_from_json(hyper_schema_filepath)
 end
 
 def open_api_2_schema
-  @open_api_2_schema ||= begin
-    driver = Committee::Drivers::OpenAPI2.new
-    driver.parse(open_api_2_data)
-  end
+  @open_api_2_schema ||= Committee::Drivers.load_from_data(open_api_2_data)
 end
 
 def open_api_3_schema
