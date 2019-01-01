@@ -11,9 +11,16 @@ module OpenAPIParser::Schemas
     #   @return [Hash{String => MediaType}, nil] content_type to MediaType hash
     openapi_attr_hash_object :content, MediaType, reference: false
 
-    def validate_parameter(content_type, params)
+    # @param [String] content_type
+    # @param [Hash] params
+    # @param [OpenAPIParser::SchemaValidator::ResponseValidateOptions] response_validate_options
+    def validate_parameter(content_type, params, response_validate_options)
       media_type = select_media_type(content_type)
-      return nil unless media_type
+      unless media_type
+        raise ::OpenAPIParser::NotExistContentTypeDefinition, object_reference if response_validate_options.strict
+
+        return nil
+      end
 
       options = ::OpenAPIParser::SchemaValidator::Options.new # response validator not support any options
       media_type.validate_parameter(params, options)

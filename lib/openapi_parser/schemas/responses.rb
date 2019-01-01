@@ -16,20 +16,35 @@ module OpenAPIParser::Schemas
     # @param [Integer] status_code
     # @param [String] content_type
     # @param [Hash] params
-    def validate_response_body(status_code, content_type, params)
+    # @param [OpenAPIParser::SchemaValidator::ResponseValidateOptions] response_validate_options
+    def validate_response_body(status_code, content_type, params, response_validate_options)
       return nil unless response
 
-      res = response[status_code.to_s]
-      return res.validate_parameter(content_type, params) if res
+      if (res = find_response_object(status_code))
+        return res.validate_parameter(content_type, params, response_validate_options)
+      end
 
-      wild_card = status_code_to_wild_card(status_code)
-      res = response[wild_card]
-      return res.validate_parameter(content_type, params) if res
+      raise ::OpenAPIParser::NotExistStatusCodeDefinition, object_reference if response_validate_options.strict
 
-      default&.validate_parameter(content_type, params)
+      nil
     end
 
     private
+
+      # @param [Integer] status_code
+      # @return [Response]
+      def find_response_object(status_code)
+        if (res = response[status_code.to_s])
+          return res
+        end
+
+        wild_card = status_code_to_wild_card(status_code)
+        if (res = response[wild_card])
+          return res
+        end
+
+        default
+      end
 
       # parse 400 -> 4xx
       # OpenAPI3 allow 1xx, 2xx, 3xx... only, don't allow 41x

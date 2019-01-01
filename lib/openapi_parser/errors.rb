@@ -64,4 +64,16 @@ module OpenAPIParser
       "#{@value} isn't include enum in #{@reference}"
     end
   end
+
+  class NotExistStatusCodeDefinition < OpenAPIError
+    def message
+      "don't exist status code definition in #{@reference}"
+    end
+  end
+
+  class NotExistContentTypeDefinition < OpenAPIError
+    def message
+      "don't exist response definition #{@reference}"
+    end
+  end
 end

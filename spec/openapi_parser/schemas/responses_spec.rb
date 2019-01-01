@@ -23,13 +23,14 @@ RSpec.describe OpenAPIParser::Schemas::Responses do
   end
 
   describe '#validate_response_body(status_code, content_type, params)' do
-    subject { responses.validate_response_body(status_code, content_type, params) }
+    subject { responses.validate_response_body(status_code, content_type, params, response_validate_options) }
 
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/pets'] }
     let(:operation) { path_item.get }
     let(:responses) { operation.responses }
     let(:content_type) { 'application/json' }
+    let(:response_validate_options) { OpenAPIParser::SchemaValidator::ResponseValidateOptions.new }
 
     context '200' do
       let(:params) { [{ 'id' => 1, 'name' => 'name' }] }
