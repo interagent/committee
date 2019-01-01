@@ -34,10 +34,16 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
     }
   end
 
-  # TODO: raise error option
   it "passes through a valid response with no Content-Type" do
     @headers = {}
     call_response_validator
+  end
+
+  it "passes through a valid response with no Content-Type with strict option" do
+    @headers = {}
+    assert_raises(Committee::InvalidResponse) {
+      call_response_validator(true)
+    }
   end
 
   it "passes through a valid list response" do
