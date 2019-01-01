@@ -62,10 +62,18 @@ end
 
 # Don't cache this because we'll often manipulate the created hash in tests.
 def hyper_schema_data
-  JSON.parse(File.read("./test/data/hyperschema/paas.json"))
+  JSON.parse(File.read(hyper_schema_filepath))
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.
 def open_api_2_data
-  JSON.parse(File.read("./test/data/openapi2/petstore-expanded.json"))
+  JSON.parse(File.read(open_api_2_filepath))
+end
+
+def hyper_schema_filepath
+  "./test/data/hyperschema/paas.json"
+end
+
+def open_api_2_filepath
+  "./test/data/openapi2/petstore-expanded.json"
 end
