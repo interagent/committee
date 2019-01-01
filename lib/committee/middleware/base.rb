@@ -7,8 +7,7 @@ module Committee::Middleware
       @params_key = options[:params_key] || "committee.params"
       @headers_key = options[:headers_key] || "committee.headers"
       @raise = options[:raise]
-      @schema = get_schema(options[:schema] ||
-        raise(ArgumentError, "Committee: need option `schema`"))
+      @schema = get_schema(options)
 
       @router = Committee::Router.new(@schema,
         prefix: options[:prefix]
@@ -36,7 +35,14 @@ module Committee::Middleware
     # input to be a string, a data hash, or a JsonSchema::Schema. In the former
     # two cases we just parse as if we were sent hyper-schema. In the latter,
     # we have the hyper-schema driver wrap it in a new Committee object.
-    def get_schema(schema)
+    def get_schema(options)
+      schema = options[:schema]
+      unless schema
+        schema = Committee::Drivers::load_from_json(options[:json_file]) if options[:json_file]
+
+        raise(ArgumentError, "Committee: need option `schema` or json_file") unless schema
+      end
+
       # These are in a separately conditional ladder so that we only show the
       # user one warning.
       if schema.is_a?(String)
