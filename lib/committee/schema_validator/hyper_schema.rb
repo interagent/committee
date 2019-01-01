@@ -82,7 +82,7 @@ class Committee::SchemaValidator
       def parameter_coerce!(request, link, coerce_key)
         return unless link_exist?
 
-        Committee::ParameterCoercer.
+        Committee::SchemaValidator::HyperSchema::ParameterCoercer.
             new(request.env[coerce_key],
                 link.schema,
                 coerce_date_times: validator_option.coerce_date_times,

@@ -4,7 +4,6 @@ require "rack"
 require 'openapi_parser'
 
 require_relative "committee/errors"
-require_relative "committee/parameter_coercer"
 require_relative "committee/request_unpacker"
 
 require_relative "committee/validation_error"
@@ -32,6 +31,7 @@ require_relative "committee/schema_validator/hyper_schema/response_generator"
 require_relative "committee/schema_validator/hyper_schema/response_validator"
 require_relative "committee/schema_validator/hyper_schema/router"
 require_relative "committee/schema_validator/hyper_schema/string_params_coercer"
+require_relative "committee/schema_validator/hyper_schema/parameter_coercer"
 
 require_relative "committee/bin/committee_stub"
 
