@@ -57,7 +57,7 @@ Default option values:
 |coerce_path_params| false | true |
 |coerce_recursive| false | always true |
 |check_content_type | true | true |
-|optimistic_json| false | not support yet|
+|optimistic_json| false | false |
 |raise| false | false|
 |strict| false | false|
 |prefix| false | false |
