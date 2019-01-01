@@ -28,40 +28,28 @@ use Committee::Middleware::RequestValidation, open_api_3: open_api_3
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
 
-Options:
+Option values and defaults:
 
-* `allow_form_params`: Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations.
-* `allow_query_params`: Specifies that query string parameters will be taken into consideration when doing validation (defaults to `true`).
-* `check_content_type`: Specifies that `Content-Type` should be verified according to JSON Hyper-schema or OpenAPI3 definition. (defaults to `true`).
-* `coerce_date_times`: Convert the string with `"format": "date-time"` parameter to DateTime object (default to `false`).
-* `coerce_form_params`: Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation.
-* `coerce_query_params`: The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string.
-* `coerce_path_params`: The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path.
-* `coerce_recursive`: Coerce data in arrays and other nested objects (default to `true`).
-* `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
-* `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
-* `prefix`: Mounts the middleware to respond at a configured prefix.
-* `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
-* `strict`: Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run (default to `false`).
+| name | Hyper-Schema | OpenAPI3 | Description |
+|-----------:|------------:|------------:| :------------ |
+|allow_form_params | true | true | Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations. |
+|allow_query_params | true | true | Specifies that query string parameters will be taken into consideration when doing validation. |
+|coerce_date_times | false | true | Convert the string with `"format": "date-time"` parameter to DateTime object. |
+|coerce_form_params| false | true | Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation. |
+|coerce_query_params| false | true  | The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string. |
+|coerce_path_params| false | true | The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path. |
+|coerce_recursive| false | always true | Coerce data in arrays and other nested objects |
+|check_content_type | true | true | Specifies that `Content-Type` should be verified according to JSON Hyper-schema or OpenAPI3 definition. |
+|optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
+|raise| false | false | Raise an exception on error instead of responding with a generic error body. |
+|strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |
 
+No boolean option values:
 
-Default option values:
-
-| name | Hyper-Schema | OpenAPI3 |
-|-----------:|------------:|------------:|
-|allow_form_params | true | true |
-|allow_query_params | true | true |
-|coerce_date_times | false | true |
-|coerce_form_params| false | true |
-|coerce_query_params| false | true  |
-|coerce_path_params| false | true |
-|coerce_recursive| false | always true |
-|check_content_type | true | true |
-|optimistic_json| false | false |
-|raise| false | false|
-|strict| false | false|
-|prefix| false | false |
-|error_class| support | support |
+| name | allowed object type | Hyper-Schema | OpenAPI3 | Description |
+|-----------:|------------:|------------:|------------:| :------------ |
+|prefix| String | support | support | Mounts the middleware to respond at a configured prefix. (e.g. prefix is '/v1' and request path is '/v1/test' use '/test' definition) |
+|error_class| StandardError | support | support | Change validation errors from `Committee::ValidationError`) |
 
 (Hyper-Schema and OpenAPI2 is same default)
 
