@@ -15,8 +15,8 @@ describe Committee::Middleware::ResponseValidation do
 
   it "doesn't call error_handler when response is valid" do
     called = false
-    pr = ->(e) { called = true }
-    @app = new_rack_app(JSON.generate([ValidApp]), {}, schema: hyper_schema)
+    pr = ->(_e) { called = true }
+    @app = new_rack_app(JSON.generate([ValidApp]), {}, schema: hyper_schema, error_handler: pr)
     get "/apps"
     assert !called, "error_handler is called"
   end
