@@ -25,7 +25,7 @@ class Committee::SchemaValidator
       parameter_coerce!(request, link, "rack.request.query_hash") if link_exist? && !request.GET.nil? && !link.schema.nil?
     end
 
-    def response_validate(status, headers, response)
+    def response_validate(status, headers, response, _test_method = false)
       return unless link_exist?
 
       full_body = ""

@@ -13,7 +13,7 @@ module Committee::Test
       end
 
       status, headers, body = response_data
-      v.response_validate(status, headers, [body]) if validate?(status)
+      v.response_validate(status, headers, [body], true) if validate?(status)
     end
 
     def committee_options

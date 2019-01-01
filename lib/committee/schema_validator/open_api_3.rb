@@ -21,13 +21,17 @@ class Committee::SchemaValidator
       @operation_object&.coerce_request_parameter(request.env["rack.request.query_hash"], validator_option) if !request.GET.nil? && !request.env["rack.request.query_hash"].empty?
     end
 
-    def response_validate(status, headers, response)
+    def response_validate(status, headers, response, test_method = false)
       full_body = ""
       response.each do |chunk|
         full_body << chunk
       end
       data = JSON.parse(full_body)
-      Committee::SchemaValidator::OpenAPI3::ResponseValidator.new(@operation_object, validator_option).call(status, headers, data)
+
+      strict = test_method
+      Committee::SchemaValidator::OpenAPI3::ResponseValidator.
+          new(@operation_object, validator_option).
+          call(status, headers, data, strict)
     end
 
     def link_exist?

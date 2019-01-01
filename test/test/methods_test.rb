@@ -71,16 +71,14 @@ describe Committee::Test::Methods do
       end
 
       # TODO: raise don't exist content-type error option
-=begin
       it "detects an invalid response Content-Type" do
         @app = new_rack_app(JSON.generate([@correct_response]), {})
         get "/characters"
-        e = assert_raises(Committee::InvalidResponse) do
+        e = assert_raises(Committee::InvalidRequest) do
           assert_schema_conform
         end
-        assert_match(/response header must be set to/i, e.message)
+        assert_match(/don't exist response definition/i, e.message)
       end
-=end
     end
   end
 
