@@ -250,13 +250,20 @@ end
 
 ## Using OpenAPI3
 
-Please pass 'openapi_parser' object to committee.
+Committee auto select parser from definition, so you don't care.
+But if you want to load from YAML file, please use `yaml_file` option.
+
+```ruby
+use Committee::Middleware::RequestValidation, yaml_file: 'open_api_3/schema.yml'
+```
+
+If you want to select manualy, please pass 'openapi_parser' object to committee.
 This gem added gem dependency so you can use always
 
 ```ruby
 open_api = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yml'))
 schema = Committee::Drivers::OpenAPI3.new.parse(open_api)
-use Committee::Middleware::RequestValidation, open_api_3: schema
+use Committee::Middleware::RequestValidation, schema: schema
 ```
 
 ### limitations of OpenAPI3 mode
