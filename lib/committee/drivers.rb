@@ -15,6 +15,27 @@ module Committee
       end
     end
 
+    # load and build drive from JSON file
+    # @param [String] filepath
+    # @return [Committee::Driver]
+    def self.load_from_json(filepath)
+      json = JSON.parse(File.read(filepath))
+      load_from_data(json)
+    end
+
+    # load and build drive from Hash object
+    # @param [Hash] hash
+    # @return [Committee::Driver]
+    def self.load_from_data(hash)
+      driver = if hash['swagger'] == '2.0'
+                 Committee::Drivers::OpenAPI2.new
+               else
+                 Committee::Drivers::HyperSchema.new
+               end
+
+      driver.parse(hash)
+    end
+
     # Driver is a base class for driver implementations.
     class Driver
       # Whether parameters that were form-encoded will be coerced by default.
