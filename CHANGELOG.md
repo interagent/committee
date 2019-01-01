@@ -1,5 +1,7 @@
 ## Unreleased
-* add strict option #17
+
+## 0.1.9 (2019-01-01)
+* add strict option (#17)
 
 ## 0.1.8 (2018-12-31)
 * add select_media_type method(#16)
