@@ -78,6 +78,11 @@ paths:
       responses:
         '200':
           description: pet response
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
           content:
             application/json:
               schema:

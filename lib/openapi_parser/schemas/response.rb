@@ -1,4 +1,3 @@
-# TODO: headers
 # TODO: links
 
 module OpenAPIParser::Schemas
@@ -10,6 +9,10 @@ module OpenAPIParser::Schemas
     # @!attribute [r] content
     #   @return [Hash{String => MediaType}, nil] content_type to MediaType hash
     openapi_attr_hash_object :content, MediaType, reference: false
+
+    # @!attribute [r] headers
+    #   @return [Hash{String => Header}, nil] header string to Header
+    openapi_attr_hash_object :headers, Header, reference: false
 
     # @param [String] content_type
     # @param [Hash] params
