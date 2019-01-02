@@ -750,7 +750,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       it { expect(subject).not_to eq nil }
 
       context 'with validate_header = false' do
-        let(:config) { {validate_header: false} }
+        let(:config) { { validate_header: false } }
 
         context 'path item require' do
           let(:headers) { { 'header_2' => 'h' } }

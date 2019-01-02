@@ -36,6 +36,6 @@ class OpenAPIParser::Config
   # @return [OpenAPIParser::SchemaValidator::ResponseValidateOptions]
   def response_validate_options
     @response_validate_options ||= OpenAPIParser::SchemaValidator::ResponseValidateOptions.
-        new(strict: strict_response_validation, validate_header: validate_header)
+                                     new(strict: strict_response_validation, validate_header: validate_header)
   end
 end

@@ -92,7 +92,7 @@ RSpec.describe OpenAPIParser::RequestOperation do
 
       context 'no check option' do
         let(:headers) { headers_base.merge('x-next': 'next', 'x-limit' => '1') }
-        let(:init_config) { {validate_header: false} }
+        let(:init_config) { { validate_header: false } }
 
         it { expect(subject).to eq [] }
       end
