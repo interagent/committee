@@ -356,7 +356,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
   end
 
   describe 'coerce' do
-    subject { request_operation.validate_request_parameter(params) }
+    subject { request_operation.validate_request_parameter(params, {}) }
 
     let(:config) { { coerce_value: true } }
 
@@ -517,7 +517,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
 
         context 'overwrite initialize option' do
-          subject { request_operation.validate_request_parameter(params, options) }
+          subject { request_operation.validate_request_parameter(params, {}, options) }
 
           let(:options) { OpenAPIParser::SchemaValidator::Options.new(coerce_value: false) }
 
@@ -715,6 +715,39 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         expect(request_operation.path_params).to eq({ 'integer' => 1 })
       end
+    end
+  end
+
+  describe 'validate header' do
+    subject do
+      request_operation.validate_request_parameter(params, headers)
+    end
+
+    let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
+    let(:content_type) { 'application/json' }
+
+    let(:http_method) { :get }
+    let(:request_path) { '/animals/1' }
+    let(:request_operation) { root.request_operation(http_method, request_path) }
+    let(:params) { {} }
+    let(:headers) { {} }
+
+    context 'invalid header' do
+      context 'path item require' do
+        let(:headers) { { 'header_2' => 'h' } }
+        it { expect { subject }.to raise_error(OpenAPIParser::NotExistRequiredKey) }
+      end
+
+      context 'operation require' do
+        let(:headers) { { 'token' => 1 } }
+        it { expect { subject }.to raise_error(OpenAPIParser::NotExistRequiredKey) }
+      end
+    end
+
+    context 'valid header' do
+      let(:headers) { { 'token' => 1, 'header_2' => 'h' } }
+
+      it { expect(subject).not_to eq nil }
     end
   end
 

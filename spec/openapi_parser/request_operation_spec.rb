@@ -10,11 +10,13 @@ RSpec.describe OpenAPIParser::RequestOperation do
       ro = OpenAPIParser::RequestOperation.create(:get, '/pets', path_item_finder, config.request_validator_options)
       expect(ro.operation_object.object_reference).to eq '#/paths/~1pets/get'
       expect(ro.http_method).to eq('get')
+      expect(ro.path_item.object_id).to eq root.paths.path['/pets'].object_id
     end
 
     it 'path items' do
       ro = OpenAPIParser::RequestOperation.create(:get, '/pets/1', path_item_finder, config.request_validator_options)
       expect(ro.operation_object.object_reference).to eq '#/paths/~1pets~1{id}/get'
+      expect(ro.path_item.object_id).to eq root.paths.path['/pets/{id}'].object_id
     end
 
     it 'no path' do

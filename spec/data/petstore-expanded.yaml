@@ -230,6 +230,12 @@ paths:
         format: int64
       style: simple
     get:
+      parameters:
+        - name: header_2
+          in: header
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: pet response

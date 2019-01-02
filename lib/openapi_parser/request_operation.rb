@@ -6,11 +6,10 @@ class OpenAPIParser::RequestOperation
     # @param [OpenAPIParser::PathItemFinder] path_item_finder
     # @return [OpenAPIParser::RequestOperation, nil]
     def create(http_method, request_path, path_item_finder, config)
-      operation, original_path, path_params = path_item_finder.operation_object(http_method, request_path)
+      result = path_item_finder.operation_object(http_method, request_path)
+      return nil unless result
 
-      return nil unless operation
-
-      self.new(http_method, original_path, operation, path_params, config)
+      self.new(http_method, result, config)
     end
   end
 
@@ -19,19 +18,24 @@ class OpenAPIParser::RequestOperation
   # @!attribute [r] path_params
   #   @return [Hash{String => String}]
   # @!attribute [r] config
-  #   #   @return [OpenAPIParser::Config]
+  #   @return [OpenAPIParser::Config]
   # @!attribute [r] http_method
   #   @return [String]
   # @!attribute [r] original_path
   #   @return [String]
-  attr_reader :operation_object, :path_params, :config, :http_method, :original_path
+  # @!attribute [r] path_item
+  #   @return [OpenAPIParser::Schemas::PathItem]
+  attr_reader :operation_object, :path_params, :config, :http_method, :original_path, :path_item
 
+  # @param [String] http_method
+  # @param [OpenAPIParser::PathItemFinder::Result] result
   # @param [OpenAPIParser::Config] config
-  def initialize(http_method, original_path, operation_object, path_params, config)
+  def initialize(http_method, result, config)
     @http_method = http_method.to_s
-    @original_path = original_path
-    @operation_object = operation_object
-    @path_params = path_params || {}
+    @original_path = result.original_path
+    @operation_object = result.operation_object
+    @path_params = result.path_params || {}
+    @path_item = result.path_item_object
     @config = config
   end
 
@@ -57,8 +61,12 @@ class OpenAPIParser::RequestOperation
     operation_object&.validate_response_body(status_code, content_type, data, response_validate_options)
   end
 
-  def validate_request_parameter(params, options = nil)
+  # @param [Hash] params parameter hash
+  # @param [Hash] headers headers hash
+  # @param [OpenAPIParser::SchemaValidator::Options] options request validator options
+  def validate_request_parameter(params, headers, options = nil)
     options ||= config.request_validator_options
-    operation_object&.validate_request_parameter(params, options)
+    path_item&.validate_request_parameter(params, headers, options)
+    operation_object&.validate_request_parameter(params, headers, options)
   end
 end

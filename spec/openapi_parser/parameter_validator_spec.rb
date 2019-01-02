@@ -5,7 +5,7 @@ RSpec.describe OpenAPIParser::ParameterValidator do
   let(:config) { {} }
 
   describe 'validate' do
-    subject { request_operation.validate_request_parameter(params) }
+    subject { request_operation.validate_request_parameter(params, {}) }
 
     let(:content_type) { 'application/json' }
     let(:http_method) { :get }

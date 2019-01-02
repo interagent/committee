@@ -47,18 +47,16 @@ RSpec.describe OpenAPIParser::Schemas::Parameter do
 
     it do
       results = {
-          name: 'token',
-          in: 'header',
-          description: 'token to be passed as a header',
-          required: true,
-          style: 'simple',
+        name: 'token',
+        in: 'header',
+        description: 'token to be passed as a header',
+        required: true,
+        style: 'simple',
       }
 
       results.each { |k, v| expect(subject.send(k)).to eq v }
 
       expect(subject.schema.type).to eq 'integer'
-
-      expect(subject.in_header?).to eq true
     end
   end
 end

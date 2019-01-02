@@ -5,6 +5,8 @@
 
 module OpenAPIParser::Schemas
   class Operation < Base
+    include OpenAPIParser::ParameterValidatable
+
     openapi_attr_values :tags, :summary, :description, :deprecated
 
     openapi_attr_value :operation_id, schema_key: :operationId
@@ -30,30 +32,5 @@ module OpenAPIParser::Schemas
     def validate_response_body(status_code, content_type, data, response_validate_options)
       responses&.validate_response_body(status_code, content_type, data, response_validate_options)
     end
-
-    # @param [OpenAPIParser::SchemaValidator::Options] options
-    def validate_request_parameter(params, options)
-      OpenAPIParser::ParameterValidator.validate_parameter(query_parameter_hash, params, object_reference, options)
-    end
-
-    def validate_path_params(path_params, options)
-      OpenAPIParser::ParameterValidator.validate_parameter(path_parameter_hash, path_params, object_reference, options)
-    end
-
-    private
-
-      def path_parameter_hash
-        @path_parameter_hash ||= (parameters || []).
-                                   select(&:in_path?).
-                                   map { |param| [param.name, param] }.
-                                   to_h
-      end
-
-      def query_parameter_hash
-        @query_parameter_hash ||= (parameters || []).
-                                    select(&:in_query?).
-                                    map { |param| [param.name, param] }.
-                                    to_h
-      end
   end
 end
