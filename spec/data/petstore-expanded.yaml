@@ -83,6 +83,8 @@ paths:
               description: A link to the next page of responses
               schema:
                 type: string
+            x-limit:
+              $ref: '#/components/headers/X-Rate-Limit-Limit'
           content:
             application/json:
               schema:
@@ -289,3 +291,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/NewPet'
+  headers:
+    X-Rate-Limit-Limit:
+      description: The number of allowed requests in the current period
+      schema:
+        type: integer

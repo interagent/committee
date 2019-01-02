@@ -20,6 +20,8 @@ RSpec.describe OpenAPIParser::Schemas::Components do
 
       expect(subject.request_bodies['test_body'].class).to eq OpenAPIParser::Schemas::RequestBody
       expect(subject.request_bodies['test_body'].object_reference).to eq '#/components/requestBodies/test_body'
+
+      expect(subject.headers['X-Rate-Limit-Limit'].class).to eq OpenAPIParser::Schemas::Header
     end
   end
 end

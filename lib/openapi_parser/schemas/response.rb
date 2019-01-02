@@ -12,7 +12,7 @@ module OpenAPIParser::Schemas
 
     # @!attribute [r] headers
     #   @return [Hash{String => Header}, nil] header string to Header
-    openapi_attr_hash_object :headers, Header, reference: false
+    openapi_attr_hash_object :headers, Header, reference: true
 
     # @param [String] content_type
     # @param [Hash] params

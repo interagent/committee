@@ -1,5 +1,4 @@
 # TODO: examples
-# TODO: headers
 # TODO: securitySchemes
 # TODO: links
 # TODO: callbacks
@@ -21,5 +20,9 @@ module OpenAPIParser::Schemas
     # @!attribute [r] request_bodies
     #   @return [Hash{String => RequestBody}, nil]
     openapi_attr_hash_object :request_bodies, RequestBody, reference: true, schema_key: :requestBodies
+
+    # @!attribute [r] headers
+    #   @return [Hash{String => Header}, nil] header objects
+    openapi_attr_hash_object :headers, Header, reference: true
   end
 end
