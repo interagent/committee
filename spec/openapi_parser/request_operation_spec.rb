@@ -10,11 +10,13 @@ RSpec.describe OpenAPIParser::RequestOperation do
       ro = OpenAPIParser::RequestOperation.create(:get, '/pets', path_item_finder, config.request_validator_options)
       expect(ro.operation_object.object_reference).to eq '#/paths/~1pets/get'
       expect(ro.http_method).to eq('get')
+      expect(ro.path_item.object_id).to eq root.paths.path['/pets'].object_id
     end
 
     it 'path items' do
       ro = OpenAPIParser::RequestOperation.create(:get, '/pets/1', path_item_finder, config.request_validator_options)
       expect(ro.operation_object.object_reference).to eq '#/paths/~1pets~1{id}/get'
+      expect(ro.path_item.object_id).to eq root.paths.path['/pets/{id}'].object_id
     end
 
     it 'no path' do
@@ -39,11 +41,16 @@ RSpec.describe OpenAPIParser::RequestOperation do
   end
 
   describe 'validate_response_body' do
-    subject { request_operation.validate_response_body(status_code, content_type, data) }
+    subject { request_operation.validate_response_body(response_body) }
 
     let(:root) { OpenAPIParser.parse(normal_schema, init_config) }
 
     let(:init_config) { {} }
+
+    let(:response_body) do
+      OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, data, headers)
+    end
+    let(:headers) { { 'Content-Type' => content_type } }
 
     let(:status_code) { 200 }
     let(:http_method) { :post }
@@ -61,6 +68,34 @@ RSpec.describe OpenAPIParser::RequestOperation do
       let(:data) { { 'string' => 1 } }
 
       it { expect(subject).to eq nil }
+    end
+
+    context 'with header' do
+      let(:root) { OpenAPIParser.parse(petstore_schema, init_config) }
+
+      let(:http_method) { :get }
+      let(:request_operation) { root.request_operation(http_method, '/pets') }
+      let(:headers_base) { { 'Content-Type' => content_type } }
+      let(:data) { [] }
+
+      context 'valid header type' do
+        let(:headers) { headers_base.merge('x-next': 'next', 'x-limit' => 1) }
+
+        it { expect(subject).to eq [] }
+      end
+
+      context 'invalid header type' do
+        let(:headers) { headers_base.merge('x-next': 'next', 'x-limit' => '1') }
+
+        it { expect { subject }.to raise_error(OpenAPIParser::ValidateError) }
+      end
+
+      context 'no check option' do
+        let(:headers) { headers_base.merge('x-next': 'next', 'x-limit' => '1') }
+        let(:init_config) { { validate_header: false } }
+
+        it { expect(subject).to eq [] }
+      end
     end
 
     context 'invalid schema' do
@@ -95,7 +130,12 @@ RSpec.describe OpenAPIParser::RequestOperation do
         let(:http_method) { :put }
 
         context 'method parameter' do
-          subject { request_operation.validate_response_body(status_code, content_type, data, response_validate_options) }
+          subject { request_operation.validate_response_body(response_body, response_validate_options) }
+
+          let(:response_body) do
+            OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, data, headers)
+          end
+          let(:headers) { { 'Content-Type' => content_type } }
 
           let(:response_validate_options) { OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(strict: true) }
           let(:data) { {} }
@@ -122,10 +162,15 @@ RSpec.describe OpenAPIParser::RequestOperation do
         end
 
         context 'default parameter' do
-          subject { request_operation.validate_response_body(status_code, content_type, data) }
+          subject { request_operation.validate_response_body(response_body) }
 
           let(:data) { {} }
           let(:init_config) { { strict_response_validation: true } }
+
+          let(:response_body) do
+            OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, data, headers)
+          end
+          let(:headers) { { 'Content-Type' => content_type } }
 
           context 'not exist status code' do
             let(:status_code) { 201 }

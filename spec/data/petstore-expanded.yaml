@@ -78,6 +78,13 @@ paths:
       responses:
         '200':
           description: pet response
+          headers:
+            x-next:
+              description: A link to the next page of responses
+              schema:
+                type: string
+            x-limit:
+              $ref: '#/components/headers/X-Rate-Limit-Limit'
           content:
             application/json:
               schema:
@@ -214,7 +221,21 @@ paths:
       schema:
         type: integer
         format: int64
+    - name: token
+      in: header
+      description: token to be passed as a header
+      required: true
+      schema:
+        type: integer
+        format: int64
+      style: simple
     get:
+      parameters:
+        - name: header_2
+          in: header
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: pet response
@@ -284,3 +305,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/NewPet'
+  headers:
+    X-Rate-Limit-Limit:
+      description: The number of allowed requests in the current period
+      schema:
+        type: integer

@@ -14,4 +14,5 @@ module OpenAPIParser::Schemas
   class MediaType < Base; end
   class Schema < Base; end
   class Components < Base; end
+  class Header < Base; end
 end

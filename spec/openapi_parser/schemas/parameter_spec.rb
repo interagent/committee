@@ -38,4 +38,25 @@ RSpec.describe OpenAPIParser::Schemas::Parameter do
       expect(subject.allow_empty_value).to eq true
     end
   end
+
+  describe 'header support' do
+    subject { path_item.parameters.last }
+
+    let(:paths) { root.paths }
+    let(:path_item) { paths.path['/animals/{id}'] }
+
+    it do
+      results = {
+        name: 'token',
+        in: 'header',
+        description: 'token to be passed as a header',
+        required: true,
+        style: 'simple',
+      }
+
+      results.each { |k, v| expect(subject.send(k)).to eq v }
+
+      expect(subject.schema.type).to eq 'integer'
+    end
+  end
 end

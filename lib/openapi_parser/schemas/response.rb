@@ -1,4 +1,3 @@
-# TODO: headers
 # TODO: links
 
 module OpenAPIParser::Schemas
@@ -11,11 +10,16 @@ module OpenAPIParser::Schemas
     #   @return [Hash{String => MediaType}, nil] content_type to MediaType hash
     openapi_attr_hash_object :content, MediaType, reference: false
 
-    # @param [String] content_type
-    # @param [Hash] params
+    # @!attribute [r] headers
+    #   @return [Hash{String => Header}, nil] header string to Header
+    openapi_attr_hash_object :headers, Header, reference: true
+
+    # @param [OpenAPIParser::RequestOperation::ValidatableResponseBody] response_body
     # @param [OpenAPIParser::SchemaValidator::ResponseValidateOptions] response_validate_options
-    def validate_parameter(content_type, params, response_validate_options)
-      media_type = select_media_type(content_type)
+    def validate(response_body, response_validate_options)
+      validate_header(response_body.headers) if response_validate_options.validate_header
+
+      media_type = select_media_type(response_body.content_type)
       unless media_type
         raise ::OpenAPIParser::NotExistContentTypeDefinition, object_reference if response_validate_options.strict
 
@@ -23,7 +27,7 @@ module OpenAPIParser::Schemas
       end
 
       options = ::OpenAPIParser::SchemaValidator::Options.new # response validator not support any options
-      media_type.validate_parameter(params, options)
+      media_type.validate_parameter(response_body.response_data, options)
     end
 
     # select media type by content_type (consider wild card definition)
@@ -32,5 +36,19 @@ module OpenAPIParser::Schemas
     def select_media_type(content_type)
       select_media_type_from_content(content_type, content)
     end
+
+    private
+
+      # @param [Hash] response_headers
+      def validate_header(response_headers)
+        return unless headers
+
+        headers.each do |k, v|
+          h = response_headers[k]
+          next unless h
+
+          v.validate(h)
+        end
+      end
   end
 end

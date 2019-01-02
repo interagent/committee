@@ -11,14 +11,6 @@ module OpenAPIParser::Schemas
     #   @return [Schema, Reference, nil]
     openapi_attr_object :schema, Schema, reference: true
 
-    def in_query?
-      self.in == 'query'
-    end
-
-    def in_path?
-      self.in == 'path'
-    end
-
     # @return [Object] coerced or original params
     # @param [OpenAPIParser::SchemaValidator::Options] options
     def validate_params(params, options)

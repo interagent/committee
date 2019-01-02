@@ -3,6 +3,8 @@
 
 module OpenAPIParser::Schemas
   class PathItem < Base
+    include OpenAPIParser::ParameterValidatable
+
     openapi_attr_values :summary, :description
 
     openapi_attr_objects :get, :put, :post, :delete, :options, :head, :patch, :trace, Operation

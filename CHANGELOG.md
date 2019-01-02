@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.1.9 (2019-01-02)
+* support header validate (#18)
+
 ## 0.1.9 (2019-01-01)
 * add strict option (#17)
 
