@@ -13,15 +13,14 @@ module OpenAPIParser::Schemas
     # validate params data by definition
     # find response object by status_code and content_type
     # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#patterned-fields-1
-    # @param [Integer] status_code
-    # @param [String] content_type
-    # @param [Hash] params
+    # @param [OpenAPIParser::RequestOperation::ValidatableResponseBody] response_body
     # @param [OpenAPIParser::SchemaValidator::ResponseValidateOptions] response_validate_options
-    def validate_response_body(status_code, content_type, params, response_validate_options)
+    def validate(response_body, response_validate_options)
       return nil unless response
 
-      if (res = find_response_object(status_code))
-        return res.validate_parameter(content_type, params, response_validate_options)
+      if (res = find_response_object(response_body.status_code))
+
+        return res.validate(response_body, response_validate_options)
       end
 
       raise ::OpenAPIParser::NotExistStatusCodeDefinition, object_reference if response_validate_options.strict

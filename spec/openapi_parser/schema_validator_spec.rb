@@ -718,7 +718,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
     end
   end
 
-  describe 'validate header' do
+  describe 'validate header in parameter' do
     subject do
       request_operation.validate_request_parameter(params, headers)
     end

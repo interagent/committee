@@ -8,5 +8,11 @@ module OpenAPIParser::Schemas
     # @!attribute [r] schema
     #   @return [Schema, Reference, nil]
     openapi_attr_object :schema, Schema, reference: true
+
+    # validate by schema
+    # @param [Object] value
+    def validate(value)
+      OpenAPIParser::SchemaValidator.validate(value, schema, OpenAPIParser::SchemaValidator::Options.new)
+    end
   end
 end

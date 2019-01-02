@@ -52,13 +52,12 @@ class OpenAPIParser::RequestOperation
     operation_object&.validate_request_body(content_type, params, options)
   end
 
-  # @param [String] content_type
-  # @param [Integer] status_code
-  # @param [Hash] data
+  # @param [OpenAPIParser::RequestOperation::ValidatableResponseBody] response_body
   # @param [OpenAPIParser::SchemaValidator::ResponseValidateOptions] response_validate_options
-  def validate_response_body(status_code, content_type, data, response_validate_options = nil)
+  def validate_response_body(response_body, response_validate_options = nil)
     response_validate_options ||= config.response_validate_options
-    operation_object&.validate_response_body(status_code, content_type, data, response_validate_options)
+
+    operation_object&.validate_response(response_body, response_validate_options)
   end
 
   # @param [Hash] params parameter hash
@@ -68,5 +67,19 @@ class OpenAPIParser::RequestOperation
     options ||= config.request_validator_options
     path_item&.validate_request_parameter(params, headers, options)
     operation_object&.validate_request_parameter(params, headers, options)
+  end
+
+  class ValidatableResponseBody
+    attr_reader :status_code, :response_data, :headers
+
+    def initialize(status_code, response_data, headers)
+      @status_code = status_code
+      @response_data = response_data
+      @headers = headers
+    end
+
+    def content_type
+      headers['Content-Type'].to_s.split(';').first.to_s
+    end
   end
 end

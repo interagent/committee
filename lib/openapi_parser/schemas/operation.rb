@@ -25,12 +25,10 @@ module OpenAPIParser::Schemas
       request_body&.validate_request_body(content_type, params, options)
     end
 
-    # @param [String] content_type
-    # @param [Integer] status_code
-    # @param [Hash] data
+    # @param [OpenAPIParser::RequestOperation::ValidatableResponseBody] response_body
     # @param [OpenAPIParser::SchemaValidator::ResponseValidateOptions] response_validate_options
-    def validate_response_body(status_code, content_type, data, response_validate_options)
-      responses&.validate_response_body(status_code, content_type, data, response_validate_options)
+    def validate_response(response_body, response_validate_options)
+      responses&.validate(response_body, response_validate_options)
     end
   end
 end
