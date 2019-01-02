@@ -8,11 +8,11 @@ module Committee
       @validate_errors = validator_option.validate_errors
     end
 
-    def call(status, headers, data, strict)
+    def call(status, headers, response_data, strict)
       return unless Committee::Middleware::ResponseValidation.validate?(status, validate_errors)
 
-      content_type = headers['Content-Type'].to_s.split(";").first.to_s
-      operation_wrapper.validate_response_params(status, content_type, data, strict)
+      #content_type = headers['Content-Type'].to_s.split(";").first.to_s
+      operation_wrapper.validate_response_params(status, headers, response_data, strict)
     end
 
     private

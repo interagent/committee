@@ -20,32 +20,34 @@ module Committee
       request_operation.validate_path_params(options)
     end
 
-    def coerce_request_parameter(params, validator_option)
+    def coerce_request_parameter(params, headers, validator_option)
       options = build_openapi_parser_get_option(validator_option)
       return unless options.coerce_value
 
-      request_operation.validate_request_parameter(params, options)
+      request_operation.validate_request_parameter(params, headers, options)
     end
 
     # @param [Boolean] strict when not content_type or status code definition, raise error
-    def validate_response_params(status_code, content_type, params, strict)
-      return request_operation.validate_response_body(status_code, content_type, params, response_validate_options(strict))
+    def validate_response_params(status_code, headers, response_data, strict)
+      request_body = OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, response_data, headers)
+
+      return request_operation.validate_response_body(request_body, response_validate_options(strict))
     rescue OpenAPIParser::OpenAPIError => e
       raise Committee::InvalidResponse.new(e.message)
     end
 
-    def validate_request_params(params, content_type, validator_option)
+    def validate_request_params(params, headers, validator_option)
       ret, err = case request_operation.http_method
             when 'get'
-              validate_get_request_params(params, validator_option)
+              validate_get_request_params(params, headers, validator_option)
             when 'post'
-              validate_post_request_params(params, content_type, validator_option)
+              validate_post_request_params(params, headers, validator_option)
             when 'put'
-              validate_post_request_params(params, content_type, validator_option)
+              validate_post_request_params(params, headers, validator_option)
             when 'patch'
-              validate_post_request_params(params, content_type, validator_option)
+              validate_post_request_params(params, headers, validator_option)
             when 'delete'
-              validate_get_request_params(params, validator_option)
+              validate_get_request_params(params, headers, validator_option)
             else
               raise "Committee OpenAPI3 not support #{request_operation.http_method} method"
             end
@@ -85,14 +87,16 @@ module Committee
       OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,datetime_coerce_class: datetime_coerce_class)
     end
 
-    def validate_get_request_params(params, validator_option)
+    def validate_get_request_params(params, headers, validator_option)
       # bad performance because when we coerce value, same check
-      request_operation.validate_request_parameter(params, build_openapi_parser_get_option(validator_option))
+      request_operation.validate_request_parameter(params, headers, build_openapi_parser_get_option(validator_option))
     rescue OpenAPIParser::OpenAPIError => e
       raise Committee::InvalidRequest.new(e.message)
     end
 
-    def validate_post_request_params(params, content_type, validator_option)
+    def validate_post_request_params(params, headers, validator_option)
+      content_type = headers['Content-Type'].to_s.split(";").first.to_s
+
       # bad performance because when we coerce value, same check
       return request_operation.validate_request_body(content_type, params, build_openapi_parser_post_option(validator_option))
     rescue => e

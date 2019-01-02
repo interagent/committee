@@ -11,7 +11,7 @@ module Committee
       content_type = ::Committee::SchemaValidator.request_media_type(request)
       check_content_type(request, content_type) if @validator_option.check_content_type
 
-      @operation_object.validate_request_params(params, content_type, @validator_option)
+      @operation_object.validate_request_params(params, headers, @validator_option)
 
       # TODO: support header
     end
