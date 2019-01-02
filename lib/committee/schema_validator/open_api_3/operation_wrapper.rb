@@ -28,10 +28,10 @@ module Committee
     end
 
     # @param [Boolean] strict when not content_type or status code definition, raise error
-    def validate_response_params(status_code, headers, response_data, strict)
+    def validate_response_params(status_code, headers, response_data, strict, check_header)
       request_body = OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, response_data, headers)
 
-      return request_operation.validate_response_body(request_body, response_validate_options(strict))
+      return request_operation.validate_response_body(request_body, response_validate_options(strict, check_header))
     rescue OpenAPIParser::OpenAPIError => e
       raise Committee::InvalidResponse.new(e.message)
     end
@@ -70,21 +70,30 @@ module Committee
     def build_openapi_parser_path_option(validator_option)
       coerce_value = validator_option.coerce_path_params
       datetime_coerce_class = validator_option.coerce_date_times ? DateTime : nil
-      OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,datetime_coerce_class: datetime_coerce_class)
+      validate_header = validator_option.check_header
+      OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,
+                                                  datetime_coerce_class: datetime_coerce_class,
+                                                  validate_header: validate_header)
     end
 
     # @return [OpenAPIParser::SchemaValidator::Options]
     def build_openapi_parser_post_option(validator_option)
       coerce_value = validator_option.coerce_form_params
       datetime_coerce_class = validator_option.coerce_date_times ? DateTime : nil
-      OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,datetime_coerce_class: datetime_coerce_class)
+      validate_header = validator_option.check_header
+      OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,
+                                                  datetime_coerce_class: datetime_coerce_class,
+                                                  validate_header: validate_header)
     end
 
     # @return [OpenAPIParser::SchemaValidator::Options]
     def build_openapi_parser_get_option(validator_option)
       coerce_value = validator_option.coerce_query_params
       datetime_coerce_class = validator_option.coerce_date_times ? DateTime : nil
-      OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,datetime_coerce_class: datetime_coerce_class)
+      validate_header = validator_option.check_header
+      OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,
+                                                  datetime_coerce_class: datetime_coerce_class,
+                                                  validate_header: validate_header)
     end
 
     def validate_get_request_params(params, headers, validator_option)
@@ -103,8 +112,8 @@ module Committee
       raise Committee::InvalidRequest.new(e.message)
     end
 
-    def response_validate_options(strict)
-      ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(strict: strict)
+    def response_validate_options(strict, check_header)
+      ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(strict: strict, validate_header: check_header)
     end
   end
 end

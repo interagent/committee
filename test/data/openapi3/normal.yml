@@ -470,7 +470,21 @@ paths:
       responses:
         '204':
           description: no content
-
+  /header:
+    get:
+      parameters:
+        - name: integer
+          in: header
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          headers:
+            x-limit:
+              description: integer
+              schema:
+                type: integer
 components:
   schemas:
     nested_array:

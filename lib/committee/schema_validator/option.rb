@@ -22,8 +22,6 @@ class Committee::SchemaValidator
       @coerce_path_params  = options.fetch(:coerce_path_params, schema.driver.default_path_params)
 
       @check_content_type  = options.fetch(:check_content_type, true)
-
-      raise 'OpenAPI3 not support @check_header option' if schema_type == :open_api_3 && options[:check_header]
       @check_header        = options.fetch(:check_header, true)
     end
   end

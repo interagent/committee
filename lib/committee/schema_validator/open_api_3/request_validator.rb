@@ -1,6 +1,6 @@
 module Committee
   class SchemaValidator::OpenAPI3::RequestValidator
-    # @param [OpenAPIParser::RequestOperation] operation_object
+    # @param [SchemaValidator::OpenAPI3::OperationWrapper] operation_object
     # @param [Committee::SchemaValidator::Option] validator_option
     def initialize(operation_object, validator_option:)
       @operation_object = operation_object
@@ -12,8 +12,6 @@ module Committee
       check_content_type(request, content_type) if @validator_option.check_content_type
 
       @operation_object.validate_request_params(params, headers, @validator_option)
-
-      # TODO: support header
     end
 
     private

@@ -76,6 +76,32 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  describe 'check header' do
+    it 'valid type header' do
+      @app = new_response_rack({}.to_json, {'x-limit' => 1}, open_api_3: open_api_3_schema, raise: true)
+
+      get "/header"
+
+      assert_equal 200, last_response.status
+    end
+
+    it 'invalid type header' do
+      @app = new_response_rack({}.to_json, {'x-limit' => '1'}, open_api_3: open_api_3_schema, raise: true)
+
+      assert_raises(Committee::InvalidResponse) do
+        get "/header"
+      end
+    end
+
+    it 'invalid type but not check' do
+      @app = new_response_rack({}.to_json, {'x-limit' => '1'}, open_api_3: open_api_3_schema, raise: true, check_header: false)
+
+      get "/header"
+
+      assert_equal 200, last_response.status
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})
