@@ -17,7 +17,7 @@ module OpenAPIParser::Schemas
     # @param [OpenAPIParser::RequestOperation::ValidatableResponseBody] response_body
     # @param [OpenAPIParser::SchemaValidator::ResponseValidateOptions] response_validate_options
     def validate(response_body, response_validate_options)
-      validate_header(response_body.headers)
+      validate_header(response_body.headers) if response_validate_options.validate_header
 
       media_type = select_media_type(response_body.content_type)
       unless media_type

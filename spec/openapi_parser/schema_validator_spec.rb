@@ -723,7 +723,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       request_operation.validate_request_parameter(params, headers)
     end
 
-    let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
+    let(:root) { OpenAPIParser.parse(petstore_schema, config) }
     let(:content_type) { 'application/json' }
 
     let(:http_method) { :get }
@@ -748,6 +748,20 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       let(:headers) { { 'token' => 1, 'header_2' => 'h' } }
 
       it { expect(subject).not_to eq nil }
+
+      context 'with validate_header = false' do
+        let(:config) { {validate_header: false} }
+
+        context 'path item require' do
+          let(:headers) { { 'header_2' => 'h' } }
+          it { expect(subject).not_to eq nil }
+        end
+
+        context 'operation require' do
+          let(:headers) { { 'token' => 1 } }
+          it { expect(subject).not_to eq nil }
+        end
+      end
     end
   end
 

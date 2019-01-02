@@ -9,7 +9,7 @@ module OpenAPIParser::ParameterValidatable
   # @param [Hash] headers headers hash
   # @param [OpenAPIParser::SchemaValidator::Options] options request validator options
   def validate_request_parameter(params, headers, options)
-    validate_header_parameter(headers, object_reference, options)
+    validate_header_parameter(headers, object_reference, options) if options.validate_header
     validate_query_parameter(params, object_reference, options)
   end
 

@@ -89,6 +89,13 @@ RSpec.describe OpenAPIParser::RequestOperation do
 
         it { expect { subject }.to raise_error(OpenAPIParser::ValidateError) }
       end
+
+      context 'no check option' do
+        let(:headers) { headers_base.merge('x-next': 'next', 'x-limit' => '1') }
+        let(:init_config) { {validate_header: false} }
+
+        it { expect(subject).to eq [] }
+      end
     end
 
     context 'invalid schema' do
