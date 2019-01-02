@@ -7,6 +7,7 @@ module OpenAPIParser::MediaTypeSelectable
     # @return [OpenAPIParser::Schemas::MediaType, nil]
     def select_media_type_from_content(content_type, content)
       return nil unless content_type
+      return nil unless content
 
       if (media_type = content[content_type])
         return media_type
