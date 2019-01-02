@@ -221,6 +221,14 @@ paths:
       schema:
         type: integer
         format: int64
+    - name: token
+      in: header
+      description: token to be passed as a header
+      required: true
+      schema:
+        type: integer
+        format: int64
+      style: simple
     get:
       responses:
         '200':

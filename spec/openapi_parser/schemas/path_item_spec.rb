@@ -26,7 +26,7 @@ RSpec.describe OpenAPIParser::Schemas::PathItem do
     let(:path_item) { paths.path['/animals/{id}'] }
 
     it do
-      expect(subject.parameters.size).to eq 1
+      expect(subject.parameters.size).to eq 2
       expect(subject.parameters.first.name).to eq 'id'
     end
   end

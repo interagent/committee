@@ -19,6 +19,10 @@ module OpenAPIParser::Schemas
       self.in == 'path'
     end
 
+    def in_header?
+      self.in == 'header'
+    end
+
     # @return [Object] coerced or original params
     # @param [OpenAPIParser::SchemaValidator::Options] options
     def validate_params(params, options)
