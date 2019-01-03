@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.2.1 (2019-01-03)
+* raise error when invalid datetime format (#19)
+
 ## 0.2.0 (2019-01-02)
 * support header validate (#18)
 

@@ -13,7 +13,10 @@ class OpenAPIParser::SchemaValidator
       value, err = check_enum_include(value, schema)
       return [nil, err] if err
 
-      value = coerce_date_time(value, schema) unless @datetime_coerce_class.nil?
+      unless @datetime_coerce_class.nil?
+        value = coerce_date_time(value, schema)
+        return OpenAPIParser::ValidateError.build_error_result(value, schema) unless value.kind_of?(@datetime_coerce_class)
+      end
 
       [value, nil]
     end
