@@ -427,7 +427,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
       end
 
-      context 'correct datetime' do
+      context 'datetime' do
         let(:params) { { 'datetime' => datetime_str } }
         let(:request_path) { '/validate' }
 
@@ -658,10 +658,10 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
       end
 
-      context 'invalid datetime not parsed' do
+      context 'invalid datetime raise validation error' do
         let(:params) { { 'datetime_string' => 'honoka' } }
 
-        it { expect(subject['datetime_string']).to eq 'honoka' }
+        it { expect { subject }.to raise_error(OpenAPIParser::ValidateError) }
       end
 
       context "don't change object type" do
