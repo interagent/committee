@@ -40,6 +40,15 @@ paths:
                     type: array
                     items:
                       type: string
+        '400':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integer:
+                    type: integer
     post:
       description: new characters
       responses:

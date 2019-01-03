@@ -102,6 +102,37 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  describe 'validate error option' do
+    it "detects an invalid response status code" do
+      @app = new_response_rack({ integer: '1' }.to_json,
+                               {},
+                               app_status: 400,
+                               open_api_3: open_api_3_schema,
+                               raise: true,
+                               validate_errors: true)
+
+
+      e = assert_raises(Committee::InvalidResponse) do
+        get "/characters"
+      end
+      assert_match(/1 class is String/i, e.message)
+    end
+
+    it "detects an invalid response status code with validate_errors = false" do
+      @app = new_response_rack({ string_1: :honoka }.to_json,
+                               {},
+                               app_status: 400,
+                               open_api_3: open_api_3_schema,
+                               raise: true,
+                               validate_errors: false)
+
+
+      get "/characters"
+
+      assert_equal 400, last_response.status
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})
