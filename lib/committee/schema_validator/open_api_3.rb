@@ -1,5 +1,5 @@
 class Committee::SchemaValidator
-    class OpenAPI3
+  class OpenAPI3
     # @param [Committee::SchemaValidator::Option] validator_option
     def initialize(router, request, validator_option)
       @router = router
