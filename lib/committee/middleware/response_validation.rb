@@ -1,10 +1,17 @@
 module Committee::Middleware
   class ResponseValidation < Base
-    attr_reader :validate_errors
+    attr_reader :validate_success_only
 
     def initialize(app, options = {})
       super
-      @validate_errors = options[:validate_errors]
+      @validate_success_only = options[:validate_success_only]
+
+      unless options[:validate_errors].nil?
+        @validate_success_only = !options[:validate_errors]
+        Committee.warn_deprecated("Committee: validate_errors option is deprecated; " \
+        "please use validate_success_only=#{@validate_success_only}.")
+      end
+
       @error_handler = options[:error_handler]
     end
 
@@ -18,7 +25,7 @@ module Committee::Middleware
           full_body << chunk
         end
         data = JSON.parse(full_body)
-        Committee::ResponseValidator.new(link, validate_errors: validate_errors).call(status, headers, data)
+        Committee::ResponseValidator.new(link, validate_success_only: validate_success_only).call(status, headers, data)
       end
 
       [status, headers, response]
@@ -33,7 +40,7 @@ module Committee::Middleware
     end
 
     def validate?(status)
-      Committee::ResponseValidator.validate?(status, validate_errors: validate_errors)
+      Committee::ResponseValidator.validate?(status, validate_success_only: validate_success_only)
     end
   end
 end

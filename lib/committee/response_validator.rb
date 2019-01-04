@@ -1,18 +1,18 @@
 module Committee
   class ResponseValidator
-    attr_reader :validate_errors
+    attr_reader :validate_success_only
 
     def initialize(link, options = {})
       @link = link
-      @validate_errors = options[:validate_errors]
+      @validate_success_only = options[:validate_success_only]
 
       @validator = JsonSchema::Validator.new(target_schema(link))
     end
 
     def self.validate?(status, options = {})
-      validate_errors = options[:validate_errors]
+      validate_success_only = options[:validate_success_only]
 
-      status != 204 and validate_errors || (200...300).include?(status)
+      status != 204 and !validate_success_only || (200...300).include?(status)
     end
 
     def call(status, headers, data)
@@ -41,7 +41,7 @@ module Committee
         return if data == nil
       end
 
-      if self.class.validate?(status, validate_errors: validate_errors) && !@validator.validate(data)
+      if self.class.validate?(status, validate_success_only: validate_success_only) && !@validator.validate(data)
         errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
         raise InvalidResponse, "Invalid response.\n\n#{errors}"
       end
