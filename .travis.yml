@@ -9,6 +9,9 @@ rvm:
   - 2.6.0
   - ruby-head
 
+before_install:
+  - gem install bundler -v '< 2'
+
 cache: bundler
 
 script: bundle exec rake
