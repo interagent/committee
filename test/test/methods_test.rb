@@ -27,7 +27,6 @@ describe Committee::Test::Methods do
     @committee_router = nil
     @committee_schema = nil
     @committee_options = nil
-    @validate_errors = nil
   end
 
   describe "Hyper-Schema" do

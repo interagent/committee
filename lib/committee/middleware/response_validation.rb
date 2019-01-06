@@ -5,13 +5,6 @@ module Committee::Middleware
     def initialize(app, options = {})
       super
       @validate_success_only = options[:validate_success_only]
-
-      unless options[:validate_errors].nil?
-        @validate_success_only = !options[:validate_errors]
-        Committee.warn_deprecated("Committee: validate_errors option is deprecated; " \
-        "please use validate_success_only=#{@validate_success_only}.")
-      end
-
       @error_handler = options[:error_handler]
     end
 
