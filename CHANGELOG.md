@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.2.2 (2019-01-06)
+* bugfix for datetime validate (#20)
+
 ## 0.2.1 (2019-01-03)
 * raise error when invalid datetime format (#19)
 
