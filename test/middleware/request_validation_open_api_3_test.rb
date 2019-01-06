@@ -95,19 +95,16 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  # TODO: support date-time object format check
-=begin
   it "passes given an invalid datetime string with coerce_date_times enabled" do
     @app = new_rack_app(open_api_3: open_api_3_schema, coerce_date_times: true)
     params = {
         "datetime_string" => "invalid_datetime_format"
     }
-    get "/string_params_coercer", JSON.generate(params)
+    get "/string_params_coercer", params
 
     assert_equal 400, last_response.status
-    assert_match(/invalid request/i, last_response.body)
+    assert_match(/invalid_datetime/i, last_response.body)
   end
-=end
 
   it "passes a nested object with recursive option" do
     params = {
