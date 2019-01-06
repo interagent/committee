@@ -428,7 +428,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
       end
 
       context 'datetime' do
-        let(:params) { { 'datetime' => datetime_str } }
+        let(:params) { { 'datetime' => datetime_str, 'string' => 'str' } }
         let(:request_path) { '/validate' }
 
         let(:datetime_str) { '2016-04-01T16:00:00+09:00' }
@@ -437,6 +437,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
           subject
 
           expect(params['datetime'].class).to eq DateTime
+          expect(params['string'].class).to eq String
         end
       end
 

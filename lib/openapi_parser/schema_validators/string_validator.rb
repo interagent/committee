@@ -14,8 +14,8 @@ class OpenAPIParser::SchemaValidator
       return [nil, err] if err
 
       unless @datetime_coerce_class.nil?
-        value = coerce_date_time(value, schema)
-        return OpenAPIParser::ValidateError.build_error_result(value, schema) unless value.kind_of?(@datetime_coerce_class)
+        value, err = coerce_date_time(value, schema)
+        return [nil, err] if err
       end
 
       [value, nil]
@@ -25,17 +25,19 @@ class OpenAPIParser::SchemaValidator
 
       # @param [OpenAPIParser::Schemas::Schema] schema
       def coerce_date_time(value, schema)
-        (schema.format == 'date-time') ? parse_date_time(value) : value
+        return parse_date_time(value, schema) if schema.format == 'date-time'
+
+        [value, nil]
       end
 
-      def parse_date_time(value)
+      def parse_date_time(value, schema)
         begin
-          return @datetime_coerce_class.parse(value)
+          return @datetime_coerce_class.parse(value), nil
         rescue ArgumentError => e
           raise e unless e.message =~ /invalid date/
         end
 
-        value
+        OpenAPIParser::ValidateError.build_error_result(value, schema)
       end
   end
 end
