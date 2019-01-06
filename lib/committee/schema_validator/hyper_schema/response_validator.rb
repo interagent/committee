@@ -1,10 +1,10 @@
 module Committee
   class SchemaValidator::HyperSchema::ResponseValidator
-    attr_reader :validate_errors
+    attr_reader :validate_success_only
 
     def initialize(link, options = {})
       @link = link
-      @validate_errors = options[:validate_errors]
+      @validate_success_only = options[:validate_success_only]
 
       @validator = JsonSchema::Validator.new(target_schema(link))
     end
@@ -35,7 +35,7 @@ module Committee
         return if data == nil
       end
 
-      if Committee::Middleware::ResponseValidation.validate?(status, validate_errors) && !@validator.validate(data)
+      if Committee::Middleware::ResponseValidation.validate?(status, validate_success_only) && !@validator.validate(data)
         errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
         raise InvalidResponse, "Invalid response.\n\n#{errors}"
       end

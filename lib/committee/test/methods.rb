@@ -3,7 +3,6 @@ module Committee::Test
     def assert_schema_conform
       @schema ||= Committee::Middleware::Base.get_schema(committee_options)
       @router ||= @schema.build_router(committee_options)
-      @validate_errors ||= committee_options[:validate_errors]
 
       v = @router.build_schema_validator(request_object)
 
@@ -29,7 +28,7 @@ module Committee::Test
     end
 
     def validate_response?(status)
-      Committee::Middleware::ResponseValidation.validate?(status, @validate_errors)
+      Committee::Middleware::ResponseValidation.validate?(status, false)
     end
   end
 end

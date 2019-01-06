@@ -15,8 +15,8 @@ describe Committee::Middleware::ResponseValidation do
 
   it "doesn't call error_handler when response is valid" do
     called = false
-    pr = ->(e) { called = true }
-    @app = new_rack_app(JSON.generate([ValidApp]), {}, schema: hyper_schema)
+    pr = ->(_e) { called = true }
+    @app = new_rack_app(JSON.generate([ValidApp]), {}, schema: hyper_schema, error_handler: pr)
     get "/apps"
     assert !called, "error_handler is called"
   end
@@ -41,9 +41,20 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 404, last_response.status
   end
 
-  it "optionally validates non-2xx invalid responses" do
+  it "optionally validates non-2xx invalid responses and deprecated option" do
+    mock(Committee).warn_deprecated.with_any_args
+
     @app = new_rack_app("", {}, app_status: 404, validate_errors: true,
-      schema: hyper_schema)
+                        schema: hyper_schema)
+
+    get "/apps"
+    assert_equal 500, last_response.status
+    assert_match(/valid JSON/i, last_response.body)
+  end
+
+  it "optionally validates non-2xx invalid responses" do
+    @app = new_rack_app("", {}, app_status: 404, validate_success_only: false,
+                        schema: hyper_schema)
 
     get "/apps"
     assert_equal 500, last_response.status
