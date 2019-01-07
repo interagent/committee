@@ -8,14 +8,8 @@ module Committee
       @validate_errors = validator_option.validate_errors
     end
 
-    def self.validate?(status, options = {})
-      validate_errors = options[:validate_errors]
-
-      status != 204 && (validate_errors || (200...300).include?(status))
-    end
-
     def call(status, headers, data, strict)
-      return unless self.class.validate?(status, validate_errors: validate_errors)
+      return unless Committee::Middleware::ResponseValidation.validate?(status, validate_errors)
 
       content_type = headers['Content-Type'].to_s.split(";").first.to_s
       operation_wrapper.validate_response_params(status, content_type, data, strict)

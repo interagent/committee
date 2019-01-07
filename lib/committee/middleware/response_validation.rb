@@ -12,7 +12,7 @@ module Committee::Middleware
       status, headers, response = @app.call(request.env)
 
       v = build_schema_validator(request)
-      v.response_validate(status, headers, response) if v.link_exist? && validate?(status)
+      v.response_validate(status, headers, response) if v.link_exist? && self.class.validate?(status, validate_errors)
 
       [status, headers, response]
     rescue Committee::InvalidResponse
@@ -25,8 +25,10 @@ module Committee::Middleware
       @error_class.new(500, :invalid_response, "Response wasn't valid JSON.").render
     end
 
-    def validate?(status)
-      status != 204 and validate_errors || (200...300).include?(status)
+    class << self
+      def validate?(status, validate_errors)
+        status != 204 && (validate_errors || (200...300).include?(status))
+      end
     end
   end
 end

@@ -13,7 +13,7 @@ module Committee::Test
       end
 
       status, headers, body = response_data
-      v.response_validate(status, headers, [body], true) if validate?(status)
+      v.response_validate(status, headers, [body], true) if validate_response?(status)
     end
 
     def committee_options
@@ -28,9 +28,8 @@ module Committee::Test
       raise "please set response data like 'last_response.status, last_response.headers, last_response.body'"
     end
 
-    # TODO: refactoring
-    def validate?(status)
-      status != 204 and @validate_errors || (200...300).include?(status)
+    def validate_response?(status)
+      Committee::Middleware::ResponseValidation.validate?(status, @validate_errors)
     end
   end
 end

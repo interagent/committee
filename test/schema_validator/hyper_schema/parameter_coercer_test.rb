@@ -1,8 +1,8 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
 require "stringio"
 
-describe Committee::ParameterCoercer do
+describe Committee::SchemaValidator::HyperSchema::ParameterCoercer do
   before do
     @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
@@ -106,6 +106,6 @@ describe Committee::ParameterCoercer do
 
   def call(params, options={})
     link = Committee::Drivers::HyperSchema::Link.new(@link)
-    Committee::ParameterCoercer.new(params, link.schema, options).call!
+    Committee::SchemaValidator::HyperSchema::ParameterCoercer.new(params, link.schema, options).call!
   end
 end
