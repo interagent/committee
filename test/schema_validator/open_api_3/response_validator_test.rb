@@ -22,10 +22,16 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
     call_response_validator
   end
 
-  # TODO: raise error option
-  it "passes through a valid response with no registered Content-Type" do
+  it "passes through a valid response with no registered Content-Type with strict = false" do
     @headers = { "Content-Type" => "application/xml" }
     call_response_validator
+  end
+
+  it "passes through a valid response with no registered Content-Type with strict = true" do
+    @headers = { "Content-Type" => "application/xml" }
+    assert_raises(Committee::InvalidResponse) {
+      call_response_validator(true)
+    }
   end
 
   # TODO: raise error option
@@ -48,8 +54,10 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
 
   private
 
-  def call_response_validator
+  def call_response_validator(strict = false)
     @operation_object = open_api_3_schema.operation_object(@path, @method)
-    Committee::SchemaValidator::OpenAPI3::ResponseValidator.new(@operation_object, @validator_option).call(@status, @headers, @data)
+    Committee::SchemaValidator::OpenAPI3::ResponseValidator.
+        new(@operation_object, @validator_option).
+        call(@status, @headers, @data, strict)
   end
 end

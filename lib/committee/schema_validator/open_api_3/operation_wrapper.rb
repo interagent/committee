@@ -27,10 +27,11 @@ module Committee
       request_operation.validate_request_parameter(params, options)
     end
 
-    def validate_response_params(status_code, content_type, params)
-      return request_operation.validate_response_body(status_code, content_type, params)
+    # @param [Boolean] strict when not content_type or status code definition, raise error
+    def validate_response_params(status_code, content_type, params, strict)
+      return request_operation.validate_response_body(status_code, content_type, params, response_validate_options(strict))
     rescue OpenAPIParser::OpenAPIError => e
-      raise Committee::InvalidRequest.new(e.message)
+      raise Committee::InvalidResponse.new(e.message)
     end
 
     def validate_request_params(params, content_type, validator_option)
@@ -96,6 +97,10 @@ module Committee
       return request_operation.validate_request_body(content_type, params, build_openapi_parser_post_option(validator_option))
     rescue => e
       raise Committee::InvalidRequest.new(e.message)
+    end
+
+    def response_validate_options(strict)
+      ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(strict: strict)
     end
   end
 end

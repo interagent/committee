@@ -60,7 +60,7 @@ Default option values:
 |optimistic_json| false | not support yet|
 |raise| false | false|
 |strict| false | false|
-|prefix| support | not support yet|
+|prefix| false | false |
 |error_class| support | support |
 
 (Hyper-Schema and OpenAPI2 is same default)
