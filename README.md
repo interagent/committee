@@ -133,7 +133,8 @@ Options:
 * `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
-* `validate_errors`: Also validate non-2xx responses (defaults to `false`).
+* `validate_errors`: Also validate non-2xx responses (defaults to `false`). *deprecated please use validate_success_only.*
+* `validate_success_only`: Also validate non-2xx responses only (defaults to `true`). This is same mean validate_errors=false.
 * `error_handler`: A proc which will be called when error occurs. Take an Error instance as first argument.
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
