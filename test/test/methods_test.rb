@@ -27,7 +27,6 @@ describe Committee::Test::Methods do
     @committee_router = nil
     @committee_schema = nil
     @committee_options = nil
-    @validate_errors = nil
   end
 
   describe "Hyper-Schema" do
@@ -80,7 +79,6 @@ describe Committee::Test::Methods do
       end
 
       it "detects an invalid response status code" do
-        @committee_options.merge!(validate_errors: true)
         @app = new_rack_app(JSON.generate([@correct_response]), {}, 419)
 
         get "/characters"
@@ -89,15 +87,6 @@ describe Committee::Test::Methods do
           assert_schema_conform
         end
         assert_match(/don't exist status code definition/i, e.message)
-      end
-
-      it "detects an invalid response status code with validate_errors = false" do
-        @committee_options.merge!(validate_errors: false)
-        @app = new_rack_app(JSON.generate([@correct_response]), {}, 419)
-
-        get "/characters"
-
-        assert_schema_conform
       end
     end
   end

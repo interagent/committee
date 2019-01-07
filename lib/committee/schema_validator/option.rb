@@ -1,6 +1,6 @@
 class Committee::SchemaValidator
   class Option
-    attr_reader :coerce_recursive, :params_key, :allow_form_params, :allow_query_params, :optimistic_json, :coerce_form_params, :headers_key, :coerce_query_params, :coerce_path_params, :check_content_type, :check_header, :coerce_date_times, :validate_errors, :prefix
+    attr_reader :coerce_recursive, :params_key, :allow_form_params, :allow_query_params, :optimistic_json, :coerce_form_params, :headers_key, :coerce_query_params, :coerce_path_params, :check_content_type, :check_header, :coerce_date_times, :prefix, :validate_success_only
 
     def initialize(options, schema, schema_type)
       @headers_key         = options[:headers_key] || "committee.headers"
@@ -9,7 +9,7 @@ class Committee::SchemaValidator
       @prefix              = options[:prefix]
 
       # response option
-      @validate_errors     = options[:validate_errors]
+      @validate_success_only = options[:validate_success_only]
 
       @coerce_recursive    = options.fetch(:coerce_recursive, true)
       @allow_form_params   = options.fetch(:allow_form_params, true)

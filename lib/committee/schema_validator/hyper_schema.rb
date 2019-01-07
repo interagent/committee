@@ -33,7 +33,7 @@ class Committee::SchemaValidator
         full_body << chunk
       end
       data = JSON.parse(full_body)
-      Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link, validate_errors: validator_option.validate_errors).call(status, headers, data)
+      Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link, validate_success_only: validator_option.validate_success_only).call(status, headers, data)
     end
 
     def link_exist?

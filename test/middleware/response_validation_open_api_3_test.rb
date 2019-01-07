@@ -109,7 +109,7 @@ describe Committee::Middleware::ResponseValidation do
                                app_status: 400,
                                open_api_3: open_api_3_schema,
                                raise: true,
-                               validate_errors: true)
+                               validate_success_only: false)
 
 
       e = assert_raises(Committee::InvalidResponse) do
@@ -118,13 +118,13 @@ describe Committee::Middleware::ResponseValidation do
       assert_match(/1 class is String/i, e.message)
     end
 
-    it "detects an invalid response status code with validate_errors = false" do
+    it "detects an invalid response status code with validate_success_only=true" do
       @app = new_response_rack({ string_1: :honoka }.to_json,
                                {},
                                app_status: 400,
                                open_api_3: open_api_3_schema,
                                raise: true,
-                               validate_errors: false)
+                               validate_success_only: true)
 
 
       get "/characters"

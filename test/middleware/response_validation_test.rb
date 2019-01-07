@@ -42,8 +42,8 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "optionally validates non-2xx invalid responses" do
-    @app = new_rack_app("", {}, app_status: 404, validate_errors: true,
-      schema: hyper_schema)
+    @app = new_rack_app("", {}, app_status: 404, validate_success_only: false,
+                        schema: hyper_schema)
 
     get "/apps"
     assert_equal 500, last_response.status

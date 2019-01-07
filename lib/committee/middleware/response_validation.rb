@@ -1,10 +1,10 @@
 module Committee::Middleware
   class ResponseValidation < Base
-    attr_reader :validate_errors
+    attr_reader :validate_success_only
 
     def initialize(app, options = {})
       super
-      @validate_errors = options[:validate_errors]
+      @validate_success_only = options[:validate_success_only]
       @error_handler = options[:error_handler]
     end
 
@@ -12,7 +12,7 @@ module Committee::Middleware
       status, headers, response = @app.call(request.env)
 
       v = build_schema_validator(request)
-      v.response_validate(status, headers, response) if v.link_exist? && self.class.validate?(status, validate_errors)
+      v.response_validate(status, headers, response) if v.link_exist? && self.class.validate?(status, validate_success_only)
 
       [status, headers, response]
     rescue Committee::InvalidResponse
@@ -26,8 +26,8 @@ module Committee::Middleware
     end
 
     class << self
-      def validate?(status, validate_errors)
-        status != 204 && (validate_errors || (200...300).include?(status))
+      def validate?(status, validate_success_only)
+        status != 204 && (!validate_success_only || (200...300).include?(status))
       end
     end
   end
