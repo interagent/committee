@@ -18,7 +18,7 @@ class Committee::SchemaValidator
 
       request_schema_validation(request)
 
-      @operation_object&.coerce_request_parameter(request.env["rack.request.query_hash"], validator_option) if !request.GET.nil? && !request.env["rack.request.query_hash"].empty?
+      @operation_object&.coerce_request_parameter(request.env["rack.request.query_hash"], header(request), validator_option) if !request.GET.nil? && !request.env["rack.request.query_hash"].empty?
     end
 
     def response_validate(status, headers, response, test_method = false)
@@ -55,7 +55,11 @@ class Committee::SchemaValidator
       return unless @operation_object
 
       validator = Committee::SchemaValidator::OpenAPI3::RequestValidator.new(@operation_object, validator_option: validator_option)
-      validator.call(request, request.env[validator_option.params_key], request.env[validator_option.headers_key])
+      validator.call(request, request.env[validator_option.params_key], header(request))
+    end
+
+    def header(request)
+      request.env[validator_option.headers_key]
     end
 
     def request_unpack(request)

@@ -88,11 +88,14 @@ module Committee
 
     def headers
       env = @request.env
-      env.keys.grep(/HTTP_/).inject({}) do |headers, key|
+      base = env.keys.grep(/HTTP_/).inject({}) do |headers, key|
         headerized_key = key.gsub(/^HTTP_/, '').gsub(/_/, '-')
         headers[headerized_key] = env[key]
         headers
       end
+
+      base.merge!('Content-Type' => env['CONTENT_TYPE']) if env['CONTENT_TYPE']
+      base
     end
   end
 end

@@ -14,7 +14,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       open_api_3_schema.operation_object(@path, @method)
     end
 
-    CONTENT_TYPE = 'application/json'
+    HEADER = { 'Content-Type' => 'application/json' }
 
     SCHEMA_PROPERTIES_PAIR = [
         ['string', 'str'],
@@ -25,7 +25,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
     ]
 
     it 'correct data' do
-      operation_object.validate_request_params(SCHEMA_PROPERTIES_PAIR.to_h, CONTENT_TYPE, @validator_option)
+      operation_object.validate_request_params(SCHEMA_PROPERTIES_PAIR.to_h, HEADER, @validator_option)
       assert true
     end
 
@@ -39,7 +39,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
                                              "number_1" => nil
                                          }
                                  },
-                                               CONTENT_TYPE,
+                                               HEADER,
                                                @validator_option)
 
       assert true
@@ -47,7 +47,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
     it 'invalid params' do
       e = assert_raises(Committee::InvalidRequest) {
-        operation_object.validate_request_params({"string" => 1}, CONTENT_TYPE, @validator_option)
+        operation_object.validate_request_params({"string" => 1}, HEADER, @validator_option)
       }
 
       # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
@@ -56,10 +56,10 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
     it 'support put method' do
       @method = "put"
-      operation_object.validate_request_params({"string" => "str"}, CONTENT_TYPE, @validator_option)
+      operation_object.validate_request_params({"string" => "str"}, HEADER, @validator_option)
 
       e = assert_raises(Committee::InvalidRequest) {
-        operation_object.validate_request_params({"string" => 1}, CONTENT_TYPE, @validator_option)
+        operation_object.validate_request_params({"string" => 1}, HEADER, @validator_option)
       }
 
       # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
@@ -68,17 +68,17 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
     it 'support patch method' do
       @method = "patch"
-      operation_object.validate_request_params({"integer" => 1}, CONTENT_TYPE, @validator_option)
+      operation_object.validate_request_params({"integer" => 1}, HEADER, @validator_option)
 
       e = assert_raises(Committee::InvalidRequest) {
-        operation_object.validate_request_params({"integer" => "str"}, CONTENT_TYPE, @validator_option)
+        operation_object.validate_request_params({"integer" => "str"}, HEADER, @validator_option)
       }
 
       assert e.message.start_with?("str class is String but it's not valid")
     end
 
     it 'unknown param' do
-      operation_object.validate_request_params({"unknown" => 1}, CONTENT_TYPE, @validator_option)
+      operation_object.validate_request_params({"unknown" => 1}, HEADER, @validator_option)
     end
 
     describe 'support get method' do
@@ -89,13 +89,13 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       it 'correct' do
         operation_object.validate_request_params(
             {"query_string" => "query", "query_integer_list" => [1, 2]},
-            CONTENT_TYPE,
+            HEADER,
             @validator_option
         )
 
         operation_object.validate_request_params(
             {"query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => 1},
-            CONTENT_TYPE,
+            HEADER,
             @validator_option
         )
 
@@ -104,7 +104,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
       it 'not exist required' do
         e = assert_raises(Committee::InvalidRequest) {
-          operation_object.validate_request_params({"query_integer_list" => [1, 2]}, CONTENT_TYPE, @validator_option)
+          operation_object.validate_request_params({"query_integer_list" => [1, 2]}, HEADER, @validator_option)
         }
 
         assert e.message.start_with?("required parameters query_string not exist in")
@@ -114,7 +114,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         e = assert_raises(Committee::InvalidRequest) {
           operation_object.validate_request_params(
               {"query_string" => 1, "query_integer_list" => [1, 2], "optional_integer" => 1},
-              CONTENT_TYPE,
+              HEADER,
               @validator_option
           )
         }
@@ -131,14 +131,14 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       end
 
       it 'correct' do
-        operation_object.validate_request_params({"limit" => "1"}, CONTENT_TYPE, @validator_option)
+        operation_object.validate_request_params({"limit" => "1"}, HEADER, @validator_option)
 
         assert true
       end
 
       it 'invalid type' do
         e = assert_raises(Committee::InvalidRequest) {
-          operation_object.validate_request_params({"limit" => "a"}, CONTENT_TYPE, @validator_option)
+          operation_object.validate_request_params({"limit" => "a"}, HEADER, @validator_option)
         }
 
         assert e.message.start_with?("a class is String but")

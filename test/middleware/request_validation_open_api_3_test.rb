@@ -343,6 +343,25 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 'Committee OpenAPI3 not support head method', e.message
   end
 
+  describe 'check header' do
+    it 'no required header' do
+      @app = new_rack_app(open_api_3: open_api_3_schema, check_header: true)
+
+      get "/header"
+
+      assert_equal 400, last_response.status
+      assert_match(/required parameters integer not exist/i, last_response.body)
+    end
+
+    it 'no required header but not check' do
+      @app = new_rack_app(open_api_3: open_api_3_schema, check_header: false)
+
+      get "/header"
+
+      assert_equal 200, last_response.status
+    end
+  end
+
   private
 
   def new_rack_app(options = {})

@@ -40,6 +40,7 @@ Option values and defaults:
 |coerce_path_params| false | true | The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path. |
 |coerce_recursive| false | always true | Coerce data in arrays and other nested objects |
 |check_content_type | true | true | Specifies that `Content-Type` should be verified according to JSON Hyper-schema or OpenAPI3 definition. |
+|check_header | true | true | Check header data using JSON Hyper-schema or OpenAPI3 definition. |
 |optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |
