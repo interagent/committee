@@ -89,7 +89,8 @@ describe Committee::Middleware::RequestValidation do
 
     @app = new_rack_app_with_lambda(check_parameter, open_api_3: open_api_3_schema, coerce_date_times: true, coerce_recursive: true)
 
-    post "/string_params_coercer", params
+    header "Content-Type", "application/json"
+    post "/string_params_coercer", JSON.generate(params)
 
     assert_equal 200, last_response.status
   end
@@ -263,17 +264,6 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
-  # TODO: support check_content_type
-  it "OpenAPI not support check_content_type" do
-    @app = new_rack_app(open_api_3: open_api_3_schema, check_content_type: true)
-
-    e = assert_raises(RuntimeError) {
-      post "/characters", {}
-    }
-
-    assert_equal 'OpenAPI3 not support @check_content_type option', e.message
-  end
-=begin
   it "optionally content_type check" do
     @app = new_rack_app(check_content_type: true, open_api_3: open_api_3_schema)
     params = {
@@ -283,7 +273,6 @@ describe Committee::Middleware::RequestValidation do
     post "/characters", JSON.generate(params)
     assert_equal 400, last_response.status
   end
-=end
 
   it "optionally skip content_type check" do
     @app = new_rack_app(check_content_type: false, open_api_3: open_api_3_schema)

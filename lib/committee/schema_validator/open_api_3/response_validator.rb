@@ -25,11 +25,5 @@ module Committee
 
     # @return [Committee::SchemaValidator::OpenAPI3::OperationWrapper]
     attr_reader :operation_wrapper
-
-    def check_content_type!(response)
-      # TODO: fix
-      # OpenAPI3 support multi content type definitions, so we should get OperationObject by content type and this function don't need
-      # We should support if content exist and not exist content-type definition, raise error (if not exist content, we don't raise error)
-    end
   end
 end

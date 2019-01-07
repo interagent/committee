@@ -27,12 +27,8 @@ module Committee
 
     private
 
-    def request_media_type(request)
-      request.content_type.to_s.split(";").first.to_s
-    end
-
     def check_content_type!(request, data)
-      content_type = request_media_type(request)
+      content_type = ::Committee::SchemaValidator.request_media_type(request)
       if content_type && @link.enc_type && !empty_request?(request)
         unless Rack::Mime.match?(content_type, @link.enc_type)
           raise Committee::InvalidRequest,

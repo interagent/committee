@@ -20,6 +20,7 @@ require_relative "committee/middleware/response_validation"
 require_relative "committee/middleware/stub"
 
 require_relative "committee/schema_validator/option"
+require_relative "committee/schema_validator/schema_validator"
 require_relative "committee/schema_validator/open_api_3"
 require_relative "committee/schema_validator/open_api_3/router"
 require_relative "committee/schema_validator/open_api_3/operation_wrapper"
