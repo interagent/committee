@@ -79,17 +79,26 @@ describe Committee::Test::Methods do
         assert_match(/don't exist response definition/i, e.message)
       end
 
-      # TODO: we need add all status code check option (we'll implement later)
-=begin
       it "detects an invalid response status code" do
+        @committee_options.merge!(validate_errors: true)
         @app = new_rack_app(JSON.generate([@correct_response]), {}, 419)
+
         get "/characters"
+
         e = assert_raises(Committee::InvalidResponse) do
           assert_schema_conform
         end
         assert_match(/don't exist status code definition/i, e.message)
       end
-=end
+
+      it "detects an invalid response status code with validate_errors = false" do
+        @committee_options.merge!(validate_errors: false)
+        @app = new_rack_app(JSON.generate([@correct_response]), {}, 419)
+
+        get "/characters"
+
+        assert_schema_conform
+      end
     end
   end
 
