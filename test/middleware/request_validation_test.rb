@@ -374,19 +374,19 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "OpenAPI3 pass through a valid request" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
     get "/characters"
     assert_equal 200, last_response.status
   end
 
   it "OpenAPI3 pass not exist href" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
     get "/unknown"
     assert_equal 200, last_response.status
   end
 
   it "OpenAPI3 pass not exist href in strict mode" do
-    @app = new_rack_app(open_api_3: open_api_3_schema, strict: true)
+    @app = new_rack_app(schema: open_api_3_schema, strict: true)
     get "/unknown"
     assert_equal 404, last_response.status
   end

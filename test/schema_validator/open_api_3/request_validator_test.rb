@@ -9,7 +9,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
     end
 
     it "optionally content_type check" do
-      @app = new_rack_app(check_content_type: true, open_api_3: open_api_3_schema)
+      @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
       params = {
           "string_post_1" => "cloudnasium"
       }
@@ -19,7 +19,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
     end
 
     it "optionally skip content_type check" do
-      @app = new_rack_app(check_content_type: false, open_api_3: open_api_3_schema)
+      @app = new_rack_app(check_content_type: false, schema: open_api_3_schema)
       params = {
           "string_post_1" => "cloudnasium"
       }
