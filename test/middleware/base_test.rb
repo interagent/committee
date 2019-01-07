@@ -20,7 +20,7 @@ describe Committee::Middleware::Base do
   end
 
   it "accepts just a OpenAPI3 schema object" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
     params = {
         "name" => "cloudnasium"
     }
@@ -98,7 +98,24 @@ describe Committee::Middleware::Base do
       post "/apps"
     end
 
-    assert_equal "Committee: need option `schema` or `open_api_3`", e.message
+    assert_equal "Committee: need option `schema` or `json_file` or `yaml_file`", e.message
+  end
+
+  describe 'initialize option' do
+    it "json file option with hyper-schema" do
+      b = Committee::Middleware::Base.new(nil, json_file: hyper_schema_filepath)
+      assert_kind_of Committee::Drivers::HyperSchema::Schema, b.instance_variable_get(:@schema)
+    end
+
+    it "json file option with OpenAPI2" do
+      b = Committee::Middleware::Base.new(nil, json_file: open_api_2_filepath)
+      assert_kind_of Committee::Drivers::OpenAPI2::Schema, b.instance_variable_get(:@schema)
+    end
+
+    it "yaml file option with OpenAPI2" do
+      b = Committee::Middleware::Base.new(nil, yaml_file: open_api_3_filepath)
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, b.instance_variable_get(:@schema)
+    end
   end
 
   private

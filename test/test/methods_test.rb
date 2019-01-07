@@ -57,7 +57,7 @@ describe Committee::Test::Methods do
 
   describe "OpenAPI3" do
     before do
-      @committee_options = {open_api_3: open_api_3_schema}
+      @committee_options = {schema: open_api_3_schema}
 
       @correct_response = { string_1: :honoka }
     end

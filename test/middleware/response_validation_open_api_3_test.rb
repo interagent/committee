@@ -10,13 +10,13 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "passes through a valid response" do
-    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, open_api_3: open_api_3_schema)
+    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, schema: open_api_3_schema)
     get "/characters"
     assert_equal 200, last_response.status
   end
 
   it "passes through a invalid json" do
-    @app = new_response_rack("not_json", {}, open_api_3: open_api_3_schema)
+    @app = new_response_rack("not_json", {}, schema: open_api_3_schema)
 
     get "/characters"
 
@@ -25,13 +25,13 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "passes through not definition" do
-    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, open_api_3: open_api_3_schema)
+    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, schema: open_api_3_schema)
     get "/no_data"
     assert_equal 200, last_response.status
   end
 
   it "detects a response invalid due to schema" do
-    @app = new_response_rack("[]", {}, open_api_3: open_api_3_schema, raise: true)
+    @app = new_response_rack("[]", {}, schema: open_api_3_schema, raise: true)
 
     e = assert_raises(Committee::InvalidResponse) {
       get "/characters"
@@ -41,19 +41,19 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "passes through a 204 (no content) response" do
-    @app = new_response_rack("", {}, {open_api_3: open_api_3_schema}, {status: 204})
+    @app = new_response_rack("", {}, {schema: open_api_3_schema}, {status: 204})
     post "/validate"
     assert_equal 204, last_response.status
   end
 
   it "passes through a valid response with prefix" do
-    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, open_api_3: open_api_3_schema, prefix: "/v1")
+    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, schema: open_api_3_schema, prefix: "/v1")
     get "/v1/characters"
     assert_equal 200, last_response.status
   end
 
   it "passes through a invalid json with prefix" do
-    @app = new_response_rack("not_json", {}, open_api_3: open_api_3_schema, prefix: "/v1")
+    @app = new_response_rack("not_json", {}, schema: open_api_3_schema, prefix: "/v1")
 
     get "/v1/characters"
 
@@ -62,14 +62,14 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "rescues JSON errors" do
-    @app = new_response_rack("_42", {}, open_api_3: open_api_3_schema, raise: true)
+    @app = new_response_rack("_42", {}, schema: open_api_3_schema, raise: true)
     assert_raises(Committee::InvalidResponse) do
       get "/characters"
     end
   end
 
   it "not parameter requset" do
-    @app = new_response_rack({integer: '1'}.to_json, {}, open_api_3: open_api_3_schema, raise: true)
+    @app = new_response_rack({integer: '1'}.to_json, {}, schema: open_api_3_schema, raise: true)
 
     assert_raises(Committee::InvalidResponse) do
       patch "/validate_no_parameter", {no_schema: 'no'}
@@ -78,7 +78,7 @@ describe Committee::Middleware::ResponseValidation do
 
   describe 'check header' do
     it 'valid type header' do
-      @app = new_response_rack({}.to_json, {'x-limit' => 1}, open_api_3: open_api_3_schema, raise: true)
+      @app = new_response_rack({}.to_json, {'x-limit' => 1}, schema: open_api_3_schema, raise: true)
 
       get "/header"
 
@@ -86,7 +86,7 @@ describe Committee::Middleware::ResponseValidation do
     end
 
     it 'invalid type header' do
-      @app = new_response_rack({}.to_json, {'x-limit' => '1'}, open_api_3: open_api_3_schema, raise: true)
+      @app = new_response_rack({}.to_json, {'x-limit' => '1'}, schema: open_api_3_schema, raise: true)
 
       assert_raises(Committee::InvalidResponse) do
         get "/header"
@@ -94,7 +94,7 @@ describe Committee::Middleware::ResponseValidation do
     end
 
     it 'invalid type but not check' do
-      @app = new_response_rack({}.to_json, {'x-limit' => '1'}, open_api_3: open_api_3_schema, raise: true, check_header: false)
+      @app = new_response_rack({}.to_json, {'x-limit' => '1'}, schema: open_api_3_schema, raise: true, check_header: false)
 
       get "/header"
 
@@ -107,7 +107,7 @@ describe Committee::Middleware::ResponseValidation do
       @app = new_response_rack({ integer: '1' }.to_json,
                                {},
                                app_status: 400,
-                               open_api_3: open_api_3_schema,
+                               schema: open_api_3_schema,
                                raise: true,
                                validate_success_only: false)
 
@@ -122,7 +122,7 @@ describe Committee::Middleware::ResponseValidation do
       @app = new_response_rack({ string_1: :honoka }.to_json,
                                {},
                                app_status: 400,
-                               open_api_3: open_api_3_schema,
+                               schema: open_api_3_schema,
                                raise: true,
                                validate_success_only: true)
 

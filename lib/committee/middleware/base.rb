@@ -23,22 +23,21 @@ module Committee::Middleware
 
     class << self
       def get_schema(options)
-        open_api_3 = options[:open_api_3]
-        return open_api_3 if open_api_3
-
         schema = options[:schema]
+        unless schema
+          schema = Committee::Drivers::load_from_json(options[:json_file]) if options[:json_file]
+          schema = Committee::Drivers::load_from_yaml(options[:yaml_file]) if options[:yaml_file]
 
-        if schema
-          # Expect the type we want by now. If we don't have it, the user passed
-          # something else non-standard in.
-          if !schema.is_a?(Committee::Drivers::Schema)
-            raise ArgumentError, "Committee: schema expected to be an instance of Committee::Drivers::Schema."
-          end
-
-          return schema
+          raise(ArgumentError, "Committee: need option `schema` or `json_file` or `yaml_file`") unless schema
         end
 
-        raise(ArgumentError, "Committee: need option `schema` or `open_api_3`")
+        # Expect the type we want by now. If we don't have it, the user passed
+        # something else non-standard in.
+        if !schema.is_a?(Committee::Drivers::Schema)
+          raise ArgumentError, "Committee: schema expected to be an instance of Committee::Drivers::Schema."
+        end
+
+        return schema
       end
     end
 

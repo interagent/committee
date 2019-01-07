@@ -8,7 +8,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "OpenAPI3 pass through a valid request" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
     params = {
         "string_post_1" => "cloudnasium"
     }
@@ -23,7 +23,7 @@ describe Committee::Middleware::RequestValidation do
       [200, {integer: 1}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter_string, open_api_3: open_api_3_schema)
+    @app = new_rack_app_with_lambda(check_parameter_string, schema: open_api_3_schema)
 
     put "/validate_no_parameter", {no_schema: 'no'}
   end
@@ -36,7 +36,7 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter, open_api_3: open_api_3_schema, coerce_date_times: true)
+    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, coerce_date_times: true)
 
     get "/string_params_coercer", params
     assert_equal 200, last_response.status
@@ -87,7 +87,7 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter, open_api_3: open_api_3_schema, coerce_date_times: true, coerce_recursive: true)
+    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, coerce_date_times: true, coerce_recursive: true)
 
     header "Content-Type", "application/json"
     post "/string_params_coercer", JSON.generate(params)
@@ -96,7 +96,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "passes given an invalid datetime string with coerce_date_times enabled" do
-    @app = new_rack_app(open_api_3: open_api_3_schema, coerce_date_times: true)
+    @app = new_rack_app(schema: open_api_3_schema, coerce_date_times: true)
     params = {
         "datetime_string" => "invalid_datetime_format"
     }
@@ -128,7 +128,7 @@ describe Committee::Middleware::RequestValidation do
                                     coerce_query_params: true,
                                     coerce_recursive: true,
                                     coerce_date_times: true,
-                                    open_api_3: open_api_3_schema)
+                                    schema: open_api_3_schema)
 
     get "/string_params_coercer", params
 
@@ -197,7 +197,7 @@ describe Committee::Middleware::RequestValidation do
 
     @app = new_rack_app_with_lambda(check_parameter,
                                     coerce_date_times: true,
-                                    open_api_3: open_api_3_schema)
+                                    schema: open_api_3_schema)
 
     header "Content-Type", "application/json"
     post "/string_params_coercer", JSON.generate(params)
@@ -205,7 +205,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "OpenAPI3 detects an invalid request" do
-    @app = new_rack_app(open_api_3: open_api_3_schema, strict: true)
+    @app = new_rack_app(schema: open_api_3_schema, strict: true)
     header "Content-Type", "application/json"
     params = {
         "string_post_1" => 1
@@ -217,7 +217,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "rescues JSON errors" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
     header "Content-Type", "application/json"
     post "/apps", "{x:y}"
     assert_equal 400, last_response.status
@@ -225,7 +225,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "take a prefix" do
-    @app = new_rack_app(prefix: "/v1", open_api_3: open_api_3_schema)
+    @app = new_rack_app(prefix: "/v1", schema: open_api_3_schema)
     params = {
         "string_post_1" => "cloudnasium"
     }
@@ -235,7 +235,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "take a prefix with invalid data" do
-    @app = new_rack_app(prefix: "/v1", open_api_3: open_api_3_schema)
+    @app = new_rack_app(prefix: "/v1", schema: open_api_3_schema)
     params = {
         "string_post_1" => 1
     }
@@ -246,7 +246,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "ignores paths outside the prefix" do
-    @app = new_rack_app(prefix: "/v1", open_api_3: open_api_3_schema)
+    @app = new_rack_app(prefix: "/v1", schema: open_api_3_schema)
     params = {
         "string_post_1" => 1
     }
@@ -256,7 +256,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "don't check prefix with no option" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
     params = {
         "string_post_1" => 1
     }
@@ -266,19 +266,19 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "OpenAPI3 pass not exist href" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
     get "/unknown"
     assert_equal 200, last_response.status
   end
 
   it "OpenAPI3 pass not exist href in strict mode" do
-    @app = new_rack_app(open_api_3: open_api_3_schema, strict: true)
+    @app = new_rack_app(schema: open_api_3_schema, strict: true)
     get "/unknown"
     assert_equal 404, last_response.status
   end
 
   it "optionally raises an error" do
-    @app = new_rack_app(raise: true, open_api_3: open_api_3_schema)
+    @app = new_rack_app(raise: true, schema: open_api_3_schema)
     header "Content-Type", "application/json"
     assert_raises(Committee::InvalidRequest) do
       post "/characters", "{x:y}"
@@ -286,14 +286,14 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "optionally coerces query params" do
-    @app = new_rack_app(coerce_query_params: true, open_api_3: open_api_3_schema)
+    @app = new_rack_app(coerce_query_params: true, schema: open_api_3_schema)
     header "Content-Type", "application/json"
     get "/string_params_coercer", {"integer_1" => "1"}
     assert_equal 200, last_response.status
   end
 
   it "still raises an error if query param coercion is not possible" do
-    @app = new_rack_app(coerce_query_params: false, open_api_3: open_api_3_schema)
+    @app = new_rack_app(coerce_query_params: false, schema: open_api_3_schema)
     header "Content-Type", "application/json"
     get "/string_params_coercer", {"integer_1" => "1"}
 
@@ -307,13 +307,13 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter, open_api_3: open_api_3_schema)
+    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema)
     get "/characters?limit=3"
     assert_equal 200, last_response.status
   end
 
   it "detects an invalid request for OpenAPI" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
     get "/characters?limit=foo"
 
     assert_equal 400, last_response.status
@@ -326,12 +326,12 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter_string, open_api_3: open_api_3_schema, coerce_path_params: true)
+    @app = new_rack_app_with_lambda(check_parameter_string, schema: open_api_3_schema, coerce_path_params: true)
     get "/coerce_path_params/1"
   end
 
   it "OpenAPI3 raise not support method" do
-    @app = new_rack_app(open_api_3: open_api_3_schema)
+    @app = new_rack_app(schema: open_api_3_schema)
 
     e = assert_raises(RuntimeError) {
       head "/characters", {}
@@ -342,7 +342,7 @@ describe Committee::Middleware::RequestValidation do
 
   describe 'check header' do
     it 'no required header' do
-      @app = new_rack_app(open_api_3: open_api_3_schema, check_header: true)
+      @app = new_rack_app(schema: open_api_3_schema, check_header: true)
 
       get "/header"
 
@@ -351,7 +351,7 @@ describe Committee::Middleware::RequestValidation do
     end
 
     it 'no required header but not check' do
-      @app = new_rack_app(open_api_3: open_api_3_schema, check_header: false)
+      @app = new_rack_app(schema: open_api_3_schema, check_header: false)
 
       get "/header"
 

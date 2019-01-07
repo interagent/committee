@@ -98,7 +98,7 @@ describe Committee::Middleware::Stub do
 
   it "caches the response if called multiple times" do
     cache = {}
-    @app = new_rack_app(cache: cache, open_api_3: open_api_3_schema)
+    @app = new_rack_app(cache: cache, schema: open_api_3_schema)
 
     assert_raises(Committee::NotSupportOpenAPI3) do
       get "/characters"
