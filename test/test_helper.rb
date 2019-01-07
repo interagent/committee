@@ -47,25 +47,27 @@ ValidPet = {
 }.freeze
 
 def hyper_schema
-  @hyper_schema ||= begin
-    driver = Committee::Drivers::HyperSchema.new
-    driver.parse(hyper_schema_data)
-  end
+  @hyper_schema ||= Committee::Drivers.load_from_json(hyper_schema_filepath)
 end
 
 def open_api_2_schema
-  @open_api_2_schema ||= begin
-    driver = Committee::Drivers::OpenAPI2.new
-    driver.parse(open_api_2_data)
-  end
+  @open_api_2_schema ||= Committee::Drivers.load_from_data(open_api_2_data)
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.
 def hyper_schema_data
-  JSON.parse(File.read("./test/data/hyperschema/paas.json"))
+  JSON.parse(File.read(hyper_schema_filepath))
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.
 def open_api_2_data
-  JSON.parse(File.read("./test/data/openapi2/petstore-expanded.json"))
+  JSON.parse(File.read(open_api_2_filepath))
+end
+
+def hyper_schema_filepath
+  "./test/data/hyperschema/paas.json"
+end
+
+def open_api_2_filepath
+  "./test/data/openapi2/petstore-expanded.json"
 end
