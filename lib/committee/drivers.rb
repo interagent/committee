@@ -29,6 +29,13 @@ module Committee
       load_from_data(YAML.load_file(filepath))
     end
 
+    # load and build drive from file
+    # @param [String] filepath
+    # @return [Committee::Driver]
+    def self.load_from_file(filepath)
+      load_from_json(filepath)
+    end
+
     # load and build drive from Hash object
     # @param [Hash] hash
     # @return [Committee::Driver]

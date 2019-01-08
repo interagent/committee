@@ -25,6 +25,7 @@ module Committee::Middleware
       def get_schema(options)
         schema = options[:schema]
         unless schema
+          schema = Committee::Drivers::load_from_file(options[:filepath]) if options[:filepath]
           schema = Committee::Drivers::load_from_json(options[:json_file]) if options[:json_file]
           schema = Committee::Drivers::load_from_yaml(options[:yaml_file]) if options[:yaml_file]
 

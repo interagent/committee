@@ -52,7 +52,7 @@ def hyper_schema
 end
 
 def open_api_2_schema
-  @open_api_2_schema ||= Committee::Drivers.load_from_data(open_api_2_data)
+  @open_api_2_schema ||= Committee::Drivers.load_from_file(open_api_2_filepath)
 end
 
 def open_api_3_schema
