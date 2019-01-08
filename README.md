@@ -251,10 +251,9 @@ end
 ## Using OpenAPI3
 
 Committee auto select parser from definition, so you don't care.
-But if you want to load from YAML file, please use `yaml_file` option.
 
 ```ruby
-use Committee::Middleware::RequestValidation, yaml_file: 'open_api_3/schema.yml'
+use Committee::Middleware::RequestValidation, filepath: 'open_api_3/schema.yml'
 ```
 
 If you want to select manualy, please pass 'openapi_parser' object to committee.
@@ -312,6 +311,7 @@ use Committee::Middleware::RequestValidation, schema: schema
 The auto select algorithm like this.
 
 ```ruby
+
 hash = JSON.load(json_path)
 
 if hash['openapi']&.start_with?('3.') # OpenAPI3 specification require this key and version

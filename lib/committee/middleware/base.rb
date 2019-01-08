@@ -26,10 +26,8 @@ module Committee::Middleware
         schema = options[:schema]
         unless schema
           schema = Committee::Drivers::load_from_file(options[:filepath]) if options[:filepath]
-          schema = Committee::Drivers::load_from_json(options[:json_file]) if options[:json_file]
-          schema = Committee::Drivers::load_from_yaml(options[:yaml_file]) if options[:yaml_file]
 
-          raise(ArgumentError, "Committee: need option `schema` or `json_file` or `yaml_file`") unless schema
+          raise(ArgumentError, "Committee: need option `schema` or `filepath`") unless schema
         end
 
         # Expect the type we want by now. If we don't have it, the user passed
