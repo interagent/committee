@@ -252,6 +252,16 @@
             "$ref": "#/definitions/app"
           },
           "title": "Update"
+        },
+        {
+          "description": "match path",
+          "href": "/apps/abc",
+          "method": "GET",
+          "rel": "self",
+          "targetSchema": {
+            "$ref": "#/definitions/app"
+          },
+          "title": "abc"
         }
       ],
       "properties": {

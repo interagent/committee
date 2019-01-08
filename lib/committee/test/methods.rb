@@ -126,7 +126,7 @@ module Committee::Test
     private
 
       def validate?(status)
-        Committee::ResponseValidator.validate?(status)
+        Committee::ResponseValidator.validate?(status, validate_success_only: true)
       end
   end
 end
