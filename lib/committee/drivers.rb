@@ -33,7 +33,14 @@ module Committee
     # @param [String] filepath
     # @return [Committee::Driver]
     def self.load_from_file(filepath)
-      load_from_json(filepath)
+      case File.extname(filepath)
+      when '.json'
+        load_from_json(filepath)
+      when '.yaml', '.yml'
+        load_from_yaml(filepath)
+      else
+        raise "committee filepath option support '.yaml', '.yml', '.json' files only"
+      end
     end
 
     # load and build drive from Hash object

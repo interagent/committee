@@ -33,6 +33,19 @@ describe Committee::Drivers do
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
     end
+
+    it 'load OpenAPI3' do
+      s = Committee::Drivers.load_from_file(open_api_3_filepath)
+      assert_kind_of Committee::Drivers::Schema, s
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+
+    it 'load unsupported file extension' do
+      e = assert_raises(StandardError) do
+        Committee::Drivers.load_from_file('test.xml')
+      end
+      assert_equal "committee filepath option support '.yaml', '.yml', '.json' files only", e.message
+    end
   end
 
   describe 'load_from_json(filepath)' do

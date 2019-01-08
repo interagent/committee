@@ -128,6 +128,11 @@ describe Committee::Middleware::Base do
       b = Committee::Middleware::Base.new(nil, json_file: open_api_2_filepath)
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, b.instance_variable_get(:@schema)
     end
+
+    it "filepath option with OpenAPI3" do
+      b = Committee::Middleware::Base.new(nil, filepath: open_api_3_filepath)
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, b.instance_variable_get(:@schema)
+    end
   end
 
   private
