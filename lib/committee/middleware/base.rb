@@ -38,6 +38,7 @@ module Committee::Middleware
     def get_schema(options)
       schema = options[:schema]
       unless schema
+        schema = Committee::Drivers::load_from_json(options[:filepath]) if options[:filepath]
         schema = Committee::Drivers::load_from_json(options[:json_file]) if options[:json_file]
 
         raise(ArgumentError, "Committee: need option `schema` or json_file") unless schema

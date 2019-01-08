@@ -71,7 +71,7 @@ describe Committee::Middleware::Base do
 
   describe 'initialize option' do
     it "json file option with hyper-schema" do
-      b = Committee::Middleware::Base.new(nil, json_file: hyper_schema_filepath)
+      b = Committee::Middleware::Base.new(nil, filepath: hyper_schema_filepath)
       assert_kind_of Committee::Drivers::HyperSchema::Schema, b.instance_variable_get(:@schema)
     end
 

@@ -34,6 +34,13 @@ module Committee
       driver.parse(hash)
     end
 
+    # load and build drive from file
+    # @param [String] filepath
+    # @return [Committee::Driver]
+    def self.load_from_file(filepath)
+      load_from_json(filepath)
+    end
+
     # Driver is a base class for driver implementations.
     class Driver
       # Whether parameters that were form-encoded will be coerced by default.
