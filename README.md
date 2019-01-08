@@ -261,7 +261,6 @@ So please set filepath or loaded data.
 ```ruby
 # auto select Hyper-Schema/OpenAPI2 from file
 use Committee::Middleware::RequestValidation, filepath: 'docs/schema.json' # using file extension
-use Committee::Middleware::RequestValidation, json_file: 'docs/schema.json'
 
 # auto select Hyper-Schema/OpenAPI2 from hash
 json = JSON.parse(File.read('docs/schema.json'))

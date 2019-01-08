@@ -70,13 +70,13 @@ describe Committee::Middleware::Base do
   end
 
   describe 'initialize option' do
-    it "json file option with hyper-schema" do
+    it "filepath option with hyper-schema" do
       b = Committee::Middleware::Base.new(nil, filepath: hyper_schema_filepath)
       assert_kind_of Committee::Drivers::HyperSchema::Schema, b.instance_variable_get(:@schema)
     end
 
-    it "json file option with OpenAPI2" do
-      b = Committee::Middleware::Base.new(nil, json_file: open_api_2_filepath)
+    it "filepath option with OpenAPI2" do
+      b = Committee::Middleware::Base.new(nil, filepath: open_api_2_filepath)
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, b.instance_variable_get(:@schema)
     end
   end
