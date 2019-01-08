@@ -35,16 +35,25 @@ module Committee::Test
       @committee_router ||= Committee::Router.new(@committee_schema,
         prefix: schema_url_prefix)
 
-      link, _ = @committee_router.find_request_link(last_request)
+      link, _ = @committee_router.find_request_link(request_object)
       unless link
-        response = "`#{last_request.request_method} #{last_request.path_info}` undefined in schema."
+        response = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema."
         raise Committee::InvalidResponse.new(response)
       end
 
-      if validate?(last_response.status)
-        data = JSON.parse(last_response.body)
-        Committee::ResponseValidator.new(link).call(last_response.status, last_response.headers, data)
+      status, headers, body = response_data
+      if validate?(status)
+        data = JSON.parse(body)
+        Committee::ResponseValidator.new(link).call(status, headers, data)
       end
+    end
+
+    def request_object
+      last_request
+    end
+
+    def response_data
+      [last_response.status, last_response.headers, last_response.body]
     end
 
     def assert_schema_content_type
