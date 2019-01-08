@@ -28,6 +28,16 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       assert_equal 200, last_response.status
     end
 
+    it "if not exist requsetBody definition, skip content_type check" do
+      @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
+      params = {
+          "string_post_1" => "cloudnasium"
+      }
+      header "Content-Type", "application/json"
+      patch "/validate_no_parameter", JSON.generate(params)
+      assert_equal 200, last_response.status
+    end
+
     def new_rack_app(options = {})
       Rack::Builder.new {
         use Committee::Middleware::RequestValidation, options
