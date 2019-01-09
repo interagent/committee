@@ -29,7 +29,7 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "detects a response invalid due to not being JSON" do
-    @app = new_rack_app("", {}, schema: hyper_schema)
+    @app = new_rack_app("{_}", {}, schema: hyper_schema)
     get "/apps"
     assert_equal 500, last_response.status
     assert_match(/valid JSON/i, last_response.body)
@@ -44,7 +44,7 @@ describe Committee::Middleware::ResponseValidation do
   it "optionally validates non-2xx invalid responses and deprecated option" do
     mock(Committee).warn_deprecated.with_any_args
 
-    @app = new_rack_app("", {}, app_status: 404, validate_errors: true,
+    @app = new_rack_app("{_}", {}, app_status: 404, validate_errors: true,
                         schema: hyper_schema)
 
     get "/apps"
@@ -53,9 +53,14 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "optionally validates non-2xx invalid responses" do
-    @app = new_rack_app("", {}, app_status: 404, validate_success_only: false,
-                        schema: hyper_schema)
+    @app = new_rack_app("", {}, app_status: 404, validate_success_only: false, schema: hyper_schema)
+    get "/apps"
+    assert_equal 500, last_response.status
+    assert_match(/Invalid response/i, last_response.body)
+  end
 
+  it "optionally validates non-2xx invalid responses with invalid json" do
+    @app = new_rack_app("{_}", {}, app_status: 404, validate_success_only: false, schema: hyper_schema)
     get "/apps"
     assert_equal 500, last_response.status
     assert_match(/valid JSON/i, last_response.body)
@@ -67,8 +72,15 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 204, last_response.status
   end
 
+  it "skip validation when 4xx" do
+    @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema, validate_success_only: true, app_status: 400)
+    get "/apps"
+    assert_equal 400, last_response.status
+    assert_match("[{x:y}]", last_response.body)
+  end
+
   it "rescues JSON errors" do
-    @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema)
+    @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema, validate_success_only: false)
     get "/apps"
     assert_equal 500, last_response.status
     assert_match(/valid json/i, last_response.body)
@@ -114,7 +126,7 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "detects an invalid response for OpenAPI" do
-    @app = new_rack_app("", {}, schema: open_api_2_schema)
+    @app = new_rack_app("{_}", {}, schema: open_api_2_schema)
     get "/api/pets"
     assert_equal 500, last_response.status
     assert_match(/valid JSON/i, last_response.body)
