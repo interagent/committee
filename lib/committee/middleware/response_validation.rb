@@ -4,7 +4,7 @@ module Committee::Middleware
 
     def initialize(app, options = {})
       super
-      @validate_success_only = options[:validate_success_only]
+      @validate_success_only = options.fetch(:validate_success_only, true)
 
       unless options[:validate_errors].nil?
         @validate_success_only = !options[:validate_errors]
@@ -24,7 +24,7 @@ module Committee::Middleware
         response.each do |chunk|
           full_body << chunk
         end
-        data = JSON.parse(full_body)
+        data = full_body.empty? ? {} : JSON.parse(full_body)
         Committee::ResponseValidator.new(link, validate_success_only: validate_success_only).call(status, headers, data)
       end
 
