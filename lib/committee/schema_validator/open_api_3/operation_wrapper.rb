@@ -55,8 +55,14 @@ module Committee
       ret
     end
 
-    def request_bodies_media_type(request_content_type)
-      request_operation.operation_object&.request_body&.select_media_type(request_content_type)
+    def valid_request_content_type?(content_type)
+      if (request_body = request_operation.operation_object&.request_body)
+        !request_body.select_media_type(content_type).nil?
+      else
+        # if not exist request body object, all content_type allow.
+        # because request body object required content field so when it exists there're content type definition.
+        true
+      end
     end
 
     private

@@ -19,9 +19,7 @@ module Committee
     def check_content_type(request, content_type)
       # support post, put, patch only
       return true unless request.post? || request.put? || request.patch?
-
-      media_type = @operation_object.request_bodies_media_type(content_type)
-      return true if media_type
+      return true if @operation_object.valid_request_content_type?(content_type)
 
       raise Committee::InvalidRequest, %{"Content-Type" request header must be set to "#{@operation_object}".}
     end

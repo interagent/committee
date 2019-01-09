@@ -311,7 +311,6 @@ use Committee::Middleware::RequestValidation, schema: schema
 The auto select algorithm like this.
 
 ```ruby
-
 hash = JSON.load(json_path)
 
 if hash['openapi']&.start_with?('3.') # OpenAPI3 specification require this key and version
