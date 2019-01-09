@@ -15,11 +15,7 @@ Committee is tested on the following MRI versions:
 Hyper-Schema and OpenAPI3 support this feature.
 
 ``` ruby
-# load from json file
-use Committee::Middleware::RequestValidation, json_file: 'docs/schema.json', strict: false
-
-# load from yaml file
-use Committee::Middleware::RequestValidation, yaml_file: 'open_api_3/schema.yml', strict: false
+use Committee::Middleware::RequestValidation, filepath: 'docs/schema.json', coerce_date_times: true
 ```
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
@@ -83,7 +79,7 @@ $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d
 When you use OpenAPI3, you can't use this feature yet.
 
 ``` ruby
-use Committee::Middleware::Stub, json_file: 'docs/schema.json'
+use Committee::Middleware::Stub, filepath: 'docs/schema.json'
 ```
 
 This piece of middleware intercepts any routes that are in the JSON Schema, then builds and returns an appropriate response for them.
@@ -138,7 +134,7 @@ committee-stub -p <port> <path to JSON schema>
 Hyper-Schema and OpenAPI3 support this feature.
 
 ``` ruby
-use Committee::Middleware::ResponseValidation, json_file: 'docs/schema.json'
+use Committee::Middleware::ResponseValidation, filepath: 'docs/schema.json'
 ```
 
 This piece of middleware validates the contents of the response received from up the stack for any route that matches the JSON Schema. A hyper-schema link's `targetSchema` property is used to determine what a valid response looks like.
@@ -157,7 +153,7 @@ Given a simple Sinatra app that responds for an endpoint in an incomplete fashio
 require "committee"
 require "sinatra"
 
-use Committee::Middleware::ResponseValidation, json_file: 'docs/schema.json'
+use Committee::Middleware::ResponseValidation, filepath: 'docs/schema.json'
 
 get "/apps" do
   content_type :json
@@ -255,10 +251,9 @@ end
 ## Using OpenAPI3
 
 Committee auto select parser from definition, so you don't care.
-But if you want to load from YAML file, please use `yaml_file` option.
 
 ```ruby
-use Committee::Middleware::RequestValidation, yaml_file: 'open_api_3/schema.yml'
+use Committee::Middleware::RequestValidation, filepath: 'open_api_3/schema.yml'
 ```
 
 If you want to select manualy, please pass 'openapi_parser' object to committee.
@@ -296,13 +291,12 @@ use Committee::Middleware::RequestValidation, schema: 'json string'
 ```
 
 But we don't support version 3.x.  
-Because 3.x support other schema and we can't define which parser we use.  
-So please wrap Committee::Drivers::Schema like this.   
+Because 3.x support yaml and json, we can't decide which should be use.  
+So please set filepath or loaded data.
 
 ```ruby
 # auto select Hyper-Schema/OpenAPI2/OpenAPI3 from file
-use Committee::Middleware::RequestValidation, json_file: 'docs/schema.json'
-use Committee::Middleware::RequestValidation, yaml_file: 'open_api_3/schema.yml'
+use Committee::Middleware::RequestValidation, filepath: 'docs/schema.json' # using file extension
 
 # auto select Hyper-Schema/OpenAPI2/OpenAPI3 from hash
 json = JSON.parse(File.read('docs/schema.json'))
@@ -317,6 +311,7 @@ use Committee::Middleware::RequestValidation, schema: schema
 The auto select algorithm like this.
 
 ```ruby
+
 hash = JSON.load(json_path)
 
 if hash['openapi']&.start_with?('3.') # OpenAPI3 specification require this key and version
@@ -335,9 +330,7 @@ This method should return same data in ResponseValidation option.
 
 ```ruby
 def committee_options
-  schema = Committee::Drivers::load_from_json('docs/schema.json')
-
-  {schema: schema, prefix: "/v1"}
+  @committee_options ||= {schema: Committee::Drivers::load_from_file('docs/schema.json'), prefix: "/v1"}
 end
 ```
 
