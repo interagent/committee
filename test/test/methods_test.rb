@@ -29,7 +29,7 @@ describe Committee::Test::Methods do
 
   describe "#assert_schema_conform" do
     it "passes through a valid response" do
-      mock(Committee).warn_deprecated.with_any_args.times(3)
+      mock(Committee).warn_deprecated.with_any_args.times(2)
 
       @app = new_rack_app(JSON.generate([ValidApp]))
       get "/apps"
@@ -37,7 +37,7 @@ describe Committee::Test::Methods do
     end
 
     it "detects an invalid response Content-Type" do
-      mock(Committee).warn_deprecated.with_any_args.times(3)
+      mock(Committee).warn_deprecated.with_any_args.times(2)
 
       @app = new_rack_app(JSON.generate([ValidApp]), {})
       get "/apps"
@@ -48,7 +48,7 @@ describe Committee::Test::Methods do
     end
 
     it "accepts schema string (legacy behavior)" do
-      mock(Committee).warn_deprecated.with_any_args.times(4)
+      mock(Committee).warn_deprecated.with_any_args.times(3)
 
       stub(self).committee_schema { nil }
       stub(self).schema_contents { JSON.dump(hyper_schema_data) }
@@ -59,7 +59,7 @@ describe Committee::Test::Methods do
     end
 
     it "accepts schema hash (legacy behavior)" do
-      mock(Committee).warn_deprecated.with_any_args.times(4)
+      mock(Committee).warn_deprecated.with_any_args.times(3)
 
       stub(self).committee_schema { nil }
       stub(self).schema_contents { hyper_schema_data }
@@ -73,7 +73,7 @@ describe Committee::Test::Methods do
       # Note we don't warn here because this is a recent deprecation and
       # passing a schema object will not be a huge performance hit. We should
       # probably start warning on the next version.
-      mock(Committee).warn_deprecated.with_any_args.times(3)
+      mock(Committee).warn_deprecated.with_any_args.times(2)
 
       stub(self).committee_schema { nil }
       stub(self).schema_contents do

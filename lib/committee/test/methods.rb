@@ -62,7 +62,10 @@ module Committee::Test
 
     # we use this method 3.0 or later
     def committee_options
-      Committee.warn_deprecated("Committee: committee 3.0 require overwrite committee options so please use this method.")
+      unless defined?(@call_committee_options_deprecated)
+        @call_committee_options_deprecated = true
+        Committee.warn_deprecated("Committee: committee 3.0 require overwrite committee options so please use this method.")
+      end
 
       {}
     end
@@ -120,13 +123,17 @@ module Committee::Test
     def validate_response?(status)
       Committee.warn_deprecated("Committee: w'll remove validate_response? method in committee 3.0")
 
-      Committee::ResponseValidator.validate?(status)
+      Committee::ResponseValidator.validate?(status, validate_success_only: validate_success_only)
     end
 
     private
 
+      def validate_success_only
+        committee_options.fetch(:validate_success_only, true)
+      end
+
       def validate?(status)
-        Committee::ResponseValidator.validate?(status, validate_success_only: true)
+        Committee::ResponseValidator.validate?(status, validate_success_only: validate_success_only)
       end
   end
 end
