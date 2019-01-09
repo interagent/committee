@@ -26,7 +26,7 @@ class Committee::SchemaValidator
       response.each do |chunk|
         full_body << chunk
       end
-      data = JSON.parse(full_body)
+      data = full_body.empty? ? {} : JSON.parse(full_body)
 
       strict = test_method
       Committee::SchemaValidator::OpenAPI3::ResponseValidator.

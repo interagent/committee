@@ -9,7 +9,7 @@ class Committee::SchemaValidator
       @prefix              = options[:prefix]
 
       # response option
-      @validate_success_only = options[:validate_success_only]
+      @validate_success_only = options.fetch(:validate_success_only, schema.driver.default_validate_success_only)
 
       @coerce_recursive    = options.fetch(:coerce_recursive, true)
       @allow_form_params   = options.fetch(:allow_form_params, true)

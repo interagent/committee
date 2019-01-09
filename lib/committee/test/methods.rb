@@ -28,7 +28,7 @@ module Committee::Test
     end
 
     def validate_response?(status)
-      Committee::Middleware::ResponseValidation.validate?(status, false)
+      Committee::Middleware::ResponseValidation.validate?(status, committee_options.fetch(:validate_success_only, false))
     end
   end
 end

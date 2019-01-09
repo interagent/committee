@@ -4,7 +4,8 @@ module Committee::Middleware
 
     def initialize(app, options = {})
       super
-      @validate_success_only = options[:validate_success_only]
+      @validate_success_only = @schema.validator_option.validate_success_only
+
       @error_handler = options[:error_handler]
     end
 

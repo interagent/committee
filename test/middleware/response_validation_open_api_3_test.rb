@@ -76,6 +76,19 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  it "optionally validates non-2xx blank responses" do
+    @app = new_response_rack("", {}, schema: open_api_3_schema, validate_success_only: false)
+    get "/characters"
+    assert_equal 200, last_response.status
+  end
+
+  it "optionally validates non-2xx invalid responses with invalid json" do
+    @app = new_response_rack("{_}", {}, schema: open_api_3_schema, validate_success_only: false)
+    get "/characters"
+    assert_equal 500, last_response.status
+    assert_match(/valid JSON/i, last_response.body)
+  end
+
   describe 'check header' do
     it 'valid type header' do
       @app = new_response_rack({}.to_json, {'x-limit' => 1}, schema: open_api_3_schema, raise: true)

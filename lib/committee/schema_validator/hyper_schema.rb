@@ -32,7 +32,7 @@ class Committee::SchemaValidator
       response.each do |chunk|
         full_body << chunk
       end
-      data = JSON.parse(full_body)
+      data = full_body.empty? ? {} : JSON.parse(full_body)
       Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link, validate_success_only: validator_option.validate_success_only).call(status, headers, data)
     end
 

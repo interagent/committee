@@ -60,6 +60,12 @@ describe Committee::SchemaValidator::HyperSchema::Router do
     assert_equal '/api/pets/dog', link.href
   end
 
+  it "fewer match not support in HyperSchema" do
+    link, _ = hyper_schema_router.find_link("GET", "/apps/abc")
+    refute_nil link
+    assert_equal '/apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fname)}', link.href
+  end
+
   def hyper_schema_router(options = {})
     schema = Committee::Drivers::HyperSchema.new.parse(hyper_schema_data)
     validator_option = Committee::SchemaValidator::Option.new(options, schema, :hyper_schema)

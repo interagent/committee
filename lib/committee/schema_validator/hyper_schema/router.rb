@@ -25,7 +25,7 @@ module Committee
         else
           nil
         end
-      end.compact.sort.first
+      end.compact.sort_by(&:first).first
       link_with_matches.nil? ? nil : link_with_matches.slice(1, 2)
     end
 

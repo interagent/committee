@@ -6,6 +6,15 @@ Unreleased
 	OpenAPI 3.0 support (#164)
 	Drop old ruby version (#146)
 
+2.4.0 xxxxx
+	Add methods for harmless upgrade (#199, #195)
+	Support filepath option (#191)
+	Change change validate_errors option to validate_success_only (#187)
+	Bugfix for coerce_recursive option in request params (#162)
+	Path definition fewer matches in OpenAPI2 (#160)
+	Deprecated test method (#157)
+	Add `error_handler` option (#152)
+
 2.3.0 2018-11-15
 	Deprecate use of `JsonSchema::Schema` object (#147)
 	Update minimum Rack dependencies to mitigate CVE-2018-16471 (#155)

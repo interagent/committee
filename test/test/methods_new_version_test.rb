@@ -46,7 +46,23 @@ describe Committee::Test::Methods do
     end
 
     it "detects an invalid response Content-Type" do
-      @app = new_rack_app(JSON.generate([ValidApp]), {})
+      @app = new_rack_app(JSON.generate([ValidApp]), 200, {})
+      get "/apps"
+      e = assert_raises(Committee::InvalidResponse) do
+        assert_schema_conform
+      end
+      assert_match(/response header must be set to/i, e.message)
+    end
+
+    it "detects an invalid response Content-Type but ignore because it's not success status code" do
+      @committee_options.merge!(validate_success_only: true)
+      @app = new_rack_app(JSON.generate([ValidApp]), 400, {})
+      get "/apps"
+      assert_schema_conform
+    end
+
+    it "detects an invalid response Content-Type and check all status code" do
+      @app = new_rack_app(JSON.generate([ValidApp]), 400, {})
       get "/apps"
       e = assert_raises(Committee::InvalidResponse) do
         assert_schema_conform
@@ -57,10 +73,10 @@ describe Committee::Test::Methods do
 
   private
 
-  def new_rack_app(response, headers={ "Content-Type" => "application/json" })
+  def new_rack_app(response, status=200, headers={ "Content-Type" => "application/json" })
     Rack::Builder.new {
       run lambda { |_|
-        [200, headers, [response]]
+        [status, headers, [response]]
       }
     }
   end

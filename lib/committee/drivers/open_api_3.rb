@@ -21,6 +21,10 @@ module Committee::Drivers
       true
     end
 
+    def default_validate_success_only
+      false
+    end
+
     def name
       :open_api_3
     end
@@ -36,6 +40,7 @@ module Committee::Drivers
 
     class Schema < Committee::Drivers::Schema
       attr_reader :open_api
+      attr_reader :validator_option
 
       # @!attribute [r] open_api
       #   @return [OpenAPIParser::Schemas::OpenAPI]
@@ -54,8 +59,8 @@ module Committee::Drivers
       end
 
       def build_router(options)
-        validator_option = Committee::SchemaValidator::Option.new(options, self, :open_api_3)
-        Committee::SchemaValidator::OpenAPI3::Router.new(self, validator_option)
+        @validator_option = Committee::SchemaValidator::Option.new(options, self, :open_api_3)
+        Committee::SchemaValidator::OpenAPI3::Router.new(self, @validator_option)
       end
 
       # OpenAPI3 only

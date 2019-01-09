@@ -234,10 +234,7 @@ describe Committee::Middleware::Stub do
   end
 
   def committee_options
-    json = JSON.parse(File.read("./my-schema.json"))
-    json = Committee::Drivers::HyperSchema.new.parse(json)
-    
-    {schema: schema}
+    @committee_options ||= { schema: Committee::Drivers::load_from_file('docs/schema.json'), prefix: "/v1", validate_success_only: true }
   end
 
   describe "GET /" do
@@ -327,9 +324,12 @@ In committee 3.0 we'll drop many method in method.rb.
 So please overwrite committee_options and return schema data and prefix option.  
 This method should return same data in ResponseValidation option.
 
+The default assertion option in 2.x is `validate_success_only=true`.But we change `validate_success_only=false` in 3.x.
+So if you should set false before upgrade 3.x for harmless upgrade.
+
 ```ruby
 def committee_options
-  @committee_options ||= {schema: Committee::Drivers::load_from_file('docs/schema.json'), prefix: "/v1"}
+  @committee_options ||= { schema: Committee::Drivers::load_from_file('docs/schema.json'), prefix: "/v1", validate_success_only: true }
 end
 ```
 
