@@ -373,6 +373,39 @@ describe Committee::Middleware::RequestValidation do
     assert_match(/invalid request/i, last_response.body)
   end
 
+  it "OpenAPI3 pass through a valid request" do
+    @app = new_rack_app(schema: open_api_3_schema)
+    get "/characters"
+    assert_equal 200, last_response.status
+  end
+
+  it "OpenAPI3 pass not exist href" do
+    @app = new_rack_app(schema: open_api_3_schema)
+    get "/unknown"
+    assert_equal 200, last_response.status
+  end
+
+  it "OpenAPI3 pass not exist href in strict mode" do
+    @app = new_rack_app(schema: open_api_3_schema, strict: true)
+    get "/unknown"
+    assert_equal 404, last_response.status
+  end
+
+  it "not exist path and options" do
+    options = {
+        coerce_form_params: true,
+        coerce_date_times: true,
+        coerce_query_params: true,
+        coerce_path_params: true,
+        coerce_recursive: true
+    }
+
+    @app = new_rack_app({schema: hyper_schema}.merge(options))
+    header "Content-Type", "application/x-www-form-urlencoded"
+    post "/unknown"
+    assert_equal 200, last_response.status
+  end
+
   private
 
   def new_rack_app(options = {})

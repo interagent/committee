@@ -1,8 +1,8 @@
-require_relative "test_helper"
+require_relative "../../test_helper"
 
 require "stringio"
 
-describe Committee::RequestValidator do
+describe Committee::SchemaValidator::HyperSchema::RequestValidator do
   describe 'HyperSchema' do
     before do
       @schema = JsonSchema.parse!(hyper_schema_data)
@@ -100,7 +100,7 @@ describe Committee::RequestValidator do
     def call(data, headers={}, options={})
       # hyper-schema link should be dropped into driver wrapper before it's used
       link = Committee::Drivers::HyperSchema::Link.new(@link)
-      Committee::RequestValidator.new(link, options).call(@request, data, headers)
+      Committee::SchemaValidator::HyperSchema::RequestValidator.new(link, options).call(@request, data, headers)
     end
   end
 
@@ -143,7 +143,7 @@ describe Committee::RequestValidator do
 
     def call(data, headers={}, options={})
       # hyper-schema link should be dropped into driver wrapper before it's used
-      Committee::RequestValidator.new(@link, options).call(@request, data, headers)
+      Committee::SchemaValidator::HyperSchema::RequestValidator.new(@link, options).call(@request, data, headers)
     end
   end
 end

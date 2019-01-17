@@ -7,8 +7,7 @@ module Committee
       @allow_query_params = options[:allow_query_params]
       @coerce_form_params = options[:coerce_form_params]
       @optimistic_json    = options[:optimistic_json]
-      @coerce_recursive   = options[:coerce_recursive]
-      @schema             = options[:schema]
+      @schema_validator   = options[:schema_validator]
     end
 
     def call
@@ -31,9 +30,7 @@ module Committee
         # PUT or PATCH too. Silly Rack.
         p = @request.POST
 
-        if @coerce_form_params && @schema
-          Committee::StringParamsCoercer.new(p, @schema, coerce_recursive: @coerce_recursive).call!
-        end
+        @schema_validator.coerce_form_params(p) if @coerce_form_params
 
         p
       else
@@ -91,11 +88,14 @@ module Committee
 
     def headers
       env = @request.env
-      env.keys.grep(/HTTP_/).inject({}) do |headers, key|
+      base = env.keys.grep(/HTTP_/).inject({}) do |headers, key|
         headerized_key = key.gsub(/^HTTP_/, '').gsub(/_/, '-')
         headers[headerized_key] = env[key]
         headers
       end
+
+      base.merge!('Content-Type' => env['CONTENT_TYPE']) if env['CONTENT_TYPE']
+      base
     end
   end
 end

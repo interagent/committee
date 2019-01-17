@@ -17,6 +17,14 @@ module Committee::Drivers
       true
     end
 
+    def default_coerce_date_times
+      false
+    end
+
+    def default_validate_success_only
+      true
+    end
+
     def name
       :open_api_2
     end
@@ -204,6 +212,12 @@ module Committee::Drivers
       attr_accessor :definitions
       attr_accessor :produces
       attr_accessor :routes
+      attr_reader :validator_option
+
+      def build_router(options)
+        @validator_option = Committee::SchemaValidator::Option.new(options, self, :hyper_schema)
+        Committee::SchemaValidator::HyperSchema::Router.new(self, @validator_option)
+      end
     end
 
     private

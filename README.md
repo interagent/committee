@@ -1,20 +1,18 @@
 # Committee  [![Travis Status](https://travis-ci.org/interagent/committee.svg)](https://travis-ci.org/interagent/committee)
 
-A collection of middleware to help build services with JSON Schema.
+A collection of middleware to help build services with JSON Schema, OpenAPI2, OpenAPI3.
 
 ## Supported Ruby Versions
 
 Committee is tested on the following MRI versions:
 
-- 2.0
-- 2.1
-- 2.2
 - 2.3
 - 2.4
 - 2.5
 - 2.6
 
 ## Committee::Middleware::RequestValidation
+Hyper-Schema and OpenAPI3 support this feature.
 
 ``` ruby
 use Committee::Middleware::RequestValidation, filepath: 'docs/schema.json', coerce_date_times: true
@@ -22,21 +20,32 @@ use Committee::Middleware::RequestValidation, filepath: 'docs/schema.json', coer
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
 
-Options:
+Option values and defaults:
 
-* `allow_form_params`: Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations.
-* `allow_query_params`: Specifies that query string parameters will be taken into consideration when doing validation (defaults to `true`).
-* `check_content_type`: Specifies that `Content-Type` should be verified according to JSON Hyper-schema definition. (defaults to `true`).
-* `coerce_date_times`: Convert the string with `"format": "date-time"` parameter to DateTime object (default to `false`).
-* `coerce_form_params`: Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation.
-* `coerce_query_params`: The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string.
-* `coerce_path_params`: The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path.
-* `coerce_recursive`: Coerce data in arrays and other nested objects (default to `true`).
-* `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
-* `optimistic_json`: Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options (defaults to `false`).
-* `prefix`: Mounts the middleware to respond at a configured prefix.
-* `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
-* `strict`: Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run (default to `false`).
+| name | Hyper-Schema | OpenAPI3 | Description |
+|-----------:|------------:|------------:| :------------ |
+|allow_form_params | true | true | Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations. |
+|allow_query_params | true | true | Specifies that query string parameters will be taken into consideration when doing validation. |
+|coerce_date_times | false | true | Convert the string with `"format": "date-time"` parameter to DateTime object. |
+|coerce_form_params| false | true | Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation. |
+|coerce_query_params| false | true  | The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string. |
+|coerce_path_params| false | true | The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path. |
+|coerce_recursive| false | always true | Coerce data in arrays and other nested objects |
+|check_content_type | true | true | Specifies that `Content-Type` should be verified according to JSON Hyper-schema or OpenAPI3 definition. |
+|check_header | true | true | Check header data using JSON Hyper-schema or OpenAPI3 definition. |
+|optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
+|raise| false | false | Raise an exception on error instead of responding with a generic error body. |
+|strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |
+
+No boolean option values:
+
+| name | allowed object type | Hyper-Schema | OpenAPI3 | Description |
+|-----------:|------------:|------------:|------------:| :------------ |
+|prefix| String | support | support | Mounts the middleware to respond at a configured prefix. (e.g. prefix is '/v1' and request path is '/v1/test' use '/test' definition) |
+|error_class| StandardError | support | support | Change validation errors from `Committee::ValidationError`) |
+
+(Hyper-Schema and OpenAPI2 is same default)
+
 
 Some examples of use:
 
@@ -67,6 +76,7 @@ $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d
 ```
 
 ## Committee::Middleware::Stub
+When you use OpenAPI3, you can't use this feature yet.
 
 ``` ruby
 use Committee::Middleware::Stub, filepath: 'docs/schema.json'
@@ -121,6 +131,7 @@ committee-stub -p <port> <path to JSON schema>
 ```
 
 ## Committee::Middleware::ResponseValidation
+Hyper-Schema and OpenAPI3 support this feature.
 
 ``` ruby
 use Committee::Middleware::ResponseValidation, filepath: 'docs/schema.json'
@@ -133,8 +144,7 @@ Options:
 * `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
 * `prefix`: Mounts the middleware to respond at a configured prefix.
 * `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
-* `validate_errors`: Also validate non-2xx responses (defaults to `false`). *deprecated please use validate_success_only.*
-* `validate_success_only`: Also validate non-2xx responses only (defaults to `true`). This is same mean validate_errors=false.
+* `validate_success_only`: Also validate non-2xx responses only (defaults to `true`). This is same mean validate_errors=false in 2.x.
 * `error_handler`: A proc which will be called when error occurs. Take an Error instance as first argument.
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
@@ -203,6 +213,7 @@ end
 ```
 
 ## Test Assertions
+Hyper-Schema and OpenAPI3 support this feature.
 
 Committee ships with a small set of schema validation test assertions designed to be used along with `rack-test`.
 
@@ -234,6 +245,31 @@ describe Committee::Middleware::Stub do
 end
 ```
 
+## Using OpenAPI3
+
+Committee auto select parser from definition, so you don't care.
+
+```ruby
+use Committee::Middleware::RequestValidation, filepath: 'open_api_3/schema.yml'
+```
+
+If you want to select manualy, please pass 'openapi_parser' object to committee.
+This gem added gem dependency so you can use always
+
+```ruby
+open_api = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yml'))
+schema = Committee::Drivers::OpenAPI3.new.parse(open_api)
+use Committee::Middleware::RequestValidation, schema: schema
+```
+
+### limitations of OpenAPI3 mode
+
+* Not support stub
+  * 'Committee::Middleware::Stub' and 'Committee::Bin::CommitteeStub' don't work now.
+
+* Not support coerce_recursive option
+  * Always set coerce_recursive=true
+
 ## Updater for version 3.x from version 2.x
 
 ### Set Committee::Drivers::Schema object for middleware
@@ -256,10 +292,10 @@ Because 3.x support yaml and json, we can't decide which should be use.
 So please set filepath or loaded data.
 
 ```ruby
-# auto select Hyper-Schema/OpenAPI2 from file
+# auto select Hyper-Schema/OpenAPI2/OpenAPI3 from file
 use Committee::Middleware::RequestValidation, filepath: 'docs/schema.json' # using file extension
 
-# auto select Hyper-Schema/OpenAPI2 from hash
+# auto select Hyper-Schema/OpenAPI2/OpenAPI3 from hash
 json = JSON.parse(File.read('docs/schema.json'))
 use Committee::Middleware::RequestValidation, schema: Committee::Drivers::load_data(json)
 
@@ -274,7 +310,9 @@ The auto select algorithm like this.
 ```ruby
 hash = JSON.load(json_path)
 
-if hash['swagger'] == '2.0' # OpenAPI2 require swagger key
+if hash['openapi']&.start_with?('3.') # OpenAPI3 specification require this key and version
+  return Committee::Drivers::OpenAPI3.new.parse(hash)
+elsif hash['swagger'] == '2.0' # OpenAPI2 require swagger key
   return Committee::Drivers::OpenAPI2.new.parse(hash)
 else 
   return Committee::Drivers::HyperSchema.new.parse(hash)

@@ -8,6 +8,8 @@ module Committee
         Committee::Drivers::HyperSchema.new
       when :open_api_2
         Committee::Drivers::OpenAPI2.new
+      when :open_api_3
+        Committee::Drivers::OpenAPI3.new
       else
         raise ArgumentError, %{Committee: unknown driver "#{name}".}
       end
@@ -17,14 +19,39 @@ module Committee
     # @param [String] filepath
     # @return [Committee::Driver]
     def self.load_from_json(filepath)
-      json = JSON.parse(File.read(filepath))
-      load_from_data(json)
+      load_from_data(JSON.parse(File.read(filepath)))
+    end
+
+    # load and build drive from YAML file
+    # @param [String] filepath
+    # @return [Committee::Driver]
+    def self.load_from_yaml(filepath)
+      load_from_data(YAML.load_file(filepath))
+    end
+
+    # load and build drive from file
+    # @param [String] filepath
+    # @return [Committee::Driver]
+    def self.load_from_file(filepath)
+      case File.extname(filepath)
+      when '.json'
+        load_from_json(filepath)
+      when '.yaml', '.yml'
+        load_from_yaml(filepath)
+      else
+        raise "committee filepath option support '.yaml', '.yml', '.json' files only"
+      end
     end
 
     # load and build drive from Hash object
     # @param [Hash] hash
     # @return [Committee::Driver]
     def self.load_from_data(hash)
+      if hash['openapi'] == '3.0.0'
+        parser = OpenAPIParser.parse(hash)
+        return Committee::Drivers::OpenAPI3.new.parse(parser)
+      end
+
       driver = if hash['swagger'] == '2.0'
                  Committee::Drivers::OpenAPI2.new
                else
@@ -32,13 +59,6 @@ module Committee
                end
 
       driver.parse(hash)
-    end
-
-    # load and build drive from file
-    # @param [String] filepath
-    # @return [Committee::Driver]
-    def self.load_from_file(filepath)
-      load_from_json(filepath)
     end
 
     # Driver is a base class for driver implementations.
@@ -84,6 +104,15 @@ module Committee
       # that create this schema.
       def driver
         raise "needs implementation"
+      end
+
+      def build_router(options)
+        raise "needs implementation"
+      end
+
+      # OpenAPI3 not support stub but JSON Hyper-Schema and OpenAPI2 support
+      def support_stub?
+        true
       end
     end
   end

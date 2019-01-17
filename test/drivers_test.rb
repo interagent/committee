@@ -4,6 +4,7 @@ describe Committee::Drivers do
   DRIVERS = [
     :hyper_schema,
     :open_api_2,
+    :open_api_3,
   ].freeze
 
   it "gets driver with .driver_from_name" do
@@ -32,6 +33,19 @@ describe Committee::Drivers do
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
     end
+
+    it 'load OpenAPI3' do
+      s = Committee::Drivers.load_from_file(open_api_3_filepath)
+      assert_kind_of Committee::Drivers::Schema, s
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+
+    it 'load unsupported file extension' do
+      e = assert_raises(StandardError) do
+        Committee::Drivers.load_from_file('test.xml')
+      end
+      assert_equal "committee filepath option support '.yaml', '.yml', '.json' files only", e.message
+    end
   end
 
   describe 'load_from_json(filepath)' do
@@ -48,7 +62,21 @@ describe Committee::Drivers do
     end
   end
 
+  describe 'load_from_yaml(filepath)' do
+    it 'load OpenAPI3' do
+      s = Committee::Drivers.load_from_yaml(open_api_3_filepath)
+      assert_kind_of Committee::Drivers::Schema, s
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+  end
+
   describe 'load_from_data(filepath)' do
+    it 'load OpenAPI3' do
+      s = Committee::Drivers.load_from_data(open_api_3_data)
+      assert_kind_of Committee::Drivers::Schema, s
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+
     it 'load OpenAPI2' do
       s = Committee::Drivers.load_from_data(open_api_2_data)
       assert_kind_of Committee::Drivers::Schema, s
@@ -88,6 +116,7 @@ end
 describe Committee::Drivers::Schema do
   SCHEMA_METHODS = {
     :driver => [],
+    :build_router => [validator_option: nil, prefix: nil]
   }
 
   it "has a set of abstract methods" do
