@@ -87,9 +87,7 @@ describe Committee::Middleware::Base do
     e = assert_raises(ArgumentError) do
       post "/apps"
     end
-
-    assert_equal "Committee: schema expected to be an instance " +
-                     "of Committee::Drivers::Schema.", e.message
+    assert_equal "Committee: schema expected to be an instance of Committee::Drivers::Schema.", e.message
   end
 
   it "schema not exist" do
