@@ -139,13 +139,20 @@ use Committee::Middleware::ResponseValidation, filepath: 'docs/schema.json'
 
 This piece of middleware validates the contents of the response received from up the stack for any route that matches the JSON Schema. A hyper-schema link's `targetSchema` property is used to determine what a valid response looks like.
 
-Options:
+Option values and defaults:
 
-* `error_class`: Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`)
-* `prefix`: Mounts the middleware to respond at a configured prefix.
-* `raise`: Raise an exception on error instead of responding with a generic error body (defaults to `false`).
-* `validate_success_only`: Also validate non-2xx responses only (defaults to `true`). This is same mean validate_errors=false in 2.x.
-* `error_handler`: A proc which will be called when error occurs. Take an Error instance as first argument.
+| name | Hyper-Schema | OpenAPI3 | Description |
+|-----------:|------------:|------------:| :------------ |
+|validate_success_only| true | false | Also validate non-2xx responses only. |
+|raise| false | false | Raise an exception on error instead of responding with a generic error body |
+
+No boolean option values:
+
+| name | allowed object type | Hyper-Schema | OpenAPI3 | Description |
+|-----------:|------------:|------------:|------------:| :------------ |
+|prefix| String | support | support | Mounts the middleware to respond at a configured prefix. |
+|error_class| StandardError | support | support | Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`). |
+|error_handler| Proc Object | support | support | A proc which will be called when error occurs. Take an Error instance as first argument. |
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
 
@@ -250,14 +257,14 @@ end
 Committee auto select parser from definition, so you don't care.
 
 ```ruby
-use Committee::Middleware::RequestValidation, filepath: 'open_api_3/schema.yml'
+use Committee::Middleware::RequestValidation, filepath: 'open_api_3/schema.yaml'
 ```
 
 If you want to select manualy, please pass 'openapi_parser' object to committee.
 This gem added gem dependency so you can use always
 
 ```ruby
-open_api = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yml'))
+open_api = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yaml'))
 schema = Committee::Drivers::OpenAPI3.new.parse(open_api)
 use Committee::Middleware::RequestValidation, schema: schema
 ```
@@ -271,6 +278,18 @@ use Committee::Middleware::RequestValidation, schema: schema
   * Always set coerce_recursive=true
 
 ## Updater for version 3.x from version 2.x
+
+We recommend upgrade this step.
+There are many breaking changes in 3.x.
+But we add deprecated warning and migration path in 2.x.
+So you can harmless update using latest 2.x.
+
+1. use latest 2.x version
+2. fix all deprecated warning (see below)
+3. update 3.0.x version
+4. (If you want to use OpenAPI3) use OpenAPI3
+
+It is detailed in the next section.
 
 ### Set Committee::Drivers::Schema object for middleware
 The schema option support JSON object and Sting and Hash object in version 2.x like this.  
