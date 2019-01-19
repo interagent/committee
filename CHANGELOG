@@ -4,7 +4,7 @@ Unreleased
 	Prefer path with fewest slugs when a request may route to resolve to multiple (#160)
 	Fix bug when using `coerce_recursive` in request parameters (#162)
 	Deprecated `validate_errors` option in favor of `validate_success_only` (#187)
-	Add `filepath` option (#191)
+	Add `schema_path` option (#191)
 	Add `request_object` and `response_data` to `Committee::Test::Methods` (#195)
 	Add `validate_success_only` option (#199)
 

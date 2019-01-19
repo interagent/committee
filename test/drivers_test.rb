@@ -20,35 +20,35 @@ describe Committee::Drivers do
     assert_equal %{Committee: unknown driver "blueprint".}, e.message
   end
 
-  describe 'load_from_file(filepath)' do
+  describe 'load_from_file(schema_path)' do
     it 'load OpenAPI2' do
-      s = Committee::Drivers.load_from_file(open_api_2_filepath)
+      s = Committee::Drivers.load_from_file(open_api_2_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, s
     end
 
     it 'load Hyper-Schema' do
-      s = Committee::Drivers.load_from_file(hyper_schema_filepath)
+      s = Committee::Drivers.load_from_file(hyper_schema_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
     end
   end
 
-  describe 'load_from_json(filepath)' do
+  describe 'load_from_json(schema_path)' do
     it 'load OpenAPI2' do
-      s = Committee::Drivers.load_from_json(open_api_2_filepath)
+      s = Committee::Drivers.load_from_json(open_api_2_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, s
     end
 
     it 'load Hyper-Schema' do
-      s = Committee::Drivers.load_from_json(hyper_schema_filepath)
+      s = Committee::Drivers.load_from_json(hyper_schema_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
     end
   end
 
-  describe 'load_from_data(filepath)' do
+  describe 'load_from_data(schema_path)' do
     it 'load OpenAPI2' do
       s = Committee::Drivers.load_from_data(open_api_2_data)
       assert_kind_of Committee::Drivers::Schema, s

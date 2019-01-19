@@ -14,10 +14,10 @@ module Committee
     end
 
     # load and build drive from JSON file
-    # @param [String] filepath
+    # @param [String] schema_path
     # @return [Committee::Driver]
-    def self.load_from_json(filepath)
-      json = JSON.parse(File.read(filepath))
+    def self.load_from_json(schema_path)
+      json = JSON.parse(File.read(schema_path))
       load_from_data(json)
     end
 
@@ -35,10 +35,10 @@ module Committee
     end
 
     # load and build drive from file
-    # @param [String] filepath
+    # @param [String] schema_path
     # @return [Committee::Driver]
-    def self.load_from_file(filepath)
-      load_from_json(filepath)
+    def self.load_from_file(schema_path)
+      load_from_json(schema_path)
     end
 
     # Driver is a base class for driver implementations.
