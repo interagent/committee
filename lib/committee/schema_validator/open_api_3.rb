@@ -38,7 +38,7 @@ class Committee::SchemaValidator
     end
 
     def coerce_form_params(_parameter)
-      # nothing because when request_schema_validation, check and coerce
+      # Empty because request_schema_validation checks and coerces
     end
 
     private
