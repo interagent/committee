@@ -10,7 +10,6 @@ class Committee::SchemaValidator
 
     def request_validate(request)
       path_params = validator_option.coerce_path_params ? coerce_path_params : {}
-      # coerce_query_params(request) if validator_option.coerce_query_params
 
       request_unpack(request)
 
