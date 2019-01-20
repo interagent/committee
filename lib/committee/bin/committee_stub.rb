@@ -10,7 +10,7 @@ module Committee
       def get_app(schema, options)
         cache = {}
 
-        raise Committee::NotSupportOpenAPI3.new("OpenAPI3 not support stub") unless schema.support_stub?
+        raise Committee::OpenAPI3Unsupported.new("Stubs are not yet supported for OpenAPI 3") unless schema.supports_stub?
 
         Rack::Builder.new {
           unless options[:tolerant]

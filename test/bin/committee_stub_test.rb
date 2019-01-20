@@ -27,7 +27,7 @@ describe Committee::Bin::CommitteeStub do
   end
 
   it "OpenAPI3 not support Stub" do
-    assert_raises(Committee::NotSupportOpenAPI3) do
+    assert_raises(Committee::OpenAPI3Unsupported) do
       @bin.get_app(open_api_3_schema, {})
     end
   end

@@ -15,7 +15,7 @@ module Committee::Middleware
 
       @call = options[:call]
 
-      raise Committee::NotSupportOpenAPI3.new("OpenAPI3 not support stub") unless @schema.support_stub?
+      raise Committee::OpenAPI3Unsupported.new("OpenAPI3 not support stub") unless @schema.supports_stub?
     end
 
     def handle(request)

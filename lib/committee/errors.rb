@@ -17,6 +17,6 @@ module Committee
   class ReferenceNotFound < Error
   end
 
-  class NotSupportOpenAPI3 < Error
+  class OpenAPI3Unsupported < Error
   end
 end

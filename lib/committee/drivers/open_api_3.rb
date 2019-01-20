@@ -50,7 +50,7 @@ module Committee::Drivers
         @driver = driver
       end
 
-      def support_stub?
+      def supports_stub?
         false
       end
 
