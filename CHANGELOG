@@ -1,4 +1,5 @@
 Unreleased
+3.0.0.beta 2019-01-19
 	Support full committee options in OpenAPI3
 	Fix bug when non defined link with form content type and coerce option (#173)
 	Support check_content_type option for OpenAPI3 (#174)
@@ -8,13 +9,14 @@ Unreleased
 	Drop old ruby version (#146)
 
 2.4.0 xxxxx
-	Add methods for harmless upgrade (#199, #195)
-	Support filepath option (#191)
-	Change change validate_errors option to validate_success_only (#187)
-	Bugfix for coerce_recursive option in request params (#162)
-	Path definition fewer matches in OpenAPI2 (#160)
-	Deprecated test method (#157)
 	Add `error_handler` option (#152)
+	Deprecate many methods in `Committee::Test::Methods` (#157)
+	Prefer path with fewest slugs when a request may route to resolve to multiple (#160)
+	Fix bug when using `coerce_recursive` in request parameters (#162)
+	Deprecated `validate_errors` option in favor of `validate_success_only` (#187)
+	Add `schema_path` option (#191)
+	Add `request_object` and `response_data` to `Committee::Test::Methods` (#195)
+	Add `validate_success_only` option (#199)
 
 2.3.0 2018-11-15
 	Deprecate use of `JsonSchema::Schema` object (#147)
