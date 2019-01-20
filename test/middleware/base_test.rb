@@ -29,7 +29,7 @@ describe Committee::Middleware::Base do
     assert_equal 200, last_response.status
   end
 
-  it "don't accepts schema string" do
+  it "doesn't accept a schema string" do
     @app = new_rack_app(
       schema: JSON.dump(hyper_schema_data)
     )
@@ -46,7 +46,7 @@ describe Committee::Middleware::Base do
                      "of Committee::Drivers::Schema.", e.message
   end
 
-  it "don't accepts schema hash" do
+  it "doesn't accept a schema hash" do
     @app = new_rack_app(
       schema: hyper_schema_data
     )
@@ -63,7 +63,7 @@ describe Committee::Middleware::Base do
                      "of Committee::Drivers::Schema.", e.message
   end
 
-  it "don't accepts schema JsonSchema::Schema object" do
+  it "doesn't accept a JsonSchema::Schema object" do
     @app = new_rack_app(
       schema: JsonSchema.parse!(hyper_schema_data)
     )
@@ -90,7 +90,7 @@ describe Committee::Middleware::Base do
     assert_equal "Committee: schema expected to be an instance of Committee::Drivers::Schema.", e.message
   end
 
-  it "schema not exist" do
+  it "errors when no schema is specified" do
     @app = new_rack_app
     e = assert_raises(ArgumentError) do
       post "/apps"
