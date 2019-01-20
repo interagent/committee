@@ -6,7 +6,7 @@ Unreleased
 
 3.0.0.alpha 2018-12-26
 	OpenAPI 3.0 support (#164)
-	Drop old ruby version (#146)
+	Drops support for old versions of Ruby (#146)
 
 2.4.0 xxxxx
 	Add `error_handler` option (#152)
