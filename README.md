@@ -17,7 +17,7 @@ Committee is tested on the following MRI versions:
 ## Committee::Middleware::RequestValidation
 
 ``` ruby
-use Committee::Middleware::RequestValidation, filepath: 'docs/schema.json', coerce_date_times: true
+use Committee::Middleware::RequestValidation, schema_path: 'docs/schema.json', coerce_date_times: true
 ```
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
@@ -69,7 +69,7 @@ $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d
 ## Committee::Middleware::Stub
 
 ``` ruby
-use Committee::Middleware::Stub, filepath: 'docs/schema.json'
+use Committee::Middleware::Stub, schema_path: 'docs/schema.json'
 ```
 
 This piece of middleware intercepts any routes that are in the JSON Schema, then builds and returns an appropriate response for them.
@@ -123,7 +123,7 @@ committee-stub -p <port> <path to JSON schema>
 ## Committee::Middleware::ResponseValidation
 
 ``` ruby
-use Committee::Middleware::ResponseValidation, filepath: 'docs/schema.json'
+use Committee::Middleware::ResponseValidation, schema_path: 'docs/schema.json'
 ```
 
 This piece of middleware validates the contents of the response received from up the stack for any route that matches the JSON Schema. A hyper-schema link's `targetSchema` property is used to determine what a valid response looks like.
@@ -143,7 +143,7 @@ Given a simple Sinatra app that responds for an endpoint in an incomplete fashio
 require "committee"
 require "sinatra"
 
-use Committee::Middleware::ResponseValidation, filepath: 'docs/schema.json'
+use Committee::Middleware::ResponseValidation, schema_path: 'docs/schema.json'
 
 get "/apps" do
   content_type :json
@@ -253,11 +253,11 @@ use Committee::Middleware::RequestValidation, schema: 'json string'
 
 But we don't support version 3.x.  
 Because 3.x support yaml and json, we can't decide which should be use.  
-So please set filepath or loaded data.
+So please set schema_path or loaded data.
 
 ```ruby
 # auto select Hyper-Schema/OpenAPI2 from file
-use Committee::Middleware::RequestValidation, filepath: 'docs/schema.json' # using file extension
+use Committee::Middleware::RequestValidation, schema_path: 'docs/schema.json' # using file extension
 
 # auto select Hyper-Schema/OpenAPI2 from hash
 json = JSON.parse(File.read('docs/schema.json'))

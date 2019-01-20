@@ -69,13 +69,13 @@ describe Committee::Middleware::Base do
   end
 
   describe 'initialize option' do
-    it "filepath option with hyper-schema" do
-      b = Committee::Middleware::Base.new(nil, filepath: hyper_schema_filepath)
+    it "schema_path option with hyper-schema" do
+      b = Committee::Middleware::Base.new(nil, schema_path: hyper_schema_schema_path)
       assert_kind_of Committee::Drivers::HyperSchema::Schema, b.instance_variable_get(:@schema)
     end
 
-    it "filepath option with OpenAPI2" do
-      b = Committee::Middleware::Base.new(nil, filepath: open_api_2_filepath)
+    it "schema_path option with OpenAPI2" do
+      b = Committee::Middleware::Base.new(nil, schema_path: open_api_2_schema_path)
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, b.instance_variable_get(:@schema)
     end
   end
