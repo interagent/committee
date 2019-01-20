@@ -25,7 +25,7 @@ module Committee::Middleware
       def get_schema(options)
         schema = options[:schema]
         unless schema
-          schema = Committee::Drivers::load_from_file(options[:filepath]) if options[:filepath]
+          schema = Committee::Drivers::load_from_file(options[:schema_path]) if options[:schema_path]
 
           raise(ArgumentError, "Committee: need option `schema` or `filepath`") unless schema
         end
