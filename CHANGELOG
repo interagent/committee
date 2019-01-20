@@ -1,4 +1,6 @@
 Unreleased
+
+2.4.0 2019-01-20
 	Add `error_handler` option (#152)
 	Deprecate many methods in `Committee::Test::Methods` (#157)
 	Prefer path with fewest slugs when a request may route to resolve to multiple (#160)
