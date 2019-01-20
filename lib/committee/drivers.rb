@@ -39,7 +39,7 @@ module Committee
       when '.yaml', '.yml'
         load_from_yaml(schema_path)
       else
-        raise "committee schema_path option support '.yaml', '.yml', '.json' files only"
+        raise "Committee only supports the following file extensions: '.json', '.yaml', '.yml'"
       end
     end
 

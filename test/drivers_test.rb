@@ -44,7 +44,7 @@ describe Committee::Drivers do
       e = assert_raises(StandardError) do
         Committee::Drivers.load_from_file('test.xml')
       end
-      assert_equal "committee schema_path option support '.yaml', '.yml', '.json' files only", e.message
+      assert_equal "Committee only supports the following file extensions: '.json', '.yaml', '.yml'", e.message
     end
   end
 
