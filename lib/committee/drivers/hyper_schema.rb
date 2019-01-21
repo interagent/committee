@@ -1,5 +1,9 @@
 module Committee::Drivers
   class HyperSchema < Committee::Drivers::Driver
+    def default_coerce_date_times
+      false
+    end
+
     # Whether parameters that were form-encoded will be coerced by default.
     def default_coerce_form_params
       false
@@ -14,10 +18,6 @@ module Committee::Drivers
     # Whether parameters in a request's query string will be considered and
     # coerced by default.
     def default_query_params
-      false
-    end
-
-    def default_coerce_date_times
       false
     end
 

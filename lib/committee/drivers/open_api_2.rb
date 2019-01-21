@@ -1,5 +1,9 @@
 module Committee::Drivers
   class OpenAPI2 < Committee::Drivers::Driver
+    def default_coerce_date_times
+      false
+    end
+
     # Whether parameters that were form-encoded will be coerced by default.
     def default_coerce_form_params
       true
@@ -15,10 +19,6 @@ module Committee::Drivers
     # coerced by default.
     def default_query_params
       true
-    end
-
-    def default_coerce_date_times
-      false
     end
 
     def default_validate_success_only

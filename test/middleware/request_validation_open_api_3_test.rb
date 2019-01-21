@@ -18,7 +18,7 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "not parameter requset" do
+  it "not parameter request" do
     check_parameter_string = lambda { |_|
       [200, {integer: 1}, []]
     }

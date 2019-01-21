@@ -1,5 +1,9 @@
 module Committee::Drivers
   class OpenAPI3 < Committee::Drivers::Driver
+    def default_coerce_date_times
+      true
+    end
+
     # Whether parameters that were form-encoded will be coerced by default.
     def default_coerce_form_params
       true
@@ -17,10 +21,6 @@ module Committee::Drivers
       true
     end
 
-    def default_coerce_date_times
-      true
-    end
-
     def default_validate_success_only
       false
     end
@@ -29,13 +29,13 @@ module Committee::Drivers
       :open_api_3
     end
 
-    def schema_class
-      Committee::Drivers::OpenAPI3::Schema
-    end
-
     # @return [Committee::Drivers::OpenAPI3::Schema]
     def parse(open_api)
       schema_class.new(self, open_api)
+    end
+
+    def schema_class
+      Committee::Drivers::OpenAPI3::Schema
     end
 
     class Schema < Committee::Drivers::Schema
@@ -50,7 +50,7 @@ module Committee::Drivers
         @driver = driver
       end
 
-      def support_stub?
+      def supports_stub?
         false
       end
 

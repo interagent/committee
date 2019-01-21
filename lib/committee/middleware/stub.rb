@@ -1,4 +1,4 @@
-# Don't Support OpenAPI3
+# Stub is not yet supported in OpenAPI 3
 
 module Committee::Middleware
   class Stub < Base
@@ -15,7 +15,7 @@ module Committee::Middleware
 
       @call = options[:call]
 
-      raise Committee::NotSupportOpenAPI3.new("OpenAPI3 not support stub") unless @schema.support_stub?
+      raise Committee::OpenAPI3Unsupported.new("Stubs are not yet supported for OpenAPI 3") unless @schema.supports_stub?
     end
 
     def handle(request)

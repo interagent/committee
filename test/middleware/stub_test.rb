@@ -100,7 +100,7 @@ describe Committee::Middleware::Stub do
     cache = {}
     @app = new_rack_app(cache: cache, schema: open_api_3_schema)
 
-    assert_raises(Committee::NotSupportOpenAPI3) do
+    assert_raises(Committee::OpenAPI3Unsupported) do
       get "/characters"
     end
   end

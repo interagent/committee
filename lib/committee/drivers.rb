@@ -39,7 +39,7 @@ module Committee
       when '.yaml', '.yml'
         load_from_yaml(schema_path)
       else
-        raise "committee schema_path option support '.yaml', '.yml', '.json' files only"
+        raise "Committee only supports the following file extensions: '.json', '.yaml', '.yml'"
       end
     end
 
@@ -110,8 +110,8 @@ module Committee
         raise "needs implementation"
       end
 
-      # OpenAPI3 not support stub but JSON Hyper-Schema and OpenAPI2 support
-      def support_stub?
+      # Stubs are supported in JSON Hyper-Schema and OpenAPI 2, but not yet in OpenAPI 3
+      def supports_stub?
         true
       end
     end

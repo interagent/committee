@@ -122,7 +122,7 @@ describe Committee::RequestUnpacker do
     end
   end
 
-  it "coerces form params with coerce_form_params and a OpenAPI3 schema" do
+  it "coerces form params with coerce_form_params and an OpenAPI3 schema" do
     %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
       env = {
           "CONTENT_TYPE" => content_type,

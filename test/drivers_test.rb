@@ -22,40 +22,40 @@ describe Committee::Drivers do
   end
 
   describe 'load_from_file(schema_path)' do
-    it 'load OpenAPI2' do
+    it 'loads OpenAPI2' do
       s = Committee::Drivers.load_from_file(open_api_2_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, s
     end
 
-    it 'load Hyper-Schema' do
+    it 'loads Hyper-Schema' do
       s = Committee::Drivers.load_from_file(hyper_schema_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
     end
 
-    it 'load OpenAPI3' do
+    it 'loads OpenAPI 3' do
       s = Committee::Drivers.load_from_file(open_api_3_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
-    it 'load unsupported file extension' do
+    it 'errors on an unsupported file extension' do
       e = assert_raises(StandardError) do
         Committee::Drivers.load_from_file('test.xml')
       end
-      assert_equal "committee schema_path option support '.yaml', '.yml', '.json' files only", e.message
+      assert_equal "Committee only supports the following file extensions: '.json', '.yaml', '.yml'", e.message
     end
   end
 
   describe 'load_from_json(schema_path)' do
-    it 'load OpenAPI2' do
+    it 'loads OpenAPI2' do
       s = Committee::Drivers.load_from_json(open_api_2_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, s
     end
 
-    it 'load Hyper-Schema' do
+    it 'loads Hyper-Schema' do
       s = Committee::Drivers.load_from_json(hyper_schema_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
@@ -63,7 +63,7 @@ describe Committee::Drivers do
   end
 
   describe 'load_from_yaml(schema_path)' do
-    it 'load OpenAPI3' do
+    it 'loads OpenAPI3' do
       s = Committee::Drivers.load_from_yaml(open_api_3_schema_path)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
@@ -71,19 +71,19 @@ describe Committee::Drivers do
   end
 
   describe 'load_from_data(schema_path)' do
-    it 'load OpenAPI3' do
+    it 'loads OpenAPI3' do
       s = Committee::Drivers.load_from_data(open_api_3_data)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
-    it 'load OpenAPI2' do
+    it 'loads OpenAPI2' do
       s = Committee::Drivers.load_from_data(open_api_2_data)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, s
     end
 
-    it 'load Hyper-Schema' do
+    it 'loads Hyper-Schema' do
       s = Committee::Drivers.load_from_data(hyper_schema_data)
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
