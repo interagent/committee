@@ -1,6 +1,6 @@
 # Committee  [![Travis Status](https://travis-ci.org/interagent/committee.svg)](https://travis-ci.org/interagent/committee)
 
-A collection of middleware to help build services with JSON Schema, OpenAPI2, OpenAPI3.
+A collection of middleware to help build services with JSON Schema, OpenAPI 2, OpenAPI 3.
 
 ## Supported Ruby Versions
 
@@ -12,7 +12,8 @@ Committee is tested on the following MRI versions:
 - 2.6
 
 ## Committee::Middleware::RequestValidation
-Hyper-Schema and OpenAPI3 support this feature.
+
+This feature is supported by all of Hyper-Schema, OpenAPI 2, and OpenAPI 3.
 
 ``` ruby
 use Committee::Middleware::RequestValidation, schema_path: 'docs/schema.json', coerce_date_times: true
@@ -20,9 +21,9 @@ use Committee::Middleware::RequestValidation, schema_path: 'docs/schema.json', c
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
 
-Option values and defaults:
+Options and their defaults:
 
-| name | Hyper-Schema | OpenAPI3 | Description |
+| name | Hyper-Schema | OpenAPI 3 | Description |
 |-----------:|------------:|------------:| :------------ |
 |allow_form_params | true | true | Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations. |
 |allow_query_params | true | true | Specifies that query string parameters will be taken into consideration when doing validation. |
@@ -31,21 +32,21 @@ Option values and defaults:
 |coerce_query_params| false | true  | The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string. |
 |coerce_path_params| false | true | The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path. |
 |coerce_recursive| false | always true | Coerce data in arrays and other nested objects |
-|check_content_type | true | true | Specifies that `Content-Type` should be verified according to JSON Hyper-schema or OpenAPI3 definition. |
-|check_header | true | true | Check header data using JSON Hyper-schema or OpenAPI3 definition. |
+|check_content_type | true | true | Specifies that `Content-Type` should be verified according to JSON Hyper-schema or OpenAPI 3 definition. |
+|check_header | true | true | Check header data using JSON Hyper-schema or OpenAPI 3 definition. |
 |optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |
 
-No boolean option values:
+Non-boolean options:
 
-| name | allowed object type | Hyper-Schema | OpenAPI3 | Description |
+| name | allowed object type | Hyper-Schema | OpenAPI 3 | Description |
 |-----------:|------------:|------------:|------------:| :------------ |
-|prefix| String | support | support | Mounts the middleware to respond at a configured prefix. (e.g. prefix is '/v1' and request path is '/v1/test' use '/test' definition) |
-|error_class| StandardError | support | support | Change validation errors from `Committee::ValidationError`) |
+|error_class| StandardError | supported | supported | Change validation errors from `Committee::ValidationError`). |
+|prefix| String | supported | supported | Mounts the middleware to respond at a configured prefix. (e.g. prefix is '/v1' and request path is '/v1/test' use '/test' definition). |
+|schema_path| String | supported | supported | Defines the location of the schema file to use for validation. |
 
-(Hyper-Schema and OpenAPI2 is same default)
-
+Note that Hyper-Schema and OpenAPI 2 get the same defaults for options.
 
 Some examples of use:
 
@@ -76,7 +77,8 @@ $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d
 ```
 
 ## Committee::Middleware::Stub
-When you use OpenAPI3, you can't use this feature yet.
+
+**Note:** This feature is not yet available for OpenAPI 3.
 
 ``` ruby
 use Committee::Middleware::Stub, schema_path: 'docs/schema.json'
@@ -131,7 +133,8 @@ committee-stub -p <port> <path to JSON schema>
 ```
 
 ## Committee::Middleware::ResponseValidation
-Hyper-Schema and OpenAPI3 support this feature.
+
+This feature is supported by all of Hyper-Schema, OpenAPI 2, and OpenAPI 3.
 
 ``` ruby
 use Committee::Middleware::ResponseValidation, schema_path: 'docs/schema.json'
@@ -141,14 +144,14 @@ This piece of middleware validates the contents of the response received from up
 
 Option values and defaults:
 
-| name | Hyper-Schema | OpenAPI3 | Description |
+| name | Hyper-Schema | OpenAPI 3 | Description |
 |-----------:|------------:|------------:| :------------ |
+|raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |validate_success_only| true | false | Also validate non-2xx responses only. |
-|raise| false | false | Raise an exception on error instead of responding with a generic error body |
 
 No boolean option values:
 
-| name | allowed object type | Hyper-Schema | OpenAPI3 | Description |
+| name | allowed object type | Hyper-Schema | OpenAPI 3 | Description |
 |-----------:|------------:|------------:|------------:| :------------ |
 |prefix| String | support | support | Mounts the middleware to respond at a configured prefix. |
 |error_class| StandardError | support | support | Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`). |
@@ -220,7 +223,8 @@ end
 ```
 
 ## Test Assertions
-Hyper-Schema and OpenAPI3 support this feature.
+
+Supported in HyperSchema and OpenAPI 3.
 
 Committee ships with a small set of schema validation test assertions designed to be used along with `rack-test`.
 
@@ -252,16 +256,15 @@ describe Committee::Middleware::Stub do
 end
 ```
 
-## Using OpenAPI3
+## Using OpenAPI 3
 
-Committee auto select parser from definition, so you don't care.
+Committee can detect the type of schema (Hyper-Schema, OpenAPI 3, etc.) from the provided file, so there's no need to pass in any additional options:
 
 ```ruby
 use Committee::Middleware::RequestValidation, filepath: 'open_api_3/schema.yaml'
 ```
 
-If you want to select manualy, please pass 'openapi_parser' object to committee.
-This gem added gem dependency so you can use always
+If you want to select the type manually, pass an `OpenAPI 3` object to the `schema` option manually:
 
 ```ruby
 open_api = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yaml'))
@@ -269,30 +272,25 @@ schema = Committee::Drivers::OpenAPI3.new.parse(open_api)
 use Committee::Middleware::RequestValidation, schema: schema
 ```
 
-### limitations of OpenAPI3 mode
+### Limitations of OpenAPI 3 support
 
-* Not support stub
-  * 'Committee::Middleware::Stub' and 'Committee::Bin::CommitteeStub' don't work now.
+* Stub servers are not yet supported, so neither `Committee::Middleware::Stub` or `Committee::Bin::CommitteeStub` are functional.
+* Changing `coerce_recursive` isn't supported. This option is always on.
 
-* Not support coerce_recursive option
-  * Always set coerce_recursive=true
+### Upgrading from Committee 2.* to 3.*
 
-## Updater for version 3.x from version 2.x
+Committee 3.* has many breaking changes so we recommend upgrading to the latest release on 2.* and fixing any deprecation errors you see before upgrading to 3.*. The steps would be roughly as follows:
 
-We recommend upgrade this step.
-There are many breaking changes in 3.x.
-But we add deprecated warning and migration path in 2.x.
-So you can harmless update using latest 2.x.
+1. Update to the latest 2.* release (usually by modifying the statement in your `Gemfile` and running `bundle update`).
+2. Run your test suite and fix any deprecation warnings that appear.
+3. Update to the latest 3.* release.
+4. Switch to OpenAPI 3 if you'd like to do so.
 
-1. use latest 2.x version
-2. fix all deprecated warning (see below)
-3. update 3.0.x version
-4. (If you want to use OpenAPI3) use OpenAPI3
+Important changes are also described below.
 
-It is detailed in the next section.
+### Setting schemas in middleware
 
-### Set Committee::Drivers::Schema object for middleware
-The schema option support JSON object and Sting and Hash object in version 2.x like this.  
+Committee 2.* supported setting `schema` to a string or a hash like this:
 
 ```ruby
 # valid
@@ -306,51 +304,56 @@ use Committee::Middleware::RequestValidation, schema: 'json string'
 
 ```
 
-But we don't support version 3.x.  
-Because 3.x support yaml and json, we can't decide which should be use.  
-So please set schema_path or loaded data.
+That usage is no longer supported in 3.* Instead, use either `schema_path` or set a parsed schema object to `schema`:
 
 ```ruby
-# auto select Hyper-Schema/OpenAPI2/OpenAPI3 from file
+# auto-select Hyper-Schema/OpenAPI 2/OpenAPI 3 from file
 use Committee::Middleware::RequestValidation, schema_path: 'docs/schema.json' # using file extension
 
-# auto select Hyper-Schema/OpenAPI2/OpenAPI3 from hash
+# auto-select Hyper-Schema/OpenAPI 2/OpenAPI 3 from hash
 json = JSON.parse(File.read('docs/schema.json'))
 use Committee::Middleware::RequestValidation, schema: Committee::Drivers::load_data(json)
 
-# manual select
+# manually select
 json = JSON.parse(File.read(...))
 schema = Committee::Drivers::HyperSchema.new.parse(json)
 use Committee::Middleware::RequestValidation, schema: schema
 ```
 
-The auto select algorithm like this.
+The auto-select algorithm works roughly like this (so make sure that your file sets one of these attributes correctly):
 
 ```ruby
 hash = JSON.load(json_path)
 
-if hash['openapi']&.start_with?('3.') # OpenAPI3 specification require this key and version
+# OpenAPI 3 requires the `openapi` key and a version
+if hash['openapi']&.start_with?('3.')
   return Committee::Drivers::OpenAPI3.new.parse(hash)
-elsif hash['swagger'] == '2.0' # OpenAPI2 require swagger key
+
+# OpenAPI 2 requires the `swagger` key
+elsif hash['swagger'] == '2.0'
   return Committee::Drivers::OpenAPI2.new.parse(hash)
-else 
+
+else
   return Committee::Drivers::HyperSchema.new.parse(hash)
 end
 ```
 
-### Change Test Assertions
-In committee 3.0 we'll drop many method in method.rb.  
-So please overwrite committee_options and return schema data and prefix option.  
-This method should return same data in ResponseValidation option.
+### Test assertions
 
-The default assertion option in 2.x is `validate_success_only=true`.But we change `validate_success_only=false` in 3.x.
-So if you should set false before upgrade 3.x for harmless upgrade.
+Committee 3.* drops many of the methods that were
+previously available from the `Committee::Test::Methods`
+mixin.
+
+Use it by defining a `committee_options` method and having
+it return a schema and other options you'd like to use:
 
 ```ruby
 def committee_options
   @committee_options ||= { schema: Committee::Drivers::load_from_file('docs/schema.json'), prefix: "/v1", validate_success_only: true }
 end
 ```
+
+The default assertion option in 2.* was `validate_success_only=true`, but this becomes `validate_success_only=false` in 3.*. For the smoothest possible upgrade, you should set it to `false` in your test suite before upgrading to 3.*.
 
 ## Development
 
