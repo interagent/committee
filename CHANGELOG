@@ -1,5 +1,8 @@
 Unreleased
 
+2.5.1 2019-01-22
+	Fix bug in the handling of `pattern` attribute on OpenAPI 2 parameters (#209)
+
 2.5.0 2019-01-22
 	Support more parameter validations for OpenAPI 2 (#207)
 
