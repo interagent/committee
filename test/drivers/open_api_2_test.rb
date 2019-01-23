@@ -307,7 +307,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
 
     assert_nil schema_data
     assert_equal "password", schema.properties["password"].format
-    assert_equal "[a-zA-Z0-9]+", schema.properties["password"].pattern
+    assert_equal Regexp.new("[a-zA-Z0-9]+"), schema.properties["password"].pattern
     assert_equal 6, schema.properties["password"].min_length
     assert_equal 30, schema.properties["password"].max_length
   end
