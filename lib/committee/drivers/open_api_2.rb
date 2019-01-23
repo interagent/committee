@@ -177,7 +177,7 @@ module Committee::Drivers
 
               # validation: string
               param_schema.format = param_data["format"] unless param_data["format"].nil?
-              param_schema.pattern = param_data["pattern"] unless param_data["pattern"].nil?
+              param_schema.pattern = Regexp.new(param_data["pattern"]) unless param_data["pattern"].nil?
               param_schema.min_length = param_data["minLength"] unless param_data["minLength"].nil?
               param_schema.max_length = param_data["maxLength"] unless param_data["maxLength"].nil?
 
