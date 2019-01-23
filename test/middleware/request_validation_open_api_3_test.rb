@@ -42,6 +42,20 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "passes given a datetime and with coerce_date_times enabled on GET endpoint with request body(old behavior)" do
+    params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
+
+    check_parameter = lambda { |env|
+      assert_equal DateTime, env['committee.params']["datetime_string"].class
+      [200, {}, []]
+    }
+
+    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, coerce_date_times: true)
+
+    get "/get_body_test", { no_problem: true }, { input: params.to_json }
+    assert_equal 200, last_response.status
+  end
+
   it "passes given a datetime and with coerce_date_times enabled on POST endpoint" do
     params = {
         "nested_array" => [

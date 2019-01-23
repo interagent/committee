@@ -20,13 +20,6 @@ module Committee
       request_operation.validate_path_params(options)
     end
 
-    def coerce_request_parameter(params, headers, validator_option)
-      options = build_openapi_parser_get_option(validator_option)
-      return unless options.coerce_value
-
-      request_operation.validate_request_parameter(params, headers, options)
-    end
-
     # @param [Boolean] strict when not content_type or status code definition, raise error
     def validate_response_params(status_code, headers, response_data, strict, check_header)
       request_body = OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, response_data, headers)

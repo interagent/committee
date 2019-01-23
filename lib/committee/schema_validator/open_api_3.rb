@@ -17,7 +17,7 @@ class Committee::SchemaValidator
 
       request_schema_validation(request)
 
-      @operation_object&.coerce_request_parameter(request.env["rack.request.query_hash"], header(request), validator_option) if !request.GET.nil? && !request.env["rack.request.query_hash"].empty?
+      copy_coered_data_to_query_hash(request)
     end
 
     def response_validate(status, headers, response, test_method = false)
@@ -70,6 +70,14 @@ class Committee::SchemaValidator
           optimistic_json:    validator_option.optimistic_json,
           schema_validator:   self
       ).call
+    end
+
+    def copy_coered_data_to_query_hash(request)
+      return if request.env["rack.request.query_hash"].nil? || request.env["rack.request.query_hash"].empty?
+
+      request.env["rack.request.query_hash"].keys.each do |k|
+        request.env["rack.request.query_hash"][k] = request.env[validator_option.params_key][k]
+      end
     end
   end
 end
