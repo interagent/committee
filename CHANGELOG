@@ -1,4 +1,6 @@
 Unreleased
+
+
 3.0.0.beta 2019-01-19
 	Support full committee options in OpenAPI3
 	Fix bug when non defined link with form content type and coerce option (#173)
@@ -8,7 +10,13 @@ Unreleased
 	OpenAPI 3.0 support (#164)
 	Drops support for old versions of Ruby (#146)
 
-2.4.0 xxxxx
+2.5.1 2019-01-22
+	Fix bug in the handling of `pattern` attribute on OpenAPI 2 parameters (#209)
+
+2.5.0 2019-01-22
+	Support more parameter validations for OpenAPI 2 (#207)
+
+2.4.0 2019-01-20
 	Add `error_handler` option (#152)
 	Deprecate many methods in `Committee::Test::Methods` (#157)
 	Prefer path with fewest slugs when a request may route to resolve to multiple (#160)

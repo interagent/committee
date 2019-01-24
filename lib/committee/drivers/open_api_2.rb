@@ -181,6 +181,26 @@ module Committee::Drivers
               # therefore this should map over quite well.
               param_schema.type = [param_data["type"]]
 
+              param_schema.enum = param_data["enum"] unless param_data["enum"].nil?
+
+              # validation: string
+              param_schema.format = param_data["format"] unless param_data["format"].nil?
+              param_schema.pattern = Regexp.new(param_data["pattern"]) unless param_data["pattern"].nil?
+              param_schema.min_length = param_data["minLength"] unless param_data["minLength"].nil?
+              param_schema.max_length = param_data["maxLength"] unless param_data["maxLength"].nil?
+
+              # validation: array
+              param_schema.min_items = param_data["minItems"] unless param_data["minItems"].nil?
+              param_schema.max_items = param_data["maxItems"] unless param_data["maxItems"].nil?
+              param_schema.unique_items = param_data["uniqueItems"] unless param_data["uniqueItems"].nil?
+
+              # validation: number/integer
+              param_schema.min = param_data["minimum"] unless param_data["minimum"].nil?
+              param_schema.min_exclusive = param_data["exclusiveMinimum"] unless param_data["exclusiveMinimum"].nil?
+              param_schema.max = param_data["maximum"] unless param_data["maximum"].nil?
+              param_schema.max_exclusive = param_data["exclusiveMaximum"] unless param_data["exclusiveMaximum"].nil?
+              param_schema.multiple_of = param_data["multipleOf"] unless param_data["multipleOf"].nil?
+
               # And same idea: despite parameters not being schemas, the items
               # key (if preset) is actually a schema that defines each item of an
               # array type, so we can just reflect that directly onto our
