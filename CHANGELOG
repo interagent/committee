@@ -1,5 +1,5 @@
 Unreleased
-
+	OpenAPI 3 merge request body to request parameter in GET request (#210)
 
 3.0.0.beta 2019-01-19
 	Support full committee options in OpenAPI3
