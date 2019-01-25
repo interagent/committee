@@ -494,6 +494,20 @@ paths:
               description: integer
               schema:
                 type: integer
+  /get_body_test:
+    get:
+      description: get body test
+      parameters:
+      - name: datetime_string
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '204':
+          description: no content
+
 components:
   schemas:
     nested_array:
