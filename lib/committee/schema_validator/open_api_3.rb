@@ -17,7 +17,7 @@ class Committee::SchemaValidator
 
       request_schema_validation(request)
 
-      copy_coered_data_to_query_hash(request)
+      copy_coerced_data_to_query_hash(request)
     end
 
     def response_validate(status, headers, response, test_method = false)
@@ -72,7 +72,7 @@ class Committee::SchemaValidator
       ).call
     end
 
-    def copy_coered_data_to_query_hash(request)
+    def copy_coerced_data_to_query_hash(request)
       return if request.env["rack.request.query_hash"].nil? || request.env["rack.request.query_hash"].empty?
 
       request.env["rack.request.query_hash"].keys.each do |k|
