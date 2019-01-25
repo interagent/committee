@@ -1,5 +1,11 @@
 Unreleased
+
+
+3.0.0.beta3 2019-01-25
 	OpenAPI 3 merge request body to request parameter in GET request (#210)
+
+3.0.0.beta2 2019-01-23
+	Merge 2.4.0 feature (rename `filepath` option to `schema_path` (#191))
 
 3.0.0.beta 2019-01-19
 	Support full committee options in OpenAPI3
