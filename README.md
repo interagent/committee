@@ -27,6 +27,7 @@ Options and their defaults:
 |-----------:|------------:|------------:| :------------ |
 |allow_form_params | true | true | Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations. |
 |allow_query_params | true | true | Specifies that query string parameters will be taken into consideration when doing validation. |
+|allow_get_body | true | false | Allow GET request body, which merge to request parameter. See (#211) |
 |coerce_date_times | false | true | Convert the string with `"format": "date-time"` parameter to DateTime object. |
 |coerce_form_params| false | true | Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation. |
 |coerce_query_params| false | true  | The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string. |
@@ -285,6 +286,7 @@ Committee 3.* has many breaking changes so we recommend upgrading to the latest 
 2. Run your test suite and fix any deprecation warnings that appear.
 3. Update to the latest 3.* release.
 4. Switch to OpenAPI 3 if you'd like to do so.
+   (If you use GET request body data, don't forget to set allow_get_body true.)
 
 Important changes are also described below.
 

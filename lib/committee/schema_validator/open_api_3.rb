@@ -68,6 +68,7 @@ class Committee::SchemaValidator
           allow_query_params: validator_option.allow_query_params,
           coerce_form_params: validator_option.coerce_form_params,
           optimistic_json:    validator_option.optimistic_json,
+          allow_get_body:     validator_option.allow_get_body,
           schema_validator:   self
       ).call
     end
