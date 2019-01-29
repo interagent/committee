@@ -42,7 +42,25 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "passes given a datetime and with coerce_date_times enabled on GET endpoint with request body(old behavior)" do
+  it "passes given a valid parameter on GET endpoint with request body and allow_get_body=true" do
+    params = { "data" => "abc" }
+
+    @app = new_rack_app(schema: open_api_3_schema, allow_get_body: true)
+
+    get "/get_endpoint_with_requered_parameter", { no_problem: true }, { input: params.to_json }
+    assert_equal 200, last_response.status
+  end
+
+  it "get error given valid parameter on GET endpoint with request body and allow_get_body=false" do
+    params = { "data" => "abc" }
+
+    @app = new_rack_app(schema: open_api_3_schema, allow_get_body: false)
+
+    get "/get_endpoint_with_requered_parameter", { no_problem: true }, { input: params.to_json }
+    assert_equal 400, last_response.status
+  end
+
+  it "passes given a datetime and with coerce_date_times enabled on GET endpoint with request body" do
     params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
 
     check_parameter = lambda { |env|
@@ -55,17 +73,8 @@ describe Committee::Middleware::RequestValidation do
                                     coerce_date_times: true,
                                     allow_get_body: true)
 
-    get "/get_body_test", { no_problem: true }, { input: params.to_json }
+    get "/string_params_coercer", { no_problem: true }, { input: params.to_json }
     assert_equal 200, last_response.status
-  end
-
-  it "get error given a datetime and with coerce_date_times enabled on GET endpoint with request body" do
-    params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
-
-    @app = new_rack_app(schema: open_api_3_schema, allow_get_body: false)
-
-    get "/get_body_test", { no_problem: true }, { input: params.to_json }
-    assert_equal 400, last_response.status
   end
 
   it "passes given a datetime and with coerce_date_times enabled on POST endpoint" do

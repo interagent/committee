@@ -93,10 +93,10 @@ end
 
 describe Committee::Drivers::Driver do
   DRIVER_METHODS = {
+    :default_allow_get_body     => [],
     :default_coerce_form_params => [],
     :default_path_params        => [],
     :default_query_params       => [],
-    :default_allow_get_body     => [],
     :name                       => [],
     :parse                      => [nil],
     :schema_class               => [],

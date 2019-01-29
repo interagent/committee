@@ -235,7 +235,7 @@ describe Committee::RequestUnpacker do
     assert_equal({ "FOO-BAR" => "some header value" }, headers)
   end
 
-  it "use_get_body = true" do
+  it "includes request body when`use_get_body` is true" do
     env = {
         "rack.input" => StringIO.new('{"x":1, "y":2}'),
         "REQUEST_METHOD" => "GET",
@@ -246,7 +246,7 @@ describe Committee::RequestUnpacker do
     assert_equal({ 'data' => 'value', 'x' => 1, 'y' => 2 }, params)
   end
 
-  it "use_get_body = false" do
+  it "doesn't include request body when `use_get_body` is false" do
     env = {
         "rack.input" => StringIO.new('{"x":1, "y":2}'),
         "REQUEST_METHOD" => "GET",
