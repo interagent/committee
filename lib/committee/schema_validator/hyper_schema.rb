@@ -66,6 +66,7 @@ class Committee::SchemaValidator
         request.env[validator_option.params_key], request.env[validator_option.headers_key] = Committee::RequestUnpacker.new(
             request,
             allow_form_params:  validator_option.allow_form_params,
+            allow_get_body:     validator_option.allow_get_body,
             allow_query_params: validator_option.allow_query_params,
             coerce_form_params: validator_option.coerce_form_params,
             optimistic_json:    validator_option.optimistic_json,

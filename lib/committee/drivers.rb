@@ -68,6 +68,11 @@ module Committee
         raise "needs implementation"
       end
 
+      # Use GET request body to request parameter (request body merge to parameter)
+      def default_allow_get_body
+        raise "needs implementation"
+      end
+
       # Whether parameters in a request's path will be considered and coerced
       # by default.
       def default_path_params

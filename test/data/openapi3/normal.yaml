@@ -494,16 +494,15 @@ paths:
               description: integer
               schema:
                 type: integer
-  /get_body_test:
+  /get_endpoint_with_requered_parameter:
     get:
       description: get body test
       parameters:
-      - name: datetime_string
+      - name: data
         in: query
         required: true
         schema:
           type: string
-          format: date-time
       responses:
         '204':
           description: no content

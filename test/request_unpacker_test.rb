@@ -234,4 +234,26 @@ describe Committee::RequestUnpacker do
     _, headers = Committee::RequestUnpacker.new(request, { allow_header_params: true }).call
     assert_equal({ "FOO-BAR" => "some header value" }, headers)
   end
+
+  it "includes request body when`use_get_body` is true" do
+    env = {
+        "rack.input" => StringIO.new('{"x":1, "y":2}'),
+        "REQUEST_METHOD" => "GET",
+        "QUERY_STRING"=>"data=value&x=aaa",
+    }
+    request = Rack::Request.new(env)
+    params, _ = Committee::RequestUnpacker.new(request, { allow_query_params: true, allow_get_body: true }).call
+    assert_equal({ 'data' => 'value', 'x' => 1, 'y' => 2 }, params)
+  end
+
+  it "doesn't include request body when `use_get_body` is false" do
+    env = {
+        "rack.input" => StringIO.new('{"x":1, "y":2}'),
+        "REQUEST_METHOD" => "GET",
+        "QUERY_STRING"=>"data=value&x=aaa",
+    }
+    request = Rack::Request.new(env)
+    params, _ = Committee::RequestUnpacker.new(request, { allow_query_params: true, use_get_body: false }).call
+    assert_equal({ 'data' => 'value', 'x' => 'aaa' }, params)
+  end
 end

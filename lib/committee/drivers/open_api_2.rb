@@ -9,6 +9,10 @@ module Committee::Drivers
       true
     end
 
+    def default_allow_get_body
+      true
+    end
+
     # Whether parameters in a request's path will be considered and coerced by
     # default.
     def default_path_params

@@ -4,6 +4,7 @@ module Committee
       @request = request
 
       @allow_form_params  = options[:allow_form_params]
+      @allow_get_body     = options[:allow_get_body]
       @allow_query_params = options[:allow_query_params]
       @coerce_form_params = options[:coerce_form_params]
       @optimistic_json    = options[:optimistic_json]
@@ -70,20 +71,21 @@ module Committee
     end
 
     def parse_json
-      if (body = @request.body.read).length != 0
-        @request.body.rewind
-        hash = JSON.parse(body)
-        # We want a hash specifically. '42', 42, and [42] will all be
-        # decoded properly, but we can't use them here.
-        if !hash.is_a?(Hash)
-          raise BadRequest,
-            "Invalid JSON input. Require object with parameters as keys."
-        end
-        indifferent_params(hash)
+      return nil if @request.request_method == "GET" && !@allow_get_body
+
+      body = @request.body.read
       # if request body is empty, we just have empty params
-      else
-        nil
+      return nil if body.length == 0
+
+      @request.body.rewind
+      hash = JSON.parse(body)
+      # We want a hash specifically. '42', 42, and [42] will all be
+      # decoded properly, but we can't use them here.
+      if !hash.is_a?(Hash)
+        raise BadRequest,
+              "Invalid JSON input. Require object with parameters as keys."
       end
+      indifferent_params(hash)
     end
 
     def headers

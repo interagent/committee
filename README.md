@@ -26,14 +26,15 @@ Options and their defaults:
 | name | Hyper-Schema | OpenAPI 3 | Description |
 |-----------:|------------:|------------:| :------------ |
 |allow_form_params | true | true | Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations. |
+|allow_get_body | true | false | Allow GET request body, which merge to request parameter. See (#211) |
 |allow_query_params | true | true | Specifies that query string parameters will be taken into consideration when doing validation. |
-|coerce_date_times | false | true | Convert the string with `"format": "date-time"` parameter to DateTime object. |
-|coerce_form_params| false | true | Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation. |
-|coerce_query_params| false | true  | The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string. |
-|coerce_path_params| false | true | The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path. |
-|coerce_recursive| false | always true | Coerce data in arrays and other nested objects |
 |check_content_type | true | true | Specifies that `Content-Type` should be verified according to JSON Hyper-schema or OpenAPI 3 definition. |
 |check_header | true | true | Check header data using JSON Hyper-schema or OpenAPI 3 definition. |
+|coerce_date_times | false | true | Convert the string with `"format": "date-time"` parameter to DateTime object. |
+|coerce_form_params| false | true | Tries to convert POST data encoded into an `application/x-www-form-urlencoded` body (where values are all strings) into concrete types required by the schema. This works for `null` (empty value), `integer` (numeric value without decimals), `number` (numeric value) and `boolean` ("true" is converted to `true` and "false" to `false`). If coercion is not possible, the original value is passed unchanged to schema validation. |
+|coerce_path_params| false | true | The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path. |
+|coerce_query_params| false | true  | The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string. |
+|coerce_recursive| false | always true | Coerce data in arrays and other nested objects |
 |optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |
@@ -354,6 +355,10 @@ end
 ```
 
 The default assertion option in 2.* was `validate_success_only=true`, but this becomes `validate_success_only=false` in 3.*. For the smoothest possible upgrade, you should set it to `false` in your test suite before upgrading to 3.*.
+
+### Other changes
+
+* `GET` request bodies are ignored in OpenAPI 3 by default. If you want to use them, set the `allow_get_body` option to `true`.
 
 ## Development
 

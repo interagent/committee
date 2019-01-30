@@ -1,5 +1,5 @@
 Unreleased
-
+	Allow GET request body data (#211)
 
 3.0.0.beta3 2019-01-25
 	OpenAPI 3 merge request body to request parameter in GET request (#210)
