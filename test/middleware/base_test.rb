@@ -19,8 +19,17 @@ describe Committee::Middleware::Base do
     assert_equal 200, last_response.status
   end
 
-  it "accepts schema string (legacy behavior)" do
-    mock(Committee).warn_deprecated.with_any_args
+  it "accepts just a OpenAPI3 schema object" do
+    @app = new_rack_app(schema: open_api_3_schema)
+    params = {
+        "name" => "cloudnasium"
+    }
+    header "Content-Type", "application/json"
+    post "/apps", JSON.generate(params)
+    assert_equal 200, last_response.status
+  end
+
+  it "doesn't accept a schema string" do
     @app = new_rack_app(
       schema: JSON.dump(hyper_schema_data)
     )
@@ -28,12 +37,16 @@ describe Committee::Middleware::Base do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
+
+    e = assert_raises(ArgumentError) do
+      post "/apps", JSON.generate(params)
+    end
+
+    assert_equal "Committee: schema expected to be an instance " +
+                     "of Committee::Drivers::Schema.", e.message
   end
 
-  it "accepts schema hash (legacy behavior)" do
-    mock(Committee).warn_deprecated.with_any_args
+  it "doesn't accept a schema hash" do
     @app = new_rack_app(
       schema: hyper_schema_data
     )
@@ -41,12 +54,16 @@ describe Committee::Middleware::Base do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
+
+    e = assert_raises(ArgumentError) do
+      post "/apps", JSON.generate(params)
+    end
+
+    assert_equal "Committee: schema expected to be an instance " +
+                     "of Committee::Drivers::Schema.", e.message
   end
 
-  it "accepts schema JsonSchema::Schema object (legacy behavior)" do
-    mock(Committee).warn_deprecated.with_any_args
+  it "doesn't accept a JsonSchema::Schema object" do
     @app = new_rack_app(
       schema: JsonSchema.parse!(hyper_schema_data)
     )
@@ -54,8 +71,13 @@ describe Committee::Middleware::Base do
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
-    post "/apps", JSON.generate(params)
-    assert_equal 200, last_response.status
+
+    e = assert_raises(ArgumentError) do
+      post "/apps", JSON.generate(params)
+    end
+
+    assert_equal "Committee: schema expected to be an instance " +
+                     "of Committee::Drivers::Schema.", e.message
   end
 
   it "doesn't accept other schema types" do
@@ -68,6 +90,15 @@ describe Committee::Middleware::Base do
     assert_equal "Committee: schema expected to be an instance of Committee::Drivers::Schema.", e.message
   end
 
+  it "errors when no schema is specified" do
+    @app = new_rack_app
+    e = assert_raises(ArgumentError) do
+      post "/apps"
+    end
+
+    assert_equal "Committee: need option `schema` or `filepath`", e.message
+  end
+
   describe 'initialize option' do
     it "schema_path option with hyper-schema" do
       b = Committee::Middleware::Base.new(nil, schema_path: hyper_schema_schema_path)
@@ -77,6 +108,11 @@ describe Committee::Middleware::Base do
     it "schema_path option with OpenAPI2" do
       b = Committee::Middleware::Base.new(nil, schema_path: open_api_2_schema_path)
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, b.instance_variable_get(:@schema)
+    end
+
+    it "filepath option with OpenAPI3" do
+      b = Committee::Middleware::Base.new(nil, schema_path: open_api_3_schema_path)
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, b.instance_variable_get(:@schema)
     end
   end
 

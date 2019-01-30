@@ -1,7 +1,15 @@
 module Committee::Drivers
   class OpenAPI2 < Committee::Drivers::Driver
+    def default_coerce_date_times
+      false
+    end
+
     # Whether parameters that were form-encoded will be coerced by default.
     def default_coerce_form_params
+      true
+    end
+
+    def default_allow_get_body
       true
     end
 
@@ -14,6 +22,10 @@ module Committee::Drivers
     # Whether parameters in a request's query string will be considered and
     # coerced by default.
     def default_query_params
+      true
+    end
+
+    def default_validate_success_only
       true
     end
 
@@ -224,6 +236,12 @@ module Committee::Drivers
       attr_accessor :definitions
       attr_accessor :produces
       attr_accessor :routes
+      attr_reader :validator_option
+
+      def build_router(options)
+        @validator_option = Committee::SchemaValidator::Option.new(options, self, :hyper_schema)
+        Committee::SchemaValidator::HyperSchema::Router.new(self, @validator_option)
+      end
     end
 
     private

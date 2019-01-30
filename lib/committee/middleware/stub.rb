@@ -1,3 +1,5 @@
+# Stub is not yet supported in OpenAPI 3
+
 module Committee::Middleware
   class Stub < Base
     def initialize(app, options={})
@@ -12,6 +14,8 @@ module Committee::Middleware
       @cache = options[:cache]
 
       @call = options[:call]
+
+      raise Committee::OpenAPI3Unsupported.new("Stubs are not yet supported for OpenAPI 3") unless @schema.supports_stub?
     end
 
     def handle(request)
@@ -20,7 +24,7 @@ module Committee::Middleware
         headers = { "Content-Type" => "application/json" }
 
         data, schema = cache(link) do
-          Committee::ResponseGenerator.new.call(link)
+          Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
         end
 
         if @call

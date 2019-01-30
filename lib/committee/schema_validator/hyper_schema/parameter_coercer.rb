@@ -1,5 +1,5 @@
 module Committee
-  class ParameterCoercer
+  class SchemaValidator::HyperSchema::ParameterCoercer
     def initialize(params, schema, options = {})
       @params = params
       @schema = schema

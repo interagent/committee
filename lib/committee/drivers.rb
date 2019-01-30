@@ -8,6 +8,8 @@ module Committee
         Committee::Drivers::HyperSchema.new
       when :open_api_2
         Committee::Drivers::OpenAPI2.new
+      when :open_api_3
+        Committee::Drivers::OpenAPI3.new
       else
         raise ArgumentError, %{Committee: unknown driver "#{name}".}
       end
@@ -17,14 +19,39 @@ module Committee
     # @param [String] schema_path
     # @return [Committee::Driver]
     def self.load_from_json(schema_path)
-      json = JSON.parse(File.read(schema_path))
-      load_from_data(json)
+      load_from_data(JSON.parse(File.read(schema_path)))
+    end
+
+    # load and build drive from YAML file
+    # @param [String] schema_path
+    # @return [Committee::Driver]
+    def self.load_from_yaml(schema_path)
+      load_from_data(YAML.load_file(schema_path))
+    end
+
+    # load and build drive from file
+    # @param [String] schema_path
+    # @return [Committee::Driver]
+    def self.load_from_file(schema_path)
+      case File.extname(schema_path)
+      when '.json'
+        load_from_json(schema_path)
+      when '.yaml', '.yml'
+        load_from_yaml(schema_path)
+      else
+        raise "Committee only supports the following file extensions: '.json', '.yaml', '.yml'"
+      end
     end
 
     # load and build drive from Hash object
     # @param [Hash] hash
     # @return [Committee::Driver]
     def self.load_from_data(hash)
+      if hash['openapi'] == '3.0.0'
+        parser = OpenAPIParser.parse(hash)
+        return Committee::Drivers::OpenAPI3.new.parse(parser)
+      end
+
       driver = if hash['swagger'] == '2.0'
                  Committee::Drivers::OpenAPI2.new
                else
@@ -34,17 +61,15 @@ module Committee
       driver.parse(hash)
     end
 
-    # load and build drive from file
-    # @param [String] schema_path
-    # @return [Committee::Driver]
-    def self.load_from_file(schema_path)
-      load_from_json(schema_path)
-    end
-
     # Driver is a base class for driver implementations.
     class Driver
       # Whether parameters that were form-encoded will be coerced by default.
       def default_coerce_form_params
+        raise "needs implementation"
+      end
+
+      # Use GET request body to request parameter (request body merge to parameter)
+      def default_allow_get_body
         raise "needs implementation"
       end
 
@@ -84,6 +109,15 @@ module Committee
       # that create this schema.
       def driver
         raise "needs implementation"
+      end
+
+      def build_router(options)
+        raise "needs implementation"
+      end
+
+      # Stubs are supported in JSON Hyper-Schema and OpenAPI 2, but not yet in OpenAPI 3
+      def supports_stub?
+        true
       end
     end
   end

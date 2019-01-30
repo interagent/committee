@@ -1,3 +1,5 @@
+# Don't Support OpenAPI3
+
 module Committee
   module Bin
     # CommitteeStub internalizes the functionality of bin/committee-stub so
@@ -7,6 +9,8 @@ module Committee
       # Gets a Rack app suitable for use as a stub.
       def get_app(schema, options)
         cache = {}
+
+        raise Committee::OpenAPI3Unsupported.new("Stubs are not yet supported for OpenAPI 3") unless schema.supports_stub?
 
         Rack::Builder.new {
           unless options[:tolerant]

@@ -25,6 +25,12 @@ describe Committee::Bin::CommitteeStub do
     assert_equal true, options[:tolerant]
     assert_equal "1234", options[:port]
   end
+
+  it "is not supported in OpenAPI 3" do
+    assert_raises(Committee::OpenAPI3Unsupported) do
+      @bin.get_app(open_api_3_schema, {})
+    end
+  end
 end
 
 describe Committee::Bin::CommitteeStub, "app" do

@@ -21,6 +21,7 @@ require "minitest/spec"
 require "minitest/autorun"
 require "rack/test"
 require "rr"
+require "pry"
 
 require_relative "../lib/committee"
 
@@ -47,11 +48,15 @@ ValidPet = {
 }.freeze
 
 def hyper_schema
-  @hyper_schema ||= Committee::Drivers.load_from_file(hyper_schema_schema_path)
+  @hyper_schema ||= Committee::Drivers.load_from_json(hyper_schema_schema_path)
 end
 
 def open_api_2_schema
-  @open_api_2_schema ||= Committee::Drivers.load_from_data(open_api_2_data)
+  @open_api_2_schema ||= Committee::Drivers.load_from_file(open_api_2_schema_path)
+end
+
+def open_api_3_schema
+  @open_api_3_schema ||= Committee::Drivers.load_from_data(open_api_3_data)
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.
@@ -64,6 +69,10 @@ def open_api_2_data
   JSON.parse(File.read(open_api_2_schema_path))
 end
 
+def open_api_3_data
+  YAML.load_file(open_api_3_schema_path)
+end
+
 def hyper_schema_schema_path
   "./test/data/hyperschema/paas.json"
 end
@@ -71,3 +80,8 @@ end
 def open_api_2_schema_path
   "./test/data/openapi2/petstore-expanded.json"
 end
+
+def open_api_3_schema_path
+  "./test/data/openapi3/normal.yaml"
+end
+

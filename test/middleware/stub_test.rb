@@ -96,6 +96,15 @@ describe Committee::Middleware::Stub do
     assert_equal({ "cached" => true }, data)
   end
 
+  it "caches the response if called multiple times" do
+    cache = {}
+    @app = new_rack_app(cache: cache, schema: open_api_3_schema)
+
+    assert_raises(Committee::OpenAPI3Unsupported) do
+      get "/characters"
+    end
+  end
+
   private
 
   def new_rack_app(options = {})

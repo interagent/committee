@@ -1,5 +1,5 @@
 module Committee
-  class ResponseGenerator
+  class SchemaValidator::HyperSchema::ResponseGenerator
     def call(link)
       schema = target_schema(link)
       data = generate_properties(link, schema)
