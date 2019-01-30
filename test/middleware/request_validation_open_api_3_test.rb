@@ -51,7 +51,7 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "get error given valid parameter on GET endpoint with request body and allow_get_body=false" do
+  it "errors given valid parameter on GET endpoint with request body and allow_get_body=false" do
     params = { "data" => "abc" }
 
     @app = new_rack_app(schema: open_api_3_schema, allow_get_body: false)

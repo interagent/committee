@@ -4,11 +4,11 @@ module Committee
       @request = request
 
       @allow_form_params  = options[:allow_form_params]
+      @allow_get_body     = options[:allow_get_body]
       @allow_query_params = options[:allow_query_params]
       @coerce_form_params = options[:coerce_form_params]
       @optimistic_json    = options[:optimistic_json]
       @schema_validator   = options[:schema_validator]
-      @allow_get_body     = options[:allow_get_body]
     end
 
     def call
