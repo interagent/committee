@@ -1,4 +1,7 @@
 Unreleased
+
+
+3.0.0 2019-01-31
 	Allow GET request body data (#211)
 
 3.0.0.beta3 2019-01-25
