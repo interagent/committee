@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
 
   s.summary       = "A collection of Rack middleware to support JSON Schema."
 
-  s.authors       = ["Brandur", "geemus (Wesley Beary)"]
-  s.email         = ["brandur@mutelight.org", "geemus+github@gmail.com"]
+  s.authors       = ["Brandur", "geemus (Wesley Beary)", "ota42y"]
+  s.email         = ["brandur@mutelight.org", "geemus+github@gmail.com", "ota42y@gmail.com"]
   s.homepage      = "https://github.com/interagent/committee"
   s.license       = "MIT"
 
