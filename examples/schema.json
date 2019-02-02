@@ -45,6 +45,16 @@
               "object"
             ]
           },
+          "targetSchema": {
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/app/definitions/id"
+              },
+              "name": {
+                "$ref": "#/definitions/app/definitions/name"
+              }
+            }
+          },
           "title": "Create"
         },
         {
@@ -82,6 +92,16 @@
             "type": [
               "object"
             ]
+          },
+          "targetSchema": {
+            "properties": {
+              "id": {
+                "$ref": "#/definitions/app/definitions/id"
+              },
+              "name": {
+                "$ref": "#/definitions/app/definitions/name"
+              }
+            }
           },
           "title": "Update"
         }

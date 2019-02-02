@@ -5,12 +5,12 @@ require "sinatra/base"
 require "yaml"
 
 class App < Sinatra::Base
-  SCHEMA = YAML.load(File.read(File.expand_path("../schema.json", __FILE__)))
+  SCHEMA_PATH = File.expand_path("../schema.json", __FILE__)
 
   # The request validator verifies that the required input parameters (and no
   # unknown input parameters) are included with the request and that they are
   # of the right types.
-  use Committee::Middleware::RequestValidation, schema: SCHEMA
+  use Committee::Middleware::RequestValidation, schema_path: SCHEMA_PATH
 
   # The stubbing middleware generates sample responses based on the schema. The
   # :call option indicates that it should still call down to the underlying
@@ -18,13 +18,13 @@ class App < Sinatra::Base
   #
   # Note that the stub's response can be modified or suppressed. See the POST
   # /apps and PATCH /apps/:id handlers below for examples.
-  use Committee::Middleware::Stub, call: true, schema: SCHEMA
+  use Committee::Middleware::Stub, schema_path: SCHEMA_PATH
 
   # The response validator checks that responses from within the stack are
   # compliant with the JSON schema. It's normally used for verification in
   # tests, but here we can use it to check that our changes to the stub's
   # responses are still compliant with our schema.
-  use Committee::Middleware::ResponseValidation, schema: SCHEMA
+  use Committee::Middleware::ResponseValidation, schema_path: SCHEMA_PATH
 
   # This handler is called into, but its response is ignored.
   get "/apps" do
