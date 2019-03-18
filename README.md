@@ -262,7 +262,7 @@ end
 Committee can detect the type of schema (Hyper-Schema, OpenAPI 3, etc.) from the provided file, so there's no need to pass in any additional options:
 
 ```ruby
-use Committee::Middleware::RequestValidation, filepath: 'open_api_3/schema.yaml'
+use Committee::Middleware::RequestValidation, schema_path: 'open_api_3/schema.yaml'
 ```
 
 If you want to select the type manually, pass an `OpenAPI 3` object to the `schema` option manually:
