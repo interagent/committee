@@ -4,12 +4,16 @@ class OpenAPIParser::ParameterValidator
     # @param [Hash] params
     # @param [String] object_reference
     # @param [OpenAPIParser::SchemaValidator::Options] options
-    def validate_parameter(parameters_hash, params, object_reference, options)
+    # @param [Boolean] is_header is header or not (ignore params key case)
+    def validate_parameter(parameters_hash, params, object_reference, options, is_header = false)
       no_exist_required_key = []
+
+      params_key_converted = params.keys.map { |k| [(is_header ? k&.downcase : k), k] }.to_h
       parameters_hash.each do |k, v|
-        if params.include?(k)
-          coerced = v.validate_params(params[k], options)
-          params[k] = coerced if options.coerce_value
+        key = params_key_converted[k.downcase]
+        if params.include?(key)
+          coerced = v.validate_params(params[key], options)
+          params[key] = coerced if options.coerce_value
         elsif v.required
           no_exist_required_key << k
         end
