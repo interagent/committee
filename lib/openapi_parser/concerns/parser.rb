@@ -1,6 +1,8 @@
 module OpenAPIParser::Parser
 end
 
+require 'forwardable'
+
 require_relative './parser/core'
 require_relative './schema_loader'
 
