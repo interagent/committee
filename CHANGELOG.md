@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.2.3 (2019-03-18)
+* validate_header_parameter support case incentive (#25)
+
 ## 0.2.2 (2019-01-06)
 * bugfix for datetime validate (#20)
 
