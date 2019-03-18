@@ -746,7 +746,7 @@ RSpec.describe OpenAPIParser::SchemaValidator do
     end
 
     context 'valid header' do
-      let(:headers) { { 'token' => 1, 'header_2' => 'h' } }
+      let(:headers) { { 'TOKEN' => 1, 'header_2' => 'h' } }
 
       it { expect(subject).not_to eq nil }
 

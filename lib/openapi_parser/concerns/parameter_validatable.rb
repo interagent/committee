@@ -26,7 +26,7 @@ module OpenAPIParser::ParameterValidatable
     # @param [String] object_reference
     # @param [OpenAPIParser::SchemaValidator::Options] options request validator options
     def validate_header_parameter(headers, object_reference, options)
-      OpenAPIParser::ParameterValidator.validate_parameter(header_parameter_hash, headers, object_reference, options)
+      OpenAPIParser::ParameterValidator.validate_parameter(header_parameter_hash, headers, object_reference, options, true)
     end
 
     def header_parameter_hash
