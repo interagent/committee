@@ -27,7 +27,7 @@ module Committee::Middleware
         unless schema
           schema = Committee::Drivers::load_from_file(options[:schema_path]) if options[:schema_path]
 
-          raise(ArgumentError, "Committee: need option `schema` or `filepath`") unless schema
+          raise(ArgumentError, "Committee: need option `schema` or `schema_path`") unless schema
         end
 
         # Expect the type we want by now. If we don't have it, the user passed

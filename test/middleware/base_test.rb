@@ -96,7 +96,7 @@ describe Committee::Middleware::Base do
       post "/apps"
     end
 
-    assert_equal "Committee: need option `schema` or `filepath`", e.message
+    assert_equal "Committee: need option `schema` or `schema_path`", e.message
   end
 
   describe 'initialize option' do
@@ -110,7 +110,7 @@ describe Committee::Middleware::Base do
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, b.instance_variable_get(:@schema)
     end
 
-    it "filepath option with OpenAPI3" do
+    it "schema_path option with OpenAPI3" do
       b = Committee::Middleware::Base.new(nil, schema_path: open_api_3_schema_path)
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, b.instance_variable_get(:@schema)
     end
