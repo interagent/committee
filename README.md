@@ -149,6 +149,7 @@ Option values and defaults:
 |-----------:|------------:|------------:| :------------ |
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |validate_success_only| true | false | Also validate non-2xx responses only. |
+|ignore_error| false | false | Validate and ignore result even if validation is error. So always return original data. |
 
 No boolean option values:
 
@@ -179,6 +180,8 @@ The middleware will raise an error to indicate what the problems are:
 $ curl -X GET http://localhost:9292/apps
 {"id":"invalid_response","message":"Missing keys in response: archived_at, buildpack_provided_description, created_at, git_url, id, maintenance, name, owner:email, owner:id, region:id, region:name, released_at, repo_size, slug_size, stack:id, stack:name, updated_at, web_url."}
 ```
+
+If you want to take log only (for example avoiding false-positive in production), use `ignore_error` and `error_handler` option.
 
 ## Validation Errors
 
