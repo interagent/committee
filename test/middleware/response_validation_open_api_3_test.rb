@@ -24,6 +24,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal "{\"id\":\"invalid_response\",\"message\":\"Response wasn't valid JSON.\"}", last_response.body
   end
 
+  it "passes through a invalid json with ignore_error option" do
+    @app = new_response_rack("not_json", {}, schema: open_api_3_schema, ignore_error: true)
+
+    get "/characters"
+
+    assert_equal 200, last_response.status
+  end
+
   it "passes through not definition" do
     @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, schema: open_api_3_schema)
     get "/no_data"
