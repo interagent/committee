@@ -224,6 +224,10 @@ paths:
                         id:
                           type: integer
                           format: int64
+                one_of_data:
+                  oneOf:
+                    - $ref: '#/components/schemas/one_of_object1'
+                    - $ref: '#/components/schemas/one_of_object2'
                 object_1:
                   type: object
                   properties:
@@ -569,3 +573,23 @@ components:
             type: array
             items:
               type: object
+    one_of_object1:
+      type: object
+      required:
+        - name
+        - integer_1
+      properties:
+        name:
+          type: string
+        integer_1:
+          type: integer
+    one_of_object2:
+      type: object
+      required:
+        - name
+        - string_1
+      properties:
+        name:
+          type: string
+        string_1:
+          type: string

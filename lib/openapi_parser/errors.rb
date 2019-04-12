@@ -43,6 +43,17 @@ module OpenAPIParser
     end
   end
 
+  class NotOneOf < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} isn't one of in #{@reference}"
+    end
+  end
+
   class NotAnyOf < OpenAPIError
     def initialize(value, reference)
       super(reference)
