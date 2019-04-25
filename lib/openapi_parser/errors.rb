@@ -76,6 +76,18 @@ module OpenAPIParser
     end
   end
 
+  class InvalidPattern < OpenAPIError
+    def initialize(value, pattern, reference)
+      super(reference)
+      @value = value
+      @pattern = pattern
+    end
+
+    def message
+      "#{@value} isn't match #{@pattern} in #{@reference}"
+    end
+  end
+
   class NotExistStatusCodeDefinition < OpenAPIError
     def message
       "don't exist status code definition in #{@reference}"
