@@ -13,6 +13,9 @@ class OpenAPIParser::SchemaValidator
       value, err = check_enum_include(value, schema)
       return [nil, err] if err
 
+      value, err = pattern_validate(value, schema)
+      return [nil, err] if err
+
       unless @datetime_coerce_class.nil?
         value, err = coerce_date_time(value, schema)
         return [nil, err] if err
@@ -38,6 +41,15 @@ class OpenAPIParser::SchemaValidator
         end
 
         OpenAPIParser::ValidateError.build_error_result(value, schema)
+      end
+
+      # @param [OpenAPIParser::Schemas::Schema] schema
+      def pattern_validate(value, schema)
+        # pattern support string only so put this
+        return [value, nil] unless schema.pattern
+        return [value, nil] if value =~ /#{schema.pattern}/
+
+        [nil, OpenAPIParser::InvalidPattern.new(value, schema.pattern, schema.object_reference)]
       end
   end
 end

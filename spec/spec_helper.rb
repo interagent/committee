@@ -31,3 +31,24 @@ end
 def petstore_schema
   YAML.load_file('./spec/data/petstore-expanded.yaml')
 end
+
+def build_validate_test_schema(new_properties)
+  b = YAML.load_file('./spec/data/validate_test.yaml')
+  obj = b['paths']['/validate_test']['post']['requestBody']['content']['application/json']['schema']['properties']
+  obj.merge!(change_string_key(new_properties))
+  b
+end
+
+def change_string_key(hash)
+  new_data = hash.map do |k, v|
+    if v.kind_of?(Hash)
+      [k.to_s, change_string_key(v)]
+    elsif v.kind_of?(Array)
+      [k.to_s, v.map { |child| change_string_key(child) }]
+    else
+      [k.to_s, v]
+    end
+  end
+
+  new_data.to_h
+end

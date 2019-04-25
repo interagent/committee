@@ -1,0 +1,19 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OpenAPI3 Test
+paths:
+  /validate_test:
+    post:
+      description: override here
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                test:
+                  type: string
+      responses:
+        '204':
+          description: empty
