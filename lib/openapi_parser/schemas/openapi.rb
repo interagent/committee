@@ -5,6 +5,8 @@
 
 module OpenAPIParser::Schemas
   class OpenAPI < Base
+    include OpenAPIParser::DefinitionValidatable
+
     def initialize(raw_schema, config)
       super('#', nil, self, raw_schema)
       @find_object_cache = {}
@@ -27,6 +29,18 @@ module OpenAPIParser::Schemas
     # @return [OpenAPIParser::RequestOperation, nil]
     def request_operation(http_method, request_path)
       OpenAPIParser::RequestOperation.create(http_method, request_path, @path_item_finder, @config)
+    end
+
+    # return the definition is valid or not
+    # @return Boolean
+    def valid_definition?
+      openapi_definition_errors.empty?
+    end
+
+    # return definition errors
+    # @return Array
+    def openapi_definition_errors
+      @openapi_definition_errors ||= validate_definitions([])
     end
   end
 end

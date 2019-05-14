@@ -88,7 +88,7 @@ class OpenAPIParser::SchemaValidator
   private
 
     # @return [OpenAPIParser::SchemaValidator::Base, nil]
-    def validator(value, schema)
+    def validator(value, schema) # rubocop:disable Metrics/CyclomaticComplexity
       return any_of_validator if schema.any_of
       return all_of_validator if schema.all_of
       return one_of_validator if schema.one_of
