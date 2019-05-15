@@ -3,6 +3,10 @@ class OpenAPIParser::SchemaValidator
     # @param [Object] value
     # @param [OpenAPIParser::Schemas::Schema] schema
     def coerce_and_validate(value, schema)
+      if schema.discriminator
+        return validate_discriminator_schema(schema.discriminator, value)
+      end
+
       # in all schema return error (=true) not any of data
       schema.any_of.each do |s|
         coerced, err = validatable.validate_schema(value, s)

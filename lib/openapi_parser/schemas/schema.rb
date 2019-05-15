@@ -1,5 +1,5 @@
 # TODO: support 'not' because I need check reference...
-# TODO: support 'discriminator', 'xml', 'externalDocs'
+# TODO: support 'xml', 'externalDocs'
 # TODO: support extended property
 
 module OpenAPIParser::Schemas
@@ -73,6 +73,7 @@ module OpenAPIParser::Schemas
                         :example,
                         :deprecated
 
+
     # @!attribute [r] read_only
     #   @return [Boolean, nil]
     openapi_attr_value :read_only, schema_key: :readOnly
@@ -100,6 +101,18 @@ module OpenAPIParser::Schemas
     # @!attribute [r] properties
     #   @return [Hash{String => Schema}, nil]
     openapi_attr_hash_object :properties, Schema, reference: true
+
+    # @!attribute [r] discriminator
+    #   @return [Hash{String => Schema}, nil]
+    openapi_attr_objects :discriminator, Schema
+
+    # @!attribute [r] property_name
+    #   @return [String, nil]
+    openapi_attr_value :property_name, schema_key: :propertyName
+
+    # @!attribute [r] mapping
+    #   @return [Hash{String => String]
+    openapi_attr_value :mapping
 
     # @!attribute [r] additional_properties
     #   @return [Boolean, Schema, Reference, nil]
