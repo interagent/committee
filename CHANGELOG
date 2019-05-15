@@ -1,5 +1,8 @@
 Unreleased
 
+3.0.2 2019-05-15
+	Support OpenAPI 3 patch version (#223)
+
 3.0.1 2019-03-18
 	Correct use of `filepath` to `schema_path` (#216)
 
