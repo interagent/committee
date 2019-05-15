@@ -85,3 +85,6 @@ def open_api_3_schema_path
   "./test/data/openapi3/normal.yaml"
 end
 
+def open_api_3_0_1_schema_path
+  "./test/data/openapi3/3_0_1.yaml"
+end

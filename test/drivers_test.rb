@@ -40,6 +40,12 @@ describe Committee::Drivers do
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
+    it 'load OpenAPI 3 (patch version 3.0.1)' do
+      s = Committee::Drivers.load_from_file(open_api_3_0_1_schema_path)
+      assert_kind_of Committee::Drivers::Schema, s
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+
     it 'errors on an unsupported file extension' do
       e = assert_raises(StandardError) do
         Committee::Drivers.load_from_file('test.xml')
