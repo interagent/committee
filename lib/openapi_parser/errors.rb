@@ -43,6 +43,17 @@ module OpenAPIParser
     end
   end
 
+  class NotExistDiscriminatorMappingTarget < OpenAPIError
+    def initialize(key, reference)
+      super(reference)
+      @key = key
+    end
+
+    def message
+      "discriminator mapping key #{@key} not exist in #{@reference}"
+    end
+  end
+
   class NotOneOf < OpenAPIError
     def initialize(value, reference)
       super(reference)

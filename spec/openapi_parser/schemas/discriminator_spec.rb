@@ -51,5 +51,28 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         expect(e.message.start_with?("required parameters milk_stock not exist")).to eq true
       end
     end
+
+    it "throws error when discrimator mapping is not found" do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "dogs",
+            "content" => [
+              {
+                "name"        => "Mr. Dog",
+                "born_at"     => "2019-05-16T11 =>37 =>02.160Z",
+                "description" => "Dog bruiser",
+                "nut_stock"   => 10 # passing squirrel attribute here, but discriminator still picks cats and fails
+              }
+            ]
+          },
+        ]
+      }
+
+      expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
+        expect(e.kind_of?(OpenAPIParser::NotExistDiscriminatorMappingTarget)).to eq true
+        expect(e.message.start_with?("discriminator mapping key dogs not exist")).to eq true
+      end
+    end
   end
 end
