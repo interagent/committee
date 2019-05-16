@@ -19,6 +19,9 @@ class OpenAPIParser::SchemaValidator
     end
 
     def validate_discriminator_schema(discriminator, value)
+      unless value.key?(discriminator.property_name)
+        return [nil, OpenAPIParser::NotExistDiscriminatorPropertyName.new(discriminator.property_name, value, discriminator.object_reference)]
+      end
       mapping_key = value[discriminator.property_name]
 
       # TODO: it's allowed to have discriminator without mapping, then we need to lookup discriminator.property_name
