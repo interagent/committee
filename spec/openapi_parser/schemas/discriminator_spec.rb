@@ -47,8 +47,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         ]
       }
       expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-        expect(e.message).to match("^required parameters milk_stock not exist.*?$")
+        expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
+        expect(e.message).to match("^property nut_stock is not defined in.*?$")
       end
     end
 
