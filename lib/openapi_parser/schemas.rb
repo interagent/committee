@@ -1,6 +1,7 @@
 require_relative 'schemas/classes'
 
 require_relative 'schemas/base'
+require_relative 'schemas/discriminator'
 require_relative 'schemas/openapi'
 require_relative 'schemas/paths'
 require_relative 'schemas/path_item'

@@ -73,7 +73,6 @@ module OpenAPIParser::Schemas
                         :example,
                         :deprecated
 
-
     # @!attribute [r] read_only
     #   @return [Boolean, nil]
     openapi_attr_value :read_only, schema_key: :readOnly
@@ -103,16 +102,8 @@ module OpenAPIParser::Schemas
     openapi_attr_hash_object :properties, Schema, reference: true
 
     # @!attribute [r] discriminator
-    #   @return [Hash{String => Schema}, nil]
-    openapi_attr_objects :discriminator, Schema
-
-    # @!attribute [r] property_name
-    #   @return [String, nil]
-    openapi_attr_value :property_name, schema_key: :propertyName
-
-    # @!attribute [r] mapping
-    #   @return [Hash{String => String]
-    openapi_attr_value :mapping
+    #   @return [Discriminator, nil]
+    openapi_attr_object :discriminator, Discriminator
 
     # @!attribute [r] additional_properties
     #   @return [Boolean, Schema, Reference, nil]
