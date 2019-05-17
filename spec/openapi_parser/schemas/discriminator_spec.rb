@@ -18,7 +18,7 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
             "content" => [
               {
                 "name"        => "Mr. Cat",
-                "born_at"     => "2019-05-16T11 =>37 =>02.160Z",
+                "born_at"     => "2019-05-16T11:37:02.160Z",
                 "description" => "Cat gentleman",
                 "milk_stock"  => 10
               }
@@ -38,7 +38,7 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
             "content" => [
               {
                 "name"        => "Mr. Cat",
-                "born_at"     => "2019-05-16T11 =>37 =>02.160Z",
+                "born_at"     => "2019-05-16T11:37:02.160Z",
                 "description" => "Cat gentleman",
                 "nut_stock"   => 10 # passing squirrel attribute here, but discriminator still picks cats and fails
               }
@@ -60,7 +60,7 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
             "content" => [
               {
                 "name"        => "Mr. Dog",
-                "born_at"     => "2019-05-16T11 =>37 =>02.160Z",
+                "born_at"     => "2019-05-16T11:37:02.160Z",
                 "description" => "Dog bruiser",
                 "nut_stock"   => 10 # passing squirrel attribute here, but discriminator still picks cats and fails
               }
@@ -82,7 +82,7 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
             "content" => [
               {
                 "name"        => "Mr. Dog",
-                "born_at"     => "2019-05-16T11 =>37 =>02.160Z",
+                "born_at"     => "2019-05-16T11:37:02.160Z",
                 "description" => "Dog bruiser",
                 "milk_stock"   => 10
               }
