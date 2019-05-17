@@ -62,7 +62,7 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
                 "name"        => "Mr. Dog",
                 "born_at"     => "2019-05-16T11:37:02.160Z",
                 "description" => "Dog bruiser",
-                "nut_stock"   => 10 # passing squirrel attribute here, but discriminator still picks cats and fails
+                "nut_stock"   => 10
               }
             ]
           },
