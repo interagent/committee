@@ -31,7 +31,7 @@ class OpenAPIParser::SchemaValidator
         return [nil, OpenAPIParser::NotExistDiscriminatorMappingTarget.new(mapping_key, discriminator.object_reference)]
       end
 
-      # TODO: this is likely O(n) for each validation, we need to find it once during parsing
+      # Find object does O(n) search at worst, then caches the result, so this is ok for repeated search
       resolved_schema = discriminator.root.find_object(mapping_target)
       validatable.validate_schema(value, resolved_schema)
     end
