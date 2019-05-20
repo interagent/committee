@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.2.7 (2019-05-20)
+* Fix for release miss
+
 ## 0.2.6 (2019-05-20)
 * Add support for discriminator (#32)
 
