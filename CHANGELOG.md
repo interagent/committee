@@ -1,5 +1,11 @@
 ## Unreleased
 
+## 0.2.6 (2019-05-20)
+* Add support for discriminator (#32)
+
+## 0.2.5 (2019-04-12)
+* Support one of validator (#26)
+
 ## 0.2.3 (2019-03-18)
 * validate_header_parameter support case incentive (#25)
 
