@@ -2,6 +2,7 @@
 
 module OpenAPIParser::Schemas
   class Base; end
+  class Discriminator < Base; end
   class OpenAPI < Base; end
   class Operation < Base; end
   class Parameter < Base; end

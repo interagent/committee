@@ -32,6 +32,10 @@ def petstore_schema
   YAML.load_file('./spec/data/petstore-expanded.yaml')
 end
 
+def petstore_with_discriminator_schema
+  YAML.load_file('./spec/data/petstore-with-discriminator.yaml')
+end
+
 def build_validate_test_schema(new_properties)
   b = YAML.load_file('./spec/data/validate_test.yaml')
   obj = b['paths']['/validate_test']['post']['requestBody']['content']['application/json']['schema']['properties']
