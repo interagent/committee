@@ -228,6 +228,15 @@ paths:
                   oneOf:
                     - $ref: '#/components/schemas/one_of_object1'
                     - $ref: '#/components/schemas/one_of_object2'
+                one_of_with_discriminator:
+                  oneOf:
+                    - $ref: '#/components/schemas/one_of_object1'
+                    - $ref: '#/components/schemas/one_of_object2'
+                  discriminator:
+                    propertyName: objType
+                    mapping:
+                      obj1: '#/components/schemas/one_of_object1'
+                      obj2: '#/components/schemas/one_of_object2'
                 object_1:
                   type: object
                   properties:

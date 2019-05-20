@@ -337,48 +337,65 @@ RSpec.describe OpenAPIParser::SchemaValidator do
     end
 
     describe 'one_of' do
-      subject { request_operation.validate_request_body(content_type, { 'one_of_data' => params }) }
+      context 'normal' do
+        subject { request_operation.validate_request_body(content_type, { 'one_of_data' => params }) }
 
-      let(:correct_params) do
-        {
-          'name' => 'name',
-          'integer_1' => 42,
-        }
-      end
-      let(:params) { correct_params }
-
-      it { expect(subject).not_to eq nil }
-
-      context 'no schema matched' do
-        let(:params) do
-          {
-            'integer_1' => 42,
-          }
-        end
-
-        it do
-          expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::NotOneOf)).to eq true
-            expect(e.message.include?("isn't one of")).to eq true
-          end
-        end
-      end
-
-      context 'multiple schema matched' do
-        let(:params) do
+        let(:correct_params) do
           {
             'name' => 'name',
             'integer_1' => 42,
-            'string_1' => 'string_1',
           }
         end
-
-        it do
-          expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::NotOneOf)).to eq true
-            expect(e.message.include?("isn't one of")).to eq true
+        let(:params) { correct_params }
+  
+        it { expect(subject).not_to eq nil }
+  
+        context 'no schema matched' do
+          let(:params) do
+            {
+              'integer_1' => 42,
+            }
+          end
+  
+          it do
+            expect { subject }.to raise_error do |e|
+              expect(e.kind_of?(OpenAPIParser::NotOneOf)).to eq true
+              expect(e.message.include?("isn't one of")).to eq true
+            end
           end
         end
+  
+        context 'multiple schema matched' do
+          let(:params) do
+            {
+              'name' => 'name',
+              'integer_1' => 42,
+              'string_1' => 'string_1',
+            }
+          end
+  
+          it do
+            expect { subject }.to raise_error do |e|
+              expect(e.kind_of?(OpenAPIParser::NotOneOf)).to eq true
+              expect(e.message.include?("isn't one of")).to eq true
+            end
+          end
+        end  
+      end
+
+      context 'with discriminator' do
+        subject { request_operation.validate_request_body(content_type, { 'one_of_with_discriminator' => params }) }
+
+        let(:correct_params) do
+          {
+            'objType' => 'obj1',
+            'name' => 'name',
+            'integer_1' => 42,  
+          }
+        end
+        let(:params) { correct_params }
+  
+        it { expect(subject).not_to eq nil }
       end
     end
 
