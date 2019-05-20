@@ -18,7 +18,7 @@ class OpenAPIParser::SchemaValidator
   # @param [Object] value
   # @param [OpenAPIParser::Schemas::Schema] schema
   module Validatable
-    def validate_schema(value, schema)
+    def validate_schema(value, schema, **keyword_args)
       raise 'implement'
     end
 
@@ -66,11 +66,15 @@ class OpenAPIParser::SchemaValidator
   # validate value eby schema
   # @param [Object] value
   # @param [OpenAPIParser::Schemas::Schema] schema
-  def validate_schema(value, schema)
+  def validate_schema(value, schema, **keyword_args)
     return [value, nil] unless schema
 
     if (v = validator(value, schema))
-      return v.coerce_and_validate(value, schema)
+      if keyword_args.empty?
+        return v.coerce_and_validate(value, schema)
+      else
+        return v.coerce_and_validate(value, schema, **keyword_args)
+      end
     end
 
     # unknown return error
