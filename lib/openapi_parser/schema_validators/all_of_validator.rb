@@ -12,9 +12,12 @@ class OpenAPIParser::SchemaValidator
         # We need to store the reference to all of, so we can perform strict check on allowed properties
         _coerced, err = validatable.validate_schema(value, s, :parent_all_of => true)
 
-        if s.properties
-          remaining_keys               -= s.properties.keys
+        if s.type == "object"
+          remaining_keys               -= (s.properties || {}).keys
           nested_additional_properties = true if s.additional_properties
+        else
+          # If this is not allOf having array of objects inside, but e.g. having another anyOf/oneOf nested
+          remaining_keys.clear
         end
 
         return [nil, err] if err
