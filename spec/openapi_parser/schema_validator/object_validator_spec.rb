@@ -30,7 +30,32 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
 
       expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
         expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-        expect(e.message).to match("^property unknown_key is not defined in.*?$")
+        expect(e.message).to match("^properties unknown_key are not defined in.*?$")
+      end
+    end
+
+    it 'throws error when sending multiple unknown property keys with no additionalProperties defined' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "cats",
+            "content" => [
+              {
+                "name"                => "Mr. Cat",
+                "born_at"             => "2019-05-16T11:37:02.160Z",
+                "description"         => "Cat gentleman",
+                "milk_stock"          => 10,
+                "unknown_key"         => "value",
+                "another_unknown_key" => "another_value"
+              }
+            ]
+          },
+        ]
+      }
+
+      expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
+        expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
+        expect(e.message).to match("^properties unknown_key,another_unknown_key are not defined in.*?$")
       end
     end
 

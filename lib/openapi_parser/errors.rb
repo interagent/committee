@@ -44,13 +44,13 @@ module OpenAPIParser
   end
 
   class NotExistPropertyDefinition < OpenAPIError
-    def initialize(key, reference)
+    def initialize(keys, reference)
       super(reference)
-      @key = key
+      @keys = keys
     end
 
     def message
-      "property #{@key} is not defined in #{@reference}"
+      "properties #{@keys.join(",")} are not defined in #{@reference}"
     end
   end
 
