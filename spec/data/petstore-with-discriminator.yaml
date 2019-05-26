@@ -32,6 +32,24 @@ paths:
             application/json:
               schema:
                 type: object
+  /save_the_pets_without_mapping:
+    post:
+      description: Creates a new pet in the store.  Duplicates are allowed
+      operationId: addPet
+      requestBody:
+        description: Pet to add to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetBasketsWithoutMapping'
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                type: object
 components:
   schemas:
     PetBaskets:
@@ -54,6 +72,17 @@ components:
                 turtles: "#/components/schemas/TurtleBasket"
                 dragon: "#/components/schemas/Dragon"
                 hydra: "#/components/schemas/Hydra"
+    PetBasketsWithoutMapping:
+      type: object
+      properties:
+        baskets:
+          type: array
+          items:
+            anyOf:
+              - "$ref": "#/components/schemas/SquirrelBasket"
+              - "$ref": "#/components/schemas/CatBasket"
+            discriminator:
+              propertyName: name
     SquirrelBasket:
       type: object
       required:

@@ -24,9 +24,11 @@ class OpenAPIParser::SchemaValidator
       end
       mapping_key = value[discriminator.property_name]
 
-      # TODO: it's allowed to have discriminator without mapping, then we need to lookup discriminator.property_name
+      # it's allowed to have discriminator without mapping, then we need to lookup discriminator.property_name
       # but the format is not the full path, just model name in the components
-      mapping_target = discriminator.mapping[mapping_key]
+      mapping = discriminator.mapping || ->(key) { "#/components/schemas/#{key}" }
+
+      mapping_target = mapping[mapping_key]
       unless mapping_target
         return [nil, OpenAPIParser::NotExistDiscriminatorMappingTarget.new(mapping_key, discriminator.object_reference)]
       end

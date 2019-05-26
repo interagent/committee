@@ -97,4 +97,53 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
       end
     end
   end
+
+  describe 'discriminator without mapping' do
+    let(:content_type) { 'application/json' }
+    let(:http_method) { :post }
+    let(:request_path) { '/save_the_pets_without_mapping' }
+    let(:request_operation) { root.request_operation(http_method, request_path) }
+
+    it 'picks correct object based on implicit mapping and succeeds' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "CatBasket",
+            "content" => [
+              {
+                "name"        => "Mr. Cat",
+                "born_at"     => "2019-05-16T11:37:02.160Z",
+                "description" => "Cat gentleman",
+                "milk_stock"  => 10
+              }
+            ]
+          },
+        ]
+      }
+
+      request_operation.validate_request_body(content_type, body)
+    end
+
+    it 'picks correct object based on implicit mapping and fails' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "CatBasket",
+            "content" => [
+              {
+                "name"        => "Mr. Cat",
+                "born_at"     => "2019-05-16T11:37:02.160Z",
+                "description" => "Cat gentleman",
+                "nut_stock"   => 10 # passing squirrel attribute here, but discriminator still picks cats and fails
+              }
+            ]
+          },
+        ]
+      }
+      expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
+        expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
+        expect(e.message).to match("^properties nut_stock are not defined in.*?$")
+      end
+    end
+  end
 end
