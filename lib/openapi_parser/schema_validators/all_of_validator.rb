@@ -6,7 +6,7 @@ class OpenAPIParser::SchemaValidator
     # @param [OpenAPIParser::Schemas::Schema] schema
     def coerce_and_validate(value, schema)
       # if any schema return error, it's not valida all of value
-      remaining_keys               = value.keys
+      remaining_keys               = value.kind_of?(Hash) ? value.keys : []
       nested_additional_properties = false
       schema.all_of.each do |s|
         # We need to store the reference to all of, so we can perform strict check on allowed properties

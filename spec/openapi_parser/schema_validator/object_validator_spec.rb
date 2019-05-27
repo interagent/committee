@@ -80,5 +80,146 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
 
       request_operation.validate_request_body(content_type, body)
     end
+
+    it 'throws error when sending nil disallowed in allOf' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "turtles",
+            "content" => [
+              {
+                "name"                  => "Mr. Cat",
+                "born_at"               => "2019-05-16T11:37:02.160Z",
+                "description"           => "Cat gentleman",
+                "required_combat_style" => nil,
+              }
+            ]
+          },
+        ]
+      }
+
+      expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
+        expect(e.kind_of?(OpenAPIParser::NotNullError)).to eq true
+        expect(e.message).to match("^.*?(don't allow null).*?$")
+      end
+    end
+
+    it 'passing when sending nil nested to anyOf that is allowed' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "turtles",
+            "content" => [
+              {
+                "name"                  => "Mr. Cat",
+                "born_at"               => "2019-05-16T11:37:02.160Z",
+                "description"           => "Cat gentleman",
+                "optional_combat_style" => nil,
+              }
+            ]
+          },
+        ]
+      }
+
+      request_operation.validate_request_body(content_type, body)
+    end
+
+    it 'throws error when unknown attribute nested in allOf' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "turtles",
+            "content" => [
+              {
+                "name"                  => "Mr. Cat",
+                "born_at"               => "2019-05-16T11:37:02.160Z",
+                "description"           => "Cat gentleman",
+                "required_combat_style" => {
+                  "bo_color"              => "brown",
+                  "grappling_hook_length" => 10.2
+                },
+              }
+            ]
+          },
+        ]
+      }
+
+      expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
+        # expect(e.kind_of?(OpenAPIParser::NotAnyOf)).to eq true
+        expect(e.message).to match("^.*?(isn't any of).*?$")
+      end
+    end
+
+    it 'passes error with correct attributes nested in allOf' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "turtles",
+            "content" => [
+              {
+                "name"                  => "Mr. Cat",
+                "born_at"               => "2019-05-16T11:37:02.160Z",
+                "description"           => "Cat gentleman",
+                "required_combat_style" => {
+                  "bo_color"       => "brown",
+                  "shuriken_count" => 10
+                },
+              }
+            ]
+          },
+        ]
+      }
+
+      request_operation.validate_request_body(content_type, body)
+    end
+
+    it 'throws error when unknown attribute nested in allOf' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "turtles",
+            "content" => [
+              {
+                "name"                  => "Mr. Cat",
+                "born_at"               => "2019-05-16T11:37:02.160Z",
+                "description"           => "Cat gentleman",
+                "optional_combat_style" => {
+                  "bo_color"              => "brown",
+                  "grappling_hook_length" => 10.2
+                },
+              }
+            ]
+          },
+        ]
+      }
+
+      expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
+        # expect(e.kind_of?(OpenAPIParser::NotAnyOf)).to eq true
+        expect(e.message).to match("^.*?(isn't any of).*?$")
+      end
+    end
+
+    it 'passes error with correct attributes nested in anyOf' do
+      body = {
+        "baskets" => [
+          {
+            "name"    => "turtles",
+            "content" => [
+              {
+                "name"                  => "Mr. Cat",
+                "born_at"               => "2019-05-16T11:37:02.160Z",
+                "description"           => "Cat gentleman",
+                "optional_combat_style" => {
+                  "bo_color"       => "brown",
+                  "shuriken_count" => 10
+                },
+              }
+            ]
+          },
+        ]
+      }
+
+      request_operation.validate_request_body(content_type, body)
+    end
   end
 end
