@@ -17,11 +17,8 @@ class OpenAPIParser::SchemaValidator
                          remaining_keys.delete(name)
                          validatable.validate_schema(v, s)
                        else
-                         # If object is nested in all of, the validation is already done in allOf validator. Or if
-                         # additionalProperites are defined, we will validate using that
-                         remaining_keys.clear if parent_all_of || schema.additional_properties
                          # Property is not defined, try validate using additionalProperties
-                         validate_using_additional_properties(schema, name, v) if schema.additional_properties
+                         validate_using_additional_properties(schema, name, v)
                        end
 
         return [nil, err] if err
@@ -30,7 +27,11 @@ class OpenAPIParser::SchemaValidator
         [name, coerced]
       end
 
-      return [nil, OpenAPIParser::NotExistPropertyDefinition.new(remaining_keys, schema.object_reference)] unless remaining_keys.empty?
+      if !remaining_keys.empty? && !parent_all_of && !schema.additional_properties
+        # If object is nested in all of, the validation is already done in allOf validator. Or if
+        # additionalProperties are defined, we will validate using that
+        return [nil, OpenAPIParser::NotExistPropertyDefinition.new(remaining_keys, schema.object_reference)]
+      end
       return [nil, OpenAPIParser::NotExistRequiredKey.new(required_set.to_a, schema.object_reference)] unless required_set.empty?
 
       value.merge!(coerced_values.to_h) if @coerce_value
@@ -39,7 +40,7 @@ class OpenAPIParser::SchemaValidator
     end
 
     def validate_using_additional_properties(schema, name, v)
-      # TODO: we need to perform a validation based on additionalProperties here
+      # TODO: we need to perform a validation based on schema.additional_properties here
 
       return [v, nil]
     end
