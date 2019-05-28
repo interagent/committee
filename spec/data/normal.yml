@@ -188,6 +188,11 @@ paths:
           required: false
           schema:
             type: integer
+        - name: queryString
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '204':
           description: no content
