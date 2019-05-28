@@ -43,11 +43,13 @@ components:
             anyOf:
               - "$ref": "#/components/schemas/SquirrelBasket"
               - "$ref": "#/components/schemas/CatBasket"
+              - "$ref": "#/components/schemas/TurtleBasket"
             discriminator:
               propertyName: name
               mapping:
                 cats: "#/components/schemas/CatBasket"
                 squirrels: "#/components/schemas/SquirrelBasket"
+                turtles: "#/components/schemas/TurtleBasket"
     SquirrelBasket:
       type: object
       required:
@@ -77,6 +79,7 @@ components:
         nut_stock:
           nullable: true
           type: integer
+      additionalProperties: true
     CatBasket:
       type: object
       required:
@@ -106,4 +109,59 @@ components:
         milk_stock:
           nullable: true
           type: integer
+    TurtleBasket:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        content:
+          type: array
+          items:
+            "$ref": "#/components/schemas/NinjaTurtle"
+    NinjaTurtle:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+        born_at:
+          format: date-time
+          nullable: true
+          type: string
+        description:
+          nullable: true
+          type: string
+        required_combat_style:
+          allOf:
+            - anyOf:
+              - "$ref": "#/components/schemas/DonatelloStyle"
+              - "$ref": "#/components/schemas/MichelangeloStyle"
+            - nullable: false
+              type: object
+        optional_combat_style:
+          anyOf:
+            - "$ref": "#/components/schemas/DonatelloStyle"
+            - "$ref": "#/components/schemas/MichelangeloStyle"
+    DonatelloStyle:
+      type: object
+      nullable: true
+      properties:
+        bo_color:
+          type: string
+        shuriken_count:
+          type: integer
+    MichelangeloStyle:
+      type: object
+      nullable: true
+      properties:
+        nunchaku_color:
+          type: string
+        grappling_hook_length:
+          type: number
+          format: double
+
+
 

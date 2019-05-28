@@ -122,6 +122,8 @@ paths:
                 properties:
                   id:
                     type: integer
+                  message:
+                    type: string
         default:
           description: unexpected error
           content:

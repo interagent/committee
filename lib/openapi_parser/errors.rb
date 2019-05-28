@@ -43,6 +43,17 @@ module OpenAPIParser
     end
   end
 
+  class NotExistPropertyDefinition < OpenAPIError
+    def initialize(keys, reference)
+      super(reference)
+      @keys = keys
+    end
+
+    def message
+      "properties #{@keys.join(",")} are not defined in #{@reference}"
+    end
+  end
+
   class NotExistDiscriminatorMappingTarget < OpenAPIError
     def initialize(key, reference)
       super(reference)

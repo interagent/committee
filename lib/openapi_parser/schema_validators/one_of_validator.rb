@@ -2,7 +2,7 @@ class OpenAPIParser::SchemaValidator
   class OneOfValidator < Base
     # @param [Object] value
     # @param [OpenAPIParser::Schemas::Schema] schema
-    def coerce_and_validate(value, schema)
+    def coerce_and_validate(value, schema, **_keyword_args)
       if schema.discriminator
         return validate_discriminator_schema(schema.discriminator, value)
       end
