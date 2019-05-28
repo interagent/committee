@@ -32,7 +32,7 @@ class OpenAPIParser::SchemaValidator
       resolved_schema = discriminator.root.find_object(mapping_target)
 
       unless resolved_schema
-        return [nil, OpenAPIParser::NotExistDiscriminatorMappingTarget.new(mapping_key, discriminator.object_reference)]
+        return [nil, OpenAPIParser::NotExistDiscriminatorMappedSchema.new(mapping_target, discriminator.object_reference)]
       end
       validatable.validate_schema(value, resolved_schema, {discriminator_property_name: discriminator.property_name})
     end

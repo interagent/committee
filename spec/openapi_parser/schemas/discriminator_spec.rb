@@ -112,8 +112,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
       }
 
       expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistDiscriminatorMappingTarget)).to eq true
-        expect(e.message).to match("^discriminator mapping key dogs does not exist.*?$")
+        expect(e.kind_of?(OpenAPIParser::NotExistDiscriminatorMappedSchema)).to eq true
+        expect(e.message).to match("^discriminator mapped schema #/components/schemas/dogs does not exist.*?$")
       end
     end
 

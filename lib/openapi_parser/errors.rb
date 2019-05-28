@@ -54,14 +54,14 @@ module OpenAPIParser
     end
   end
 
-  class NotExistDiscriminatorMappingTarget < OpenAPIError
-    def initialize(key, reference)
+  class NotExistDiscriminatorMappedSchema < OpenAPIError
+    def initialize(mapped_schema_reference, reference)
       super(reference)
-      @key = key
+      @mapped_schema_reference = mapped_schema_reference
     end
 
     def message
-      "discriminator mapping key #{@key} does not exist in #{@reference}"
+      "discriminator mapped schema #{@mapped_schema_reference} does not exist in #{@reference}"
     end
   end
 
