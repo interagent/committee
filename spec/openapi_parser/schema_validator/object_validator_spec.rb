@@ -145,7 +145,7 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
       }
 
       expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-        # expect(e.kind_of?(OpenAPIParser::NotAnyOf)).to eq true
+        expect(e.kind_of?(OpenAPIParser::NotAnyOf)).to eq true
         expect(e.message).to match("^.*?(isn't any of).*?$")
       end
     end
@@ -194,7 +194,7 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
       }
 
       expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-        # expect(e.kind_of?(OpenAPIParser::NotAnyOf)).to eq true
+        expect(e.kind_of?(OpenAPIParser::NotAnyOf)).to eq true
         expect(e.message).to match("^.*?(isn't any of).*?$")
       end
     end
