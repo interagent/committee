@@ -6,9 +6,6 @@ module OpenAPIParser::Schemas
 
     attr_reader :parent, :raw_schema, :object_reference, :root
 
-    # Parent allOf reference, if schema is nested in allOf
-    attr_accessor :parent_all_of
-
     # @param [OpenAPIParser::Schemas::Base]
     def initialize(object_reference, parent, root, raw_schema)
       @raw_schema = raw_schema
