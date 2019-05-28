@@ -17,8 +17,9 @@ class OpenAPIParser::SchemaValidator
                          remaining_keys.delete(name)
                          validatable.validate_schema(v, s)
                        else
-                         # Property is not defined, try validate using additionalProperties
-                         validate_using_additional_properties(schema, name, v)
+                         # TODO: we need to perform a validation based on schema.additional_properties here, if
+                         # additionalProperties are defined
+                         [v, nil]
                        end
 
         return [nil, err] if err
@@ -37,12 +38,6 @@ class OpenAPIParser::SchemaValidator
       value.merge!(coerced_values.to_h) if @coerce_value
 
       [value, nil]
-    end
-
-    def validate_using_additional_properties(schema, name, v)
-      # TODO: we need to perform a validation based on schema.additional_properties here
-
-      return [v, nil]
     end
   end
 end
