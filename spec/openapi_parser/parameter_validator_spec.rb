@@ -15,20 +15,20 @@ RSpec.describe OpenAPIParser::ParameterValidator do
 
     context 'correct' do
       context 'no optional' do
-        let(:params) { { 'query_string' => 'query', 'query_integer_list' => [1, 2] } }
-        it { expect(subject).to eq({ 'query_string' => 'query', 'query_integer_list' => [1, 2] }) }
+        let(:params) { { 'query_string' => 'query', 'query_integer_list' => [1, 2], 'queryString' => 'Query' } }
+        it { expect(subject).to eq({ 'query_string' => 'query', 'query_integer_list' => [1, 2], 'queryString' => 'Query' }) }
       end
 
       context 'with optional' do
-        let(:params) { { 'query_string' => 'query', 'query_integer_list' => [1, 2], 'optional_integer' => 1 } }
-        it { expect(subject).to eq({ 'optional_integer' => 1, 'query_integer_list' => [1, 2], 'query_string' => 'query' }) }
+        let(:params) { { 'query_string' => 'query', 'query_integer_list' => [1, 2], 'queryString' => 'Query', 'optional_integer' => 1 } }
+        it { expect(subject).to eq({ 'optional_integer' => 1, 'query_integer_list' => [1, 2], 'queryString' => 'Query', 'query_string' => 'query' }) }
       end
     end
 
     context 'invalid' do
       context 'not exist required' do
         context 'not exist data' do
-          let(:params) { { 'query_integer_list' => [1, 2] } }
+          let(:params) { { 'query_integer_list' => [1, 2], 'queryString' => 'Query' } }
 
           it do
             expect { subject }.to raise_error do |e|
@@ -39,7 +39,7 @@ RSpec.describe OpenAPIParser::ParameterValidator do
         end
 
         context 'not exist array' do
-          let(:params) { { 'query_string' => 'query' } }
+          let(:params) { { 'query_string' => 'query', 'queryString' => 'Query' } }
 
           it do
             expect { subject }.to raise_error do |e|
@@ -52,12 +52,12 @@ RSpec.describe OpenAPIParser::ParameterValidator do
 
       context 'non null check' do
         context 'optional' do
-          let(:params) { { 'query_string' => 'query', 'query_integer_list' => [1, 2], 'optional_integer' => nil } }
+          let(:params) { { 'query_string' => 'query', 'query_integer_list' => [1, 2], 'queryString' => 'Query', 'optional_integer' => nil } }
           it { expect { subject }.to raise_error(OpenAPIParser::NotNullError) }
         end
 
         context 'optional' do
-          let(:params) { { 'query_string' => 'query', 'query_integer_list' => nil } }
+          let(:params) { { 'query_string' => 'query', 'query_integer_list' => nil, 'queryString' => 'Query' } }
           it { expect { subject }.to raise_error(OpenAPIParser::NotNullError) }
         end
       end
