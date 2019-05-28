@@ -44,12 +44,16 @@ components:
               - "$ref": "#/components/schemas/SquirrelBasket"
               - "$ref": "#/components/schemas/CatBasket"
               - "$ref": "#/components/schemas/TurtleBasket"
+              - "$ref": "#/components/schemas/Dragon"
+              - "$ref": "#/components/schemas/Hydra"
             discriminator:
               propertyName: name
               mapping:
                 cats: "#/components/schemas/CatBasket"
                 squirrels: "#/components/schemas/SquirrelBasket"
                 turtles: "#/components/schemas/TurtleBasket"
+                dragon: "#/components/schemas/Dragon"
+                hydra: "#/components/schemas/Hydra"
     SquirrelBasket:
       type: object
       required:
@@ -162,6 +166,34 @@ components:
         grappling_hook_length:
           type: number
           format: double
-
-
-
+    Dragon:
+      allOf:
+      - $ref: '#/components/schemas/DragonBody'
+      - type: object
+        required:
+        - fire_range
+        properties:
+          fire_range:
+            type: integer
+            format: int64
+    Hydra:
+      allOf:
+        - $ref: '#/components/schemas/DragonBody'
+        - type: object
+          required:
+            - head_count
+          properties:
+            head_count:
+              type: integer
+              format: int64
+          additionalProperties:
+            type: string
+    DragonBody:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        mass:
+          type: integer
