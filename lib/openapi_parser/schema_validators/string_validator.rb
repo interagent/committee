@@ -7,7 +7,7 @@ class OpenAPIParser::SchemaValidator
       @datetime_coerce_class = datetime_coerce_class
     end
 
-    def coerce_and_validate(value, schema)
+    def coerce_and_validate(value, schema, **_keyword_args)
       return OpenAPIParser::ValidateError.build_error_result(value, schema) unless value.kind_of?(String)
 
       value, err = check_enum_include(value, schema)

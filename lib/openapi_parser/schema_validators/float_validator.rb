@@ -5,7 +5,7 @@ class OpenAPIParser::SchemaValidator
     # validate float value by schema
     # @param [Object] value
     # @param [OpenAPIParser::Schemas::Schema] schema
-    def coerce_and_validate(value, schema)
+    def coerce_and_validate(value, schema, **_keyword_args)
       value = coerce(value) if @coerce_value
 
       return validatable.validate_integer(value, schema) if value.kind_of?(Integer)

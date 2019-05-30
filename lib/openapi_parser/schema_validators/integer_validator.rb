@@ -5,7 +5,7 @@ class OpenAPIParser::SchemaValidator
     # validate integer value by schema
     # @param [Object] value
     # @param [OpenAPIParser::Schemas::Schema] schema
-    def coerce_and_validate(value, schema)
+    def coerce_and_validate(value, schema, **_keyword_args)
       value = coerce(value) if @coerce_value
 
       return OpenAPIParser::ValidateError.build_error_result(value, schema) unless value.kind_of?(Integer)

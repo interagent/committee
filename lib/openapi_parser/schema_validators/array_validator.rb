@@ -2,7 +2,7 @@ class OpenAPIParser::SchemaValidator
   class ArrayValidator < Base
     # @param [Array] value
     # @param [OpenAPIParser::Schemas::Schema] schema
-    def coerce_and_validate(value, schema)
+    def coerce_and_validate(value, schema, **_keyword_args)
       return OpenAPIParser::ValidateError.build_error_result(value, schema) unless value.kind_of?(Array)
 
       # array type have an schema in items property
