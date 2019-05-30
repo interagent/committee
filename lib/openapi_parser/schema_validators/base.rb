@@ -33,7 +33,8 @@ class OpenAPIParser::SchemaValidator
 
       # Find object does O(n) search at worst, then caches the result, so this is ok for repeated search
       resolved_schema = discriminator.root.find_object(mapping_target)
-      validatable.validate_schema(value, resolved_schema)
+
+      validatable.validate_schema(value, resolved_schema, {discriminator_property_name: discriminator.property_name})
     end
   end
 end
