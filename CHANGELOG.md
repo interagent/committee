@@ -1,5 +1,14 @@
 ## Unreleased
 
+## 0.3.0 (2019-06-01)
+
+### features
+* Perform a strict check on object properties (#33)
+
+### Bugfix
+* Support discriminator without mapping (#35)
+* Fix upper case request param validation (#38)
+
 ## 0.2.7 (2019-05-20)
 * Fix for release miss
 
