@@ -94,6 +94,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Squirrel"
+      additionalProperties: false
     Squirrel:
       type: object
       required:
@@ -124,6 +125,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/Cat"
+      additionalProperties: false
     Cat:
       type: object
       required:
@@ -142,6 +144,7 @@ components:
         milk_stock:
           nullable: true
           type: integer
+      additionalProperties: false
     TurtleBasket:
       type: object
       required:
@@ -153,6 +156,7 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/NinjaTurtle"
+      additionalProperties: false
     NinjaTurtle:
       type: object
       required:
@@ -186,6 +190,7 @@ components:
           type: string
         shuriken_count:
           type: integer
+      additionalProperties: false
     MichelangeloStyle:
       type: object
       nullable: true
@@ -195,6 +200,7 @@ components:
         grappling_hook_length:
           type: number
           format: double
+      additionalProperties: false
     Dragon:
       allOf:
       - $ref: '#/components/schemas/DragonBody'
@@ -205,6 +211,7 @@ components:
           fire_range:
             type: integer
             format: int64
+        additionalProperties: false
     Hydra:
       allOf:
         - $ref: '#/components/schemas/DragonBody'
@@ -226,3 +233,4 @@ components:
           type: string
         mass:
           type: integer
+      additionalProperties: false

@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.3.1 (2019-06-04)
+* Add additionalProperties default value (#40)
+
 ## 0.3.0 (2019-06-01)
 
 ### features
