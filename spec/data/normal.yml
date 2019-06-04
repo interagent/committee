@@ -202,6 +202,7 @@ paths:
         content:
           application/json:
             schema:
+              additionalProperties: false
               type: object
               properties:
                 string:
@@ -597,6 +598,7 @@ components:
           type: string
         integer_1:
           type: integer
+      additionalProperties: false
     one_of_object2:
       type: object
       required:
@@ -607,3 +609,4 @@ components:
           type: string
         string_1:
           type: string
+      additionalProperties: false

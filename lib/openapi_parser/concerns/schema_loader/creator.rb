@@ -35,7 +35,7 @@ class OpenAPIParser::SchemaLoader::Creator < OpenAPIParser::SchemaLoader::Base
     end
 
     def build_openapi_object_from_option(target_object, ref, schema)
-      return nil unless schema
+      return nil if schema.nil?
 
       if @allow_data_type && !check_object_schema?(schema)
         schema

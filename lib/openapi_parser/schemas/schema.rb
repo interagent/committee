@@ -108,5 +108,10 @@ module OpenAPIParser::Schemas
     # @!attribute [r] additional_properties
     #   @return [Boolean, Schema, Reference, nil]
     openapi_attr_object :additional_properties, Schema, reference: true, allow_data_type: true, schema_key: :additionalProperties
+    # additional_properties have default value
+    # we should add default value feature in openapi_attr_object method, but we need temporary fix so override attr_reader
+    def additional_properties
+      @additional_properties.nil? ? true : @additional_properties
+    end
   end
 end
