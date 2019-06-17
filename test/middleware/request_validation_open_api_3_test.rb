@@ -312,6 +312,16 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 404, last_response.status
   end
 
+  it "OpenAPI3 parser not exist required key" do
+    @app = new_rack_app(raise: true, schema: open_api_3_schema)
+
+    e = assert_raises(Committee::InvalidRequest) do
+      get "/validate", nil
+    end
+
+    assert_match(/required parameters query_string not exist in/i, e.message)
+  end
+
   it "optionally raises an error" do
     @app = new_rack_app(raise: true, schema: open_api_3_schema)
     header "Content-Type", "application/json"
