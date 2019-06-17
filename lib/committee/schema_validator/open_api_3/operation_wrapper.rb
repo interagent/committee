@@ -18,6 +18,8 @@ module Committee
       return {} unless options.coerce_value
 
       request_operation.validate_path_params(options)
+    rescue OpenAPIParser::NotExistRequiredKey => e
+      raise Committee::InvalidRequest.new(e.message)
     end
 
     # @param [Boolean] strict when not content_type or status code definition, raise error
