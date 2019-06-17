@@ -1,5 +1,8 @@
 Unreleased
 
+3.0.3 2019-06-17
+	Catch OpenAPIParser::NotExistRequiredKey with RequestValidation (#225)
+
 3.0.2 2019-05-15
 	Support OpenAPI 3 patch version (#223)
 
