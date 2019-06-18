@@ -43,7 +43,7 @@ describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
     @link.target_schema = nil
 
     # We're testing for legacy behavior here: even without a `targetSchema` as
-    # long as `rel` is set to `instances` we still wrap the the result in an
+    # long as `rel` is set to `instances` we still wrap the result in an
     # array.
     assert_equal "instances", @link.rel
 
@@ -59,7 +59,7 @@ describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
     @link.target_schema = nil
 
     # We're testing for legacy behavior here: even without a `targetSchema` as
-    # long as `rel` is set to `instances` we still wrap the the result in an
+    # long as `rel` is set to `instances` we still wrap the result in an
     # array.
     assert_equal "instances", @link.rel
 
