@@ -322,6 +322,17 @@ describe Committee::Middleware::RequestValidation do
     assert_match(/required parameters query_string not exist in/i, e.message)
   end
 
+  it "raises error when required path parameter is invalid" do
+    @app = new_rack_app(raise: true, schema: open_api_3_schema)
+
+    e = assert_raises(Committee::InvalidRequest) do
+      not_an_integer = 'abc'
+      get "/coerce_path_params/#{not_an_integer}", nil
+    end
+
+    assert_match(/is String but it's not valid integer in/i, e.message)
+  end
+
   it "optionally raises an error" do
     @app = new_rack_app(raise: true, schema: open_api_3_schema)
     header "Content-Type", "application/json"
