@@ -18,7 +18,7 @@ module Committee
       return {} unless options.coerce_value
 
       request_operation.validate_path_params(options)
-    rescue OpenAPIParser::NotExistRequiredKey => e
+    rescue OpenAPIParser::OpenAPIError => e
       raise Committee::InvalidRequest.new(e.message)
     end
 
