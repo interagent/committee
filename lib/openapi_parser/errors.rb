@@ -117,7 +117,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than minimum value of #{@reference}"
+      "#{@value} cannot be less than minimum value in #{@reference}"
     end
   end
 
@@ -128,7 +128,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than or equal to exclusive minimum value of #{@reference}"
+      "#{@value} cannot be less than or equal to exclusive minimum value in #{@reference}"
     end
   end
 
@@ -139,7 +139,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than maximum value of #{@reference}"
+      "#{@value} cannot be more than maximum value in #{@reference}"
     end
   end
 
@@ -150,7 +150,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than or equal to exclusive maximum value of #{@reference}"
+      "#{@value} cannot be more than or equal to exclusive maximum value in #{@reference}"
     end
   end
 
