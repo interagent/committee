@@ -52,6 +52,15 @@ describe Committee::Test::Methods do
         end
         assert_match(/response header must be set to/i, e.message)
       end
+
+      it "outputs deprecation warning" do
+        @app = new_rack_app(JSON.generate([ValidApp]))
+        get "/apps"
+        _, err = capture_io do
+          assert_schema_conform
+        end
+        assert_match(/\[DEPRECATION\]/i, err)
+      end
     end
   end
 
@@ -87,6 +96,15 @@ describe Committee::Test::Methods do
           assert_schema_conform
         end
         assert_match(/don't exist status code definition/i, e.message)
+      end
+
+      it "outputs deprecation warning" do
+        @app = new_rack_app(JSON.generate(@correct_response))
+        get "/characters"
+        _, err = capture_io do
+          assert_schema_conform
+        end
+        assert_match(/\[DEPRECATION\]/i, err)
       end
     end
   end
