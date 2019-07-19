@@ -62,6 +62,23 @@ describe Committee::Test::Methods do
         assert_match(/\[DEPRECATION\]/i, err)
       end
     end
+
+    describe "#assert_response_schema_confirm" do
+      it "passes through a valid response" do
+        @app = new_rack_app(JSON.generate([ValidApp]))
+        get "/apps"
+        assert_response_schema_confirm
+      end
+
+      it "detects an invalid response Content-Type" do
+        @app = new_rack_app(JSON.generate([ValidApp]), {})
+        get "/apps"
+        e = assert_raises(Committee::InvalidResponse) do
+          assert_response_schema_confirm
+        end
+        assert_match(/response header must be set to/i, e.message)
+      end
+    end
   end
 
   describe "OpenAPI3" do
@@ -105,6 +122,34 @@ describe Committee::Test::Methods do
           assert_schema_conform
         end
         assert_match(/\[DEPRECATION\]/i, err)
+      end
+    end
+
+    describe "#assert_response_schema_confirm" do
+      it "passes through a valid response" do
+        @app = new_rack_app(JSON.generate(@correct_response))
+        get "/characters"
+        assert_response_schema_confirm
+      end
+
+      it "detects an invalid response Content-Type" do
+        @app = new_rack_app(JSON.generate([@correct_response]), {})
+        get "/characters"
+        e = assert_raises(Committee::InvalidResponse) do
+          assert_response_schema_confirm
+        end
+        assert_match(/don't exist response definition/i, e.message)
+      end
+
+      it "detects an invalid response status code" do
+        @app = new_rack_app(JSON.generate([@correct_response]), {}, 419)
+
+        get "/characters"
+
+        e = assert_raises(Committee::InvalidResponse) do
+          assert_response_schema_confirm
+        end
+        assert_match(/don't exist status code definition/i, e.message)
       end
     end
   end
