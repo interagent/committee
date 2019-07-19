@@ -253,7 +253,20 @@ describe Committee::Middleware::Stub do
     it "conforms to schema" do
       assert_schema_conform
     end
-   end
+    
+    it "conforms to request schema" do
+      assert_request_schema_confirm
+    end
+    
+    it "conforms to response schema" do
+      assert_response_schema_confirm
+    end
+    
+    it "conforms to response and request schema" do
+      @committee_options[:old_assert_behavior] = false
+      assert_schema_conform
+    end
+  end
 end
 ```
 
