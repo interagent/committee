@@ -63,6 +63,23 @@ describe Committee::Test::Methods do
       end
     end
 
+    describe "assert_request_schema_confirm" do
+      it "passes through a valid request" do
+        @app = new_rack_app([])
+        get "/apps"
+        assert_request_schema_confirm
+      end
+
+      it "not exist required" do
+        @app = new_rack_app([])
+        get "/search/apps", {}
+        e = assert_raises(Committee::InvalidRequest) do
+          assert_request_schema_confirm
+        end
+        assert_match(/"query" wasn't supplied\./i, e.message)
+      end
+    end
+
     describe "#assert_response_schema_confirm" do
       it "passes through a valid response" do
         @app = new_rack_app(JSON.generate([ValidApp]))
@@ -122,6 +139,23 @@ describe Committee::Test::Methods do
           assert_schema_conform
         end
         assert_match(/\[DEPRECATION\]/i, err)
+      end
+    end
+
+    describe "assert_request_schema_confirm" do
+      it "passes through a valid request" do
+        @app = new_rack_app([])
+        get "/characters"
+        assert_request_schema_confirm
+      end
+
+      it "not exist required" do
+        @app = new_rack_app([])
+        get "/validate", {"query_string" => "query", "query_integer_list" => [1, 2]}
+        e = assert_raises(Committee::InvalidRequest) do
+          assert_request_schema_confirm
+        end
+        assert_match(/required parameters query_string not exist in #\/paths/i, e.message)
       end
     end
 
