@@ -83,7 +83,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::IntegerValidator do
       {
         my_integer: {
           type: 'integer',
-          exclusiveMaximum: 10,
+          maximum: 10,
+          exclusiveMaximum: true,
         },
       }
     end
@@ -116,7 +117,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::IntegerValidator do
       {
         my_integer: {
           type: 'integer',
-          exclusiveMinimum: 10,
+          minimum: 10,
+          exclusiveMinimum: true,
         },
       }
     end
