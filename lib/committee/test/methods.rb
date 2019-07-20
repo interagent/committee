@@ -6,6 +6,11 @@ module Committee::Test
     end
 
     def assert_request_schema_confirm
+      unless schema_validator.link_exist?
+        request = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema."
+        raise Committee::InvalidRequest.new(request)
+      end
+
       schema_validator.request_validate(request_object)
     end
 

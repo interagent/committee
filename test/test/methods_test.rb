@@ -78,6 +78,15 @@ describe Committee::Test::Methods do
         end
         assert_match(/"query" wasn't supplied\./i, e.message)
       end
+
+      it "path undefined in schema" do
+        @app = new_rack_app([])
+        get "/undefined"
+        e = assert_raises(Committee::InvalidRequest) do
+          assert_request_schema_confirm
+        end
+        assert_match(/`GET \/undefined` undefined in schema/i, e.message)
+      end
     end
 
     describe "#assert_response_schema_confirm" do
@@ -94,6 +103,15 @@ describe Committee::Test::Methods do
           assert_response_schema_confirm
         end
         assert_match(/response header must be set to/i, e.message)
+      end
+
+      it "path undefined in schema" do
+        @app = new_rack_app(JSON.generate([ValidApp]))
+        get "/undefined"
+        e = assert_raises(Committee::InvalidResponse) do
+          assert_response_schema_confirm
+        end
+        assert_match(/`GET \/undefined` undefined in schema/i, e.message)
       end
     end
   end
@@ -157,6 +175,15 @@ describe Committee::Test::Methods do
         end
         assert_match(/required parameters query_string not exist in #\/paths/i, e.message)
       end
+
+      it "path undefined in schema" do
+        @app = new_rack_app([])
+        get "/undefined"
+        e = assert_raises(Committee::InvalidRequest) do
+          assert_request_schema_confirm
+        end
+        assert_match(/`GET \/undefined` undefined in schema/i, e.message)
+      end
     end
 
     describe "#assert_response_schema_confirm" do
@@ -184,6 +211,15 @@ describe Committee::Test::Methods do
           assert_response_schema_confirm
         end
         assert_match(/don't exist status code definition/i, e.message)
+      end
+
+      it "path undefined in schema" do
+        @app = new_rack_app(JSON.generate(@correct_response))
+        get "/undefined"
+        e = assert_raises(Committee::InvalidResponse) do
+          assert_response_schema_confirm
+        end
+        assert_match(/`GET \/undefined` undefined in schema/i, e.message)
       end
     end
   end
