@@ -110,6 +110,50 @@ module OpenAPIParser
     end
   end
 
+  class LessThanMinimum < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} cannot be less than minimum value in #{@reference}"
+    end
+  end
+
+  class LessThanExclusiveMinimum < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} cannot be less than or equal to exclusive minimum value in #{@reference}"
+    end
+  end
+
+  class MoreThanMaximum < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} cannot be more than maximum value in #{@reference}"
+    end
+  end
+
+  class MoreThanExclusiveMaximum < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} cannot be more than or equal to exclusive maximum value in #{@reference}"
+    end
+  end
+
   class InvalidPattern < OpenAPIError
     def initialize(value, pattern, reference)
       super(reference)

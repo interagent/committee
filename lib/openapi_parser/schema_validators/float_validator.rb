@@ -1,6 +1,7 @@
 class OpenAPIParser::SchemaValidator
   class FloatValidator < Base
     include ::OpenAPIParser::SchemaValidator::Enumable
+    include ::OpenAPIParser::SchemaValidator::MinimumMaximum
 
     # validate float value by schema
     # @param [Object] value
@@ -18,7 +19,10 @@ class OpenAPIParser::SchemaValidator
       def coercer_and_validate_numeric(value, schema)
         return OpenAPIParser::ValidateError.build_error_result(value, schema) unless value.kind_of?(Numeric)
 
-        check_enum_include(value, schema)
+        value, err = check_enum_include(value, schema)
+        return [nil, err] if err
+        
+        check_minimum_maximum(value, schema)
       end
 
       def coerce(value)
