@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.4.0 (2019-07-27)
+* Add minimum and maximum checks for `integer` and `number` data types (#43)
+
 ## 0.3.1 (2019-06-04)
 * Add additionalProperties default value (#40)
 
