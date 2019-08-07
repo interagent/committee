@@ -61,6 +61,18 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "doesn't call error_handler when request is valid" do
+    called_error = false
+    pr = ->(_) { called_error = true }
+    @app = new_rack_app(schema: hyper_schema, error_handler: pr)
+    params = {
+      "name" => "cloudnasium"
+    }
+    header "Content-Type", "application/json"
+    post "/apps", JSON.generate(params)
+    assert !called_error
+  end
+
   it "passes given a datetime and with coerce_date_times enabled on GET endpoint" do
     key_name = "update_time"
     params = {
@@ -270,12 +282,33 @@ describe Committee::Middleware::RequestValidation do
     assert_match(/invalid request/i, last_response.body)
   end
 
+  it "calls error_handler when request is invalid" do
+    called_err = nil
+    pr = ->(e) { called_err = e }
+    @app = new_rack_app(schema: hyper_schema, error_handler: pr)
+    header "Content-Type", "application/json"
+    params = {
+      "name" => 1
+    }
+    post "/apps", JSON.generate(params)
+    assert_kind_of Committee::InvalidRequest, called_err
+  end
+
   it "rescues JSON errors" do
     @app = new_rack_app(schema: hyper_schema)
     header "Content-Type", "application/json"
     post "/apps", "{x:y}"
     assert_equal 400, last_response.status
     assert_match(/valid json/i, last_response.body)
+  end
+
+  it "calls error_handler when it rescues JSON errors" do
+    called_err = nil
+    pr = ->(e) { called_err = e }
+    @app = new_rack_app(schema: hyper_schema, error_handler: pr)
+    header "Content-Type", "application/json"
+    post "/apps", "{x:y}"
+    assert_kind_of JSON::ParserError, called_err
   end
 
   it "takes a prefix" do

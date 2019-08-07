@@ -17,6 +17,7 @@ module Committee::Middleware
 
       @app.call(request.env)
     rescue Committee::BadRequest, Committee::InvalidRequest
+      @error_handler.call($!) if @error_handler
       raise if @raise
       @error_class.new(400, :bad_request, $!.message).render
     rescue Committee::NotFound => e
@@ -27,6 +28,7 @@ module Committee::Middleware
         e.message
       ).render
     rescue JSON::ParserError
+      @error_handler.call($!) if @error_handler
       raise Committee::InvalidRequest if @raise
       @error_class.new(400, :bad_request, "Request body wasn't valid JSON.").render
     end
