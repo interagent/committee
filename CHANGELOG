@@ -1,5 +1,10 @@
 Unreleased
 
+3.1.0 2019-08-07
+	Add error handler option to Committee::Middleware::RequestValidation (#230)
+	fix: ensure we catch all OpenAPIParser::OpenAPIError classes when coercing path parameters for OpenAPI 3 (#228)
+	Support request validations by assert_schema_conform (#227)
+
 3.0.3 2019-06-17
 	Catch OpenAPIParser::NotExistRequiredKey with RequestValidation (#225)
 
