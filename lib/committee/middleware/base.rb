@@ -4,6 +4,7 @@ module Committee::Middleware
       @app = app
 
       @error_class = options.fetch(:error_class, Committee::ValidationError)
+      @error_handler = options[:error_handler]
 
       @raise = options[:raise]
       @schema = self.class.get_schema(options)
