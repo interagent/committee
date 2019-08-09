@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Stub is not yet supported in OpenAPI 3
 
 module Committee::Middleware

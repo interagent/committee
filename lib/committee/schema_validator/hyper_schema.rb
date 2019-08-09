@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Committee::SchemaValidator
   class HyperSchema
     attr_reader :link, :param_matches, :validator_option
@@ -28,7 +30,7 @@ class Committee::SchemaValidator
     def response_validate(status, headers, response, _test_method = false)
       return unless link_exist?
 
-      full_body = ""
+      full_body = +""
       response.each do |chunk|
         full_body << chunk
       end

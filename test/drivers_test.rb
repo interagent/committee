@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "test_helper"
 
 describe Committee::Drivers do
@@ -99,13 +101,13 @@ end
 
 describe Committee::Drivers::Driver do
   DRIVER_METHODS = {
-    :default_allow_get_body     => [],
-    :default_coerce_form_params => [],
-    :default_path_params        => [],
-    :default_query_params       => [],
-    :name                       => [],
-    :parse                      => [nil],
-    :schema_class               => [],
+    default_allow_get_body: [],
+    default_coerce_form_params: [],
+    default_path_params: [],
+    default_query_params: [],
+    name: [],
+    parse: [nil],
+    schema_class: [],
   }
 
   it "has a set of abstract methods" do
@@ -122,8 +124,8 @@ end
 
 describe Committee::Drivers::Schema do
   SCHEMA_METHODS = {
-    :driver => [],
-    :build_router => [validator_option: nil, prefix: nil]
+    driver: [],
+    build_router: [validator_option: nil, prefix: nil]
   }
 
   it "has a set of abstract methods" do

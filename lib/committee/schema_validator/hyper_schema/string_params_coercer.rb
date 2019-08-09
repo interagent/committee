@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   # StringParamsCoercer takes parameters that are specified over a medium that
   # can only accept strings (for example in a URL path or in query parameters)

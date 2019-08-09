@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class SchemaValidator::OpenAPI3::OperationWrapper
     # # @param request_operation [OpenAPIParser::RequestOperation]

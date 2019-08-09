@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class SchemaValidator::HyperSchema::ParameterCoercer
     def initialize(params, schema, options = {})

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee::Test
   module Methods
     def assert_schema_conform

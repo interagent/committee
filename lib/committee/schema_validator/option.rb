@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Committee::SchemaValidator
   class Option
     # Boolean Options

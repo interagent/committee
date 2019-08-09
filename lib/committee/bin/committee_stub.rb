@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Don't Support OpenAPI3
 
 module Committee
@@ -29,10 +31,10 @@ module Committee
       # Gets an option parser for command line arguments.
       def get_options_parser
         options = {
-          :driver   => nil,
-          :help     => false,
-          :port     => 9292,
-          :tolerant => false,
+          driver: nil,
+          help: false,
+          port: 9292,
+          tolerant: false,
         }
 
         parser = OptionParser.new do |opts|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   module Drivers
     # Gets a driver instance from the specified name. Raises ArgumentError for

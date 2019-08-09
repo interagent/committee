@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee::Drivers
   class OpenAPI3 < Committee::Drivers::Driver
     def default_coerce_date_times

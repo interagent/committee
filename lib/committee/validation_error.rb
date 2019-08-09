@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class ValidationError
     attr_reader :id, :message, :status

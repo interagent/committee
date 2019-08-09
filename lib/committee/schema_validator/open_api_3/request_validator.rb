@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class SchemaValidator::OpenAPI3::RequestValidator
     # @param [SchemaValidator::OpenAPI3::OperationWrapper] operation_object
