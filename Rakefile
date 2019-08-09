@@ -1,5 +1,6 @@
 require 'bundler'
 require 'rake/testtask'
+require 'rubocop/rake_task'
 
 Bundler::GemHelper.install_tasks
 
@@ -9,4 +10,6 @@ Rake::TestTask.new do |t|
   t.verbose = true
 end
 
-task :default => :test
+RuboCop::RakeTask.new
+
+task :default => [:rubocop, :test]
