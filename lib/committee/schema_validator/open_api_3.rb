@@ -23,7 +23,7 @@ class Committee::SchemaValidator
     end
 
     def response_validate(status, headers, response, test_method = false)
-      full_body = "".dup
+      full_body = +""
       response.each do |chunk|
         full_body << chunk
       end

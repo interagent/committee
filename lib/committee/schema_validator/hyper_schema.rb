@@ -30,7 +30,7 @@ class Committee::SchemaValidator
     def response_validate(status, headers, response, _test_method = false)
       return unless link_exist?
 
-      full_body = "".dup
+      full_body = +""
       response.each do |chunk|
         full_body << chunk
       end

@@ -24,3 +24,6 @@ Style/HashSyntax:
 
 Performance/RedundantMerge:
   Enabled: true
+
+Performance/UnfreezeString:
+  Enabled: true
