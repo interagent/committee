@@ -98,7 +98,7 @@ module Committee
         headers
       end
 
-      base.merge!('Content-Type' => env['CONTENT_TYPE']) if env['CONTENT_TYPE']
+      base['Content-Type'] = env['CONTENT_TYPE'] if env['CONTENT_TYPE']
       base
     end
   end

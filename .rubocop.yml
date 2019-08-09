@@ -21,3 +21,6 @@ Style/FrozenStringLiteralComment:
 # Use Ruby >= 1.9 syntax for hashes. Prefer { a: :b } over { :a => :b }.
 Style/HashSyntax:
   Enabled: true
+
+Performance/RedundantMerge:
+  Enabled: true
