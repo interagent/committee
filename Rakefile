@@ -12,4 +12,4 @@ end
 
 RuboCop::RakeTask.new
 
-task :default => [:rubocop, :test]
+task default: [:rubocop, :test]

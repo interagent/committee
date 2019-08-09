@@ -399,7 +399,7 @@ module Committee::Drivers
     def rewrite_references_and_parse(schemas_data, store)
       schemas = rewrite_references(schemas_data)
       schemas = JsonSchema.parse!(schemas_data)
-      schemas.expand_references!(:store => store)
+      schemas.expand_references!(store: store)
       schemas
     end
 
