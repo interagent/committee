@@ -46,6 +46,7 @@ Non-boolean options:
 |error_class| StandardError | supported | supported | Change validation errors from `Committee::ValidationError`). |
 |prefix| String | supported | supported | Mounts the middleware to respond at a configured prefix. (e.g. prefix is '/v1' and request path is '/v1/test' use '/test' definition). |
 |schema_path| String | supported | supported | Defines the location of the schema file to use for validation. |
+|error_handler| Proc Object | supported | supported | A proc which will be called when error occurs. Take an Error instance as first argument. |
 
 Note that Hyper-Schema and OpenAPI 2 get the same defaults for options.
 
