@@ -1,3 +1,6 @@
+require:
+  - rubocop-performance
+
 AllCops:
   TargetRubyVersion: 2.3
   # RuboCop has a bunch of cops enabled by default. This setting tells RuboCop
@@ -6,6 +9,10 @@ AllCops:
   Exclude:
     - 'examples/**/*'
     - 'vendor/**/*'
+
+Performance:
+  Exclude:
+    - 'test/**/*'
 
 Style/FrozenStringLiteralComment:
   Enabled: true
