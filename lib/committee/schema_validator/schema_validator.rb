@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Committee::SchemaValidator
   class << self
     def request_media_type(request)

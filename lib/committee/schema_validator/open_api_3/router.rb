@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class SchemaValidator::OpenAPI3::Router
     # @param [Committee::SchemaValidator::Option] validator_option

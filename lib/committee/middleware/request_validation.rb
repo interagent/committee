@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee::Middleware
   class RequestValidation < Base
     def initialize(app, options={})

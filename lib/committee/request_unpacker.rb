@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class RequestUnpacker
     def initialize(request, options={})

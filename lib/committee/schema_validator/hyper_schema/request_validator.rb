@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class SchemaValidator::HyperSchema::RequestValidator
     def initialize(link, options = {})

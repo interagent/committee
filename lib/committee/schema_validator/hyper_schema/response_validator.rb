@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class SchemaValidator::HyperSchema::ResponseValidator
     attr_reader :validate_success_only

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Don't Support OpenAPI3
 
 module Committee

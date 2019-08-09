@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class SchemaValidator::HyperSchema::Router
     def initialize(schema, validator_option)

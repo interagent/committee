@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee::Middleware
   class ResponseValidation < Base
     attr_reader :validate_success_only
