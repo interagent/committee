@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Committee
+module Committee
   module SchemaValidator
     class OpenAPI3
       # @param [Committee::SchemaValidator::Option] validator_option

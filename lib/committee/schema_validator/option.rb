@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Committee
+module Committee
   module SchemaValidator
     class Option
       # Boolean Options
