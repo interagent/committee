@@ -12,6 +12,8 @@ require_relative "committee/request_unpacker"
 require_relative "committee/validation_error"
 
 require_relative "committee/drivers"
+require_relative "committee/drivers/driver"
+require_relative "committee/drivers/schema"
 require_relative "committee/drivers/hyper_schema"
 require_relative "committee/drivers/open_api_2"
 require_relative "committee/drivers/open_api_3"

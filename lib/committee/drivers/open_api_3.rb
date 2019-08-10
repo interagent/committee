@@ -2,7 +2,7 @@
 
 module Committee
   module Drivers
-    class OpenAPI3 < Committee::Drivers::Driver
+    class OpenAPI3 < Driver
       def default_coerce_date_times
         true
       end

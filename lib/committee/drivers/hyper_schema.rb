@@ -2,7 +2,7 @@
 
 module Committee
   module Drivers
-    class HyperSchema < Committee::Drivers::Driver
+    class HyperSchema < Driver
       def default_coerce_date_times
         false
       end
