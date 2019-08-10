@@ -86,3 +86,8 @@ module Committee
     end
   end
 end
+
+require_relative "open_api_3/router"
+require_relative "open_api_3/operation_wrapper"
+require_relative "open_api_3/request_validator"
+require_relative "open_api_3/response_validator"

@@ -2,7 +2,7 @@
 
 module Committee
   module SchemaValidator
-    module OpenAPI3
+    class OpenAPI3
       class Router
         # @param [Committee::SchemaValidator::Option] validator_option
         def initialize(schema, validator_option)

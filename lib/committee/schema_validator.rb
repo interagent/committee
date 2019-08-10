@@ -17,3 +17,7 @@ module Committee
     end
   end
 end
+
+require_relative "schema_validator/hyper_schema"
+require_relative "schema_validator/open_api_3"
+require_relative "schema_validator/option"

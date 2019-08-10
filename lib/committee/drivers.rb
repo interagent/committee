@@ -64,3 +64,9 @@ module Committee
     end
   end
 end
+
+require_relative "drivers/driver"
+require_relative "drivers/schema"
+require_relative "drivers/hyper_schema"
+require_relative "drivers/open_api_2"
+require_relative "drivers/open_api_3"

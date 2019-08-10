@@ -2,7 +2,7 @@
 
 module Committee
   module SchemaValidator
-    module OpenAPI3
+    class OpenAPI3
       class RequestValidator
         # @param [SchemaValidator::OpenAPI3::OperationWrapper] operation_object
         # @param [Committee::SchemaValidator::Option] validator_option

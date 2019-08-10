@@ -96,3 +96,10 @@ module Committee
     end
   end
 end
+
+require_relative "hyper_schema/request_validator"
+require_relative "hyper_schema/response_generator"
+require_relative "hyper_schema/response_validator"
+require_relative "hyper_schema/router"
+require_relative "hyper_schema/string_params_coercer"
+require_relative "hyper_schema/parameter_coercer"

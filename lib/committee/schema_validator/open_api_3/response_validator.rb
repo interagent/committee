@@ -2,7 +2,7 @@
 
 module Committee
   module SchemaValidator
-    module OpenAPI3
+    class OpenAPI3
       class ResponseValidator
         attr_reader :validate_success_only
 
