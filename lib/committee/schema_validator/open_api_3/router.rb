@@ -1,39 +1,43 @@
 # frozen_string_literal: true
 
 module Committee
-  class SchemaValidator::OpenAPI3::Router
-    # @param [Committee::SchemaValidator::Option] validator_option
-    def initialize(schema, validator_option)
-      @schema = schema
-      @prefix_regexp = ::Committee::SchemaValidator.build_prefix_regexp(validator_option.prefix)
-      @validator_option = validator_option
-    end
+  module SchemaValidator
+    module OpenAPI3
+      class Router
+        # @param [Committee::SchemaValidator::Option] validator_option
+        def initialize(schema, validator_option)
+          @schema = schema
+          @prefix_regexp = ::Committee::SchemaValidator.build_prefix_regexp(validator_option.prefix)
+          @validator_option = validator_option
+        end
 
-    def includes_request?(request)
-      return true unless @prefix_regexp
+        def includes_request?(request)
+          return true unless @prefix_regexp
 
-      prefix_request?(request)
-    end
+          prefix_request?(request)
+        end
 
-    def build_schema_validator(request)
-      Committee::SchemaValidator::OpenAPI3.new(self, request, @validator_option)
-    end
+        def build_schema_validator(request)
+          Committee::SchemaValidator::OpenAPI3.new(self, request, @validator_option)
+        end
 
-    def operation_object(request)
-      path = request.path
-      path = path.gsub(@prefix_regexp, '') if prefix_request?(request)
+        def operation_object(request)
+          path = request.path
+          path = path.gsub(@prefix_regexp, '') if prefix_request?(request)
 
-      request_method = request.request_method.downcase
+          request_method = request.request_method.downcase
 
-      @schema.operation_object(path, request_method)
-    end
+          @schema.operation_object(path, request_method)
+        end
 
-    private
+        private
 
-    def prefix_request?(request)
-      return false unless @prefix_regexp
+        def prefix_request?(request)
+          return false unless @prefix_regexp
 
-      request.path =~ @prefix_regexp
+          request.path =~ @prefix_regexp
+        end
+      end
     end
   end
 end
