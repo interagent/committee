@@ -2,9 +2,9 @@
 
 require_relative "../test_helper"
 
-describe Committee::Drivers::HyperSchema do
+describe Committee::Drivers::HyperSchema::Driver do
   before do
-    @driver = Committee::Drivers::HyperSchema.new
+    @driver = Committee::Drivers::HyperSchema::Driver.new
   end
 
   it "has a name" do

@@ -35,7 +35,7 @@ describe Committee::Test::Methods do
     before do
       sc = JsonSchema.parse!(hyper_schema_data)
       sc.expand_references!
-      s = Committee::Drivers::HyperSchema.new.parse(sc)
+      s = Committee::Drivers::HyperSchema::Driver.new.parse(sc)
       @committee_options = {schema: s}
     end
 

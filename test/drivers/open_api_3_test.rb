@@ -2,9 +2,9 @@
 
 require_relative "../test_helper"
 
-describe Committee::Drivers::OpenAPI3 do
+describe Committee::Drivers::OpenAPI3::Driver do
   before do
-    @driver = Committee::Drivers::OpenAPI3.new
+    @driver = Committee::Drivers::OpenAPI3::Driver.new
   end
 
   it "has a name" do

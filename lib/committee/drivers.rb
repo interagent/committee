@@ -7,11 +7,11 @@ module Committee
     def self.driver_from_name(name)
       case name
       when :hyper_schema
-        Committee::Drivers::HyperSchema.new
+        Committee::Drivers::HyperSchema::Driver.new
       when :open_api_2
-        Committee::Drivers::OpenAPI2.new
+        Committee::Drivers::OpenAPI2::Driver.new
       when :open_api_3
-        Committee::Drivers::OpenAPI3.new
+        Committee::Drivers::OpenAPI3::Driver.new
       else
         raise ArgumentError, %{Committee: unknown driver "#{name}".}
       end
@@ -51,13 +51,13 @@ module Committee
     def self.load_from_data(hash)
       if hash['openapi']&.start_with?('3.0.')
         parser = OpenAPIParser.parse(hash)
-        return Committee::Drivers::OpenAPI3.new.parse(parser)
+        return Committee::Drivers::OpenAPI3::Driver.new.parse(parser)
       end
 
       driver = if hash['swagger'] == '2.0'
-                 Committee::Drivers::OpenAPI2.new
+                 Committee::Drivers::OpenAPI2::Driver.new
                else
-                 Committee::Drivers::HyperSchema.new
+                 Committee::Drivers::HyperSchema::Driver.new
                end
 
       driver.parse(hash)
