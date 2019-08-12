@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "test_helper"
+require "test_helper"
 
 #
 # The purpose of this sets of tests is just to include our Ruby executables

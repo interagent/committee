@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../../test_helper"
+require "test_helper"
 
 describe Committee::SchemaValidator::HyperSchema::Router do
   it "builds routes without parameters" do
