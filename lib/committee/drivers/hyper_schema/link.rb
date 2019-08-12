@@ -10,7 +10,7 @@ module Committee
       # places.
       class Link
         def initialize(hyper_schema_link)
-          self.hyper_schema_link = hyper_schema_link
+          @hyper_schema_link = hyper_schema_link
         end
 
         # The link's input media type. i.e. How requests should be encoded.

@@ -5,7 +5,7 @@ module Committee
     module OpenAPI2
       class SchemaBuilder
         def initialize(link_data)
-          self.link_data = link_data
+          @link_data = link_data
         end
 
         private
