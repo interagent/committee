@@ -18,11 +18,13 @@ module Committee
 
         [status, headers, response]
       rescue Committee::InvalidResponse
-        @error_handler.call($!) if @error_handler
+        handle_exception($!, request.env)
+
         raise if @raise
         @error_class.new(500, :invalid_response, $!.message).render
       rescue JSON::ParserError
-        @error_handler.call($!) if @error_handler
+        handle_exception($!, request.env)
+
         raise Committee::InvalidResponse if @raise
         @error_class.new(500, :invalid_response, "Response wasn't valid JSON.").render
       end
@@ -30,6 +32,23 @@ module Committee
       class << self
         def validate?(status, validate_success_only)
           status != 204 && (!validate_success_only || (200...300).include?(status))
+        end
+      end
+
+      private
+
+      def handle_exception(e, env)
+        return unless @error_handler
+
+        if @error_handler.arity > 1
+          @error_handler.call(e, env)
+        else
+          warn <<-MESSAGE
+          [DEPRECATION] Using `error_handler.call(exception)` is deprecated and will be change to
+            `error_handler.call(exception, request.env)` in next major version.
+          MESSAGE
+
+          @error_handler.call(e)
         end
       end
     end

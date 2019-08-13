@@ -15,9 +15,17 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
-  it "doesn't call error_handler when response is valid" do
+  it "doesn't call error_handler (has a arg) when response is valid" do
     called = false
     pr = ->(_e) { called = true }
+    @app = new_rack_app(JSON.generate([ValidApp]), {}, schema: hyper_schema, error_handler: pr)
+    get "/apps"
+    assert !called, "error_handler is called"
+  end
+
+  it "doesn't call error_handler (has two args) when response is valid" do
+    called = false
+    pr = ->(_e, _env) { called = true }
     @app = new_rack_app(JSON.generate([ValidApp]), {}, schema: hyper_schema, error_handler: pr)
     get "/apps"
     assert !called, "error_handler is called"
@@ -77,9 +85,20 @@ describe Committee::Middleware::ResponseValidation do
     assert_match(/valid json/i, last_response.body)
   end
 
-  it "calls error_handler when it rescues JSON errors" do
+  it "calls error_handler (has a arg) when it rescues JSON errors" do
     called_err = nil
     pr = ->(e) { called_err = e }
+    @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema, error_handler: pr)
+    _, err = capture_io do
+      get "/apps"
+    end
+    assert_kind_of JSON::ParserError, called_err
+    assert_match(/\[DEPRECATION\]/i, err)
+  end
+
+  it "calls error_handler (has two args) when it rescues JSON errors" do
+    called_err = nil
+    pr = ->(e, _env) { called_err = e }
     @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema, error_handler: pr)
     get "/apps"
     assert_kind_of JSON::ParserError, called_err
@@ -99,9 +118,23 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
-  it "calls error_handler when it rescues JSON errors" do
+  it "calls error_handler (has a arg) when it rescues JSON errors" do
     called_err = nil
     pr = ->(e) { called_err = e }
+    @app = new_rack_app("[{x:y}]", {}, raise: true, schema: hyper_schema, error_handler: pr)
+    assert_raises(Committee::InvalidResponse) do
+      _, err = capture_io do
+        get "/apps"
+      end
+
+      assert_kind_of JSON::ParserError, called_err
+      assert_match(/\[DEPRECATION\]/i, err)
+    end
+  end
+
+  it "calls error_handler (has two args) when it rescues JSON errors" do
+    called_err = nil
+    pr = ->(e, _env) { called_err = e }
     @app = new_rack_app("[{x:y}]", {}, raise: true, schema: hyper_schema, error_handler: pr)
     assert_raises(Committee::InvalidResponse) do
       get "/apps"

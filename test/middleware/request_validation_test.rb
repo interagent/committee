@@ -63,9 +63,21 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "doesn't call error_handler when request is valid" do
+  it "doesn't call error_handler (has a arg) when request is valid" do
     called_error = false
-    pr = ->(_) { called_error = true }
+    pr = ->(_e) { called_error = true }
+    @app = new_rack_app(schema: hyper_schema, error_handler: pr)
+    params = {
+      "name" => "cloudnasium"
+    }
+    header "Content-Type", "application/json"
+    post "/apps", JSON.generate(params)
+    assert !called_error
+  end
+
+  it "doesn't call error_handler (has 2 args) when request is valid" do
+    called_error = false
+    pr = ->(_e, _env) { called_error = true }
     @app = new_rack_app(schema: hyper_schema, error_handler: pr)
     params = {
       "name" => "cloudnasium"
@@ -284,9 +296,24 @@ describe Committee::Middleware::RequestValidation do
     assert_match(/invalid request/i, last_response.body)
   end
 
-  it "calls error_handler when request is invalid" do
+  it "calls error_handler (has a arg) when request is invalid" do
     called_err = nil
     pr = ->(e) { called_err = e }
+    @app = new_rack_app(schema: hyper_schema, error_handler: pr)
+    header "Content-Type", "application/json"
+    params = {
+      "name" => 1
+    }
+    _, err = capture_io do
+      post "/apps", JSON.generate(params)
+    end
+    assert_kind_of Committee::InvalidRequest, called_err
+    assert_match(/\[DEPRECATION\]/i, err)
+  end
+
+  it "calls error_handler (has two args) when request is invalid" do
+    called_err = nil
+    pr = ->(e, _env) { called_err = e }
     @app = new_rack_app(schema: hyper_schema, error_handler: pr)
     header "Content-Type", "application/json"
     params = {
@@ -304,9 +331,21 @@ describe Committee::Middleware::RequestValidation do
     assert_match(/valid json/i, last_response.body)
   end
 
-  it "calls error_handler when it rescues JSON errors" do
+  it "calls error_handler (has a arg) when it rescues JSON errors" do
     called_err = nil
     pr = ->(e) { called_err = e }
+    @app = new_rack_app(schema: hyper_schema, error_handler: pr)
+    header "Content-Type", "application/json"
+    _, err = capture_io do
+      post "/apps", "{x:y}"
+    end
+    assert_kind_of JSON::ParserError, called_err
+    assert_match(/\[DEPRECATION\]/i, err)
+  end
+
+  it "calls error_handler (has two args) when it rescues JSON errors" do
+    called_err = nil
+    pr = ->(e, _env) { called_err = e }
     @app = new_rack_app(schema: hyper_schema, error_handler: pr)
     header "Content-Type", "application/json"
     post "/apps", "{x:y}"
