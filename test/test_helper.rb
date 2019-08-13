@@ -1,21 +1,18 @@
 # frozen_string_literal: true
 
-if RUBY_VERSION >= '2.0.0'
-  require 'simplecov'
+require 'simplecov'
 
-  SimpleCov.start do
-    # We do our utmost to test our executables by modularizing them into
-    # testable pieces, but testing them to completion is nearly impossible as
-    # far as I can tell, so include them in our tests but don't calculate
-    # coverage.
-    add_filter "/bin/"
+SimpleCov.start do
+  # We do our utmost to test our executables by modularizing them into
+  # testable pieces, but testing them to completion is nearly impossible as
+  # far as I can tell, so include them in our tests but don't calculate
+  # coverage.
+  add_filter "/bin/"
+  add_filter "/test/"
 
-    add_filter "/test/"
-
-    # This library has a pretty modest number of lines, so let's try to stick
-    # to a 100% coverage target for a while and see what happens.
-    minimum_coverage 100
-  end
+  # This library has a pretty modest number of lines, so let's try to stick
+  # to a 100% coverage target for a while and see what happens.
+  minimum_coverage 100
 end
 
 require "minitest"
