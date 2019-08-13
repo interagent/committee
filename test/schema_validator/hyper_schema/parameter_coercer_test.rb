@@ -2,8 +2,6 @@
 
 require "test_helper"
 
-require "stringio"
-
 describe Committee::SchemaValidator::HyperSchema::ParameterCoercer do
   before do
     @schema = JsonSchema.parse!(hyper_schema_data)
