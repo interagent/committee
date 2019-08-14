@@ -20,7 +20,7 @@ module Committee
 
         @app.call(request.env)
       rescue Committee::BadRequest, Committee::InvalidRequest
-        @error_handler.call($!) if @error_handler
+        handle_exception($!, request.env)
         raise if @raise
         @error_class.new(400, :bad_request, $!.message).render
       rescue Committee::NotFound => e
@@ -31,9 +31,26 @@ module Committee
           e.message
         ).render
       rescue JSON::ParserError
-        @error_handler.call($!) if @error_handler
+        handle_exception($!, request.env)
         raise Committee::InvalidRequest if @raise
         @error_class.new(400, :bad_request, "Request body wasn't valid JSON.").render
+      end
+
+      private
+
+      def handle_exception(e, env)
+        return unless @error_handler
+
+        if @error_handler.arity > 1
+          @error_handler.call(e, env)
+        else
+          warn <<-MESSAGE
+          [DEPRECATION] Using `error_handler.call(exception)` is deprecated and will be change to
+            `error_handler.call(exception, request.env)` in next major version.
+          MESSAGE
+
+          @error_handler.call(e)
+        end
       end
     end
   end

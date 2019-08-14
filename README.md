@@ -46,7 +46,7 @@ Non-boolean options:
 |error_class| StandardError | supported | supported | Change validation errors from `Committee::ValidationError`). |
 |prefix| String | supported | supported | Mounts the middleware to respond at a configured prefix. (e.g. prefix is '/v1' and request path is '/v1/test' use '/test' definition). |
 |schema_path| String | supported | supported | Defines the location of the schema file to use for validation. |
-|error_handler| Proc Object | supported | supported | A proc which will be called when error occurs. Take an Error instance as first argument. |
+|error_handler| Proc Object | supported | supported | A proc which will be called when error occurs. Take an Error instance as first argument, and request.env as second argument. (e.g. `-> (ex, env) { Raven.capture_exception(ex, extra: { rack_env: env }) }`) |
 
 Note that Hyper-Schema and OpenAPI 2 get the same defaults for options.
 
@@ -157,7 +157,7 @@ No boolean option values:
 |-----------:|------------:|------------:|------------:| :------------ |
 |prefix| String | support | support | Mounts the middleware to respond at a configured prefix. |
 |error_class| StandardError | support | support | Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`). |
-|error_handler| Proc Object | support | support | A proc which will be called when error occurs. Take an Error instance as first argument. |
+|error_handler| Proc Object | support | support | A proc which will be called when error occurs. Take an Error instance as first argument, and request.env as second argument. (e.g. `-> (ex, env) { Raven.capture_exception(ex, extra: { rack_env: env }) }`) |
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
 
@@ -254,15 +254,15 @@ describe Committee::Middleware::Stub do
     it "conforms to schema" do
       assert_schema_conform
     end
-    
+
     it "conforms to request schema" do
       assert_request_schema_confirm
     end
-    
+
     it "conforms to response schema" do
       assert_response_schema_confirm
     end
-    
+
     it "conforms to response and request schema" do
       @committee_options[:old_assert_behavior] = false
       assert_schema_conform
