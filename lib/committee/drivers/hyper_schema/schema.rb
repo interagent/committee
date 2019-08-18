@@ -4,7 +4,7 @@ module Committee
   module Drivers
     module HyperSchema
       class Schema < ::Committee::Drivers::Schema
-        # A link back to the derivative instace of Committee::Drivers::Driver
+        # A link back to the derivative instance of Committee::Drivers::Driver
         # that create this schema.
         attr_accessor :driver
 

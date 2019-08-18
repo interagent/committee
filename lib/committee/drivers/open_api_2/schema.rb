@@ -7,7 +7,7 @@ module Committee
         attr_accessor :base_path
         attr_accessor :consumes
 
-        # A link back to the derivative instace of Committee::Drivers::Driver
+        # A link back to the derivative instance of Committee::Drivers::Driver
         # that create this schema.
         attr_accessor :driver
 
