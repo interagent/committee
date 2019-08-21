@@ -214,6 +214,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /pets/{nickname}/adopt/{param_2}:
+    post:
+      description: Adopt a pet
+      operationId: adoptPet
+      parameters:
+      - name: nickname
+        in: path
+        description: Name of pet to adopt
+        required: true
+        schema:
+          type: string
+      - name: param_2
+        in: path
+        description: Sample parameter
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: pet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /animals/{id}:
     parameters:
     - name: id
