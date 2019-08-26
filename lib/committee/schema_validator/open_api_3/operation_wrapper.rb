@@ -28,9 +28,9 @@ module Committee
 
         # @param [Boolean] strict when not content_type or status code definition, raise error
         def validate_response_params(status_code, headers, response_data, strict, check_header)
-          request_body = OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, response_data, headers)
+          response_body = OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, response_data, headers)
 
-          return request_operation.validate_response_body(request_body, response_validate_options(strict, check_header))
+          return request_operation.validate_response_body(response_body, response_validate_options(strict, check_header))
         rescue OpenAPIParser::OpenAPIError => e
           raise Committee::InvalidResponse.new(e.message)
         end
