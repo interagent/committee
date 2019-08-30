@@ -56,7 +56,7 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
         }
       end
 
-      context 'correct' do
+      context 'valid' do
         let(:value) { 'A' * 5 }
         let(:params) { { 'str' => value } }
         it { is_expected.to eq({ 'str' => value }) }
@@ -88,7 +88,7 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
         }
       end
 
-      context 'correct' do
+      context 'valid' do
         let(:value) { 'A' * 5 }
         let(:params) { { 'str' => value } }
         it { is_expected.to eq({ 'str' => value }) }
