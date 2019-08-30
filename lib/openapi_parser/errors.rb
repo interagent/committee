@@ -177,4 +177,26 @@ module OpenAPIParser
       "don't exist response definition #{@reference}"
     end
   end
+
+  class MoreThanMaxLength < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} cannot be more than max length in #{@reference}"
+    end
+  end
+
+  class LessThanMinLength < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} cannot be less than min length in #{@reference}"
+    end
+  end
 end
