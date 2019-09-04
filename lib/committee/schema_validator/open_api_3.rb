@@ -12,6 +12,8 @@ module Committee
       end
 
       def request_validate(request)
+        return unless link_exist?
+
         path_params = validator_option.coerce_path_params ? coerce_path_params : {}
 
         request_unpack(request)
@@ -49,7 +51,6 @@ module Committee
       attr_reader :validator_option
 
       def coerce_path_params
-        return {} unless link_exist?
         @operation_object.coerce_path_parameter(@validator_option)
       end
 

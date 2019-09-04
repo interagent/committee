@@ -256,7 +256,7 @@ describe Committee::Middleware::RequestValidation do
   it "rescues JSON errors" do
     @app = new_rack_app(schema: open_api_3_schema)
     header "Content-Type", "application/json"
-    post "/apps", "{x:y}"
+    post "/characters", "{x:y}"
     assert_equal 400, last_response.status
     assert_match(/valid json/i, last_response.body)
   end

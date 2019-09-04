@@ -10,6 +10,14 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       @app
     end
 
+    it "skip validaiton when link does not exist" do
+      @app = new_rack_app(schema: open_api_3_schema)
+      params = {}
+      header "Content-Type", "application/json"
+      post "/unknown", JSON.generate(params)
+      assert_equal 200, last_response.status
+    end
+
     it "optionally content_type check" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
       params = {
