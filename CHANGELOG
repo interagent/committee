@@ -1,5 +1,8 @@
 Unreleased
 
+3.1.1 2019-09-05
+	OS3 request validator skip if link does not exist (#240)
+
 3.1.0 2019-08-07
 	Add error handler option to Committee::Middleware::RequestValidation (#230)
 	fix: ensure we catch all OpenAPIParser::OpenAPIError classes when coercing path parameters for OpenAPI 3 (#228)
