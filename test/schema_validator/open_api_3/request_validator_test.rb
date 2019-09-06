@@ -10,7 +10,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       @app
     end
 
-    it "skip validaiton when link does not exist" do
+    it "skip validation when link does not exist" do
       @app = new_rack_app(schema: open_api_3_schema)
       params = {}
       header "Content-Type", "application/json"
@@ -38,7 +38,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       assert_equal 200, last_response.status
     end
 
-    it "if not exist requsetBody definition, skip content_type check" do
+    it "if not exist requestBody definition, skip content_type check" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
       params = {
           "string_post_1" => "cloudnasium"
