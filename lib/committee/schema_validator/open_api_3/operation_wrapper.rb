@@ -64,6 +64,10 @@ module Committee
           end
         end
 
+        def request_content_types
+          request_operation.operation_object&.request_body&.content&.keys || []
+        end
+
         private
 
         attr_reader :request_operation

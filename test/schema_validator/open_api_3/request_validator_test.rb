@@ -21,11 +21,34 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
     it "optionally content_type check" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
       params = {
-          "string_post_1" => "cloudnasium"
+        "string_post_1" => "cloudnasium"
       }
       header "Content-Type", "text/html"
       post "/characters", JSON.generate(params)
       assert_equal 400, last_response.status
+
+      body = JSON.parse(last_response.body)
+      message =
+          %{"Content-Type" request header must be set to "application/json".}
+
+      assert_equal "bad_request", body['id']
+      assert_equal message, body['message']
+    end
+
+    it "validates content_type" do
+      @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
+      params = {
+        "string_post_1" => "cloudnasium"
+      }
+      header "Content-Type", "text/html"
+      post "/validate_content_types", JSON.generate(params)
+      assert_equal 400, last_response.status
+
+      body = JSON.parse(last_response.body)
+      message =
+        %{"Content-Type" request header must be set to any of the following: ["application/json", "application/binary"].}
+
+      assert_equal message, body['message']
     end
 
     it "optionally skip content_type check" do
