@@ -10,7 +10,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       @app
     end
 
-    it "skip validaiton when link does not exist" do
+    it "skip validation when link does not exist" do
       @app = new_rack_app(schema: open_api_3_schema)
       params = {}
       header "Content-Type", "application/json"
@@ -21,11 +21,34 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
     it "optionally content_type check" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
       params = {
-          "string_post_1" => "cloudnasium"
+        "string_post_1" => "cloudnasium"
       }
       header "Content-Type", "text/html"
       post "/characters", JSON.generate(params)
       assert_equal 400, last_response.status
+
+      body = JSON.parse(last_response.body)
+      message =
+          %{"Content-Type" request header must be set to "application/json".}
+
+      assert_equal "bad_request", body['id']
+      assert_equal message, body['message']
+    end
+
+    it "validates content_type" do
+      @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
+      params = {
+        "string_post_1" => "cloudnasium"
+      }
+      header "Content-Type", "text/html"
+      post "/validate_content_types", JSON.generate(params)
+      assert_equal 400, last_response.status
+
+      body = JSON.parse(last_response.body)
+      message =
+        %{"Content-Type" request header must be set to any of the following: ["application/json", "application/binary"].}
+
+      assert_equal message, body['message']
     end
 
     it "optionally skip content_type check" do
@@ -38,7 +61,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       assert_equal 200, last_response.status
     end
 
-    it "if not exist requsetBody definition, skip content_type check" do
+    it "if not exist requestBody definition, skip content_type check" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
       params = {
           "string_post_1" => "cloudnasium"

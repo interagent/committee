@@ -355,6 +355,26 @@ paths:
                   string:
                     type: string
 
+  /validate_content_types:
+    post:
+      description: validate request content type
+      responses:
+        '200':
+          description: correct
+          content:
+            application/json:
+              schema:
+                type: object
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+          application/binary:
+            schema:
+              type: string
+              format: binary
+
   /validate_no_parameter:
     patch:
       description: validate no body
