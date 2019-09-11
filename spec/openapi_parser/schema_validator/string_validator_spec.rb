@@ -41,4 +41,72 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
       end
     end
   end
+
+  describe 'validate string length' do
+    subject { OpenAPIParser::SchemaValidator.validate(params, target_schema, options) }
+
+    describe 'validate max length' do
+      let(:params) { {} }
+      let(:replace_schema) do
+        {
+          str: {
+            type: 'string',
+            maxLength: 5,
+          },
+        }
+      end
+
+      context 'valid' do
+        let(:value) { 'A' * 5 }
+        let(:params) { { 'str' => value } }
+        it { is_expected.to eq({ 'str' => value }) }
+      end
+
+      context 'invalid' do
+        context 'more than max' do
+          let(:value) { 'A' * 6 }
+          let(:params) { { 'str' => value } }
+
+          it do
+            expect { subject }.to raise_error do |e|
+              expect(e.kind_of?(OpenAPIParser::MoreThanMaxLength)).to eq true
+              expect(e.message.start_with?("#{value} cannot be more than max length in")).to eq true
+            end
+          end
+        end
+      end
+    end
+
+    describe 'validate min length' do
+      let(:params) { {} }
+      let(:replace_schema) do
+        {
+          str: {
+            type: 'string',
+            minLength: 5,
+          },
+        }
+      end
+
+      context 'valid' do
+        let(:value) { 'A' * 5 }
+        let(:params) { { 'str' => value } }
+        it { is_expected.to eq({ 'str' => value }) }
+      end
+
+      context 'invalid' do
+        context 'less than min' do
+          let(:value) { 'A' * 4 }
+          let(:params) { { 'str' => value } }
+
+          it do
+            expect { subject }.to raise_error do |e|
+              expect(e.kind_of?(OpenAPIParser::LessThanMinLength)).to eq true
+              expect(e.message.start_with?("#{value} cannot be less than min length in")).to eq true
+            end
+          end
+        end
+      end
+    end
+  end
 end
