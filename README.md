@@ -283,7 +283,7 @@ If you want to select the type manually, pass an `OpenAPI 3` object to the `sche
 
 ```ruby
 open_api = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yaml'))
-schema = Committee::Drivers::OpenAPI3.new.parse(open_api)
+schema = Committee::Drivers::OpenAPI3::Driver.new.parse(open_api)
 use Committee::Middleware::RequestValidation, schema: schema
 ```
 
@@ -331,7 +331,7 @@ use Committee::Middleware::RequestValidation, schema: Committee::Drivers::load_d
 
 # manually select
 json = JSON.parse(File.read(...))
-schema = Committee::Drivers::HyperSchema.new.parse(json)
+schema = Committee::Drivers::HyperSchema::Driver.new.parse(json)
 use Committee::Middleware::RequestValidation, schema: schema
 ```
 
@@ -342,14 +342,14 @@ hash = JSON.load(json_path)
 
 # OpenAPI 3 requires the `openapi` key and a version
 if hash['openapi']&.start_with?('3.')
-  return Committee::Drivers::OpenAPI3.new.parse(hash)
+  return Committee::Drivers::OpenAPI3::Driver.new.parse(hash)
 
 # OpenAPI 2 requires the `swagger` key
 elsif hash['swagger'] == '2.0'
-  return Committee::Drivers::OpenAPI2.new.parse(hash)
+  return Committee::Drivers::OpenAPI2::Driver.new.parse(hash)
 
 else
-  return Committee::Drivers::HyperSchema.new.parse(hash)
+  return Committee::Drivers::HyperSchema::Driver.new.parse(hash)
 end
 ```
 
