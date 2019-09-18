@@ -199,4 +199,26 @@ module OpenAPIParser
       "#{@value} cannot be less than min length in #{@reference}"
     end
   end
+
+  class MoreThanMaxItems < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} cannot be more than max items in #{@reference}"
+    end
+  end
+
+  class LessThanMinItems < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} cannot be less than min items in #{@reference}"
+    end
+  end
 end
