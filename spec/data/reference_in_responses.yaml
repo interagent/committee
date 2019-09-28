@@ -1,0 +1,19 @@
+openapi: 3.0.2
+info:
+  version: 1.0.0
+  title: OpenAPI3 Test
+paths:
+  /info:
+    get:
+      responses:
+        200:
+          $ref: '#/components/responses/Response'
+
+components:
+  responses:
+    Response:
+      description: reference response
+      content:
+        application/json:
+          schema:
+            type: object

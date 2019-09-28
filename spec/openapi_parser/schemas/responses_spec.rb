@@ -1,10 +1,10 @@
 require_relative '../../spec_helper'
 
 RSpec.describe OpenAPIParser::Schemas::Responses do
-  let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
-
   describe 'correct init' do
     subject { operation.responses }
+
+    let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
 
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/pets'] }
@@ -24,6 +24,8 @@ RSpec.describe OpenAPIParser::Schemas::Responses do
 
   describe '#validate_response_body(status_code, content_type, params)' do
     subject { responses.validate(response_body, response_validate_options) }
+
+    let(:root) { OpenAPIParser.parse(petstore_schema, {}) }
 
     let(:paths) { root.paths }
     let(:path_item) { paths.path['/pets'] }
@@ -91,6 +93,23 @@ RSpec.describe OpenAPIParser::Schemas::Responses do
 
         it { expect { subject }.to raise_error(OpenAPIParser::NotExistRequiredKey) }
       end
+    end
+  end
+
+  describe 'resolve reference init' do
+    subject { operation.responses }
+
+    let(:schema) { YAML.load_file('./spec/data/reference_in_responses.yaml') }
+    let(:root) { OpenAPIParser.parse(schema, {}) }
+
+    let(:paths) { root.paths }
+    let(:path_item) { paths.path['/info'] }
+    let(:operation) { path_item.get }
+    let(:response_object) { subject.response['200'] }
+
+    it do
+      expect(response_object.class).to eq OpenAPIParser::Schemas::Response
+      expect(response_object.description).to eq 'reference response'
     end
   end
 end
