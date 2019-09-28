@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.5.0 (2019-09-28)
+* Add max and min length validators for string. #45
+* Support for minItems and maxItems in array #49
+
 ## 0.4.1 (2019-07-27)
 * release missed
 
