@@ -1,5 +1,8 @@
 Unreleased
 
+3.2.0 2010-09-28
+	add ignore_error option (#218)
+
 3.1.1 2019-09-05
 	OS3 request validator skip if link does not exist (#240)
 
