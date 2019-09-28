@@ -17,7 +17,6 @@ module Committee
         def call(status, headers, response_data, strict)
           return unless Committee::Middleware::ResponseValidation.validate?(status, validate_success_only)
 
-          #content_type = headers['Content-Type'].to_s.split(";").first.to_s
           operation_wrapper.validate_response_params(status, headers, response_data, strict, check_header)
         end
 
