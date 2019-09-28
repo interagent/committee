@@ -1,19 +1,18 @@
-if RUBY_VERSION >= '2.0.0'
-  require 'simplecov'
+# frozen_string_literal: true
 
-  SimpleCov.start do
-    # We do our utmost to test our executables by modularizing them into
-    # testable pieces, but testing them to completion is nearly impossible as
-    # far as I can tell, so include them in our tests but don't calculate
-    # coverage.
-    add_filter "/bin/"
+require 'simplecov'
 
-    add_filter "/test/"
+SimpleCov.start do
+  # We do our utmost to test our executables by modularizing them into
+  # testable pieces, but testing them to completion is nearly impossible as
+  # far as I can tell, so include them in our tests but don't calculate
+  # coverage.
+  add_filter "/bin/"
+  add_filter "/test/"
 
-    # This library has a pretty modest number of lines, so let's try to stick
-    # to a 100% coverage target for a while and see what happens.
-    minimum_coverage 100
-  end
+  # This library has a pretty modest number of lines, so let's try to stick
+  # to a 100% coverage target for a while and see what happens.
+  minimum_coverage 100
 end
 
 require "minitest"
@@ -22,6 +21,7 @@ require "minitest/autorun"
 require "rack/test"
 require "rr"
 require "pry"
+require "stringio"
 
 require_relative "../lib/committee"
 
@@ -85,3 +85,6 @@ def open_api_3_schema_path
   "./test/data/openapi3/normal.yaml"
 end
 
+def open_api_3_0_1_schema_path
+  "./test/data/openapi3/3_0_1.yaml"
+end

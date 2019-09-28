@@ -1,4 +1,6 @@
-require_relative "../test_helper"
+# frozen_string_literal: true
+
+require "test_helper"
 
 describe Committee::Middleware::Stub do
   include Rack::Test::Methods

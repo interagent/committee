@@ -1,4 +1,6 @@
-require_relative "../test_helper"
+# frozen_string_literal: true
+
+require "test_helper"
 
 describe Committee::Middleware::RequestValidation do
   include Rack::Test::Methods
@@ -254,7 +256,7 @@ describe Committee::Middleware::RequestValidation do
   it "rescues JSON errors" do
     @app = new_rack_app(schema: open_api_3_schema)
     header "Content-Type", "application/json"
-    post "/apps", "{x:y}"
+    post "/characters", "{x:y}"
     assert_equal 400, last_response.status
     assert_match(/valid json/i, last_response.body)
   end
@@ -310,6 +312,27 @@ describe Committee::Middleware::RequestValidation do
     @app = new_rack_app(schema: open_api_3_schema, strict: true)
     get "/unknown"
     assert_equal 404, last_response.status
+  end
+
+  it "OpenAPI3 parser not exist required key" do
+    @app = new_rack_app(raise: true, schema: open_api_3_schema)
+
+    e = assert_raises(Committee::InvalidRequest) do
+      get "/validate", nil
+    end
+
+    assert_match(/required parameters query_string not exist in/i, e.message)
+  end
+
+  it "raises error when required path parameter is invalid" do
+    @app = new_rack_app(raise: true, schema: open_api_3_schema)
+
+    e = assert_raises(Committee::InvalidRequest) do
+      not_an_integer = 'abc'
+      get "/coerce_path_params/#{not_an_integer}", nil
+    end
+
+    assert_match(/is String but it's not valid integer in/i, e.message)
   end
 
   it "optionally raises an error" do

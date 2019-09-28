@@ -1,6 +1,6 @@
-require_relative "../../test_helper"
+# frozen_string_literal: true
 
-require "stringio"
+require "test_helper"
 
 describe Committee::SchemaValidator::HyperSchema::ParameterCoercer do
   before do

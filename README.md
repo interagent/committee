@@ -46,6 +46,7 @@ Non-boolean options:
 |error_class| StandardError | supported | supported | Change validation errors from `Committee::ValidationError`). |
 |prefix| String | supported | supported | Mounts the middleware to respond at a configured prefix. (e.g. prefix is '/v1' and request path is '/v1/test' use '/test' definition). |
 |schema_path| String | supported | supported | Defines the location of the schema file to use for validation. |
+|error_handler| Proc Object | supported | supported | A proc which will be called when error occurs. Take an Error instance as first argument, and request.env as second argument. (e.g. `-> (ex, env) { Raven.capture_exception(ex, extra: { rack_env: env }) }`) |
 
 Note that Hyper-Schema and OpenAPI 2 get the same defaults for options.
 
@@ -157,7 +158,7 @@ No boolean option values:
 |-----------:|------------:|------------:|------------:| :------------ |
 |prefix| String | support | support | Mounts the middleware to respond at a configured prefix. |
 |error_class| StandardError | support | support | Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`). |
-|error_handler| Proc Object | support | support | A proc which will be called when error occurs. Take an Error instance as first argument. |
+|error_handler| Proc Object | support | support | A proc which will be called when error occurs. Take an Error instance as first argument, and request.env as second argument. (e.g. `-> (ex, env) { Raven.capture_exception(ex, extra: { rack_env: env }) }`) |
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
 
@@ -256,7 +257,20 @@ describe Committee::Middleware::Stub do
     it "conforms to schema" do
       assert_schema_conform
     end
-   end
+
+    it "conforms to request schema" do
+      assert_request_schema_confirm
+    end
+
+    it "conforms to response schema" do
+      assert_response_schema_confirm
+    end
+
+    it "conforms to response and request schema" do
+      @committee_options[:old_assert_behavior] = false
+      assert_schema_conform
+    end
+  end
 end
 ```
 
@@ -272,7 +286,7 @@ If you want to select the type manually, pass an `OpenAPI 3` object to the `sche
 
 ```ruby
 open_api = OpenAPIParser.parse(YAML.load_file('open_api_3/schema.yaml'))
-schema = Committee::Drivers::OpenAPI3.new.parse(open_api)
+schema = Committee::Drivers::OpenAPI3::Driver.new.parse(open_api)
 use Committee::Middleware::RequestValidation, schema: schema
 ```
 
@@ -320,7 +334,7 @@ use Committee::Middleware::RequestValidation, schema: Committee::Drivers::load_d
 
 # manually select
 json = JSON.parse(File.read(...))
-schema = Committee::Drivers::HyperSchema.new.parse(json)
+schema = Committee::Drivers::HyperSchema::Driver.new.parse(json)
 use Committee::Middleware::RequestValidation, schema: schema
 ```
 
@@ -331,14 +345,14 @@ hash = JSON.load(json_path)
 
 # OpenAPI 3 requires the `openapi` key and a version
 if hash['openapi']&.start_with?('3.')
-  return Committee::Drivers::OpenAPI3.new.parse(hash)
+  return Committee::Drivers::OpenAPI3::Driver.new.parse(hash)
 
 # OpenAPI 2 requires the `swagger` key
 elsif hash['swagger'] == '2.0'
-  return Committee::Drivers::OpenAPI2.new.parse(hash)
+  return Committee::Drivers::OpenAPI2::Driver.new.parse(hash)
 
 else
-  return Committee::Drivers::HyperSchema.new.parse(hash)
+  return Committee::Drivers::HyperSchema::Driver.new.parse(hash)
 end
 ```
 

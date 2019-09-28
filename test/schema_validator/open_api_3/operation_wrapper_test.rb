@@ -1,4 +1,6 @@
-require_relative "../../test_helper"
+# frozen_string_literal: true
+
+require "test_helper"
 
 require "stringio"
 
@@ -142,6 +144,22 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         }
 
         assert e.message.start_with?("a class is String but")
+      end
+    end
+
+    describe '#content_types' do
+      it 'returns supported content types' do
+        @path = '/validate_content_types'
+        @method = 'post'
+
+        assert_equal ["application/json", "application/binary"], operation_object.request_content_types
+      end
+
+      it 'returns an empty array when the content of requestBody does not exist' do
+        @path = '/characters'
+        @method = 'get'
+
+        assert_equal [], operation_object.request_content_types
       end
     end
   end

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 Gem::Specification.new do |s|
   s.name          = "committee"
-  s.version       = "3.0.1"
+  s.version       = "3.1.1"
 
   s.summary       = "A collection of Rack middleware to support JSON Schema."
 
@@ -25,5 +27,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rr", "~> 1.1"
   s.add_development_dependency "pry"
   s.add_development_dependency "pry-byebug"
+  s.add_development_dependency "rubocop"
+  s.add_development_dependency "rubocop-performance"
   s.add_development_dependency "simplecov"
 end

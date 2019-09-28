@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Committee
   class Error < StandardError
   end

@@ -1,8 +1,10 @@
-require_relative "../test_helper"
+# frozen_string_literal: true
 
-describe Committee::Drivers::OpenAPI3 do
+require "test_helper"
+
+describe Committee::Drivers::OpenAPI3::Driver do
   before do
-    @driver = Committee::Drivers::OpenAPI3.new
+    @driver = Committee::Drivers::OpenAPI3::Driver.new
   end
 
   it "has a name" do

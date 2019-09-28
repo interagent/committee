@@ -1,5 +1,19 @@
 Unreleased
 
+3.1.1 2019-09-05
+	OS3 request validator skip if link does not exist (#240)
+
+3.1.0 2019-08-07
+	Add error handler option to Committee::Middleware::RequestValidation (#230)
+	fix: ensure we catch all OpenAPIParser::OpenAPIError classes when coercing path parameters for OpenAPI 3 (#228)
+	Support request validations by assert_schema_conform (#227)
+
+3.0.3 2019-06-17
+	Catch OpenAPIParser::NotExistRequiredKey with RequestValidation (#225)
+
+3.0.2 2019-05-15
+	Support OpenAPI 3 patch version (#223)
+
 3.0.1 2019-03-18
 	Correct use of `filepath` to `schema_path` (#216)
 

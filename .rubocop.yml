@@ -1,0 +1,32 @@
+require:
+  - rubocop-performance
+
+AllCops:
+  TargetRubyVersion: 2.3
+  # RuboCop has a bunch of cops enabled by default. This setting tells RuboCop
+  # to ignore them, so only the ones explicitly set in this file are enabled.
+  DisabledByDefault: true
+  Exclude:
+    - 'examples/**/*'
+    - 'vendor/**/*'
+
+Performance:
+  Exclude:
+    - 'test/**/*'
+
+Style/ClassAndModuleChildren:
+  Enabled: true
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  EnforcedStyle: always
+
+# Use Ruby >= 1.9 syntax for hashes. Prefer { a: :b } over { :a => :b }.
+Style/HashSyntax:
+  Enabled: true
+
+Performance/RedundantMerge:
+  Enabled: true
+
+Performance/UnfreezeString:
+  Enabled: true

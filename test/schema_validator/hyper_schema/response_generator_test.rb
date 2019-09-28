@@ -1,4 +1,6 @@
-require_relative "../../test_helper"
+# frozen_string_literal: true
+
+require "test_helper"
 
 describe Committee::SchemaValidator::HyperSchema::ResponseGenerator do
   before do
@@ -43,7 +45,7 @@ describe Committee::SchemaValidator::HyperSchema::ResponseGenerator do
     data, _schema = call
 
     # We're testing for legacy behavior here: even without a `targetSchema` as
-    # long as `rel` is set to `instances` we still wrap the the result in an
+    # long as `rel` is set to `instances` we still wrap the result in an
     # array.
     assert_equal "instances", @list_link.rel
 

@@ -1,4 +1,6 @@
-require_relative "../test_helper"
+# frozen_string_literal: true
+
+require "test_helper"
 
 describe Committee::Test::Methods do
   include Committee::Test::Methods
