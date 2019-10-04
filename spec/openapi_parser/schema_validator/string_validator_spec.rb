@@ -109,4 +109,37 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
       end
     end
   end
+
+  describe 'validate email format' do
+    subject { OpenAPIParser::SchemaValidator.validate(params, target_schema, options) }
+
+    let(:params) { {} }
+    let(:replace_schema) do
+      {
+        email_str: {
+          type: 'string',
+          format: 'email',
+        },
+      }
+    end
+
+    context 'correct' do
+      let(:params) { { 'email_str' => 'hello@example.com' } }
+      it { expect(subject).to eq({ 'email_str' => 'hello@example.com' }) }
+    end
+
+    context 'invalid' do
+      context 'error pattern' do
+        let(:value) { 'not_email' }
+        let(:params) { { 'email_str' => value } }
+
+        it do
+          expect { subject }.to raise_error do |e|
+            expect(e.kind_of?(OpenAPIParser::InvalidEmailFormat)).to eq true
+            expect(e.message.start_with?("#{value} is not a valid email address format in")).to eq true
+          end
+        end
+      end
+    end
+  end
 end
