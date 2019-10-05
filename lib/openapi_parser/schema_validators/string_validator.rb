@@ -24,6 +24,9 @@ class OpenAPIParser::SchemaValidator
       value, err = validate_max_min_length(value, schema)
       return [nil, err] if err
 
+      value, err = validate_email_format(value, schema)
+      return [nil, err] if err
+
       [value, nil]
     end
 
@@ -60,6 +63,14 @@ class OpenAPIParser::SchemaValidator
         return [nil, OpenAPIParser::LessThanMinLength.new(value, schema.object_reference)] if schema.minLength && value.size < schema.minLength
 
         [value, nil]
+      end
+
+      def validate_email_format(value, schema)
+        return [value, nil] unless schema.format == 'email'
+
+        return [value, nil] if value.match?(URI::MailTo::EMAIL_REGEXP)
+
+        return [nil, OpenAPIParser::InvalidEmailFormat.new(value, schema.object_reference)]
       end
   end
 end

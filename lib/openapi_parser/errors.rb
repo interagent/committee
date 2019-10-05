@@ -166,6 +166,17 @@ module OpenAPIParser
     end
   end
 
+  class InvalidEmailFormat < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@value} is not a valid email address format in #{@reference}"
+    end
+  end
+
   class NotExistStatusCodeDefinition < OpenAPIError
     def message
       "don't exist status code definition in #{@reference}"
