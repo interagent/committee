@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.6.0 (2019-10-05)
+* add email format validation on string #51
+
 ## 0.5.0 (2019-09-28)
 * Add max and min length validators for string. #45
 * Support for minItems and maxItems in array #49
