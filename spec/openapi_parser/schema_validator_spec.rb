@@ -189,8 +189,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::NotNullError)).to eq true
-            expect(e.message.include?("don't allow null")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::NotNullError)
+            expect(e.message.include?("does not allow null values")).to eq true
           end
         end
       end

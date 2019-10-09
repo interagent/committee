@@ -28,7 +28,7 @@ module OpenAPIParser
 
   class NotNullError < OpenAPIError
     def message
-      "#{@reference} don't allow null"
+      "#{@reference} does not allow null values"
     end
   end
 
