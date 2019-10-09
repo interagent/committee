@@ -162,7 +162,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} isn't match #{@pattern} in #{@reference}"
+      "#{@reference} pattern #{@pattern} does not match value: #{@value}"
     end
   end
 

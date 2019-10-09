@@ -34,8 +34,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::InvalidPattern)).to eq true
-            expect(e.message.start_with?("#{invalid_str} isn't match [0-9]+:[0-9]+ in")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::InvalidPattern)
+            expect(e.message).to end_with("pattern [0-9]+:[0-9]+ does not match value: #{invalid_str}")
           end
         end
       end
