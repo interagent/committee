@@ -13,7 +13,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@data} class is #{@data.class} but it's not valid #{@type} in #{@reference}"
+      "#{@reference} expected #{@type}, but received #{@data.class}: #{@data}"
     end
 
     class << self

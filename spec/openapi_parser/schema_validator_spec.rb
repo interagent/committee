@@ -74,8 +74,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         params = { key.to_s => value }
 
         expect { request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
-          expect(e.message.start_with?("#{value} class is #{value.class}")).to eq true
+          expect(e).to be_kind_of(OpenAPIParser::ValidateError)
+          expect(e.message).to end_with("expected #{key}, but received #{value.class}: #{value}")
         end
       end
     end
@@ -173,8 +173,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
-            expect(e.message.start_with?('1.1 class is Float')).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::ValidateError)
+            expect(e.message).to end_with("expected integer, but received Float: 1.1")
           end
         end
       end
@@ -223,8 +223,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
-            expect(e.message.start_with?('[] class is Array')).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::ValidateError)
+            expect(e.message).to end_with("expected object, but received Array: []")
           end
         end
       end
