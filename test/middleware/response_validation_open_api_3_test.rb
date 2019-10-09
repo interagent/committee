@@ -169,6 +169,38 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  describe ':except' do
+    [
+      { description: 'when not specified, does not exclude anything', except: nil, expected: { status: 500 } },
+      { description: 'when predicate matches, skips validation', except: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 200 } },
+      { description: 'when predicate does not match, performs validation', except: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 500 } },
+    ].each do |description:, except:, expected:|
+      it description do
+        @app = new_response_rack('not_json', {}, schema: open_api_3_schema, prefix: '/v1', except: except)
+
+        get '/v1/characters'
+
+        assert_equal expected[:status], last_response.status
+      end
+    end
+  end
+
+  describe ':only' do
+    [
+      { description: 'when not specified, includes everything', only: nil, expected: { status: 500 } },
+      { description: 'when predicate matches, performs validation', only: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 500 } },
+      { description: 'when predicate does not match, skips validation', only: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
+    ].each do |description:, only:, expected:|
+      it description do
+        @app = new_response_rack('not_json', {}, schema: open_api_3_schema, prefix: '/v1', only: only)
+
+        get 'v1/characters'
+
+        assert_equal expected[:status], last_response.status
+      end
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})

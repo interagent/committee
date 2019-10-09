@@ -480,6 +480,38 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  describe ':except' do
+    [
+      { description: 'when not specified, does not exclude anything', except: nil, expected: { status: 400 } },
+      { description: 'when predicate matches, skips validation', except: -> (request) { request.path.start_with?('/v1/a') }, expected: { status: 200 } },
+      { description: 'when predicate does not match, performs validation', except: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 400 } },
+    ].each do |description:, except:, expected:|
+      it description do
+        @app = new_rack_app(prefix: '/v1', schema: hyper_schema, except: except)
+
+        post '/v1/apps', '{x:y}'
+
+        assert_equal expected[:status], last_response.status
+      end
+    end
+  end
+
+  describe ':only' do
+    [
+      { description: 'when not specified, includes everything', only: nil, expected: { status: 400 } },
+      { description: 'when predicate matches, performs validation', only: -> (request) { request.path.start_with?('/v1/a') }, expected: { status: 400 } },
+      { description: 'when predicate does not match, skips validation', only: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
+    ].each do |description:, only:, expected:|
+      it description do
+        @app = new_rack_app(prefix: '/v1', schema: hyper_schema, only: only)
+
+        post '/v1/apps', '{x:y}'
+
+        assert_equal expected[:status], last_response.status
+      end
+    end
+  end
+
   private
 
   def new_rack_app(options = {})

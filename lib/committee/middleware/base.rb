@@ -13,12 +13,14 @@ module Committee
         @schema = self.class.get_schema(options)
 
         @router = @schema.build_router(options)
+        @only = options[:only] || -> (_) { true }
+        @except = options[:except] || -> (_) { false }
       end
 
       def call(env)
         request = Rack::Request.new(env)
 
-        if @router.includes_request?(request)
+        if @router.includes_request?(request) && should_handle?(request)
           handle(request)
         else
           @app.call(request.env)
@@ -48,6 +50,10 @@ module Committee
 
       def build_schema_validator(request)
         @router.build_schema_validator(request)
+      end
+
+      def should_handle?(request)
+        @only.call(request) && !@except.call(request)
       end
     end
   end
