@@ -92,15 +92,15 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         deleted_object = object.reject { |k, _v| k == key }
         params = { 'object_2' => deleted_object }
         expect { request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-          expect(e.message.start_with?("required parameters #{key} not exist")).to eq true
+          expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+          expect(e.message).to end_with("missing required parameters: #{key}")
         end
       end
 
       params = { 'object_2' => {} }
       expect { request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-        expect(e.message.start_with?("required parameters #{object.keys.join(",")} not exist")).to eq true
+        expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+        expect(e.message).to end_with("missing required parameters: #{object.keys.join(", ")}")
       end
     end
 
@@ -140,8 +140,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-            expect(e.message.start_with?('required parameters string not exist')).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+            expect(e.message).to end_with('missing required parameters: string')
           end
         end
       end
@@ -153,8 +153,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-            expect(e.message.start_with?('required parameters need_object not exist')).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+            expect(e.message).to end_with('missing required parameters: need_object')
           end
         end
       end

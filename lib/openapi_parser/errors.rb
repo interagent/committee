@@ -39,7 +39,7 @@ module OpenAPIParser
     end
 
     def message
-      "required parameters #{@keys.join(",")} not exist in #{@reference}"
+      "#{@reference} missing required parameters: #{@keys.join(", ")}"
     end
   end
 
