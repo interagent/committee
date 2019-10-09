@@ -50,7 +50,7 @@ module OpenAPIParser
     end
 
     def message
-      "properties #{@keys.join(",")} are not defined in #{@reference}"
+      "#{@reference} does not define properties: #{@keys.join(", ")}"
     end
   end
 

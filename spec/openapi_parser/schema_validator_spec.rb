@@ -401,8 +401,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
     it 'unknown param' do
       expect { request_operation.validate_request_body(content_type, { 'unknown' => 1 }) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-        expect(e.message).to match("^properties unknown are not defined in.*?$")
+        expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+        expect(e.message).to end_with("does not define properties: unknown")
       end
     end
 
