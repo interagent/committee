@@ -48,8 +48,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::ArrayValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::LessThanMinItems)).to eq true
-            expect(e.message.start_with?("#{invalid_array} cannot be less than min items")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::LessThanMinItems)
+            expect(e.message).to end_with("#{invalid_array} contains fewer than min items")
           end
         end
       end
