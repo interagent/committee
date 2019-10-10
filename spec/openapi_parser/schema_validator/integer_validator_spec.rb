@@ -101,8 +101,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::IntegerValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::MoreThanExclusiveMaximum)).to eq true
-            expect(e.message.start_with?("#{more_than_equal_exclusive_maximum} cannot be more than or equal to exclusive maximum")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::MoreThanExclusiveMaximum)
+            expect(e.message).to end_with("#{more_than_equal_exclusive_maximum} cannot be more than or equal to exclusive maximum value")
           end
         end
       end

@@ -150,7 +150,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than or equal to exclusive maximum value in #{@reference}"
+      "#{@reference} #{@value} cannot be more than or equal to exclusive maximum value"
     end
   end
 
