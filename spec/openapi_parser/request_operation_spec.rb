@@ -144,9 +144,10 @@ RSpec.describe OpenAPIParser::RequestOperation do
             let(:status_code) { 201 }
 
             it do
-              expect { subject }.
-                to raise_error(OpenAPIParser::NotExistStatusCodeDefinition).
-                     with_message(/don't exist status code definition in.*/)
+              expect { subject }.to raise_error do |e|
+                expect(e).to be_kind_of(OpenAPIParser::NotExistStatusCodeDefinition)
+                expect(e.message).to end_with("status code definition does not exist")
+              end
             end
           end
 
@@ -176,9 +177,10 @@ RSpec.describe OpenAPIParser::RequestOperation do
             let(:status_code) { 201 }
 
             it do
-              expect { subject }.
-                to raise_error(OpenAPIParser::NotExistStatusCodeDefinition).
-                     with_message(/don't exist status code definition in.*/)
+              expect { subject }.to raise_error do |e|
+                expect(e).to be_kind_of(OpenAPIParser::NotExistStatusCodeDefinition)
+                expect(e.message).to end_with("status code definition does not exist")
+              end
             end
           end
 

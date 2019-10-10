@@ -179,7 +179,7 @@ module OpenAPIParser
 
   class NotExistStatusCodeDefinition < OpenAPIError
     def message
-      "don't exist status code definition in #{@reference}"
+      "#{@reference} status code definition does not exist"
     end
   end
 
