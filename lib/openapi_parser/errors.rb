@@ -128,7 +128,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than or equal to exclusive minimum value in #{@reference}"
+      "#{@reference} #{@value} cannot be less than or equal to exclusive minimum value"
     end
   end
 

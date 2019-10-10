@@ -135,8 +135,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::IntegerValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::LessThanExclusiveMinimum)).to eq true
-            expect(e.message.start_with?("#{less_than_equal_exclusive_minimum} cannot be less than or equal to exclusive minimum")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::LessThanExclusiveMinimum)
+            expect(e.message).to end_with("#{less_than_equal_exclusive_minimum} cannot be less than or equal to exclusive minimum value")
           end
         end
       end
