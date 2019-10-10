@@ -135,8 +135,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::InvalidEmailFormat)).to eq true
-            expect(e.message.start_with?("#{value} is not a valid email address format in")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::InvalidEmailFormat)
+            expect(e.message).to end_with("email address format does not match value: not_email")
           end
         end
       end

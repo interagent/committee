@@ -173,7 +173,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} is not a valid email address format in #{@reference}"
+      "#{@reference} email address format does not match value: #{@value}"
     end
   end
 
