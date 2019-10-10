@@ -101,8 +101,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
 
           it do
             expect { subject }.to raise_error do |e|
-              expect(e.kind_of?(OpenAPIParser::LessThanMinLength)).to eq true
-              expect(e.message.start_with?("#{value} cannot be less than min length in")).to eq true
+              expect(e).to be_kind_of(OpenAPIParser::LessThanMinLength)
+              expect(e.message).to end_with("#{value} is shorter than min length")
             end
           end
         end

@@ -207,7 +207,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than min length in #{@reference}"
+      "#{@reference} #{@value} is shorter than min length"
     end
   end
 
