@@ -34,8 +34,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::IntegerValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::MoreThanMaximum)).to eq true
-            expect(e.message.start_with?("#{more_than_maximum} cannot be more than maximum")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::MoreThanMaximum)
+            expect(e.message).to end_with("#{more_than_maximum} is more than maximum value")
           end
         end
       end

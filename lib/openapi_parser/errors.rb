@@ -139,7 +139,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than maximum value in #{@reference}"
+      "#{@reference} #{@value} is more than maximum value"
     end
   end
 
