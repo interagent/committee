@@ -67,8 +67,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::IntegerValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::LessThanMinimum)).to eq true
-            expect(e.message.start_with?("#{less_than_minimum} cannot be less than minimum")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::LessThanMinimum)
+            expect(e.message).to end_with("#{less_than_minimum} is less than minimum value")
           end
         end
       end

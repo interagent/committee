@@ -117,7 +117,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than minimum value in #{@reference}"
+      "#{@reference} #{@value} is less than minimum value"
     end
   end
 
