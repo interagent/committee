@@ -599,7 +599,7 @@ components:
   responses:
     header_integer_required:
       headers:
-        integer:
+        'x-limit':
           schema:
             required: true
             type: integer
