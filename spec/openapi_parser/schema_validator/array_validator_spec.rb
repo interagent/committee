@@ -36,8 +36,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::ArrayValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::MoreThanMaxItems)).to eq true
-            expect(e.message.start_with?("#{invalid_array} cannot be more than max items")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::MoreThanMaxItems)
+            expect(e.message).to end_with("#{invalid_array} contains more than max items")
           end
         end
       end

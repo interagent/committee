@@ -218,7 +218,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than max items in #{@reference}"
+      "#{@reference} #{@value} contains more than max items"
     end
   end
 
