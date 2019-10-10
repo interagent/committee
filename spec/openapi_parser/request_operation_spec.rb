@@ -155,9 +155,10 @@ RSpec.describe OpenAPIParser::RequestOperation do
             let(:content_type) { 'application/xml' }
 
             it do
-              expect { subject }.
-                to raise_error(OpenAPIParser::NotExistContentTypeDefinition).
-                     with_message(/don't exist response definition .*/)
+              expect { subject }.to raise_error do |e|
+                expect(e).to be_kind_of(OpenAPIParser::NotExistContentTypeDefinition)
+                expect(e.message).to end_with("response definition does not exist")
+              end
             end
           end
         end
@@ -188,9 +189,10 @@ RSpec.describe OpenAPIParser::RequestOperation do
             let(:content_type) { 'application/xml' }
 
             it do
-              expect { subject }.
-                to raise_error(OpenAPIParser::NotExistContentTypeDefinition).
-                     with_message(/don't exist response definition .*/)
+              expect { subject }.to raise_error do |e|
+                expect(e).to be_kind_of(OpenAPIParser::NotExistContentTypeDefinition)
+                expect(e.message).to end_with("response definition does not exist")
+              end
             end
           end
         end

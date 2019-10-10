@@ -185,7 +185,7 @@ module OpenAPIParser
 
   class NotExistContentTypeDefinition < OpenAPIError
     def message
-      "don't exist response definition #{@reference}"
+      "#{@reference} response definition does not exist"
     end
   end
 
