@@ -1,5 +1,29 @@
 require_relative '../../spec_helper'
 
+RSpec.describe OpenAPIParser::SchemaValidator::ObjectValidator do
+  before do
+    @validator = OpenAPIParser::SchemaValidator::ObjectValidator.new(nil, nil)
+    @root = OpenAPIParser.parse(
+      'openapi' => '3.0.0',
+      'components' => {
+        'schemas' => {
+          'object_with_required_but_no_properties' => {
+            'type' => 'object',
+            'required' => ['id'],
+          },
+        },
+      },
+    )
+  end
+
+  it 'shows error when required key is absent' do
+    schema = @root.components.schemas['object_with_required_but_no_properties']
+    _value, e = *@validator.coerce_and_validate({}, schema)
+
+    expect(e&.message).to match('^required parameters id not exist in.*?$')
+  end
+end
+
 RSpec.describe OpenAPIParser::Schemas::RequestBody do
 
 
