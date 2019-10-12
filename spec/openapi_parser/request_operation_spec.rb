@@ -109,11 +109,11 @@ RSpec.describe OpenAPIParser::RequestOperation do
 
       it do
         expect { subject }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
+          expect(e).to be_kind_of(OpenAPIParser::ValidateError)
           if Gem::Version.create(RUBY_VERSION) <= Gem::Version.create('2.4.0')
-            expect(e.message.start_with?('1 class is Fixnum')).to eq true
+            expect(e.message).to end_with("expected string, but received Fixnum: 1")
           else
-            expect(e.message.start_with?('1 class is Integer')).to eq true
+            expect(e.message).to end_with("expected string, but received Integer: 1")
           end
         end
       end
@@ -125,8 +125,8 @@ RSpec.describe OpenAPIParser::RequestOperation do
 
       it do
         expect { subject }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
-          expect(e.message.start_with?('1 class is String')).to eq true
+          expect(e).to be_kind_of(OpenAPIParser::ValidateError)
+          expect(e.message).to end_with("expected integer, but received String: 1")
         end
       end
     end
@@ -150,9 +150,10 @@ RSpec.describe OpenAPIParser::RequestOperation do
             let(:status_code) { 201 }
 
             it do
-              expect { subject }.
-                to raise_error(OpenAPIParser::NotExistStatusCodeDefinition).
-                     with_message(/don't exist status code definition in.*/)
+              expect { subject }.to raise_error do |e|
+                expect(e).to be_kind_of(OpenAPIParser::NotExistStatusCodeDefinition)
+                expect(e.message).to end_with("status code definition does not exist")
+              end
             end
           end
 
@@ -160,9 +161,10 @@ RSpec.describe OpenAPIParser::RequestOperation do
             let(:content_type) { 'application/xml' }
 
             it do
-              expect { subject }.
-                to raise_error(OpenAPIParser::NotExistContentTypeDefinition).
-                     with_message(/don't exist response definition .*/)
+              expect { subject }.to raise_error do |e|
+                expect(e).to be_kind_of(OpenAPIParser::NotExistContentTypeDefinition)
+                expect(e.message).to end_with("response definition does not exist")
+              end
             end
           end
         end
@@ -182,9 +184,10 @@ RSpec.describe OpenAPIParser::RequestOperation do
             let(:status_code) { 201 }
 
             it do
-              expect { subject }.
-                to raise_error(OpenAPIParser::NotExistStatusCodeDefinition).
-                     with_message(/don't exist status code definition in.*/)
+              expect { subject }.to raise_error do |e|
+                expect(e).to be_kind_of(OpenAPIParser::NotExistStatusCodeDefinition)
+                expect(e.message).to end_with("status code definition does not exist")
+              end
             end
           end
 
@@ -192,9 +195,10 @@ RSpec.describe OpenAPIParser::RequestOperation do
             let(:content_type) { 'application/xml' }
 
             it do
-              expect { subject }.
-                to raise_error(OpenAPIParser::NotExistContentTypeDefinition).
-                     with_message(/don't exist response definition .*/)
+              expect { subject }.to raise_error do |e|
+                expect(e).to be_kind_of(OpenAPIParser::NotExistContentTypeDefinition)
+                expect(e.message).to end_with("response definition does not exist")
+              end
             end
           end
         end

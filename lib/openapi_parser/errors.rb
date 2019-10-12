@@ -13,7 +13,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@data} class is #{@data.class} but it's not valid #{@type} in #{@reference}"
+      "#{@reference} expected #{@type}, but received #{@data.class}: #{@data}"
     end
 
     class << self
@@ -28,7 +28,7 @@ module OpenAPIParser
 
   class NotNullError < OpenAPIError
     def message
-      "#{@reference} don't allow null"
+      "#{@reference} does not allow null values"
     end
   end
 
@@ -39,7 +39,7 @@ module OpenAPIParser
     end
 
     def message
-      "required parameters #{@keys.join(",")} not exist in #{@reference}"
+      "#{@reference} missing required parameters: #{@keys.join(", ")}"
     end
   end
 
@@ -50,7 +50,7 @@ module OpenAPIParser
     end
 
     def message
-      "properties #{@keys.join(",")} are not defined in #{@reference}"
+      "#{@reference} does not define properties: #{@keys.join(", ")}"
     end
   end
 
@@ -117,7 +117,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than minimum value in #{@reference}"
+      "#{@reference} #{@value} is less than minimum value"
     end
   end
 
@@ -128,7 +128,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than or equal to exclusive minimum value in #{@reference}"
+      "#{@reference} #{@value} cannot be less than or equal to exclusive minimum value"
     end
   end
 
@@ -139,7 +139,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than maximum value in #{@reference}"
+      "#{@reference} #{@value} is more than maximum value"
     end
   end
 
@@ -150,7 +150,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than or equal to exclusive maximum value in #{@reference}"
+      "#{@reference} #{@value} cannot be more than or equal to exclusive maximum value"
     end
   end
 
@@ -162,7 +162,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} isn't match #{@pattern} in #{@reference}"
+      "#{@reference} pattern #{@pattern} does not match value: #{@value}"
     end
   end
 
@@ -173,19 +173,19 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} is not a valid email address format in #{@reference}"
+      "#{@reference} email address format does not match value: #{@value}"
     end
   end
 
   class NotExistStatusCodeDefinition < OpenAPIError
     def message
-      "don't exist status code definition in #{@reference}"
+      "#{@reference} status code definition does not exist"
     end
   end
 
   class NotExistContentTypeDefinition < OpenAPIError
     def message
-      "don't exist response definition #{@reference}"
+      "#{@reference} response definition does not exist"
     end
   end
 
@@ -196,7 +196,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than max length in #{@reference}"
+      "#{@reference} #{@value} is longer than max length"
     end
   end
 
@@ -207,7 +207,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than min length in #{@reference}"
+      "#{@reference} #{@value} is shorter than min length"
     end
   end
 
@@ -218,7 +218,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be more than max items in #{@reference}"
+      "#{@reference} #{@value} contains more than max items"
     end
   end
 
@@ -229,7 +229,7 @@ module OpenAPIParser
     end
 
     def message
-      "#{@value} cannot be less than min items in #{@reference}"
+      "#{@reference} #{@value} contains fewer than min items"
     end
   end
 end

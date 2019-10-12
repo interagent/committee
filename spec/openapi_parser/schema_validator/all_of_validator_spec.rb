@@ -37,8 +37,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-          expect(e.message).to match("^properties speed are not defined in.*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+          expect(e.message).to end_with("does not define properties: speed")
         end
       end
 
@@ -53,8 +53,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-          expect(e.message).to match("^required parameters fire_range not exist .*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+          expect(e.message).to end_with("missing required parameters: fire_range")
         end
       end
     end
@@ -115,8 +115,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-          expect(e.message).to match("^required parameters head_count not exist .*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+          expect(e.message).to end_with("missing required parameters: head_count")
         end
       end
     end

@@ -34,8 +34,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::InvalidPattern)).to eq true
-            expect(e.message.start_with?("#{invalid_str} isn't match [0-9]+:[0-9]+ in")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::InvalidPattern)
+            expect(e.message).to end_with("pattern [0-9]+:[0-9]+ does not match value: #{invalid_str}")
           end
         end
       end
@@ -69,8 +69,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
 
           it do
             expect { subject }.to raise_error do |e|
-              expect(e.kind_of?(OpenAPIParser::MoreThanMaxLength)).to eq true
-              expect(e.message.start_with?("#{value} cannot be more than max length in")).to eq true
+              expect(e).to be_kind_of(OpenAPIParser::MoreThanMaxLength)
+              expect(e.message).to end_with("#{value} is longer than max length")
             end
           end
         end
@@ -101,8 +101,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
 
           it do
             expect { subject }.to raise_error do |e|
-              expect(e.kind_of?(OpenAPIParser::LessThanMinLength)).to eq true
-              expect(e.message.start_with?("#{value} cannot be less than min length in")).to eq true
+              expect(e).to be_kind_of(OpenAPIParser::LessThanMinLength)
+              expect(e.message).to end_with("#{value} is shorter than min length")
             end
           end
         end
@@ -135,8 +135,8 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::InvalidEmailFormat)).to eq true
-            expect(e.message.start_with?("#{value} is not a valid email address format in")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::InvalidEmailFormat)
+            expect(e.message).to end_with("email address format does not match value: not_email")
           end
         end
       end

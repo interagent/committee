@@ -74,8 +74,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         params = { key.to_s => value }
 
         expect { request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
-          expect(e.message.start_with?("#{value} class is #{value.class}")).to eq true
+          expect(e).to be_kind_of(OpenAPIParser::ValidateError)
+          expect(e.message).to end_with("expected #{key}, but received #{value.class}: #{value}")
         end
       end
     end
@@ -92,15 +92,15 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         deleted_object = object.reject { |k, _v| k == key }
         params = { 'object_2' => deleted_object }
         expect { request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-          expect(e.message.start_with?("required parameters #{key} not exist")).to eq true
+          expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+          expect(e.message).to end_with("missing required parameters: #{key}")
         end
       end
 
       params = { 'object_2' => {} }
       expect { request_operation.validate_request_body(content_type, params) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-        expect(e.message.start_with?("required parameters #{object.keys.join(",")} not exist")).to eq true
+        expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+        expect(e.message).to end_with("missing required parameters: #{object.keys.join(", ")}")
       end
     end
 
@@ -140,8 +140,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-            expect(e.message.start_with?('required parameters string not exist')).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+            expect(e.message).to end_with('missing required parameters: string')
           end
         end
       end
@@ -153,8 +153,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
         end
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-            expect(e.message.start_with?('required parameters need_object not exist')).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+            expect(e.message).to end_with('missing required parameters: need_object')
           end
         end
       end
@@ -173,8 +173,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
-            expect(e.message.start_with?('1.1 class is Float')).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::ValidateError)
+            expect(e.message).to end_with("expected integer, but received Float: 1.1")
           end
         end
       end
@@ -189,8 +189,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::NotNullError)).to eq true
-            expect(e.message.include?("don't allow null")).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::NotNullError)
+            expect(e.message.include?("does not allow null values")).to eq true
           end
         end
       end
@@ -223,8 +223,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
         it do
           expect { subject }.to raise_error do |e|
-            expect(e.kind_of?(OpenAPIParser::ValidateError)).to eq true
-            expect(e.message.start_with?('[] class is Array')).to eq true
+            expect(e).to be_kind_of(OpenAPIParser::ValidateError)
+            expect(e.message).to end_with("expected object, but received Array: []")
           end
         end
       end
@@ -401,8 +401,8 @@ RSpec.describe OpenAPIParser::SchemaValidator do
 
     it 'unknown param' do
       expect { request_operation.validate_request_body(content_type, { 'unknown' => 1 }) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-        expect(e.message).to match("^properties unknown are not defined in.*?$")
+        expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+        expect(e.message).to end_with("does not define properties: unknown")
       end
     end
 

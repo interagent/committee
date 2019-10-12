@@ -31,8 +31,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-          expect(e.message).to match("^properties unknown_key are not defined in.*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+          expect(e.message).to end_with("does not define properties: unknown_key")
         end
       end
 
@@ -56,8 +56,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-          expect(e.message).to match("^properties unknown_key,another_unknown_key are not defined in.*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+          expect(e.message).to end_with("does not define properties: unknown_key, another_unknown_key")
         end
       end
 
@@ -101,8 +101,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotNullError)).to eq true
-          expect(e.message).to match("^.*?(don't allow null).*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotNullError)
+          expect(e.message).to end_with("does not allow null values")
         end
       end
 

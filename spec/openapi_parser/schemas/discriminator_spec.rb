@@ -67,8 +67,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         ]
       }
       expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-        expect(e.message).to match("^properties nut_stock are not defined in.*?$")
+        expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+        expect(e.message).to end_with("does not define properties: nut_stock")
       end
     end
 
@@ -89,8 +89,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         ]
       }
       expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-        expect(e.message).to match("^properties nut_stock are not defined in.*?$")
+        expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+        expect(e.message).to end_with("does not define properties: nut_stock")
       end
     end
 
@@ -183,8 +183,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         ]
       }
       expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-        expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-        expect(e.message).to match("^properties nut_stock are not defined in.*?$")
+        expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+        expect(e.message).to end_with("does not define properties: nut_stock")
       end
     end
   end
