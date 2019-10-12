@@ -20,7 +20,7 @@ RSpec.describe OpenAPIParser::SchemaValidator::ObjectValidator do
     schema = @root.components.schemas['object_with_required_but_no_properties']
     _value, e = *@validator.coerce_and_validate({}, schema)
 
-    expect(e&.message).to match('^required parameters id not exist in.*?$')
+    expect(e&.message).to match('.* missing required parameters: id')
   end
 end
 
