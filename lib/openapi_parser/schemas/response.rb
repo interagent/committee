@@ -43,11 +43,11 @@ module OpenAPIParser::Schemas
       def validate_header(response_headers)
         return unless headers
 
-        headers.each do |k, v|
-          h = response_headers[k]
-          next unless h
+        headers.each do |name, schema|
+          next unless response_headers.key?(name)
 
-          v.validate(h)
+          value = response_headers[name]
+          schema.validate(value)
         end
       end
   end
