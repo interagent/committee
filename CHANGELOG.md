@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 0.6.1 (2019-10-12)
+* Bugfix: validate non-nullable response header #54
+* Improve grammar in error messages #55
+* fix object validator in case of properties missing #56
+
 ## 0.6.0 (2019-10-05)
 * add email format validation on string #51
 
