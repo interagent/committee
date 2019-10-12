@@ -399,21 +399,32 @@ describe Committee::Middleware::RequestValidation do
   end
 
   describe 'check header' do
-    it 'no required header' do
-      @app = new_rack_app(schema: open_api_3_schema, check_header: true)
+    [
+      { check_header: true, description: 'valid value', value: 1, expected: { status: 200 } },
+      { check_header: true, description: 'missing value', value: nil, expected: { status: 400, error: 'required parameters integer not exist' } },
+      { check_header: true, description: 'invalid value', value: 'x', expected: { status: 400, error: 'x class is String but it\'s not valid integer' } },
 
-      get "/header"
+      { check_header: false, description: 'valid value', value: 1, expected: { status: 200 } },
+      { check_header: false, description: 'missing value', value: nil, expected: { status: 200 } },
+      { check_header: false, description: 'invalid value', value: 'x', expected: { status: 200 } },
+    ].each do |check_header:, description:, value:, expected:|
+      describe "when #{check_header}" do
+        %w(get post put patch delete).each do |method|
+          describe method do
+            describe description do
+              it (expected[:error].nil? ? 'should pass' : 'should fail') do
+                @app = new_rack_app(schema: open_api_3_schema, check_header: check_header)
 
-      assert_equal 400, last_response.status
-      assert_match(/required parameters integer not exist/i, last_response.body)
-    end
+                header 'integer', value
+                send(method, "/header")
 
-    it 'no required header but not check' do
-      @app = new_rack_app(schema: open_api_3_schema, check_header: false)
-
-      get "/header"
-
-      assert_equal 200, last_response.status
+                assert_equal expected[:status], last_response.status
+                assert_match(expected[:error], last_response.body) if expected[:error]
+              end
+            end
+          end
+        end
+      end
     end
   end
 

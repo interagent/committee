@@ -502,18 +502,35 @@ paths:
   /header:
     get:
       parameters:
-        - name: integer
-          in: header
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/header_integer_required'
       responses:
         '200':
-          headers:
-            x-limit:
-              description: integer
-              schema:
-                type: integer
+          $ref: '#/components/responses/header_integer_required'
+    post:
+      parameters:
+        - $ref: '#/components/parameters/header_integer_required'
+      responses:
+        '200':
+          $ref: '#/components/responses/header_integer_required'
+    put:
+      parameters:
+        - $ref: '#/components/parameters/header_integer_required'
+      responses:
+        '200':
+          $ref: '#/components/responses/header_integer_required'
+    patch:
+      parameters:
+        - $ref: '#/components/parameters/header_integer_required'
+      responses:
+        '200':
+          $ref: '#/components/responses/header_integer_required'
+    delete:
+      parameters:
+        - $ref: '#/components/parameters/header_integer_required'
+      responses:
+        '200':
+          $ref: '#/components/responses/header_integer_required'
+
   /get_endpoint_with_requered_parameter:
     get:
       description: get body test
@@ -570,3 +587,19 @@ components:
             items:
               type: string
               format: date-time
+
+  parameters:
+    header_integer_required:
+      name: integer
+      in: header
+      required: true
+      schema:
+        type: integer
+
+  responses:
+    header_integer_required:
+      headers:
+        'x-limit':
+          schema:
+            required: true
+            type: integer

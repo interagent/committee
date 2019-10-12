@@ -116,7 +116,9 @@ module Committee
           content_type = headers['Content-Type'].to_s.split(";").first.to_s
 
           # bad performance because when we coerce value, same check
-          return request_operation.validate_request_body(content_type, params, build_openapi_parser_post_option(validator_option))
+          schema_validator_options = build_openapi_parser_post_option(validator_option)
+          request_operation.validate_request_parameter(params, headers, schema_validator_options)
+          request_operation.validate_request_body(content_type, params, schema_validator_options)
         rescue => e
           raise Committee::InvalidRequest.new(e.message)
         end
