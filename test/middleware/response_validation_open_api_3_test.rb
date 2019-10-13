@@ -47,7 +47,7 @@ describe Committee::Middleware::ResponseValidation do
       get "/characters"
     }
 
-    assert_match(/class is Array but it's not valid object/i, e.message)
+    assert_match(/expected object, but received Array: /i, e.message)
   end
 
   it "passes through a 204 (no content) response" do
@@ -138,7 +138,8 @@ describe Committee::Middleware::ResponseValidation do
       e = assert_raises(Committee::InvalidResponse) do
         get "/characters"
       end
-      assert_match(/1 class is String/i, e.message)
+
+      assert_match(/but received String: 1/i, e.message)
     end
 
     it "detects an invalid response status code with validate_success_only=true" do

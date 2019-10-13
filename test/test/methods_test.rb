@@ -138,7 +138,7 @@ describe Committee::Test::Methods do
         e = assert_raises(Committee::InvalidResponse) do
           assert_schema_conform
         end
-        assert_match(/don't exist response definition/i, e.message)
+        assert_match(/response definition does not exist/i, e.message)
       end
 
       it "detects an invalid response status code" do
@@ -149,7 +149,7 @@ describe Committee::Test::Methods do
         e = assert_raises(Committee::InvalidResponse) do
           assert_schema_conform
         end
-        assert_match(/don't exist status code definition/i, e.message)
+        assert_match(/status code definition does not exist/i, e.message)
       end
 
       it "outputs deprecation warning" do
@@ -175,7 +175,8 @@ describe Committee::Test::Methods do
         e = assert_raises(Committee::InvalidRequest) do
           assert_request_schema_confirm
         end
-        assert_match(/required parameters query_string not exist in #\/paths/i, e.message)
+
+        assert_match(/missing required parameters: query_string/i, e.message)
       end
 
       it "path undefined in schema" do
@@ -201,7 +202,7 @@ describe Committee::Test::Methods do
         e = assert_raises(Committee::InvalidResponse) do
           assert_response_schema_confirm
         end
-        assert_match(/don't exist response definition/i, e.message)
+        assert_match(/response definition does not exist/i, e.message)
       end
 
       it "detects an invalid response status code" do
@@ -212,7 +213,7 @@ describe Committee::Test::Methods do
         e = assert_raises(Committee::InvalidResponse) do
           assert_response_schema_confirm
         end
-        assert_match(/don't exist status code definition/i, e.message)
+        assert_match(/status code definition does not exist/i, e.message)
       end
 
       it "path undefined in schema" do
