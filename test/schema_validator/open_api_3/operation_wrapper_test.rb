@@ -53,7 +53,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       }
 
       # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-      assert e.message.start_with?("1 class is #{1.class} but it's not valid")
+      assert_match(/expected string, but received #{1.class}: 1/i, e.message)
     end
 
     it 'support put method' do
@@ -65,7 +65,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       }
 
       # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-      assert e.message.start_with?("1 class is #{1.class} but it's not valid")
+      assert_match(/expected string, but received #{1.class}: 1/i, e.message)
     end
 
     it 'support patch method' do
@@ -76,7 +76,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         operation_object.validate_request_params({"integer" => "str"}, HEADER, @validator_option)
       }
 
-      assert e.message.start_with?("str class is String but it's not valid")
+      assert_match(/expected integer, but received String: str/i, e.message)
     end
 
     it 'unknown param' do
@@ -109,7 +109,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
           operation_object.validate_request_params({"query_integer_list" => [1, 2]}, HEADER, @validator_option)
         }
 
-        assert e.message.start_with?("required parameters query_string not exist in")
+        assert_match(/missing required parameters: query_string/i, e.message)
       end
 
       it 'invalid type' do
@@ -122,7 +122,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         }
 
         # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-        assert e.message.start_with?("1 class is #{1.class} but")
+        assert_match(/expected string, but received #{1.class}: 1/i, e.message)
       end
     end
 
@@ -143,7 +143,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
           operation_object.validate_request_params({"limit" => "a"}, HEADER, @validator_option)
         }
 
-        assert e.message.start_with?("a class is String but")
+        assert_match(/expected integer, but received String: a/i, e.message)
       end
     end
 

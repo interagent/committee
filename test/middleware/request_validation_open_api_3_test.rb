@@ -250,7 +250,7 @@ describe Committee::Middleware::RequestValidation do
     post "/characters", JSON.generate(params)
     assert_equal 400, last_response.status
     # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-    assert_match(/1 class is #{1.class}/i, last_response.body)
+    assert_match(/expected string, but received #{1.class}:/i, last_response.body)
   end
 
   it "rescues JSON errors" do
@@ -279,7 +279,8 @@ describe Committee::Middleware::RequestValidation do
     header "Content-Type", "application/json"
     post "/v1/characters", JSON.generate(params)
     assert_equal 400, last_response.status
-    assert_match(/1 class is/i, last_response.body)
+    # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
+    assert_match(/expected string, but received #{1.class}: /i, last_response.body)
   end
 
   it "ignores paths outside the prefix" do
@@ -321,7 +322,7 @@ describe Committee::Middleware::RequestValidation do
       get "/validate", nil
     end
 
-    assert_match(/required parameters query_string not exist in/i, e.message)
+    assert_match(/missing required parameters: query_string/i, e.message)
   end
 
   it "raises error when required path parameter is invalid" do
@@ -332,7 +333,7 @@ describe Committee::Middleware::RequestValidation do
       get "/coerce_path_params/#{not_an_integer}", nil
     end
 
-    assert_match(/is String but it's not valid integer in/i, e.message)
+    assert_match(/expected integer, but received String: abc/i, e.message)
   end
 
   it "optionally raises an error" do
@@ -356,7 +357,7 @@ describe Committee::Middleware::RequestValidation do
     get "/string_params_coercer", {"integer_1" => "1"}
 
     assert_equal 400, last_response.status
-    assert_match(/1 class/i, last_response.body)
+    assert_match(/expected integer, but received String:/i, last_response.body)
   end
 
   it "passes through a valid request for OpenAPI3" do
@@ -375,7 +376,7 @@ describe Committee::Middleware::RequestValidation do
     get "/characters?limit=foo"
 
     assert_equal 400, last_response.status
-    assert_match(/foo class/i, last_response.body)
+    assert_match(/expected integer, but received String: foo/i, last_response.body)
   end
 
   it "coerce string to integer" do
@@ -401,8 +402,8 @@ describe Committee::Middleware::RequestValidation do
   describe 'check header' do
     [
       { check_header: true, description: 'valid value', value: 1, expected: { status: 200 } },
-      { check_header: true, description: 'missing value', value: nil, expected: { status: 400, error: 'required parameters integer not exist' } },
-      { check_header: true, description: 'invalid value', value: 'x', expected: { status: 400, error: 'x class is String but it\'s not valid integer' } },
+      { check_header: true, description: 'missing value', value: nil, expected: { status: 400, error: 'missing required parameters: integer' } },
+      { check_header: true, description: 'invalid value', value: 'x', expected: { status: 400, error: 'expected integer, but received String: x' } },
 
       { check_header: false, description: 'valid value', value: 1, expected: { status: 200 } },
       { check_header: false, description: 'missing value', value: nil, expected: { status: 200 } },
