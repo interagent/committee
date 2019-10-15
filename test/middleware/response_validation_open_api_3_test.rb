@@ -100,28 +100,40 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   describe 'check header' do
-    it 'valid type header' do
-      @app = new_response_rack({}.to_json, {'x-limit' => 1}, schema: open_api_3_schema, raise: true)
+    [
+      { check_header: true, description: 'valid value', header: { 'integer' => 1 }, expected: { status: 200 } },
+      { check_header: true, description: 'missing value', header: { 'integer' => nil }, expected: { error: 'headers/integer/schema does not allow null values' } },
+      { check_header: true, description: 'invalid value', header: { 'integer' => 'x' }, expected: { error: 'headers/integer/schema expected integer, but received String: x' } },
 
-      get "/header"
+      { check_header: false, description: 'valid value', header: { 'integer' => 1 }, expected: { status: 200 } },
+      { check_header: false, description: 'missing value', header: { 'integer' => nil }, expected: { status: 200 } },
+      { check_header: false, description: 'invalid value', header: { 'integer' => 'x' }, expected: { status: 200 } },
+    ].each do |check_header:, description:, header:, expected:|
+      describe "when #{check_header}" do
+        %w(get post put patch delete).each do |method|
+          describe method do
+            describe description do
+              if expected[:error].nil?
+                it 'should pass' do
+                  @app = new_response_rack({}.to_json, header, schema: open_api_3_schema, raise: true, check_header: check_header)
 
-      assert_equal 200, last_response.status
-    end
+                  send(method, "/header")
+                  assert_equal expected[:status], last_response.status
+                end
+              else
+                it 'should fail' do
+                  @app = new_response_rack({}.to_json, header, schema: open_api_3_schema, raise: true, check_header: check_header)
 
-    it 'invalid type header' do
-      @app = new_response_rack({}.to_json, {'x-limit' => '1'}, schema: open_api_3_schema, raise: true)
-
-      assert_raises(Committee::InvalidResponse) do
-        get "/header"
+                  error = assert_raises(Committee::InvalidResponse) do
+                    get "/header"
+                  end
+                  assert_match(expected[:error], error.message)
+                end
+              end
+            end
+          end
+        end
       end
-    end
-
-    it 'invalid type but not check' do
-      @app = new_response_rack({}.to_json, {'x-limit' => '1'}, schema: open_api_3_schema, raise: true, check_header: false)
-
-      get "/header"
-
-      assert_equal 200, last_response.status
     end
   end
 
