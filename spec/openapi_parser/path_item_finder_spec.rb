@@ -23,7 +23,7 @@ RSpec.describe OpenAPIParser::PathItemFinder do
       expect(result.path_params['id']).to eq '1'
     end
 
-    it "ignores invalid HTTP methods" do
+    it 'ignores invalid HTTP methods' do
       expect(subject.operation_object(:exit, '/pets')).to eq(nil)
       expect(subject.operation_object(:blah, '/pets')).to eq(nil)
     end
