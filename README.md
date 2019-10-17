@@ -38,6 +38,7 @@ Options and their defaults:
 |optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |
+|ignore_error| false | false | Validate and ignore result even if validation is error. So always return original data. |
 
 Non-boolean options:
 

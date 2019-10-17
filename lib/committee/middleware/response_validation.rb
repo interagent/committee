@@ -8,7 +8,6 @@ module Committee
       def initialize(app, options = {})
         super
         @validate_success_only = @schema.validator_option.validate_success_only
-        @ignore_error = options.fetch(:ignore_error, false)
       end
 
       def handle(request)

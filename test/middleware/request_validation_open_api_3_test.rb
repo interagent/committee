@@ -379,6 +379,13 @@ describe Committee::Middleware::RequestValidation do
     assert_match(/expected integer, but received String: foo/i, last_response.body)
   end
 
+  it "ignores errors when ignore_error: true" do
+    @app = new_rack_app(schema: open_api_3_schema, ignore_error: true)
+    get "/characters?limit=foo"
+
+    assert_equal 200, last_response.status
+  end
+
   it "coerce string to integer" do
     check_parameter_string = lambda { |env|
       assert env['committee.params']['integer'].is_a?(Integer)
