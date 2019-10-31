@@ -296,6 +296,16 @@ describe Committee::Middleware::RequestValidation do
     assert_match(/invalid request/i, last_response.body)
   end
 
+  it "ignores errors when ignore_error: true" do
+    @app = new_rack_app(schema: hyper_schema, ignore_error: true)
+    header "Content-Type", "application/json"
+    params = {
+      "name" => 1
+    }
+    post "/apps", JSON.generate(params)
+    assert_equal 200, last_response.status
+  end
+
   it "calls error_handler (has a arg) when request is invalid" do
     called_err = nil
     pr = ->(e) { called_err = e }
