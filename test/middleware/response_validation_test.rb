@@ -162,22 +162,6 @@ describe Committee::Middleware::ResponseValidation do
     assert_match(/valid JSON/i, last_response.body)
   end
 
-  describe ':except' do
-    [
-      { description: 'when not specified, does not exclude anything', except: nil, expected: { status: 500 } },
-      { description: 'when predicate matches, skips validation', except: -> (request) { request.path.start_with?('/v1/a') }, expected: { status: 200 } },
-      { description: 'when predicate does not match, performs validation', except: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 500 } },
-    ].each do |description:, except:, expected:|
-      it description do
-        @app = new_rack_app('not_json', {}, schema: hyper_schema, prefix: '/v1', except: except)
-
-        get '/v1/apps'
-
-        assert_equal expected[:status], last_response.status
-      end
-    end
-  end
-
   describe ':only' do
     [
       { description: 'when not specified, includes everything', only: nil, expected: { status: 500 } },

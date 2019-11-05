@@ -14,7 +14,6 @@ module Committee
 
         @router = @schema.build_router(options)
         @only = options[:only] || -> (_) { true }
-        @except = options[:except] || -> (_) { false }
       end
 
       def call(env)
@@ -53,7 +52,7 @@ module Committee
       end
 
       def should_handle?(request)
-        @only.call(request) && !@except.call(request)
+        @only.call(request)
       end
     end
   end
