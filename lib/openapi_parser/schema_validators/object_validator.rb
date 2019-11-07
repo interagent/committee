@@ -7,13 +7,13 @@ class OpenAPIParser::SchemaValidator
     def coerce_and_validate(value, schema, parent_all_of: false, discriminator_property_name: nil)
       return OpenAPIParser::ValidateError.build_error_result(value, schema) unless value.kind_of?(Hash)
 
-      return [value, nil] unless schema.properties
+      properties = schema.properties || {}
 
       required_set = schema.required ? schema.required.to_set : Set.new
       remaining_keys = value.keys
 
       coerced_values = value.map do |name, v|
-        s = schema.properties[name]
+        s = properties[name]
         coerced, err = if s
                          remaining_keys.delete(name)
                          validatable.validate_schema(v, s)

@@ -1,6 +1,18 @@
 ## Unreleased
 
-## 0.4.0 (2019-07-27)
+## 0.6.1 (2019-10-12)
+* Bugfix: validate non-nullable response header #54
+* Improve grammar in error messages #55
+* fix object validator in case of properties missing #56
+
+## 0.6.0 (2019-10-05)
+* add email format validation on string #51
+
+## 0.5.0 (2019-09-28)
+* Add max and min length validators for string. #45
+* Support for minItems and maxItems in array #49
+
+## 0.4.1 (2019-07-27)
 * release missed
 
 ## 0.4.0 (2019-07-27)

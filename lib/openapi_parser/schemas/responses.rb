@@ -8,7 +8,7 @@ module OpenAPIParser::Schemas
 
     # @!attribute [r] response
     #   @return [Hash{String => Response, Reference}, nil] response object indexed by status code. see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#patterned-fields-1
-    openapi_attr_hash_body_objects 'response', Response, reject_keys: [:default], allow_reference: true, allow_data_type: false
+    openapi_attr_hash_body_objects 'response', Response, reject_keys: [:default], reference: true, allow_data_type: false
 
     # validate params data by definition
     # find response object by status_code and content_type

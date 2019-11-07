@@ -1,5 +1,29 @@
 require_relative '../../spec_helper'
 
+RSpec.describe OpenAPIParser::SchemaValidator::ObjectValidator do
+  before do
+    @validator = OpenAPIParser::SchemaValidator::ObjectValidator.new(nil, nil)
+    @root = OpenAPIParser.parse(
+      'openapi' => '3.0.0',
+      'components' => {
+        'schemas' => {
+          'object_with_required_but_no_properties' => {
+            'type' => 'object',
+            'required' => ['id'],
+          },
+        },
+      },
+    )
+  end
+
+  it 'shows error when required key is absent' do
+    schema = @root.components.schemas['object_with_required_but_no_properties']
+    _value, e = *@validator.coerce_and_validate({}, schema)
+
+    expect(e&.message).to match('.* missing required parameters: id')
+  end
+end
+
 RSpec.describe OpenAPIParser::Schemas::RequestBody do
 
 
@@ -31,8 +55,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-          expect(e.message).to match("^properties unknown_key are not defined in.*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+          expect(e.message).to end_with("does not define properties: unknown_key")
         end
       end
 
@@ -56,8 +80,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotExistPropertyDefinition)).to eq true
-          expect(e.message).to match("^properties unknown_key,another_unknown_key are not defined in.*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotExistPropertyDefinition)
+          expect(e.message).to end_with("does not define properties: unknown_key, another_unknown_key")
         end
       end
 
@@ -101,8 +125,8 @@ RSpec.describe OpenAPIParser::Schemas::RequestBody do
         }
 
         expect { request_operation.validate_request_body(content_type, body) }.to raise_error do |e|
-          expect(e.kind_of?(OpenAPIParser::NotNullError)).to eq true
-          expect(e.message).to match("^.*?(don't allow null).*?$")
+          expect(e).to be_kind_of(OpenAPIParser::NotNullError)
+          expect(e.message).to end_with("does not allow null values")
         end
       end
 

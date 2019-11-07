@@ -32,8 +32,8 @@ RSpec.describe OpenAPIParser::ParameterValidator do
 
           it do
             expect { subject }.to raise_error do |e|
-              expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-              expect(e.message.start_with?('required parameters query_string not exist')).to eq true
+              expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+              expect(e.message).to end_with('missing required parameters: query_string')
             end
           end
         end
@@ -43,8 +43,8 @@ RSpec.describe OpenAPIParser::ParameterValidator do
 
           it do
             expect { subject }.to raise_error do |e|
-              expect(e.kind_of?(OpenAPIParser::NotExistRequiredKey)).to eq true
-              expect(e.message.start_with?('required parameters query_integer_list not exist')).to eq true
+              expect(e).to be_kind_of(OpenAPIParser::NotExistRequiredKey)
+              expect(e.message).to end_with('missing required parameters: query_integer_list')
             end
           end
         end

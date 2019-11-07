@@ -21,6 +21,12 @@ class OpenAPIParser::SchemaValidator
         return [nil, err] if err
       end
 
+      value, err = validate_max_min_length(value, schema)
+      return [nil, err] if err
+
+      value, err = validate_email_format(value, schema)
+      return [nil, err] if err
+
       [value, nil]
     end
 
@@ -50,6 +56,24 @@ class OpenAPIParser::SchemaValidator
         return [value, nil] if value =~ /#{schema.pattern}/
 
         [nil, OpenAPIParser::InvalidPattern.new(value, schema.pattern, schema.object_reference)]
+      end
+
+      def validate_max_min_length(value, schema)
+        return [nil, OpenAPIParser::MoreThanMaxLength.new(value, schema.object_reference)] if schema.maxLength && value.size > schema.maxLength
+        return [nil, OpenAPIParser::LessThanMinLength.new(value, schema.object_reference)] if schema.minLength && value.size < schema.minLength
+
+        [value, nil]
+      end
+
+      def validate_email_format(value, schema)
+        return [value, nil] unless schema.format == 'email'
+
+        # match? method is good performance.
+        # So when we drop ruby 2.3 support we use match? method because this method add ruby 2.4
+        #return [value, nil] if value.match?(URI::MailTo::EMAIL_REGEXP)
+        return [value, nil] if value.match(URI::MailTo::EMAIL_REGEXP)
+
+        return [nil, OpenAPIParser::InvalidEmailFormat.new(value, schema.object_reference)]
       end
   end
 end

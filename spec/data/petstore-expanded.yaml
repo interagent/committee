@@ -85,6 +85,8 @@ paths:
                 type: string
             x-limit:
               $ref: '#/components/headers/X-Rate-Limit-Limit'
+            non-nullable-x-limit:
+              $ref: '#/components/headers/Non-Nullable-X-Rate-Limit-Limit'
           content:
             application/json:
               schema:
@@ -342,3 +344,8 @@ components:
       description: The number of allowed requests in the current period
       schema:
         type: integer
+    Non-Nullable-X-Rate-Limit-Limit:
+      description: The number of allowed requests in the current period
+      schema:
+        type: integer
+        nullable: false

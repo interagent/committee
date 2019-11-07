@@ -12,7 +12,9 @@ module OpenAPIParser::Schemas
 
     # @return [Operation]
     def operation(method)
-      send(method)
+      public_send(method)
+    rescue NoMethodError
+      nil
     end
   end
 end
