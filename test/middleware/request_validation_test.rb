@@ -480,14 +480,14 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  describe ':only' do
+  describe ':accept_request_filter' do
     [
-      { description: 'when not specified, includes everything', only: nil, expected: { status: 400 } },
-      { description: 'when predicate matches, performs validation', only: -> (request) { request.path.start_with?('/v1/a') }, expected: { status: 400 } },
-      { description: 'when predicate does not match, skips validation', only: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
-    ].each do |description:, only:, expected:|
+      { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 400 } },
+      { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/a') }, expected: { status: 400 } },
+      { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
+    ].each do |description:, accept_request_filter:, expected:|
       it description do
-        @app = new_rack_app(prefix: '/v1', schema: hyper_schema, only: only)
+        @app = new_rack_app(prefix: '/v1', schema: hyper_schema, accept_request_filter: accept_request_filter)
 
         post '/v1/apps', '{x:y}'
 

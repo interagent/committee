@@ -429,14 +429,14 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
-  describe ':only' do
+  describe ':accept_request_filter' do
     [
-      { description: 'when not specified, includes everything', only: nil, expected: { status: 400 } },
-      { description: 'when predicate matches, performs validation', only: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 400 } },
-      { description: 'when predicate does not match, skips validation', only: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
-    ].each do |description:, only:, expected:|
+      { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 400 } },
+      { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 400 } },
+      { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
+    ].each do |description:, accept_request_filter:, expected:|
       it description do
-        @app = new_rack_app(prefix: '/v1', schema: open_api_3_schema, only: only)
+        @app = new_rack_app(prefix: '/v1', schema: open_api_3_schema, accept_request_filter: accept_request_filter)
 
         post 'v1/characters', JSON.generate(string_post_1: 1)
 

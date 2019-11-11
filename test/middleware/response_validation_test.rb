@@ -162,14 +162,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_match(/valid JSON/i, last_response.body)
   end
 
-  describe ':only' do
+  describe ':accept_request_filter' do
     [
-      { description: 'when not specified, includes everything', only: nil, expected: { status: 500 } },
-      { description: 'when predicate matches, performs validation', only: -> (request) { request.path.start_with?('/v1/a') }, expected: { status: 500 } },
-      { description: 'when predicate does not match, skips validation', only: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
-    ].each do |description:, only:, expected:|
+      { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 500 } },
+      { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/a') }, expected: { status: 500 } },
+      { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
+    ].each do |description:, accept_request_filter:, expected:|
       it description do
-        @app = new_rack_app('not_json', {}, schema: hyper_schema, prefix: '/v1', only: only)
+        @app = new_rack_app('not_json', {}, schema: hyper_schema, prefix: '/v1', accept_request_filter: accept_request_filter)
 
         get '/v1/apps'
 
