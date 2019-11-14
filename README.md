@@ -48,6 +48,7 @@ Non-boolean options:
 |prefix| String | supported | supported | Mounts the middleware to respond at a configured prefix. (e.g. prefix is '/v1' and request path is '/v1/test' use '/test' definition). |
 |schema_path| String | supported | supported | Defines the location of the schema file to use for validation. |
 |error_handler| Proc Object | supported | supported | A proc which will be called when error occurs. Take an Error instance as first argument, and request.env as second argument. (e.g. `-> (ex, env) { Raven.capture_exception(ex, extra: { rack_env: env }) }`) |
+|accept_request_filter  | Proc Object | supported | supported | A proc that accepts a Request and returns a boolean. It indicates whether to validate the current request, or not. (e.g. `-> (request) { request.path.start_with?('/something') }`) |
 
 Note that Hyper-Schema and OpenAPI 2 get the same defaults for options.
 
