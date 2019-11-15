@@ -1,5 +1,9 @@
 Unreleased
 
+3.3.0 2019-11-16
+	Add a filter for request validation (#249)
+	Add ignore_error option to Committee::Middleware::RequestValidation (#248)
+
 3.2.1 2019-10-13
 	Bugfix: validate request parameter for POST, PUT, PATCH operations (#244)
 	use openapi_parser 0.6.1 (#246)
