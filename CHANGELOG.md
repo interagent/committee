@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.7.0 (2020-01-15)
+* Avoid potential `.send(:exit)` #58
+* Improve PathItemFinder #44
+
 ## 0.6.1 (2019-10-12)
 * Bugfix: validate non-nullable response header #54
 * Improve grammar in error messages #55
