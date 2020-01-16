@@ -28,14 +28,33 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
     end
 
     context 'invalid' do
-      context 'error pattern' do
-        let(:invalid_str) { '11922' }
-        let(:params) { { 'number_str' => invalid_str } }
+      let(:invalid_str) { '11922' }
+      let(:params) { { 'number_str' => invalid_str } }
 
+      context 'error pattern' do
         it do
           expect { subject }.to raise_error do |e|
             expect(e).to be_kind_of(OpenAPIParser::InvalidPattern)
             expect(e.message).to end_with("pattern [0-9]+:[0-9]+ does not match value: #{invalid_str}")
+          end
+        end
+      end
+
+      context 'error pattern with example' do
+        let(:replace_schema) do
+          {
+            number_str: {
+              type: 'string',
+              pattern: '[0-9]+:[0-9]+',
+              example: '11:22'
+            },
+          }
+        end
+
+        it do
+          expect { subject }.to raise_error do |e|
+            expect(e).to be_kind_of(OpenAPIParser::InvalidPattern)
+            expect(e.message).to end_with("pattern [0-9]+:[0-9]+ does not match value: #{invalid_str}, example: 11:22")
           end
         end
       end
