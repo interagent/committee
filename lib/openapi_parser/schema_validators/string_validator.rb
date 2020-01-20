@@ -55,7 +55,7 @@ class OpenAPIParser::SchemaValidator
         return [value, nil] unless schema.pattern
         return [value, nil] if value =~ /#{schema.pattern}/
 
-        [nil, OpenAPIParser::InvalidPattern.new(value, schema.pattern, schema.object_reference)]
+        [nil, OpenAPIParser::InvalidPattern.new(value, schema.pattern, schema.object_reference, schema.example)]
       end
 
       def validate_max_min_length(value, schema)

@@ -155,14 +155,15 @@ module OpenAPIParser
   end
 
   class InvalidPattern < OpenAPIError
-    def initialize(value, pattern, reference)
+    def initialize(value, pattern, reference, example)
       super(reference)
       @value = value
       @pattern = pattern
+      @example = example
     end
 
     def message
-      "#{@reference} pattern #{@pattern} does not match value: #{@value}"
+      "#{@reference} pattern #{@pattern} does not match value: #{@value}#{@example ? ", example: #{@example}" : ""}"
     end
   end
 
