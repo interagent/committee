@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.8.0 (2020-01-21)
+* Append the example to the Pattern validator error message #64
+
 ## 0.7.0 (2020-01-15)
 * Avoid potential `.send(:exit)` #58
 * Improve PathItemFinder #44
