@@ -29,7 +29,11 @@ def normal_schema
 end
 
 def petstore_schema
-  YAML.load_file('./spec/data/petstore-expanded.yaml')
+  YAML.load_file(petstore_schema_path)
+end
+
+def petstore_schema_path
+  './spec/data/petstore-expanded.yaml'
 end
 
 def petstore_with_discriminator_schema

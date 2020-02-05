@@ -1,0 +1,24 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OpenAPI3 Test
+paths:
+  /cyclic_reference:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: cyclic-remote-ref2.yaml#/components/schemas/outer
+      responses:
+        '200':
+          description: correct
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    inner:
+      type: integer
