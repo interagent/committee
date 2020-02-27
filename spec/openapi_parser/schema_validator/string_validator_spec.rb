@@ -161,4 +161,37 @@ RSpec.describe OpenAPIParser::SchemaValidator::StringValidator do
       end
     end
   end
+
+  describe 'validate uuid format' do
+    subject { OpenAPIParser::SchemaValidator.validate(params, target_schema, options) }
+
+    let(:params) { {} }
+    let(:replace_schema) do
+      {
+        uuid_str: {
+          type: 'string',
+          format: 'uuid',
+        },
+      }
+    end
+
+    context 'correct' do
+      let(:params) { { 'uuid_str' => 'fd33fb1e-b1f6-401e-994d-8a2545e1aef7' } }
+      it { expect(subject).to eq({ 'uuid_str' => 'fd33fb1e-b1f6-401e-994d-8a2545e1aef7' }) }
+    end
+
+    context 'invalid' do
+      context 'error pattern' do
+        let(:value) { 'not_uuid' }
+        let(:params) { { 'uuid_str' => value } }
+
+        it do
+          expect { subject }.to raise_error do |e|
+            expect(e).to be_kind_of(OpenAPIParser::InvalidUUIDFormat)
+            expect(e.message).to end_with("Value: not_uuid is not conformant with UUID format")
+          end
+        end
+      end
+    end
+  end
 end

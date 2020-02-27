@@ -178,6 +178,17 @@ module OpenAPIParser
     end
   end
 
+  class InvalidUUIDFormat < OpenAPIError
+    def initialize(value, reference)
+      super(reference)
+      @value = value
+    end
+
+    def message
+      "#{@reference} Value: #{@value} is not conformant with UUID format"
+    end
+  end
+
   class NotExistStatusCodeDefinition < OpenAPIError
     def message
       "#{@reference} status code definition does not exist"
