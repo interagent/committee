@@ -544,6 +544,31 @@ paths:
         '204':
           description: no content
 
+  /request_body_and_path_params/{id}:
+    post:
+      description: request body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+              - data
+              properties:
+                data:
+                  type: string
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: no content
+
 components:
   schemas:
     nested_array:

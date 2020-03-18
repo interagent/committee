@@ -107,7 +107,14 @@ module Committee
 
         def validate_get_request_params(params, headers, validator_option)
           # bad performance because when we coerce value, same check
-          request_operation.validate_request_parameter(params, headers, build_openapi_parser_get_option(validator_option))
+          request_params = (params['path'] || {}).merge(params['query'] || {}).merge(params['body'] || {}).merge(params['form_data'] || {})
+          result = request_operation.validate_request_parameter(request_params, headers, build_openapi_parser_get_option(validator_option))
+          # Copy coerced params
+          params['path'] = (params['path'] || {}).keys.map { |k| [k, request_params[k]] }.to_h
+          params['query'] = (params['query'] || {}).keys.map { |k| [k, request_params[k]] }.to_h
+          params['body'] = (params['body'] || {}).keys.map { |k| [k, request_params[k]] }.to_h
+          params['form_data'] = (params['form_data'] || {}).keys.map { |k| [k, request_params[k]] }.to_h
+          result
         rescue OpenAPIParser::OpenAPIError => e
           raise Committee::InvalidRequest.new(e.message)
         end
@@ -117,8 +124,15 @@ module Committee
 
           # bad performance because when we coerce value, same check
           schema_validator_options = build_openapi_parser_post_option(validator_option)
-          request_operation.validate_request_parameter(params, headers, schema_validator_options)
-          request_operation.validate_request_body(content_type, params, schema_validator_options)
+          request_params = (params['path'] || {}).merge(params['query'] || {}).merge(params['body'] || {}).merge(params['form_data'] || {})
+          request_operation.validate_request_parameter(request_params, headers, schema_validator_options)
+          result = request_operation.validate_request_body(content_type, params['body'], schema_validator_options)
+          # Copy coerced params
+          params['path'] = (params['path'] || {}).keys.map { |k| [k, request_params[k]] }.to_h
+          params['query'] = (params['query'] || {}).keys.map { |k| [k, request_params[k]] }.to_h
+          params['body'] = (params['body'] || {}).keys.map { |k| [k, request_params[k]] }.to_h
+          params['form_data'] = (params['form_data'] || {}).keys.map { |k| [k, request_params[k]] }.to_h
+          result
         rescue => e
           raise Committee::InvalidRequest.new(e.message)
         end
