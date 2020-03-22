@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.9.0 (2020-03-22)
+* Added support for validating UUID formatted strings #67
+
 ## 0.8.0 (2020-01-21)
 * Append the example to the Pattern validator error message #64
 
