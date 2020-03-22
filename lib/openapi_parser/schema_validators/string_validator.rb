@@ -27,6 +27,9 @@ class OpenAPIParser::SchemaValidator
       value, err = validate_email_format(value, schema)
       return [nil, err] if err
 
+      value, err = validate_uuid_format(value, schema)
+      return [nil, err] if err
+
       [value, nil]
     end
 
@@ -74,6 +77,14 @@ class OpenAPIParser::SchemaValidator
         return [value, nil] if value.match(URI::MailTo::EMAIL_REGEXP)
 
         return [nil, OpenAPIParser::InvalidEmailFormat.new(value, schema.object_reference)]
+      end
+
+      def validate_uuid_format(value, schema)
+        return [value, nil] unless schema.format == 'uuid'
+
+        return [value, nil] if value.match(/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/)
+
+        return [nil, OpenAPIParser::InvalidUUIDFormat.new(value, schema.object_reference)]
       end
   end
 end
