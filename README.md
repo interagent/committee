@@ -53,6 +53,17 @@ Or install it yourself as:
 
     $ gem install openapi_parser
 
+## Additional features
+OpenAPI Parser's validation based on [OpenAPI spec](https://github.com/OAI/OpenAPI-Specification)  
+But we support few useful features.
+
+### type validation
+We support additional type validation.
+
+|type|format|description|
+|---|---|---|
+|string|uuid|validate uuid string. But we don't check uuid layout|
+
 ## ToDo
 - correct schema checker
 - more detailed validator
