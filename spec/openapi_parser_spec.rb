@@ -1,5 +1,7 @@
 require_relative './spec_helper'
 require 'uri'
+require 'json'
+require 'yaml'
 require 'pathname'
 
 RSpec.describe OpenAPIParser do
@@ -30,21 +32,80 @@ RSpec.describe OpenAPIParser do
   end
 
   describe 'load_uri' do
-    let(:schema_registry) { {} }
-    let(:uri) { URI::File.build(path: (Pathname.getwd + petstore_schema_path).to_s) }
-    let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
+    context 'with yaml extension' do
+      let(:schema_registry) { {} }
+      let(:uri) { URI::File.build(path: (Pathname.getwd + petstore_schema_path).to_s) }
+      let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
 
-    it 'loads correct schema' do
-      root = OpenAPIParser.parse(petstore_schema, {})
-      expect(loaded.openapi).to eq root.openapi
+      it 'loads correct schema' do
+        root = OpenAPIParser.parse(petstore_schema, {})
+        expect(loaded.openapi).to eq root.openapi
+      end
+
+      it 'sets @uri' do
+        expect(loaded.instance_variable_get(:@uri)).to eq uri
+      end
+
+      it 'registers schema in schema_registry' do
+        expect(schema_registry).to eq({ uri => loaded })
+      end
     end
 
-    it 'sets @uri' do
-      expect(loaded.instance_variable_get(:@uri)).to eq uri
+    context 'with json extension' do
+      let(:schema_registry) { {} }
+      let(:uri) { URI::File.build(path: (Pathname.getwd + json_petstore_schema_path).to_s) }
+      let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
+
+      it 'loads correct schema' do
+        root = OpenAPIParser.parse(JSON.parse(IO.read(json_petstore_schema_path)), {})
+        expect(loaded.openapi).to eq root.openapi
+      end
+
+      it 'sets @uri' do
+        expect(loaded.instance_variable_get(:@uri)).to eq uri
+      end
+
+      it 'registers schema in schema_registry' do
+        expect(schema_registry).to eq({ uri => loaded })
+      end
     end
 
-    it 'registers schema in schema_registry' do
-      expect(schema_registry).to eq({ uri => loaded })
+    context 'with yaml content and unsupported extension' do
+      let(:schema_registry) { {} }
+      let(:uri) { URI::File.build(path: (Pathname.getwd + yaml_with_unsupported_extension_petstore_schema_path).to_s) }
+      let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
+
+      it 'loads correct schema' do
+        root = OpenAPIParser.parse(YAML.load_file(yaml_with_unsupported_extension_petstore_schema_path), {})
+        expect(loaded.openapi).to eq root.openapi
+      end
+
+      it 'sets @uri' do
+        expect(loaded.instance_variable_get(:@uri)).to eq uri
+      end
+
+      it 'registers schema in schema_registry' do
+        expect(schema_registry).to eq({ uri => loaded })
+      end
+    end
+
+    context 'with json content and unsupported extension' do
+      let(:schema_registry) { {} }
+      let(:uri) { URI::File.build(path: (Pathname.getwd + json_with_unsupported_extension_petstore_schema_path).to_s) }
+      let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
+
+      it 'loads correct schema' do
+        root = OpenAPIParser.parse(JSON.parse(IO.read(json_with_unsupported_extension_petstore_schema_path)), {})
+        expect(loaded.openapi).to eq root.openapi
+      end
+
+      it 'sets @uri' do
+        expect(loaded.instance_variable_get(:@uri)).to eq uri
+      end
+
+      it 'registers schema in schema_registry' do
+        expect(schema_registry).to eq({ uri => loaded })
+      end
     end
   end
 end

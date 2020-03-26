@@ -40,6 +40,18 @@ def petstore_with_discriminator_schema
   YAML.load_file('./spec/data/petstore-with-discriminator.yaml')
 end
 
+def json_petstore_schema_path
+  './spec/data/petstore.json'
+end
+
+def json_with_unsupported_extension_petstore_schema_path
+  './spec/data/petstore.json.unsupported_extension'
+end
+
+def yaml_with_unsupported_extension_petstore_schema_path
+  './spec/data/petstore.yaml.unsupported_extension'
+end
+
 def build_validate_test_schema(new_properties)
   b = YAML.load_file('./spec/data/validate_test.yaml')
   obj = b['paths']['/validate_test']['post']['requestBody']['content']['application/json']['schema']['properties']

@@ -1,5 +1,6 @@
 require 'uri'
 require 'time'
+require 'json'
 require 'psych'
 require 'pathname'
 require 'open-uri'
@@ -20,7 +21,7 @@ module OpenAPIParser
     # Load schema yaml object. Uri is not set for returned schema.
     # @return [OpenAPIParser::Schemas::OpenAPI]
     def parse(schema, config = {})
-      load_yaml(schema, config: Config.new(config), uri: nil, schema_registry: {})
+      load_hash(schema, config: Config.new(config), uri: nil, schema_registry: {})
     end
 
     # Load schema in specified filepath. If file path is relative, it is resolved using working directory.
@@ -42,13 +43,38 @@ module OpenAPIParser
         uri.open(&:read)
       end
 
-      load_yaml(Psych.safe_load(content), config: config, uri: uri, schema_registry: schema_registry)
+      extension = Pathname.new(uri.path).extname
+      load_hash(parse_file(content, extension), config: config, uri: uri, schema_registry: schema_registry)
     end
 
     private
 
-      def load_yaml(yaml, config:, uri:, schema_registry:)
-        root = Schemas::OpenAPI.new(yaml, config, uri: uri, schema_registry: schema_registry)
+      def parse_file(content, extension)
+        case extension.downcase
+        when '.yaml', '.yml'
+          parse_yaml(content)
+        when '.json'
+          parse_json(content)
+        else
+          # When extension is something we don't know, try to parse as json first. If it fails, parse as yaml
+          begin
+            parse_json(content)
+          rescue JSON::ParserError
+            parse_yaml(content)
+          end
+        end
+      end
+
+      def parse_yaml(content)
+        Psych.safe_load(content)
+      end
+
+      def parse_json(content)
+        JSON.parse(content)
+      end
+
+      def load_hash(hash, config:, uri:, schema_registry:)
+        root = Schemas::OpenAPI.new(hash, config, uri: uri, schema_registry: schema_registry)
 
         OpenAPIParser::ReferenceExpander.expand(root) if config.expand_reference
 
