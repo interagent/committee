@@ -1,5 +1,6 @@
 require 'uri'
 require 'time'
+require 'psych'
 require 'pathname'
 require 'open-uri'
 
@@ -41,7 +42,7 @@ module OpenAPIParser
         uri.open(&:read)
       end
 
-      load_yaml(YAML.load(content), config: config, uri: uri, schema_registry: schema_registry)
+      load_yaml(Psych.safe_load(content), config: config, uri: uri, schema_registry: schema_registry)
     end
 
     private
