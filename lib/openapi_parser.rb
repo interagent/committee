@@ -29,7 +29,7 @@ module OpenAPIParser
     def load(filepath, config = {})
       path = Pathname.new(filepath)
       path = Pathname.getwd + path if path.relative?
-      load_uri(URI::File.build(path: path.to_s), config: Config.new(config), schema_registry: {})
+      load_uri(URI.join("file:///",  path.to_s), config: Config.new(config), schema_registry: {})
     end
 
     # Load schema located by the passed uri. Uri must be absolute.
