@@ -1,0 +1,13 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OpenAPI3 Test
+components:
+  schemas:
+    outer:
+      type: object
+      properties:
+        content:
+          $ref: cyclic-remote-ref1.yaml#/components/schemas/inner
+      required:
+        - content

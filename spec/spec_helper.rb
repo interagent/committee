@@ -29,11 +29,27 @@ def normal_schema
 end
 
 def petstore_schema
-  YAML.load_file('./spec/data/petstore-expanded.yaml')
+  YAML.load_file(petstore_schema_path)
+end
+
+def petstore_schema_path
+  './spec/data/petstore-expanded.yaml'
 end
 
 def petstore_with_discriminator_schema
   YAML.load_file('./spec/data/petstore-with-discriminator.yaml')
+end
+
+def json_petstore_schema_path
+  './spec/data/petstore.json'
+end
+
+def json_with_unsupported_extension_petstore_schema_path
+  './spec/data/petstore.json.unsupported_extension'
+end
+
+def yaml_with_unsupported_extension_petstore_schema_path
+  './spec/data/petstore.yaml.unsupported_extension'
 end
 
 def build_validate_test_schema(new_properties)

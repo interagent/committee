@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OpenAPI3 Test
+paths:
+  /http_reference:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: https://raw.githubusercontent.com/ota42y/openapi_parser/091b20838cf0bfbc7bed2c9968b10bb0b9e8a789/spec/data/normal.yml#/components/schemas/all_of_base
+      responses:
+        '200':
+          description: correct
+          content:
+            application/json:
+              schema:
+                type: object

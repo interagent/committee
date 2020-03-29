@@ -1,0 +1,20 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OpenAPI3 Test
+paths:
+  /local_file_reference:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: normal.yml#/components/schemas/all_of_base
+      responses:
+        '200':
+          description: correct
+          content:
+            application/json:
+              schema:
+                type: object
