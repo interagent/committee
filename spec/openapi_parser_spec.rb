@@ -27,14 +27,15 @@ RSpec.describe OpenAPIParser do
 
     it 'sets @uri' do
       schema_path = (Pathname.getwd + petstore_schema_path).to_s
-      expect(loaded.instance_variable_get(:@uri).to_s).to eq "file://#{schema_path}"
+      expect(loaded.instance_variable_get(:@uri).scheme).to eq "file"
+      expect(loaded.instance_variable_get(:@uri).path).to eq schema_path
     end
   end
 
   describe 'load_uri' do
     context 'with yaml extension' do
       let(:schema_registry) { {} }
-      let(:uri) { URI::File.build(path: (Pathname.getwd + petstore_schema_path).to_s) }
+      let(:uri) { URI.join("file:///", (Pathname.getwd + petstore_schema_path).to_s) }
       let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
 
       it 'loads correct schema' do
@@ -53,7 +54,7 @@ RSpec.describe OpenAPIParser do
 
     context 'with json extension' do
       let(:schema_registry) { {} }
-      let(:uri) { URI::File.build(path: (Pathname.getwd + json_petstore_schema_path).to_s) }
+      let(:uri) { URI.join("file:///",  (Pathname.getwd + json_petstore_schema_path).to_s) }
       let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
 
       it 'loads correct schema' do
@@ -72,7 +73,7 @@ RSpec.describe OpenAPIParser do
 
     context 'with yaml content and unsupported extension' do
       let(:schema_registry) { {} }
-      let(:uri) { URI::File.build(path: (Pathname.getwd + yaml_with_unsupported_extension_petstore_schema_path).to_s) }
+      let(:uri) { URI.join("file:///",  (Pathname.getwd + yaml_with_unsupported_extension_petstore_schema_path).to_s) }
       let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
 
       it 'loads correct schema' do
@@ -91,7 +92,7 @@ RSpec.describe OpenAPIParser do
 
     context 'with json content and unsupported extension' do
       let(:schema_registry) { {} }
-      let(:uri) { URI::File.build(path: (Pathname.getwd + json_with_unsupported_extension_petstore_schema_path).to_s) }
+      let(:uri) { URI.join("file:///",  (Pathname.getwd + json_with_unsupported_extension_petstore_schema_path).to_s) }
       let!(:loaded) { OpenAPIParser.load_uri(uri, config: OpenAPIParser::Config.new({}), schema_registry: schema_registry) }
 
       it 'loads correct schema' do
