@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.10.0 (2020-04-01)
+* Support $ref to objects in other OpenAPI yaml files #66
+* Allow $ref for path item objects #71
+
 ## 0.9.0 (2020-03-22)
 * Added support for validating UUID formatted strings #67
 
