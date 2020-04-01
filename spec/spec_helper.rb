@@ -52,6 +52,10 @@ def yaml_with_unsupported_extension_petstore_schema_path
   './spec/data/petstore.yaml.unsupported_extension'
 end
 
+def path_item_ref_schema
+  YAML.load_file('./spec/data/path-item-ref.yaml')
+end
+
 def build_validate_test_schema(new_properties)
   b = YAML.load_file('./spec/data/validate_test.yaml')
   obj = b['paths']['/validate_test']['post']['requestBody']['content']['application/json']['schema']['properties']
