@@ -1,0 +1,17 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OpenAPI3 Test
+  description: A Sample file
+servers:
+- url: https://github.com/interagent/committee/
+paths: {}
+components:
+  schemas:
+    referred_schema:
+      type: object
+      properties:
+        sample:
+          type: string
+      required:
+      - sample

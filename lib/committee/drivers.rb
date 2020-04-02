@@ -21,14 +21,14 @@ module Committee
     # @param [String] schema_path
     # @return [Committee::Driver]
     def self.load_from_json(schema_path)
-      load_from_data(JSON.parse(File.read(schema_path)))
+      load_from_data(JSON.parse(File.read(schema_path)), schema_path)
     end
 
     # load and build drive from YAML file
     # @param [String] schema_path
     # @return [Committee::Driver]
     def self.load_from_yaml(schema_path)
-      load_from_data(YAML.load_file(schema_path))
+      load_from_data(YAML.load_file(schema_path), schema_path)
     end
 
     # load and build drive from file
@@ -48,10 +48,10 @@ module Committee
     # load and build drive from Hash object
     # @param [Hash] hash
     # @return [Committee::Driver]
-    def self.load_from_data(hash)
+    def self.load_from_data(hash, schema_path = nil)
       if hash['openapi']&.start_with?('3.0.')
-        parser = OpenAPIParser.parse(hash)
-        return Committee::Drivers::OpenAPI3::Driver.new.parse(parser)
+        openapi = OpenAPIParser.parse_with_filepath(hash, schema_path)
+        return Committee::Drivers::OpenAPI3::Driver.new.parse(openapi)
       end
 
       driver = if hash['swagger'] == '2.0'
