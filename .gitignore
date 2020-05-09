@@ -3,5 +3,7 @@
 *.sw*
 tags
 Gemfile.lock
+!/examples/openapi3/Gemfile.lock
+!/examples/json_schema/Gemfile.lock
 .DS_Store
 /coverage/
