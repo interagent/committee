@@ -17,6 +17,26 @@ RSpec.describe OpenAPIParser do
     end
   end
 
+  describe 'parse_with_filepath' do
+    it 'loads correct schema' do
+      parsed = OpenAPIParser.parse_with_filepath(petstore_schema, petstore_schema_path, {})
+      root = OpenAPIParser.parse(petstore_schema, {})
+      expect(parsed.openapi).to eq root.openapi
+    end
+
+    it 'sets @uri' do
+      parsed = OpenAPIParser.parse_with_filepath(petstore_schema, petstore_schema_path, {})
+      schema_path = (Pathname.getwd + petstore_schema_path).to_s
+      expect(parsed.instance_variable_get(:@uri).scheme).to eq "file"
+      expect(parsed.instance_variable_get(:@uri).path).to eq schema_path
+    end
+
+    it 'does not set @uri when passed filepath is nil' do
+      parsed = OpenAPIParser.parse_with_filepath(petstore_schema, nil, {})
+      expect(parsed.instance_variable_get(:@uri)).to be nil
+    end
+  end
+
   describe 'load' do
     let(:loaded) { OpenAPIParser.load(petstore_schema_path, {}) }
 

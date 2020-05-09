@@ -18,18 +18,24 @@ require 'openapi_parser/reference_expander'
 
 module OpenAPIParser
   class << self
-    # Load schema yaml object. Uri is not set for returned schema.
+    # Load schema hash object. Uri is not set for returned schema.
     # @return [OpenAPIParser::Schemas::OpenAPI]
     def parse(schema, config = {})
       load_hash(schema, config: Config.new(config), uri: nil, schema_registry: {})
     end
 
+    # @param filepath [String] Path of the file containing the passed schema.
+    #   Used for resolving remote $ref if provided.
+    #   If file path is relative, it is resolved using working directory.
+    # @return [OpenAPIParser::Schemas::OpenAPI]
+    def parse_with_filepath(schema, filepath, config = {})
+      load_hash(schema, config: Config.new(config), uri: filepath && file_uri(filepath), schema_registry: {})
+    end
+
     # Load schema in specified filepath. If file path is relative, it is resolved using working directory.
     # @return [OpenAPIParser::Schemas::OpenAPI]
     def load(filepath, config = {})
-      path = Pathname.new(filepath)
-      path = Pathname.getwd + path if path.relative?
-      load_uri(URI.join("file:///",  path.to_s), config: Config.new(config), schema_registry: {})
+      load_uri(file_uri(filepath), config: Config.new(config), schema_registry: {})
     end
 
     # Load schema located by the passed uri. Uri must be absolute.
@@ -48,6 +54,12 @@ module OpenAPIParser
     end
 
     private
+
+      def file_uri(filepath)
+        path = Pathname.new(filepath)
+        path = Pathname.getwd + path if path.relative?
+        URI.join("file:///",  path.to_s)
+      end
 
       def parse_file(content, extension)
         case extension.downcase
