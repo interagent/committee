@@ -495,7 +495,10 @@ describe Committee::Middleware::RequestValidation do
       { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 400 } },
       { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/a') }, expected: { status: 400 } },
       { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
-    ].each do |description:, accept_request_filter:, expected:|
+    ].each do |h|
+      description = h[:description]
+      accept_request_filter = h[:accept_request_filter]
+      expected = h[:expected]
       it description do
         @app = new_rack_app(prefix: '/v1', schema: hyper_schema, accept_request_filter: accept_request_filter)
 

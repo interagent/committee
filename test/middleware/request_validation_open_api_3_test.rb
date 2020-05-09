@@ -415,7 +415,11 @@ describe Committee::Middleware::RequestValidation do
       { check_header: false, description: 'valid value', value: 1, expected: { status: 200 } },
       { check_header: false, description: 'missing value', value: nil, expected: { status: 200 } },
       { check_header: false, description: 'invalid value', value: 'x', expected: { status: 200 } },
-    ].each do |check_header:, description:, value:, expected:|
+    ].each do |h|
+      check_header = h[:check_header]
+      description = h[:description]
+      value = h[:value]
+      expected = h[:expected]
       describe "when #{check_header}" do
         %w(get post put patch delete).each do |method|
           describe method do
@@ -441,7 +445,10 @@ describe Committee::Middleware::RequestValidation do
       { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 400 } },
       { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 400 } },
       { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
-    ].each do |description:, accept_request_filter:, expected:|
+    ].each do |h|
+      description = h[:description]
+      accept_request_filter = h[:accept_request_filter]
+      expected = h[:expected]
       it description do
         @app = new_rack_app(prefix: '/v1', schema: open_api_3_schema, accept_request_filter: accept_request_filter)
 
