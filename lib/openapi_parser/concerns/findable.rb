@@ -30,6 +30,8 @@ module OpenAPIParser::Findable
   end
 
   def purge_object_cache
+    @purged = false unless defined? @purged
+
     return if @purged
 
     @find_object_cache = {}
