@@ -14,6 +14,48 @@ module Committee
     end
 
     def call
+      return call_hyperschema if hyperschema?
+
+      # if Content-Type is empty or JSON, and there was a request body, try to
+      # interpret it as JSON
+      params = {}
+
+      params['body'] = if !@request.media_type || @request.media_type =~ %r{application/.*json}
+        parse_json
+      elsif @optimistic_json
+        begin
+          parse_json
+        rescue JSON::ParserError
+          nil
+        end
+      else
+        {}
+      end
+
+      params['form_data'] = if @allow_form_params && %w[application/x-www-form-urlencoded multipart/form-data].include?(@request.media_type)
+        # Actually, POST means anything in the request body, could be from
+        # PUT or PATCH too. Silly Rack.
+        p = @request.POST
+
+        @schema_validator.coerce_form_params(p) if @coerce_form_params
+
+        p
+      else
+        {}
+      end
+
+      params['query'] = if @allow_query_params
+        indifferent_params(@request.GET)
+      else
+        {}
+      end
+
+      [params, headers]
+    end
+
+    private
+
+    def call_hyperschema
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON
       params = if !@request.media_type || @request.media_type =~ %r{application/.*json}
@@ -47,13 +89,15 @@ module Committee
       end
     end
 
-    private
-
     # Creates a Hash with indifferent access.
     #
     # (Copied from Sinatra)
     def indifferent_hash
       Hash.new { |hash,key| hash[key.to_s] if Symbol === key }
+    end
+
+    def hyperschema?
+      @schema_validator.is_a?(Committee::SchemaValidator::HyperSchema)
     end
 
     # Enable string or symbol key access to the nested params hash.

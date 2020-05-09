@@ -44,6 +44,15 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "passes given a valid request body and path param" do
+    @app = new_rack_app(schema: open_api_3_schema)
+    params = { "data" => "abc" }
+    header "Content-Type", "application/json"
+    post "/request_body_and_path_params/abc", JSON.generate(params)
+
+    assert_equal 200, last_response.status
+  end
+
   it "passes given a valid parameter on GET endpoint with request body and allow_get_body=true" do
     params = { "data" => "abc" }
 
@@ -66,7 +75,7 @@ describe Committee::Middleware::RequestValidation do
     params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
 
     check_parameter = lambda { |env|
-      assert_equal DateTime, env['committee.params']["datetime_string"].class
+      assert_equal DateTime, env['committee.params']['body']["datetime_string"].class
       [200, {}, []]
     }
 
@@ -108,7 +117,7 @@ describe Committee::Middleware::RequestValidation do
     }
 
     check_parameter = lambda { |env|
-      nested_array = env['committee.params']["nested_array"]
+      nested_array = env['committee.params']['body']["nested_array"]
       first_data = nested_array[0]
       assert_kind_of DateTime, first_data["update_time"]
 
@@ -220,7 +229,7 @@ describe Committee::Middleware::RequestValidation do
     }
 
     check_parameter = lambda { |env|
-      hash = env['committee.params']
+      hash = env['committee.params']['body']
       array = hash['nested_array']
 
       assert_equal DateTime, array.first['update_time'].class
@@ -386,7 +395,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "coerce string to integer" do
     check_parameter_string = lambda { |env|
-      assert env['committee.params']['integer'].is_a?(Integer)
+      assert env['committee.params']['path']['integer'].is_a?(Integer)
       [200, {}, []]
     }
 
