@@ -108,7 +108,11 @@ describe Committee::Middleware::ResponseValidation do
       { check_header: false, description: 'valid value', header: { 'integer' => 1 }, expected: { status: 200 } },
       { check_header: false, description: 'missing value', header: { 'integer' => nil }, expected: { status: 200 } },
       { check_header: false, description: 'invalid value', header: { 'integer' => 'x' }, expected: { status: 200 } },
-    ].each do |check_header:, description:, header:, expected:|
+    ].each do |h|
+      check_header = h[:check_header]
+      description = h[:description]
+      header = h[:header]
+      expected = h[:expected]
       describe "when #{check_header}" do
         %w(get post put patch delete).each do |method|
           describe method do
@@ -174,7 +178,11 @@ describe Committee::Middleware::ResponseValidation do
       { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 500 } },
       { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 500 } },
       { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
-    ].each do |description:, accept_request_filter:, expected:|
+    ].each do |h|
+      description = h[:description]
+      accept_request_filter = h[:accept_request_filter]
+      expected = h[:expected]
+
       it description do
         @app = new_response_rack('not_json', {}, schema: open_api_3_schema, prefix: '/v1', accept_request_filter: accept_request_filter)
 
