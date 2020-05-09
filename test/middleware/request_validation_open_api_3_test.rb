@@ -249,8 +249,7 @@ describe Committee::Middleware::RequestValidation do
     }
     post "/characters", JSON.generate(params)
     assert_equal 400, last_response.status
-    # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-    assert_match(/expected string, but received #{1.class}:/i, last_response.body)
+    assert_match(/expected string, but received Integer:/i, last_response.body)
   end
 
   it "rescues JSON errors" do
@@ -279,8 +278,7 @@ describe Committee::Middleware::RequestValidation do
     header "Content-Type", "application/json"
     post "/v1/characters", JSON.generate(params)
     assert_equal 400, last_response.status
-    # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-    assert_match(/expected string, but received #{1.class}: /i, last_response.body)
+    assert_match(/expected string, but received Integer: /i, last_response.body)
   end
 
   it "ignores paths outside the prefix" do

@@ -52,8 +52,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         operation_object.validate_request_params({"string" => 1}, HEADER, @validator_option)
       }
 
-      # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-      assert_match(/expected string, but received #{1.class}: 1/i, e.message)
+      assert_match(/expected string, but received Integer: 1/i, e.message)
     end
 
     it 'support put method' do
@@ -64,8 +63,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         operation_object.validate_request_params({"string" => 1}, HEADER, @validator_option)
       }
 
-      # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-      assert_match(/expected string, but received #{1.class}: 1/i, e.message)
+      assert_match(/expected string, but received Integer: 1/i, e.message)
     end
 
     it 'support patch method' do
@@ -121,8 +119,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
           )
         }
 
-        # FIXME: when ruby 2.3 dropped, fix because ruby 2.3 return Fixnum, ruby 2.4 or later return Integer
-        assert_match(/expected string, but received #{1.class}: 1/i, e.message)
+        assert_match(/expected string, but received Integer: 1/i, e.message)
       end
     end
 
