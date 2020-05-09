@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.11.1 (2020-05-09)
+* fix too many warning
+
 ## 0.11.0 (2020-05-09)
 * Add committee friendly interface to use remote references. #74
 * Prevent SystemStackError on recursive schema reference #76
