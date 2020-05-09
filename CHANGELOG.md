@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 0.11.0 (2020-05-09)
+* Add committee friendly interface to use remote references. #74
+* Prevent SystemStackError on recursive schema reference #76
+* support newest ruby versions #78
+
 ## 0.10.0 (2020-04-01)
 * Support $ref to objects in other OpenAPI yaml files #66
 * Allow $ref for path item objects #71
