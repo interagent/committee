@@ -544,6 +544,16 @@ paths:
         '204':
           description: no content
 
+  /ref-sample:
+    get:
+      responses:
+        '200':
+          description: sample of remote schema reference
+          content:
+            application/json:
+              schema:
+                $ref: referee.yaml#/components/schemas/referred_schema
+
 components:
   schemas:
     nested_array:

@@ -56,7 +56,7 @@ def open_api_2_schema
 end
 
 def open_api_3_schema
-  @open_api_3_schema ||= Committee::Drivers.load_from_data(open_api_3_data)
+  @open_api_3_schema ||= Committee::Drivers.load_from_file(open_api_3_schema_path)
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.

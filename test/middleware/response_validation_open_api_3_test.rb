@@ -99,6 +99,20 @@ describe Committee::Middleware::ResponseValidation do
     assert_match(/valid JSON/i, last_response.body)
   end
 
+  describe "remote schema $ref" do
+    it "passes through a valid response" do
+      @app = new_response_rack(JSON.generate({ "sample" => "value" }), {}, schema: open_api_3_schema)
+      get "/ref-sample"
+      assert_equal 200, last_response.status
+    end
+
+    it "detects a invalid response" do
+      @app = new_response_rack("{}", {}, schema: open_api_3_schema)
+      get "/ref-sample"
+      assert_equal 500, last_response.status
+    end
+  end
+
   describe 'check header' do
     [
       { check_header: true, description: 'valid value', header: { 'integer' => 1 }, expected: { status: 200 } },
