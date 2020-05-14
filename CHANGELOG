@@ -1,5 +1,10 @@
 Unreleased
 
+4.0.0 2020-05-14
+	Support Ruby 2.7.x (#254)	
+	Drop Ruby 2.3.x
+	Support OpenAPI 3 remote $ref (#266)
+
 3.3.0 2019-11-16
 	Add a filter for request validation (#249)
 	Add ignore_error option to Committee::Middleware::RequestValidation (#248)
