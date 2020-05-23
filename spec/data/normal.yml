@@ -516,6 +516,27 @@ paths:
         default:
           "$ref": '#/components/responses/ref2'
 
+  /date_time:
+    get:
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date
+                  date-time:
+                    type: string
+                    format: date-time
+              example:
+                date: 2020-05-12
+                date-time: 2020-05-12T00:00:00.00Z
+
+
 components:
   parameters:
     ref1:

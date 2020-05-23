@@ -78,7 +78,7 @@ module OpenAPIParser
       end
 
       def parse_yaml(content)
-        Psych.safe_load(content)
+        Psych.safe_load(content, permitted_classes: [Date, Time])
       end
 
       def parse_json(content)
