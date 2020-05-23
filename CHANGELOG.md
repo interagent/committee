@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.11.2 (2020-05-23)
+* Allow date and time content in YAML #81
+
 ## 0.11.1 (2020-05-09)
 * fix too many warning
 
