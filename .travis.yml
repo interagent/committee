@@ -16,8 +16,6 @@ script: bundle exec rake
 notifications:
   email: false
 
-sudo: false
-
 git:
   depth: 10
 
