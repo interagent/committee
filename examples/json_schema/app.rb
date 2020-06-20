@@ -18,7 +18,7 @@ class App < Sinatra::Base
   #
   # Note that the stub's response can be modified or suppressed. See the POST
   # /apps and PATCH /apps/:id handlers below for examples.
-  use Committee::Middleware::Stub, schema_path: SCHEMA_PATH
+  use Committee::Middleware::Stub, schema_path: SCHEMA_PATH, call: true
 
   # The response validator checks that responses from within the stack are
   # compliant with the JSON schema. It's normally used for verification in
@@ -48,7 +48,7 @@ class App < Sinatra::Base
   # This parameter mixes in some custom information from the request into the
   # default stubbed response and responds with that.
   patch "/apps/:id" do |id|
-    env["committee.response"].merge!(env["committee.params"])
+    JSON.pretty_generate(env["committee.response"].merge!(env["committee.params"]))
   end
 
   delete "/apps/:id" do |id|
