@@ -34,6 +34,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "passes through a invalid json with parse_response_by_content_type option" do
+    @app = new_response_rack("csv response", { "Content-Type" => "test/csv"}, schema: open_api_3_schema, parse_response_by_content_type: true)
+
+    get "/csv"
+
+    assert_equal 200, last_response.status
+  end
+
   it "passes through not definition" do
     @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, schema: open_api_3_schema)
     get "/no_data"
