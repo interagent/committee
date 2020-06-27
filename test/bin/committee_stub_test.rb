@@ -43,7 +43,11 @@ describe Committee::Bin::CommitteeStub, "app" do
   end
 
   def app
-    @bin.get_app(hyper_schema, {})
+    options = {}
+    # TODO: delete when 5.0.0 released because default value changed
+    options[:parse_response_by_content_type] = false
+
+    @bin.get_app(hyper_schema, options)
   end
 
   it "defaults to a 404" do

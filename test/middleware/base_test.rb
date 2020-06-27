@@ -103,17 +103,20 @@ describe Committee::Middleware::Base do
 
   describe 'initialize option' do
     it "schema_path option with hyper-schema" do
-      b = Committee::Middleware::Base.new(nil, schema_path: hyper_schema_schema_path)
+      # TODO: delete when 5.0.0 released because default value changed
+      b = Committee::Middleware::Base.new(nil, schema_path: hyper_schema_schema_path, parse_response_by_content_type: false)
       assert_kind_of Committee::Drivers::HyperSchema::Schema, b.instance_variable_get(:@schema)
     end
 
     it "schema_path option with OpenAPI2" do
-      b = Committee::Middleware::Base.new(nil, schema_path: open_api_2_schema_path)
+      # TODO: delete when 5.0.0 released because default value changed
+      b = Committee::Middleware::Base.new(nil, schema_path: open_api_2_schema_path, parse_response_by_content_type: false)
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, b.instance_variable_get(:@schema)
     end
 
     it "schema_path option with OpenAPI3" do
-      b = Committee::Middleware::Base.new(nil, schema_path: open_api_3_schema_path)
+      # TODO: delete when 5.0.0 released because default value changed
+      b = Committee::Middleware::Base.new(nil, schema_path: open_api_3_schema_path, parse_response_by_content_type: false)
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, b.instance_variable_get(:@schema)
     end
   end
@@ -121,6 +124,9 @@ describe Committee::Middleware::Base do
   private
 
   def new_rack_app(options = {})
+    # TODO: delete when 5.0.0 released because default value changed
+    options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
+
     Rack::Builder.new {
       use Committee::Middleware::RequestValidation, options
       run lambda { |_|
