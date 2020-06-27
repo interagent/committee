@@ -100,7 +100,10 @@ describe Committee::RequestUnpacker do
       }
       request = Rack::Request.new(env)
 
-      router = hyper_schema.build_router({})
+      options = {}
+      # TODO: delete when 5.0.0 released because default value changed
+      options[:parse_response_by_content_type] = false
+      router = hyper_schema.build_router(options)
       validator = router.build_schema_validator(request)
 
       schema = JsonSchema::Schema.new
@@ -133,7 +136,10 @@ describe Committee::RequestUnpacker do
       }
       request = Rack::Request.new(env)
 
-      router = open_api_3_schema.build_router({})
+      options = {}
+      # TODO: delete when 5.0.0 released because default value changed
+      options[:parse_response_by_content_type] = false
+      router = open_api_3_schema.build_router(options)
       validator = router.build_schema_validator(request)
 
       params, _ = Committee::RequestUnpacker.new(
@@ -158,7 +164,10 @@ describe Committee::RequestUnpacker do
       }
       request = Rack::Request.new(env)
 
-      router = open_api_3_schema.build_router({})
+      options = {}
+      # TODO: delete when 5.0.0 released because default value changed
+      options[:parse_response_by_content_type] = false
+      router = open_api_3_schema.build_router(options)
       validator = router.build_schema_validator(request)
 
       params, _ = Committee::RequestUnpacker.new(

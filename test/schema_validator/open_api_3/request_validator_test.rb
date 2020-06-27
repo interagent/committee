@@ -72,6 +72,9 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
     end
 
     def new_rack_app(options = {})
+      # TODO: delete when 5.0.0 released because default value changed
+      options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
+    
       Rack::Builder.new {
         use Committee::Middleware::RequestValidation, options
         run lambda { |_|

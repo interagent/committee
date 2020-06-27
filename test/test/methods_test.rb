@@ -28,7 +28,10 @@ describe Committee::Test::Methods do
     # our purposes here in testing the module.
     @committee_router = nil
     @committee_schema = nil
-    @committee_options = nil
+    @committee_options = {}
+
+    # TODO: delete when 5.0.0 released because default value changed
+    @committee_options[:parse_response_by_content_type] = true
   end
 
   describe "Hyper-Schema" do
@@ -36,7 +39,7 @@ describe Committee::Test::Methods do
       sc = JsonSchema.parse!(hyper_schema_data)
       sc.expand_references!
       s = Committee::Drivers::HyperSchema::Driver.new.parse(sc)
-      @committee_options = {schema: s}
+      @committee_options.merge!({schema: s})
     end
 
     describe "#assert_schema_conform" do
@@ -120,7 +123,7 @@ describe Committee::Test::Methods do
 
   describe "OpenAPI3" do
     before do
-      @committee_options = {schema: open_api_3_schema}
+      @committee_options.merge!({schema: open_api_3_schema})
 
       @correct_response = { string_1: :honoka }
     end

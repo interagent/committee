@@ -112,6 +112,10 @@ describe Committee::Middleware::Stub do
   def new_rack_app(options = {})
     response = options.delete(:response)
     suppress = options.delete(:suppress)
+
+    # TODO: delete when 5.0.0 released because default value changed
+    options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
+
     Rack::Builder.new {
       use Committee::Middleware::Stub, options
       run lambda { |env|
