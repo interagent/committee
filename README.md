@@ -309,6 +309,14 @@ Committee 3.* has many breaking changes so we recommend upgrading to the latest 
 
 Important changes are also described below.
 
+
+### Upgrading from Committee 4.* to 5.*
+
+Committee 5.* has few breaking changes so we recommend upgrading to the latest release on 4.* and fixing any deprecation errors you see before upgrading.  
+(Now we doesn't release 5.* yet)
+
+- change `parse_response_by_content_type`'s default value from `false` to `true`.
+
 ### Setting schemas in middleware
 
 Committee 2.* supported setting `schema` to a string or a hash like this:
