@@ -15,7 +15,8 @@ module Committee
                   :coerce_query_params,
                   :coerce_recursive,
                   :optimistic_json,
-                  :validate_success_only
+                  :validate_success_only,
+                  :parse_response_by_content_type
 
       # Non-boolean options:
       attr_reader :headers_key,
@@ -35,6 +36,12 @@ module Committee
         @check_header        = options.fetch(:check_header, true)
         @coerce_recursive    = options.fetch(:coerce_recursive, true)
         @optimistic_json     = options.fetch(:optimistic_json, false)
+        @parse_response_by_content_type = if options[:parse_response_by_content_type].nil?
+          Committee.warn_deprecated('Committee: please set parse_response_by_content_type = false because we\'ll change default value in next major version.') 
+          false
+        else
+          options.fetch(:parse_response_by_content_type)
+        end
 
         # Boolean options and have a different value by default
         @allow_get_body      = options.fetch(:allow_get_body, schema.driver.default_allow_get_body)

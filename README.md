@@ -153,6 +153,7 @@ Option values and defaults:
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |validate_success_only| true | false | Also validate non-2xx responses only. |
 |ignore_error| false | false | Validate and ignore result even if validation is error. So always return original data. |
+|parse_response_by_content_type| false | false | Parse response body to JSON only if Content-Type header is 'application/json'. When false, this always optimistically parses as JSON without checking for Content-Type header. |
 
 No boolean option values:
 

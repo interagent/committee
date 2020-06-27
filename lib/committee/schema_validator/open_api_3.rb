@@ -30,7 +30,14 @@ module Committee
         response.each do |chunk|
           full_body << chunk
         end
-        data = full_body.empty? ? {} : JSON.parse(full_body)
+
+        parse_to_json = !validator_option.parse_response_by_content_type || 
+                        headers.fetch('Content-Type', nil)&.start_with?('application/json')
+        data = if parse_to_json
+          full_body.empty? ? {} : JSON.parse(full_body)
+        else
+          full_body
+        end
 
         strict = test_method
         Committee::SchemaValidator::OpenAPI3::ResponseValidator.

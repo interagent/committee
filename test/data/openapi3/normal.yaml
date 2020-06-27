@@ -6,6 +6,18 @@ info:
 servers:
 - url: https://github.com/interagent/committee/
 paths:
+  /csv:
+    get:
+      description: get csv
+      responses:
+        '200':
+          description: success
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+
   /characters:
     get:
       description: get characters

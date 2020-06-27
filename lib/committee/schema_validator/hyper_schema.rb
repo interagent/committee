@@ -35,7 +35,14 @@ module Committee
         response.each do |chunk|
           full_body << chunk
         end
-        data = full_body.empty? ? {} : JSON.parse(full_body)
+
+        data = {}
+        unless full_body.empty?
+          parse_to_json = !validator_option.parse_response_by_content_type ||
+                          headers.fetch('Content-Type', nil)&.start_with?('application/json')
+          data = JSON.parse(full_body) if parse_to_json
+        end
+
         Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link, validate_success_only: validator_option.validate_success_only).call(status, headers, data)
       end
 
