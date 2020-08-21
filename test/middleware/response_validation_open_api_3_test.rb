@@ -20,18 +20,9 @@ describe Committee::Middleware::ResponseValidation do
   it "passes through a invalid json" do
     @app = new_response_rack("not_json", {}, schema: open_api_3_schema)
 
-    get "/characters"
-
-    assert_equal 500, last_response.status
-    assert_equal "{\"id\":\"invalid_response\",\"message\":\"Response wasn't valid JSON.\"}", last_response.body
-  end
-
-  it "passes through a invalid json with ignore_error option" do
-    @app = new_response_rack("not_json", {}, schema: open_api_3_schema, ignore_error: true)
-
-    get "/characters"
-
-    assert_equal 200, last_response.status
+    assert_raises(JSON::ParserError) do
+      get "/characters"
+    end
   end
 
   it "passes through a invalid json with parse_response_by_content_type option" do
@@ -70,22 +61,6 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
-  it "passes through a invalid json with prefix" do
-    @app = new_response_rack("not_json", {}, schema: open_api_3_schema, prefix: "/v1")
-
-    get "/v1/characters"
-
-    assert_equal 500, last_response.status
-    assert_equal "{\"id\":\"invalid_response\",\"message\":\"Response wasn't valid JSON.\"}", last_response.body
-  end
-
-  it "rescues JSON errors" do
-    @app = new_response_rack("_42", {}, schema: open_api_3_schema, raise: true)
-    assert_raises(Committee::InvalidResponse) do
-      get "/characters"
-    end
-  end
-
   it "not parameter requset" do
     @app = new_response_rack({integer: '1'}.to_json, {}, schema: open_api_3_schema, raise: true)
 
@@ -98,13 +73,6 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_response_rack("", {}, schema: open_api_3_schema, validate_success_only: false)
     get "/characters"
     assert_equal 200, last_response.status
-  end
-
-  it "optionally validates non-2xx invalid responses with invalid json" do
-    @app = new_response_rack("{_}", {}, schema: open_api_3_schema, validate_success_only: false)
-    get "/characters"
-    assert_equal 500, last_response.status
-    assert_match(/valid JSON/i, last_response.body)
   end
 
   describe "remote schema $ref" do
@@ -197,8 +165,6 @@ describe Committee::Middleware::ResponseValidation do
 
   describe ':accept_request_filter' do
     [
-      { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 500 } },
-      { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 500 } },
       { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
     ].each do |h|
       description = h[:description]

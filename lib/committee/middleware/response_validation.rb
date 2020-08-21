@@ -22,11 +22,6 @@ module Committee
 
           raise if @raise
           return @error_class.new(500, :invalid_response, $!.message).render unless @ignore_error
-        rescue JSON::ParserError
-          handle_exception($!, request.env)
-
-          raise Committee::InvalidResponse if @raise
-          return @error_class.new(500, :invalid_response, "Response wasn't valid JSON.").render unless @ignore_error
         end
 
         [status, headers, response]
