@@ -1,5 +1,8 @@
 Unreleased
 
+4.2.0 2020-08-26
+	dose not suppress application error #279
+
 4.1.0 2020-06-27
 	fix: parse response body as JSON only when applicable (#273)
 
