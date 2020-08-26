@@ -1,4 +1,4 @@
-# Committee  [![Travis Status](https://travis-ci.org/interagent/committee.svg?branch=master)](https://travis-ci.org/interagent/committee)
+# Committee  [![Travis Status](https://travis-ci.org/interagent/committee.svg?branch=master)](https://travis-ci.org/interagent/committee) [![Gem Version](https://badge.fury.io/rb/committee.svg)](https://badge.fury.io/rb/committee)
 
 A collection of middleware to help build services with JSON Schema, OpenAPI 2, OpenAPI 3.
 
