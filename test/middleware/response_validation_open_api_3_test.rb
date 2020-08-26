@@ -215,6 +215,19 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  it 'does not suppress application error' do
+    @app = Rack::Builder.new {
+      use Committee::Middleware::ResponseValidation, {schema: open_api_3_schema, raise: true}
+      run lambda { |_|
+        JSON.load('-') # invalid json  
+      }
+    }
+
+    assert_raises(JSON::ParserError) do
+      get "/error", nil
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})

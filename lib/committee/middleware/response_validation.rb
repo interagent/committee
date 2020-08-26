@@ -11,9 +11,9 @@ module Committee
       end
 
       def handle(request)
-        begin
-          status, headers, response = @app.call(request.env)
+        status, headers, response = @app.call(request.env)
 
+        begin
           v = build_schema_validator(request)
           v.response_validate(status, headers, response) if v.link_exist? && self.class.validate?(status, validate_success_only)
 

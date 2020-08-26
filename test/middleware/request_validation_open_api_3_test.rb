@@ -457,6 +457,16 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  it 'does not suppress application error' do
+    @app = new_rack_app_with_lambda(lambda { |_|
+      JSON.load('-') # invalid json
+    }, schema: open_api_3_schema, raise: true)
+
+    assert_raises(JSON::ParserError) do
+      get "/error", nil
+    end
+  end
+
   private
 
   def new_rack_app(options = {})
