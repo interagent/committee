@@ -23,7 +23,7 @@ module Committee
 
           request_operation.validate_path_params(options)
         rescue OpenAPIParser::OpenAPIError => e
-          raise Committee::InvalidRequest.new(e.message)
+          raise Committee::InvalidRequest.new(e.message, original_error: e)
         end
 
         # @param [Boolean] strict when not content_type or status code definition, raise error
@@ -32,7 +32,7 @@ module Committee
 
           return request_operation.validate_response_body(response_body, response_validate_options(strict, check_header))
         rescue OpenAPIParser::OpenAPIError => e
-          raise Committee::InvalidResponse.new(e.message)
+          raise Committee::InvalidResponse.new(e.message, original_error: e)
         end
 
         def validate_request_params(params, headers, validator_option)
@@ -109,7 +109,7 @@ module Committee
           # bad performance because when we coerce value, same check
           request_operation.validate_request_parameter(params, headers, build_openapi_parser_get_option(validator_option))
         rescue OpenAPIParser::OpenAPIError => e
-          raise Committee::InvalidRequest.new(e.message)
+          raise Committee::InvalidRequest.new(e.message, original_error: e)
         end
 
         def validate_post_request_params(params, headers, validator_option)
@@ -120,7 +120,7 @@ module Committee
           request_operation.validate_request_parameter(params, headers, schema_validator_options)
           request_operation.validate_request_body(content_type, params, schema_validator_options)
         rescue => e
-          raise Committee::InvalidRequest.new(e.message)
+          raise Committee::InvalidRequest.new(e.message, original_error: e)
         end
 
         def response_validate_options(strict, check_header)
