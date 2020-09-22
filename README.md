@@ -49,6 +49,8 @@ Non-boolean options:
 |schema_path| String | supported | supported | Defines the location of the schema file to use for validation. |
 |error_handler| Proc Object | supported | supported | A proc which will be called when error occurs. Take an Error instance as first argument, and request.env as second argument. (e.g. `-> (ex, env) { Raven.capture_exception(ex, extra: { rack_env: env }) }`) |
 |accept_request_filter  | Proc Object | supported | supported | A proc that accepts a Request and returns a boolean. It indicates whether to validate the current request, or not. (e.g. `-> (request) { request.path.start_with?('/something') }`) |
+|params_key| String | supported | supported | Save checked parameter value to request.env using this key. Default value is `committee.params` |
+|headers_key| String | supported | supported | Save checked header value to request.env using this key. Default value is `committee.headers` |
 
 Note that Hyper-Schema and OpenAPI 2 get the same defaults for options.
 
@@ -276,6 +278,23 @@ describe Committee::Middleware::Stub do
   end
 end
 ```
+
+
+## Tips
+
+### Use Ruby on Rails with coerce option
+Please set `'action_dispatch.request.request_parameters'` to `params_key` option.
+
+```
+use Committee::Middleware::RequestValidation, 
+      schema_path: 'docs/schema.json', 
+      coerce_date_times: true, 
+      params_key: 'action_dispatch.request.request_parameters'
+```
+
+Committee has few options which enable convert request data.
+By default committee save converted data to `committee.params` and rails dose not read it.
+So we need save convertd value to `'action_dispatch.request.request_parameters'` bacause rails create parameter from this value.
 
 ## Using OpenAPI 3
 
