@@ -36,9 +36,10 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
 
   it "raises InvalidResponse when a valid response with no registered body with strict option" do
     @headers = { "Content-Type" => "application/xml" }
-    assert_raises(Committee::InvalidResponse) {
+    e = assert_raises(Committee::InvalidResponse) {
       call_response_validator(true)
     }
+    assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
   end
 
   it "passes through a valid response with no Content-Type" do
@@ -48,9 +49,10 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
 
   it "raises InvalidResponse when a valid response with no Content-Type headers with strict option" do
     @headers = {}
-    assert_raises(Committee::InvalidResponse) {
+    e = assert_raises(Committee::InvalidResponse) {
       call_response_validator(true)
     }
+    assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
   end
 
   it "passes through a valid list response" do

@@ -58,6 +58,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       }
 
       assert_match(/expected string, but received Integer: 1/i, e.message)
+      assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
     end
 
     it 'support put method' do
@@ -69,6 +70,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       }
 
       assert_match(/expected string, but received Integer: 1/i, e.message)
+      assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
     end
 
     it 'support patch method' do
@@ -80,6 +82,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       }
 
       assert_match(/expected integer, but received String: str/i, e.message)
+      assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
     end
 
     it 'unknown param' do
@@ -113,6 +116,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         }
 
         assert_match(/missing required parameters: query_string/i, e.message)
+        assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
       end
 
       it 'invalid type' do
@@ -125,6 +129,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         }
 
         assert_match(/expected string, but received Integer: 1/i, e.message)
+        assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
       end
     end
 
@@ -146,6 +151,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         }
 
         assert_match(/expected integer, but received String: a/i, e.message)
+        assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
       end
     end
 
