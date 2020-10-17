@@ -13,6 +13,16 @@ describe Committee::RequestUnpacker do
     assert_equal({ "x" => "y" }, params)
   end
 
+  it "unpacks JSON on Content-Type: application/vnd.api+json" do
+    env = {
+      "CONTENT_TYPE" => "application/vnd.api+json",
+      "rack.input"   => StringIO.new('{"x":"y"}'),
+    }
+    request = Rack::Request.new(env)
+    params, _ = Committee::RequestUnpacker.new(request).call
+    assert_equal({ "x" => "y" }, params)
+  end
+
   it "unpacks JSON on no Content-Type" do
     env = {
       "rack.input"   => StringIO.new('{"x":"y"}'),
@@ -20,6 +30,16 @@ describe Committee::RequestUnpacker do
     request = Rack::Request.new(env)
     params, _ = Committee::RequestUnpacker.new(request).call
     assert_equal({ "x" => "y" }, params)
+  end
+
+  it "doesn't unpack JSON on application/x-ndjson" do
+    env = {
+      "CONTENT_TYPE" => "application/x-ndjson",
+      "rack.input"   => StringIO.new('{"x":"y"}\n{"a":"b"}'),
+    }
+    request = Rack::Request.new(env)
+    params, _ = Committee::RequestUnpacker.new(request).call
+    assert_equal({}, params)
   end
 
   it "doesn't unpack JSON under other Content-Types" do
