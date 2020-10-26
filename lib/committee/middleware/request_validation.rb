@@ -42,11 +42,7 @@ module Committee
         if @error_handler.arity > 1
           @error_handler.call(e, env)
         else
-          warn <<-MESSAGE
-          [DEPRECATION] Using `error_handler.call(exception)` is deprecated and will be change to
-            `error_handler.call(exception, request.env)` in next major version.
-          MESSAGE
-
+          warn '[DEPRECATION] Using `error_handler.call(exception)` is deprecated and will be change to `error_handler.call(exception, request.env)` in next major version.'
           @error_handler.call(e)
         end
       end

@@ -58,12 +58,7 @@ module Committee
       def old_behavior
         old_assert_behavior = committee_options.fetch(:old_assert_behavior, nil)
         if old_assert_behavior.nil?
-          warn <<-MSG
-          [DEPRECATION] now assert_schema_conform check response schema only.
-            but we will change check request and response in future major version.
-            so if you want to conform response only, please use assert_response_schema_confirm,
-            or you can suppress this message and keep old behavior by setting old_assert_behavior=true.
-          MSG
+          warn '[DEPRECATION] now assert_schema_conform check response schema only. but we will change check request and response in future major version. so if you want to conform response only, please use assert_response_schema_confirm, or you can suppress this message and keep old behavior by setting old_assert_behavior=true.'
           old_assert_behavior = true
         end
         old_assert_behavior
