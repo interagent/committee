@@ -1,5 +1,10 @@
 Unreleased
 
+4.2.1 2020-11-07
+	Hold original exception only openapi3 #281
+	Make check for complex JSON types more strict #287
+	Put deprecation warning together in one line #288
+
 4.2.0 2020-08-26
 	dose not suppress application error #279
 
