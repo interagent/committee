@@ -16,9 +16,7 @@ module Committee
   end
 
   def self.warn_deprecated(message)
-    if !$VERBOSE.nil?
-      $stderr.puts(message)
-    end
+    warn(message)
   end
 end
 
