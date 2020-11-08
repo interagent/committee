@@ -16,7 +16,7 @@ module Committee
   end
 
   def self.warn_deprecated(message)
-    warn(message)
+    warn("[DEPRECATION] #{message}")
   end
 end
 
