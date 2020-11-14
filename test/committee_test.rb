@@ -42,7 +42,7 @@ describe Committee do
 
       $VERBOSE = true
       Committee.warn_deprecated "blah"
-      assert_equal "blah\n", $stderr.string
+      assert_equal "[DEPRECATION] blah\n", $stderr.string
     ensure
       $stderr = old_stderr
       $VERBOSE = old_verbose
