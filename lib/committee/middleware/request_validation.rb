@@ -21,14 +21,14 @@ module Committee
         rescue Committee::BadRequest, Committee::InvalidRequest
           handle_exception($!, request.env)
           raise if @raise
-          return @error_class.new(400, :bad_request, $!.message).render unless @ignore_error
+          return @error_class.new(400, :bad_request, $!.message, request).render unless @ignore_error
         rescue Committee::NotFound => e
           raise if @raise
-          return @error_class.new(404, :not_found, e.message).render unless @ignore_error
+          return @error_class.new(404, :not_found, e.message, request).render unless @ignore_error
         rescue JSON::ParserError
           handle_exception($!, request.env)
           raise Committee::InvalidRequest if @raise
-          return @error_class.new(400, :bad_request, "Request body wasn't valid JSON.").render unless @ignore_error
+          return @error_class.new(400, :bad_request, "Request body wasn't valid JSON.", request).render unless @ignore_error
         end
 
         @app.call(request.env)

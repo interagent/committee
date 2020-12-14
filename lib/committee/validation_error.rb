@@ -2,12 +2,13 @@
 
 module Committee
   class ValidationError
-    attr_reader :id, :message, :status
+    attr_reader :id, :message, :status, :request
 
-    def initialize(status, id, message)
+    def initialize(status, id, message, request = nil)
       @status = status
       @id = id
       @message = message
+      @request = request
     end
 
     def error_body
