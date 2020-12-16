@@ -25,8 +25,8 @@ module Committee
 
         status, headers, body = response_data
 
-        current_schema_coverage&.update_coverage!(request_object.path_info, request_object.request_method, status)
-        schema_coverage&.update_coverage!(request_object.path_info, request_object.request_method, status)
+        current_schema_coverage&.update_response_coverage!(request_object.path_info, request_object.request_method, status)
+        schema_coverage&.update_response_coverage!(request_object.path_info, request_object.request_method, status)
 
         schema_validator.response_validate(status, headers, [body], true) if validate_response?(status)
       end
