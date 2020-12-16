@@ -403,6 +403,38 @@ end
 
 The default assertion option in 2.* was `validate_success_only=true`, but this becomes `validate_success_only=false` in 3.*. For the smoothest possible upgrade, you should set it to `false` in your test suite before upgrading to 3.*.
 
+**Test schema coverage**  
+NOTE: Currently committee only supports schema coverage for openapi schemas, and only checks coverage on responses.  
+Steps:
+1. Either:
+  1. Set schema_coverage option of `committee_options` (e.g. `@committee_options[:schema_coverage] = Committee::Test::SchemaCoverage.new(schema)`) to combine coverage of multiple tests
+  2. Or get schema coverage after individual tests using helper method `current_schema_coverage`
+2. Then use `SchemaCoverage#report` or `SchemaCoverage#report_flatten` to get coverage report
+
+Coverage report structure:
+```
+/* using #report */
+{
+  <path> => {
+    <method> => {
+      'responses' => {
+        <status> => <true|false>
+      }
+    }
+  }
+}
+/* using #report_flatten */
+{
+  responses: [
+    { path: <path>, method: <method>, status: <status>, is_covered: <true|false> },
+  ]
+}
+```
+
+Other helper methods:
+* `Committee::Test::SchemaCoverage.merge_report(<Hash>, <Hash>)`: merge 2 coverage reports together
+* `Committee::Test::SchemaCoverage.flatten_report(<Hash>)`: flatten a coverage report Hash into flatten structure
+
 ### Other changes
 
 * `GET` request bodies are ignored in OpenAPI 3 by default. If you want to use them, set the `allow_get_body` option to `true`.
