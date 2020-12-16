@@ -29,3 +29,4 @@ require_relative "committee/validation_error"
 
 require_relative "committee/bin/committee_stub"
 require_relative "committee/test/methods"
+require_relative "committee/test/schema_coverage"

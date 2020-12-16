@@ -227,6 +227,97 @@ describe Committee::Test::Methods do
         end
         assert_match(/`GET \/undefined` undefined in schema/i, e.message)
       end
+
+      describe 'coverage' do
+        it 'records openapi coverage' do
+          @schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_coverage_schema)
+          @committee_options.merge!(schema: open_api_3_coverage_schema, schema_coverage: @schema_coverage)
+
+          @app = new_rack_app(JSON.generate({ success: true }))
+          get "/posts"
+          assert_response_schema_confirm
+          assert_equal(@schema_coverage.report[:covered], [
+            '/posts get responses 200',
+          ])
+          assert_equal(@schema_coverage.report[:uncovered], [
+            '/posts get responses 404',
+            '/posts post responses 200',
+            '/likes post responses 200',
+            '/likes delete responses 200',
+          ])
+
+          post "/likes"
+          assert_response_schema_confirm
+          assert_equal([
+            '/posts get responses 200',
+            '/likes post responses 200',
+          ], @schema_coverage.report[:covered])
+          assert_equal([
+            '/posts get responses 404',
+            '/posts post responses 200',
+            '/likes delete responses 200',
+          ], @schema_coverage.report[:uncovered])
+
+          delete "/likes"
+          assert_response_schema_confirm
+          assert_equal([
+            '/posts get responses 200',
+            '/likes post responses 200',
+            '/likes delete responses 200',
+          ], @schema_coverage.report[:covered])
+          assert_equal([
+            '/posts get responses 404',
+            '/posts post responses 200',
+          ], @schema_coverage.report[:uncovered])
+          assert_equal({
+            '/posts' => {
+              'get' => {
+                'responses' => {
+                  '200' => true,
+                  '404' => false,
+                },
+              },
+              'post' => {
+                'responses' => {
+                  '200' => false,
+                },
+              },
+            },
+            '/likes' => {
+              'post' => {
+                'responses' => {
+                  '200' => true,
+                },
+              },
+              'delete' => {
+                'responses' => {
+                  '200' => true,
+                },
+              },
+            },
+          }, @schema_coverage.report[:full])
+
+          e = assert_raises(RuntimeError) do
+            @schema_coverage.test!
+          end
+          assert_match(/Uncovered paths/i, e.message)
+
+          post "/posts"
+          assert_response_schema_confirm
+          get "/posts"
+          last_response.status = 404
+          assert_response_schema_confirm
+          assert_equal([
+            '/posts get responses 200',
+            '/posts get responses 404',
+            '/posts post responses 200',
+            '/likes post responses 200',
+            '/likes delete responses 200',
+          ], @schema_coverage.report[:covered])
+          assert_equal([], @schema_coverage.report[:uncovered])
+          @schema_coverage.test!
+        end
+      end
     end
   end
 
