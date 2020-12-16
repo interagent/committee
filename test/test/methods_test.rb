@@ -234,11 +234,11 @@ describe Committee::Test::Methods do
         end
 
         def uncovered_responses
-          @schema_coverage.report[:responses].select { |r| !r[:is_covered] }.map { |r| response_as_str(r) }
+          @schema_coverage.report_flatten[:responses].select { |r| !r[:is_covered] }.map { |r| response_as_str(r) }
         end
 
         def covered_responses
-          @schema_coverage.report[:responses].select { |r| r[:is_covered] }.map { |r| response_as_str(r) }
+          @schema_coverage.report_flatten[:responses].select { |r| r[:is_covered] }.map { |r| response_as_str(r) }
         end
 
         it 'records openapi coverage' do
@@ -307,7 +307,7 @@ describe Committee::Test::Methods do
                 },
               },
             },
-          }, @schema_coverage.report[:full])
+          }, @schema_coverage.report)
 
           post "/posts"
           assert_response_schema_confirm

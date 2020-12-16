@@ -23,26 +23,38 @@ module Committee
       end
 
       def report
-        full = {}
-        responses = []
+        report = {}
 
         schema.open_api.paths.path.each do |path_name, path_item|
-          full[path_name] = {}
+          report[path_name] = {}
           path_item._openapi_all_child_objects.each do |object_name, object|
             next unless object.is_a?(OpenAPIParser::Schemas::Operation)
 
             method = object_name.split('/').last&.downcase
             next unless method
 
-            full[path_name][method] ||= {}
+            report[path_name][method] ||= {}
 
             # TODO: check coverage on request params/body as well?
 
-            full[path_name][method]['responses'] ||= {}
+            report[path_name][method]['responses'] ||= {}
             object.responses.response.each do |response_status, _|
               response_status = response_status.to_s
               is_covered = @covered.dig(path_name, method, 'responses', response_status) || false
-              full[path_name][method]['responses'][response_status] = is_covered
+              report[path_name][method]['responses'][response_status] = is_covered
+            end
+          end
+        end
+
+        report
+      end
+
+      def report_flatten
+        responses = []
+        report.each do |path_name, path_coverage|
+          path_coverage.each do |method, method_coverage|
+            responses_coverage = method_coverage['responses']
+            responses_coverage.each do |response_status, is_covered|
               responses << {
                 path: path_name,
                 method: method,
@@ -52,9 +64,7 @@ module Committee
             end
           end
         end
-
         {
-          full: full,
           responses: responses,
         }
       end
