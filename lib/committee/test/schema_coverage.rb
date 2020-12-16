@@ -21,6 +21,26 @@ module Committee
           end
           report
         end
+
+        def flatten_report(report)
+          responses = []
+          report.each do |path_name, path_coverage|
+            path_coverage.each do |method, method_coverage|
+              responses_coverage = method_coverage['responses']
+              responses_coverage.each do |response_status, is_covered|
+                responses << {
+                  path: path_name,
+                  method: method,
+                  status: response_status,
+                  is_covered: is_covered,
+                }
+              end
+            end
+          end
+          {
+            responses: responses,
+          }
+        end
       end
 
       def initialize(schema)
@@ -68,23 +88,7 @@ module Committee
       end
 
       def report_flatten
-        responses = []
-        report.each do |path_name, path_coverage|
-          path_coverage.each do |method, method_coverage|
-            responses_coverage = method_coverage['responses']
-            responses_coverage.each do |response_status, is_covered|
-              responses << {
-                path: path_name,
-                method: method,
-                status: response_status,
-                is_covered: is_covered,
-              }
-            end
-          end
-        end
-        {
-          responses: responses,
-        }
+        self.class.flatten_report(report)
       end
     end
   end
