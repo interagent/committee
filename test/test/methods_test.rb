@@ -229,18 +229,6 @@ describe Committee::Test::Methods do
       end
 
       describe 'coverage' do
-        def response_as_str(response)
-          [:path, :method, :status].map { |key| response[key] }.join(' ')
-        end
-
-        def uncovered_responses
-          @schema_coverage.report_flatten[:responses].select { |r| !r[:is_covered] }.map { |r| response_as_str(r) }
-        end
-
-        def covered_responses
-          @schema_coverage.report_flatten[:responses].select { |r| r[:is_covered] }.map { |r| response_as_str(r) }
-        end
-
         it 'records openapi coverage' do
           @schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_coverage_schema)
           @committee_options.merge!(schema: open_api_3_coverage_schema, schema_coverage: @schema_coverage)
@@ -248,39 +236,6 @@ describe Committee::Test::Methods do
           @app = new_rack_app(JSON.generate({ success: true }))
           get "/posts"
           assert_response_schema_confirm
-          assert_equal([
-            '/posts get 200',
-          ], covered_responses)
-          assert_equal([
-            '/posts get 404',
-            '/posts post 200',
-            '/likes post 200',
-            '/likes delete 200',
-          ], uncovered_responses)
-
-          post "/likes"
-          assert_response_schema_confirm
-          assert_equal([
-            '/posts get 200',
-            '/likes post 200',
-          ], covered_responses)
-          assert_equal([
-            '/posts get 404',
-            '/posts post 200',
-            '/likes delete 200',
-          ], uncovered_responses)
-
-          delete "/likes"
-          assert_response_schema_confirm
-          assert_equal([
-            '/posts get 200',
-            '/likes post 200',
-            '/likes delete 200',
-          ], covered_responses)
-          assert_equal([
-            '/posts get 404',
-            '/posts post 200',
-          ], uncovered_responses)
           assert_equal({
             '/posts' => {
               'get' => {
@@ -298,30 +253,16 @@ describe Committee::Test::Methods do
             '/likes' => {
               'post' => {
                 'responses' => {
-                  '200' => true,
+                  '200' => false,
                 },
               },
               'delete' => {
                 'responses' => {
-                  '200' => true,
+                  '200' => false,
                 },
               },
             },
           }, @schema_coverage.report)
-
-          post "/posts"
-          assert_response_schema_confirm
-          get "/posts"
-          last_response.status = 404
-          assert_response_schema_confirm
-          assert_equal([
-            '/posts get 200',
-            '/posts get 404',
-            '/posts post 200',
-            '/likes post 200',
-            '/likes delete 200',
-          ], covered_responses)
-          assert_equal([], uncovered_responses)
         end
       end
     end
