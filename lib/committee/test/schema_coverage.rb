@@ -5,6 +5,24 @@ module Committee
     class SchemaCoverage
       attr_reader :schema
 
+      class << self
+        def merge_report(first, second)
+          report = first.dup
+          second.each do |k, v|
+            if v.is_a?(Hash)
+              if report[k].nil?
+                report[k] = v
+              else
+                report[k] = merge_report(report[k], v)
+              end
+            else
+              report[k] ||= v
+            end
+          end
+          report
+        end
+      end
+
       def initialize(schema)
         raise 'Unsupported schema' unless schema.is_a?(Committee::Drivers::OpenAPI3::Schema)
 
