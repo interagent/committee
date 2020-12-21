@@ -25,7 +25,6 @@ module Committee
 
         status, headers, body = response_data
 
-        current_schema_coverage&.update_response_coverage!(request_object.path_info, request_object.request_method, status)
         schema_coverage&.update_response_coverage!(request_object.path_info, request_object.request_method, status)
 
         schema_validator.response_validate(status, headers, [body], true) if validate_response?(status)
@@ -57,12 +56,6 @@ module Committee
 
       def schema_validator
         @schema_validator ||= router.build_schema_validator(request_object)
-      end
-
-      def current_schema_coverage
-        return nil unless schema.is_a?(Committee::Drivers::OpenAPI3::Schema)
-
-        @current_schema_coverage ||= SchemaCoverage.new(schema)
       end
 
       def schema_coverage

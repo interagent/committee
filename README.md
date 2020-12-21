@@ -404,32 +404,34 @@ end
 The default assertion option in 2.* was `validate_success_only=true`, but this becomes `validate_success_only=false` in 3.*. For the smoothest possible upgrade, you should set it to `false` in your test suite before upgrading to 3.*.
 
 **Test schema coverage**  
+You can check how much of your API schema your tests have covered.  
 NOTICE: Currently committee only supports schema coverage for **openapi** schemas, and only checks coverage on responses, via `assert_response_schema_confirm` or `assert_schema_conform` methods.  
 Usage:
-1. Either:
-    1. Set schema_coverage option of `committee_options` to combine coverage of multiple tests
-    2. Or get schema coverage after individual tests using helper method `current_schema_coverage`
-2. Then use `SchemaCoverage#report` or `SchemaCoverage#report_flatten` to get coverage report
+1. Set schema_coverage option of `committee_options`
+2. Use `assert_response_schema_confirm` or `assert_schema_conform`
+3. Then use `SchemaCoverage#report` or `SchemaCoverage#report_flatten` to get coverage report
 
 Example:
 ```ruby
 before do
-  schema_coverage_to_be_used_among_multiple_tests = Committee::Test::SchemaCoverage.new(openapi_schema)
-  @committee_options[:schema_coverage] = schema_coverage_to_be_used_among_multiple_tests
+  schema_coverage = Committee::Test::SchemaCoverage.new(openapi_schema)
+  @committee_options[:schema_coverage] = schema_coverage
 end
-it 'covers the openapi schema' do
+it 'covers /some_api' do
   get '/some_api'
   assert_response_schema_confirm # or assert_schema_confirm
-  current_schema_coverage.report
+  coverage_report = schema_coverage.report
+  # check coverage expectations of /some_api here
 end
-it 'covers the openapi schema' do
+it 'covers /other_api schema' do
   get '/other_api'
   assert_response_schema_confirm # or assert_schema_confirm
-  current_schema_coverage.report
+  coverage_report = schema_coverage.report
+  # check coverage expectations of /other_api here
 end
 after do
-  coverage_report = schema_coverage_to_be_used_among_multiple_tests.report
-  # check coverage expectations on coverage_report here
+  coverage_report = schema_coverage.report
+  # check coverage expectations of all apis here
 end
 ```
 
