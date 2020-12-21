@@ -77,9 +77,14 @@ module Committee
 
             report[path_name][method]['responses'] ||= {}
             object.responses.response.each do |response_status, _|
-              response_status = response_status.to_s
               is_covered = @covered.dig(path_name, method, 'responses', response_status) || false
               report[path_name][method]['responses'][response_status] = is_covered
+            end
+            if object.responses.default
+              is_default_covered = (@covered.dig(path_name, method, 'responses') || {}).any? do |status, is_covered|
+                is_covered && !object.responses.response.key?(status)
+              end
+              report[path_name][method]['responses']['default'] = is_default_covered
             end
           end
         end

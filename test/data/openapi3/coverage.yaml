@@ -8,7 +8,7 @@ servers:
 paths:
   /posts:
     get:
-      description: get post
+      description: get a post
       responses:
         '200':
           description: success
@@ -18,6 +18,12 @@ paths:
                 type: object
         '404':
           description: post not found
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: unknown request
           content:
             application/json:
               schema:

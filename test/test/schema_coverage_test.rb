@@ -26,6 +26,7 @@ describe Committee::Test::SchemaCoverage do
       ], covered_responses)
       assert_equal([
         '/posts get 404',
+        '/posts get default',
         '/posts post 200',
         '/likes post 200',
         '/likes delete 200',
@@ -38,6 +39,7 @@ describe Committee::Test::SchemaCoverage do
       ], covered_responses)
       assert_equal([
         '/posts get 404',
+        '/posts get default',
         '/posts post 200',
         '/likes delete 200',
       ], uncovered_responses)
@@ -45,6 +47,19 @@ describe Committee::Test::SchemaCoverage do
       @schema_coverage.update_response_coverage!('/likes', 'delete', '200')
       assert_equal([
         '/posts get 200',
+        '/likes post 200',
+        '/likes delete 200',
+      ], covered_responses)
+      assert_equal([
+        '/posts get 404',
+        '/posts get default',
+        '/posts post 200',
+      ], uncovered_responses)
+
+      @schema_coverage.update_response_coverage!('/posts', 'get', '422')
+      assert_equal([
+        '/posts get 200',
+        '/posts get default',
         '/likes post 200',
         '/likes delete 200',
       ], covered_responses)
@@ -59,6 +74,7 @@ describe Committee::Test::SchemaCoverage do
             'responses' => {
               '200' => true,
               '404' => false,
+              'default' => true,
             },
           },
           'post' => {
@@ -86,6 +102,7 @@ describe Committee::Test::SchemaCoverage do
       assert_equal([
         '/posts get 200',
         '/posts get 404',
+        '/posts get default',
         '/posts post 200',
         '/likes post 200',
         '/likes delete 200',
