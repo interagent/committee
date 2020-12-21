@@ -419,13 +419,13 @@ before do
 end
 it 'covers /some_api' do
   get '/some_api'
-  assert_response_schema_confirm # or assert_schema_confirm
+  assert_response_schema_confirm # or assert_schema_conform
   coverage_report = schema_coverage.report
   # check coverage expectations of /some_api here
 end
 it 'covers /other_api schema' do
   get '/other_api'
-  assert_response_schema_confirm # or assert_schema_confirm
+  assert_response_schema_confirm # or assert_schema_conform
   coverage_report = schema_coverage.report
   # check coverage expectations of /other_api here
 end
