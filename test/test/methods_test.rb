@@ -242,6 +242,7 @@ describe Committee::Test::Methods do
                 'responses' => {
                   '200' => true,
                   '404' => false,
+                  'default' => false,
                 },
               },
               'post' => {
