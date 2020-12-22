@@ -6,6 +6,22 @@ info:
 servers:
 - url: https://github.com/interagent/committee/
 paths:
+  /threads/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      description: get a thread
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
   /posts:
     get:
       description: get a post

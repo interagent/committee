@@ -25,7 +25,10 @@ module Committee
 
         status, headers, body = response_data
 
-        schema_coverage&.update_response_coverage!(router.operation_path(request_object), request_object.request_method, status)
+        if schema_coverage
+          operation_object = router.operation_object(request_object)
+          schema_coverage&.update_response_coverage!(operation_object.original_path, operation_object.http_method, status)
+        end
 
         schema_validator.response_validate(status, headers, [body], true) if validate_response?(status)
       end

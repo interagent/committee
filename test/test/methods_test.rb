@@ -239,14 +239,23 @@ describe Committee::Test::Methods do
       end
 
       describe 'coverage' do
-        it 'records openapi coverage' do
+        before do
           @schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_coverage_schema)
           @committee_options.merge!(schema: open_api_3_coverage_schema, schema_coverage: @schema_coverage)
 
           @app = new_rack_app(JSON.generate({ success: true }))
+        end
+        it 'records openapi coverage' do
           get "/posts"
           assert_response_schema_confirm
           assert_equal({
+            '/threads/{id}' => {
+              'get' => {
+                'responses' => {
+                  '200' => false,
+                },
+              },
+            },
             '/posts' => {
               'get' => {
                 'responses' => {
@@ -276,14 +285,18 @@ describe Committee::Test::Methods do
           }, @schema_coverage.report)
         end
 
-        it 'can records openapi coverage correctly when prefix is set' do
-          @schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_coverage_schema)
-          @committee_options.merge!(schema: open_api_3_coverage_schema, schema_coverage: @schema_coverage, prefix: '/api')
-
-          @app = new_rack_app(JSON.generate({ success: true }))
+        it 'can record openapi coverage correctly when prefix is set' do
+          @committee_options.merge!(prefix: '/api')
           post "/api/likes"
           assert_response_schema_confirm
           assert_equal({
+            '/threads/{id}' => {
+              'get' => {
+                'responses' => {
+                  '200' => false,
+                },
+              },
+            },
             '/posts' => {
               'get' => {
                 'responses' => {
@@ -302,6 +315,46 @@ describe Committee::Test::Methods do
               'post' => {
                 'responses' => {
                   '200' => true,
+                },
+              },
+              'delete' => {
+                'responses' => {
+                  '200' => false,
+                },
+              },
+            },
+          }, @schema_coverage.report)
+        end
+
+        it 'records openapi coverage correctly with path param' do
+          get "/threads/asd"
+          assert_response_schema_confirm
+          assert_equal({
+            '/threads/{id}' => {
+              'get' => {
+                'responses' => {
+                  '200' => true,
+                },
+              },
+            },
+            '/posts' => {
+              'get' => {
+                'responses' => {
+                  '200' => false,
+                  '404' => false,
+                  'default' => false,
+                },
+              },
+              'post' => {
+                'responses' => {
+                  '200' => false,
+                },
+              },
+            },
+            '/likes' => {
+              'post' => {
+                'responses' => {
+                  '200' => false,
                 },
               },
               'delete' => {
