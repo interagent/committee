@@ -275,6 +275,43 @@ describe Committee::Test::Methods do
             },
           }, @schema_coverage.report)
         end
+
+        it 'can records openapi coverage correctly when prefix is set' do
+          @schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_coverage_schema)
+          @committee_options.merge!(schema: open_api_3_coverage_schema, schema_coverage: @schema_coverage, prefix: '/api')
+
+          @app = new_rack_app(JSON.generate({ success: true }))
+          post "/api/likes"
+          assert_response_schema_confirm
+          assert_equal({
+            '/posts' => {
+              'get' => {
+                'responses' => {
+                  '200' => false,
+                  '404' => false,
+                  'default' => false,
+                },
+              },
+              'post' => {
+                'responses' => {
+                  '200' => false,
+                },
+              },
+            },
+            '/likes' => {
+              'post' => {
+                'responses' => {
+                  '200' => true,
+                },
+              },
+              'delete' => {
+                'responses' => {
+                  '200' => false,
+                },
+              },
+            },
+          }, @schema_coverage.report)
+        end
       end
     end
   end

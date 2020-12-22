@@ -21,11 +21,17 @@ module Committee
           Committee::SchemaValidator::OpenAPI3.new(self, request, @validator_option)
         end
 
-        def operation_object(request)
-          path = request.path
+        def operation_path(request)
           return nil unless includes_request?(request)
 
+          path = request.path
           path = path.gsub(@prefix_regexp, '') if @prefix_regexp
+          path
+        end
+
+        def operation_object(request)
+          path = operation_path(request)
+          return nil unless path
 
           request_method = request.request_method.downcase
 
