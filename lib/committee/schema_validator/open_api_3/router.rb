@@ -23,7 +23,9 @@ module Committee
 
         def operation_object(request)
           path = request.path
-          path = path.gsub(@prefix_regexp, '') if prefix_request?(request)
+          return nil unless includes_request?(request)
+
+          path = path.gsub(@prefix_regexp, '') if @prefix_regexp
 
           request_method = request.request_method.downcase
 

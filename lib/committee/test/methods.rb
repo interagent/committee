@@ -10,7 +10,7 @@ module Committee
 
       def assert_request_schema_confirm
         unless schema_validator.link_exist?
-          request = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema."
+          request = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema (prefix: #{committee_options[:prefix].inspect})."
           raise Committee::InvalidRequest.new(request)
         end
 
@@ -19,7 +19,7 @@ module Committee
 
       def assert_response_schema_confirm
         unless schema_validator.link_exist?
-          response = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema."
+          response = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema (prefix: #{committee_options[:prefix].inspect})."
           raise Committee::InvalidResponse.new(response)
         end
 

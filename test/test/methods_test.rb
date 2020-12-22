@@ -228,6 +228,16 @@ describe Committee::Test::Methods do
         assert_match(/`GET \/undefined` undefined in schema/i, e.message)
       end
 
+      it "raises error when path does not match prefix" do
+        @committee_options.merge!({prefix: '/api'})
+        @app = new_rack_app(JSON.generate(@correct_response))
+        get "/characters"
+        e = assert_raises(Committee::InvalidResponse) do
+          assert_response_schema_confirm
+        end
+        assert_match(/`GET \/characters` undefined in schema \(prefix: "\/api"\)/i, e.message)
+      end
+
       describe 'coverage' do
         it 'records openapi coverage' do
           @schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_coverage_schema)
