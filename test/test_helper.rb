@@ -59,6 +59,10 @@ def open_api_3_schema
   @open_api_3_schema ||= Committee::Drivers.load_from_file(open_api_3_schema_path)
 end
 
+def open_api_3_coverage_schema
+  @open_api_3_coverage_schema ||= Committee::Drivers.load_from_file(open_api_3_coverage_schema_path)
+end
+
 # Don't cache this because we'll often manipulate the created hash in tests.
 def hyper_schema_data
   JSON.parse(File.read(hyper_schema_schema_path))
@@ -83,6 +87,10 @@ end
 
 def open_api_3_schema_path
   "./test/data/openapi3/normal.yaml"
+end
+
+def open_api_3_coverage_schema_path
+  "./test/data/openapi3/coverage.yaml"
 end
 
 def open_api_3_0_1_schema_path

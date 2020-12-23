@@ -10,7 +10,7 @@ module Committee
 
       def assert_request_schema_confirm
         unless schema_validator.link_exist?
-          request = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema."
+          request = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema (prefix: #{committee_options[:prefix].inspect})."
           raise Committee::InvalidRequest.new(request)
         end
 
@@ -19,11 +19,17 @@ module Committee
 
       def assert_response_schema_confirm
         unless schema_validator.link_exist?
-          response = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema."
+          response = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema (prefix: #{committee_options[:prefix].inspect})."
           raise Committee::InvalidResponse.new(response)
         end
 
         status, headers, body = response_data
+
+        if schema_coverage
+          operation_object = router.operation_object(request_object)
+          schema_coverage&.update_response_coverage!(operation_object.original_path, operation_object.http_method, status)
+        end
+
         schema_validator.response_validate(status, headers, [body], true) if validate_response?(status)
       end
 
@@ -53,6 +59,14 @@ module Committee
 
       def schema_validator
         @schema_validator ||= router.build_schema_validator(request_object)
+      end
+
+      def schema_coverage
+        return nil unless schema.is_a?(Committee::Drivers::OpenAPI3::Schema)
+
+        coverage = committee_options.fetch(:schema_coverage, nil)
+
+        coverage.is_a?(SchemaCoverage) ? coverage : nil
       end
 
       def old_behavior

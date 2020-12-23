@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: OpenAPI3 Coverage Test
+  description: A Sample file for coverage test
+servers:
+- url: https://github.com/interagent/committee/
+paths:
+  /threads/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      description: get a thread
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+  /posts:
+    get:
+      description: get a post
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: post not found
+          content:
+            application/json:
+              schema:
+                type: object
+        default:
+          description: unknown request
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      description: create a new post
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+  /likes:
+    post:
+      description: like a post
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      description: unlike a post
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
