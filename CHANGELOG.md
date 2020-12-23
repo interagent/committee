@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.3.0] - 2020-12-23
+
+### Added
+
+- support API coverage. (#297)
+- add request to validation error. (#295)
+
+### Changed
+- Improve deprecation messages (#291)
+
 ## [4.2.1] - 2020-11-07
 
 ### Changed
