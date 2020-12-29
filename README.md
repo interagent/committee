@@ -59,27 +59,27 @@ Some examples of use:
 ``` bash
 # missing required parameter
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api"}'
-{"id":"invalid_params","message":"Require params: recipient."}
+{"id":"bad_request","message":"#/paths/~1account~1app-transfers/post/requestBody/content/application~1json/schema missing required parameters: recipient"}
 
 # missing required parameter (should have &query=...)
 $ curl -X GET http://localhost:9292/search?category=all
-{"id":"invalid_params","message":"Require params: query."}
+{"id":"bad_request","message":"#/paths/~1search/get missing required parameters: query"}
 
 # contains an unknown parameter
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api","recipient":"api@heroku.com","sender":"api@heroku.com"}'
-{"id":"invalid_params","message":"Unknown params: sender."}
+{"id":"bad_request","message":"#/paths/~1account~1app-transfers/post/requestBody/content/application~1json/schema does not define properties: sender"}
 
 # invalid type
 $ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api","recipient":7}'
-{"id":"invalid_params","message":"Invalid type for key \"recipient\": expected 7 to be [\"string\"]."}
+{"id":"bad_request","message":"#/paths/~1account~1app-transfers/post/requestBody/content/application~1json/schema/properties/recipient expected string, but received Integer: 7"}
 
 # invalid format (supports date-time, email, uuid)
-$ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api","recipient":"api@heroku"}'
-{"id":"invalid_params","message":"Invalid format for key \"recipient\": expected \"api@heroku\" to be \"email\"."
+$ curl -X POST http://localhost:9292/account/app-transfers -H "Content-Type: application/json" -d '{"app":"heroku-api","recipient":"matz"}'
+{"id":"bad_request","message":"#/paths/~1account~1app-transfers/post/requestBody/content/application~1json/schema/properties/recipient email address format does not match value: matz"}
 
 # invalid pattern
 $ curl -X POST http://localhost:9292/apps -H "Content-Type: application/json" -d '{"name":"$#%"}'
-{"id":"invalid_params","message":"Invalid pattern for key \"name\": expected $#% to match \"(?-mix:^[a-z][a-z0-9-]{3,30}$)\"."}
+{"id":"bad_request","message":"#/paths/~1apps/post/requestBody/content/application~1json/schema/properties/name pattern ^[a-z][a-z0-9-]{3,50}$ does not match value: $#%"}
 ```
 
 ## Committee::Middleware::Stub
@@ -286,9 +286,9 @@ end
 Please set `'action_dispatch.request.request_parameters'` to `params_key` option.
 
 ```
-use Committee::Middleware::RequestValidation, 
-      schema_path: 'docs/schema.json', 
-      coerce_date_times: true, 
+use Committee::Middleware::RequestValidation,
+      schema_path: 'docs/schema.json',
+      coerce_date_times: true,
       params_key: 'action_dispatch.request.request_parameters'
 ```
 
@@ -331,7 +331,7 @@ Important changes are also described below.
 
 ### Upgrading from Committee 4.* to 5.*
 
-Committee 5.* has few breaking changes so we recommend upgrading to the latest release on 4.* and fixing any deprecation errors you see before upgrading.  
+Committee 5.* has few breaking changes so we recommend upgrading to the latest release on 4.* and fixing any deprecation errors you see before upgrading.
 (Now we doesn't release 5.* yet)
 
 - change `parse_response_by_content_type`'s default value from `false` to `true`.
@@ -403,9 +403,9 @@ end
 
 The default assertion option in 2.* was `validate_success_only=true`, but this becomes `validate_success_only=false` in 3.*. For the smoothest possible upgrade, you should set it to `false` in your test suite before upgrading to 3.*.
 
-**Test schema coverage**  
-You can check how much of your API schema your tests have covered.  
-NOTICE: Currently committee only supports schema coverage for **openapi** schemas, and only checks coverage on responses, via `assert_response_schema_confirm` or `assert_schema_conform` methods.  
+**Test schema coverage**
+You can check how much of your API schema your tests have covered.
+NOTICE: Currently committee only supports schema coverage for **openapi** schemas, and only checks coverage on responses, via `assert_response_schema_confirm` or `assert_schema_conform` methods.
 Usage:
 1. Set schema_coverage option of `committee_options`
 2. Use `assert_response_schema_confirm` or `assert_schema_conform`
