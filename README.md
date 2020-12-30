@@ -403,7 +403,7 @@ end
 
 The default assertion option in 2.* was `validate_success_only=true`, but this becomes `validate_success_only=false` in 3.*. For the smoothest possible upgrade, you should set it to `false` in your test suite before upgrading to 3.*.
 
-**Test schema coverage**
+### Test schema coverage
 You can check how much of your API schema your tests have covered.
 NOTICE: Currently committee only supports schema coverage for **openapi** schemas, and only checks coverage on responses, via `assert_response_schema_confirm` or `assert_schema_conform` methods.
 Usage:
