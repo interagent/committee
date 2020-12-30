@@ -1,0 +1,55 @@
+openapi: '3.0.2'
+info:
+  title: Heroku API
+  version: '1.0'
+servers:
+  - url: http://localhost:5000
+paths:
+  /account/app-transfers:
+    post:
+      responses:
+        '201':
+          description: Created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - app
+                - recipient
+              properties:
+                recipient:
+                  type: string
+                  format: email
+                app:
+                  type: string
+  /search:
+    get:
+      responses:
+        '200':
+          description: OK
+      parameters:
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+  /apps:
+    post:
+      responses:
+        '201':
+          description: Created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  pattern: ^[a-z][a-z0-9-]{3,50}$
