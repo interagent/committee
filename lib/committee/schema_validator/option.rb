@@ -21,12 +21,14 @@ module Committee
       # Non-boolean options:
       attr_reader :headers_key,
                   :params_key,
+                  :query_hash_key,
                   :prefix
 
       def initialize(options, schema, schema_type)
         # Non-boolean options
         @headers_key         = options[:headers_key] || "committee.headers"
         @params_key          = options[:params_key] || "committee.params"
+        @query_hash_key          = options[:query_hash_key] || "committee.query_hash"
         @prefix              = options[:prefix]
 
         # Boolean options and have a common value by default

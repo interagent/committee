@@ -85,10 +85,11 @@ module Committee
       end
 
       def copy_coerced_data_to_query_hash(request)
-        return if request.env["rack.request.query_hash"].nil? || request.env["rack.request.query_hash"].empty?
+        query_hash_key = @validator_option.query_hash_key
+        return if request.env[query_hash_key].nil? || request.env[query_hash_key].empty?
 
-        request.env["rack.request.query_hash"].keys.each do |k|
-          request.env["rack.request.query_hash"][k] = request.env[validator_option.params_key][k]
+        request.env[query_hash_key].keys.each do |k|
+          request.env[query_hash_key][k] = request.env[validator_option.params_key][k]
         end
       end
     end
