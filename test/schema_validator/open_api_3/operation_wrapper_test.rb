@@ -10,8 +10,10 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       @path = '/validate'
       @method = 'post'
 
-      # TODO: delete when 5.0.0 released because default value changed
       options = {}
+      options[:coerce_form_params] = true
+
+      # TODO: delete when 5.0.0 released because default value changed
       options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
 
       @validator_option = Committee::SchemaValidator::Option.new(options, open_api_3_schema, :open_api_3)
@@ -58,6 +60,21 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       }
 
       assert_match(/expected string, but received Integer: 1/i, e.message)
+      assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
+    end
+
+    it 'coercing for application/xml' do
+      header = { 'Content-Type' => 'application/xml' }
+      operation_object.validate_request_params({'integer' => '1'}, header, @validator_option)
+      assert true
+    end
+
+    it 'no coercing for application/json' do
+      e = assert_raises(Committee::InvalidRequest) {
+        operation_object.validate_request_params({'integer' => '1'}, HEADER, @validator_option)
+      }
+
+      assert_match(/expected integer, but received String: 1/i, e.message)
       assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
     end
 

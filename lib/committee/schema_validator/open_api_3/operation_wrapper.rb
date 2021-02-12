@@ -90,8 +90,12 @@ module Committee
         end
 
         # @return [OpenAPIParser::SchemaValidator::Options]
-        def build_openapi_parser_post_option(validator_option)
-          coerce_value = validator_option.coerce_form_params
+        def build_openapi_parser_post_option(validator_option, content_type)
+          coerce_value = if content_type =~ %r{application/(?:.*\+)?json}
+                           false
+                         else
+                           validator_option.coerce_form_params
+                         end
           datetime_coerce_class = validator_option.coerce_date_times ? DateTime : nil
           validate_header = validator_option.check_header
           OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,
@@ -120,7 +124,7 @@ module Committee
           content_type = headers['Content-Type'].to_s.split(";").first.to_s
 
           # bad performance because when we coerce value, same check
-          schema_validator_options = build_openapi_parser_post_option(validator_option)
+          schema_validator_options = build_openapi_parser_post_option(validator_option, content_type)
           request_operation.validate_request_parameter(params, headers, schema_validator_options)
           request_operation.validate_request_body(content_type, params, schema_validator_options)
         rescue => e
