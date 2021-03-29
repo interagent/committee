@@ -255,25 +255,25 @@ describe Committee::Middleware::Stub do
   end
 
   def committee_options
-    @committee_options ||= { schema: Committee::Drivers::load_from_file('docs/schema.json'), prefix: "/v1", validate_success_only: true }
+    @committee_options ||= { schema: Committee::Drivers::load_from_file('docs/schema.json'), prefix: "/v1" }
   end
 
   describe "GET /" do
-    it "conforms to schema" do
-      assert_schema_conform
+    it "conforms to schema with 200 response code" do
+      assert_schema_conform(200)
     end
 
     it "conforms to request schema" do
       assert_request_schema_confirm
     end
 
-    it "conforms to response schema" do
-      assert_response_schema_confirm
+    it "conforms to response schema with 200 response code" do
+      assert_response_schema_confirm(200)
     end
 
-    it "conforms to response and request schema" do
+    it "conforms to response and request schema with 200 response code" do
       @committee_options[:old_assert_behavior] = false
-      assert_schema_conform
+      assert_schema_conform(200)
     end
   end
 end
