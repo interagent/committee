@@ -21,12 +21,20 @@ module Committee
       # Non-boolean options:
       attr_reader :headers_key,
                   :params_key,
+                  :query_hash_key,
                   :prefix
 
       def initialize(options, schema, schema_type)
         # Non-boolean options
-        @headers_key         = options[:headers_key] || "committee.headers"
-        @params_key          = options[:params_key] || "committee.params"
+        @headers_key         = options[:headers_key]    || "committee.headers"
+        @params_key          = options[:params_key]     || "committee.params"
+        @query_hash_key      = if options[:query_hash_key].nil?
+          Committee.warn_deprecated('Committee: please set query_hash_key = rack.request.query_hash because we\'ll change default value in next major version.') 
+          'rack.request.query_hash'
+        else
+          options.fetch(:query_hash_key)
+        end
+
         @prefix              = options[:prefix]
 
         # Boolean options and have a common value by default

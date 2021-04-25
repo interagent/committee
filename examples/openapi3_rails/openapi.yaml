@@ -1,0 +1,66 @@
+openapi: 3.0.0
+info:
+  title: api-test
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+    description: dev
+paths:
+  /posts:
+    post:
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - year
+              properties:
+                year:
+                  type: integer
+
+      responses:
+        '200':
+          description: correct response
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - title
+                  - page
+                  - year
+                properties:
+                  title:
+                    type: string
+                  page:
+                    type: integer
+                  year:
+                    type: integer
+
+  /dont_allow_additional_parameter:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - only_param
+              properties:
+                only_param:
+                  type: string
+      responses:
+        '200':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: object
