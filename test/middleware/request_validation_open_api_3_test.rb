@@ -170,7 +170,8 @@ describe Committee::Middleware::RequestValidation do
     }
 
     check_parameter = lambda { |env|
-      hash = env["committee.query_hash"]
+      # hash = env["committee.query_hash"] # 5.0.x-
+      hash = env["rack.request.query_hash"]
       assert_equal DateTime, hash['nested_array'].first['update_time'].class
       assert_equal 1, hash['nested_array'].first['per_page']
 
@@ -376,7 +377,8 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes through a valid request for OpenAPI3" do
     check_parameter = lambda { |env|
-      assert_equal 3, env['committee.query_hash']['limit']
+      # assert_equal 3, env['committee.query_hash']['limit'] #5.0.x-
+      assert_equal 3, env['rack.request.query_hash']['limit'] #5.0.x-
       [200, {}, []]
     }
 

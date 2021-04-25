@@ -28,7 +28,13 @@ module Committee
         # Non-boolean options
         @headers_key         = options[:headers_key]    || "committee.headers"
         @params_key          = options[:params_key]     || "committee.params"
-        @query_hash_key      = options[:query_hash_key] || "committee.query_hash"
+        @query_hash_key      = if options[:query_hash_key].nil?
+          Committee.warn_deprecated('Committee: please set query_hash_key = rack.request.query_hash because we\'ll change default value in next major version.') 
+          'rack.request.query_hash'
+        else
+          options.fetch(:query_hash_key)
+        end
+
         @prefix              = options[:prefix]
 
         # Boolean options and have a common value by default
