@@ -46,14 +46,14 @@ describe Committee::Test::Methods do
       it "passes through a valid response" do
         @app = new_rack_app(JSON.generate([ValidApp]))
         get "/apps"
-        assert_schema_conform
+        assert_schema_conform(200)
       end
 
       it "detects an invalid response Content-Type" do
         @app = new_rack_app(JSON.generate([ValidApp]), {})
         get "/apps"
         e = assert_raises(Committee::InvalidResponse) do
-          assert_schema_conform
+          assert_schema_conform(200)
         end
         assert_match(/response header must be set to/i, e.message)
       end
@@ -64,7 +64,8 @@ describe Committee::Test::Methods do
         _, err = capture_io do
           assert_schema_conform
         end
-        assert_match(/\[DEPRECATION\]/i, err)
+        assert_match(/\[DEPRECATION\] Now assert_schema_conform check response schema only/i, err)
+        assert_match(/\[DEPRECATION\] Pass expected response status code/i, err)
       end
     end
 
@@ -161,7 +162,8 @@ describe Committee::Test::Methods do
         _, err = capture_io do
           assert_schema_conform
         end
-        assert_match(/\[DEPRECATION\]/i, err)
+        assert_match(/\[DEPRECATION\] Now assert_schema_conform check response schema only/i, err)
+        assert_match(/\[DEPRECATION\] Pass expected response status code/i, err)
       end
     end
 

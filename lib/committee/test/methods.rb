@@ -3,9 +3,9 @@
 module Committee
   module Test
     module Methods
-      def assert_schema_conform
+      def assert_schema_conform(expected_status = nil)
         assert_request_schema_confirm unless old_behavior
-        assert_response_schema_confirm
+        assert_response_schema_confirm(expected_status)
       end
 
       def assert_request_schema_confirm
@@ -17,13 +17,20 @@ module Committee
         schema_validator.request_validate(request_object)
       end
 
-      def assert_response_schema_confirm
+      def assert_response_schema_confirm(expected_status = nil)
         unless schema_validator.link_exist?
           response = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema (prefix: #{committee_options[:prefix].inspect})."
           raise Committee::InvalidResponse.new(response)
         end
 
         status, headers, body = response_data
+
+        if expected_status.nil?
+          Committee.warn_deprecated('Pass expected response status code to check it against the corresponding schema explicitly.')
+        elsif expected_status != status
+          response = "Expected `#{expected_status}` status code, but it was `#{status}`."
+          raise Committee::InvalidResponse.new(response)
+        end
 
         if schema_coverage
           operation_object = router.operation_object(request_object)
