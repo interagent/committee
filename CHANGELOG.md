@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Test Assertions: assert HTTP status code explicitly. (#302)
+- Support Ruby 3.0.1. (#308)
+
 ## [4.3.0] - 2020-12-23
 
 ### Added
@@ -242,7 +247,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add the `coerce_query_params` option to allow queries with basic types to be checked against a schema/
 
-[Unreleased]: https://github.com/interagent/committee/compare/v4.2.1...HEAD
+[Unreleased]: https://github.com/interagent/committee/compare/v4.3.0...HEAD
+[4.3.0]: https://github.com/interagent/committee/compare/v4.2.1...v4.3.0
 [4.2.1]: https://github.com/interagent/committee/compare/v4.2.0...v4.2.1
 [4.2.0]: https://github.com/interagent/committee/compare/v4.1.0...v4.2.0
 [4.1.0]: https://github.com/interagent/committee/compare/v4.0.0...v4.1.0
