@@ -348,7 +348,7 @@ describe Committee::Middleware::RequestValidation do
       get "/coerce_path_params/#{not_an_integer}", nil
     end
 
-    assert_match(/expected integer, but received String: abc/i, e.message)
+    assert_match(/expected integer, but received String: \"abc\"/i, e.message)
   end
 
   it "optionally raises an error" do
@@ -392,7 +392,7 @@ describe Committee::Middleware::RequestValidation do
     get "/characters?limit=foo"
 
     assert_equal 400, last_response.status
-    assert_match(/expected integer, but received String: foo/i, last_response.body)
+    assert_match(/expected integer, but received String: \\"foo\\"/i, last_response.body)
   end
 
   it "ignores errors when ignore_error: true" do
@@ -426,7 +426,7 @@ describe Committee::Middleware::RequestValidation do
     [
       { check_header: true, description: 'valid value', value: 1, expected: { status: 200 } },
       { check_header: true, description: 'missing value', value: nil, expected: { status: 400, error: 'missing required parameters: integer' } },
-      { check_header: true, description: 'invalid value', value: 'x', expected: { status: 400, error: 'expected integer, but received String: x' } },
+      { check_header: true, description: 'invalid value', value: 'x', expected: { status: 400, error: 'expected integer, but received String: \\"x\\"' } },
 
       { check_header: false, description: 'valid value', value: 1, expected: { status: 200 } },
       { check_header: false, description: 'missing value', value: nil, expected: { status: 200 } },

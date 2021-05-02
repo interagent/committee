@@ -125,7 +125,7 @@ describe Committee::Middleware::ResponseValidation do
     [
       { check_header: true, description: 'valid value', header: { 'integer' => 1 }, expected: { status: 200 } },
       { check_header: true, description: 'missing value', header: { 'integer' => nil }, expected: { error: 'headers/integer/schema does not allow null values' } },
-      { check_header: true, description: 'invalid value', header: { 'integer' => 'x' }, expected: { error: 'headers/integer/schema expected integer, but received String: x' } },
+      { check_header: true, description: 'invalid value', header: { 'integer' => 'x' }, expected: { error: 'headers/integer/schema expected integer, but received String: "x"' } },
 
       { check_header: false, description: 'valid value', header: { 'integer' => 1 }, expected: { status: 200 } },
       { check_header: false, description: 'missing value', header: { 'integer' => nil }, expected: { status: 200 } },
@@ -177,7 +177,7 @@ describe Committee::Middleware::ResponseValidation do
         get "/characters"
       end
 
-      assert_match(/but received String: 1/i, e.message)
+      assert_match(/but received String: \"1\"/i, e.message)
     end
 
     it "detects an invalid response status code with validate_success_only=true" do
