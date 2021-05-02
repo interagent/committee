@@ -81,7 +81,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         operation_object.validate_request_params({"integer" => "str"}, HEADER, @validator_option)
       }
 
-      assert_match(/expected integer, but received String: str/i, e.message)
+      assert_match(/expected integer, but received String: "str"/i, e.message)
       assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
     end
 
@@ -150,7 +150,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
           operation_object.validate_request_params({"limit" => "a"}, HEADER, @validator_option)
         }
 
-        assert_match(/expected integer, but received String: a/i, e.message)
+        assert_match(/expected integer, but received String: "a"/i, e.message)
         assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
       end
     end
