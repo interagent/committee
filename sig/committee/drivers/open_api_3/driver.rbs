@@ -1,0 +1,18 @@
+# Classes
+module Committee
+  module Drivers
+    module OpenAPI3
+      class Driver
+        def default_coerce_date_times: -> true
+        def default_coerce_form_params: -> true
+        def default_allow_get_body: -> false
+        def default_path_params: -> true
+        def default_query_params: -> true
+        def default_validate_success_only: -> false
+        def name: -> :open_api_3
+        def schema_class: -> singleton(Committee::Drivers::OpenAPI3::Schema)
+        def parse: (untyped open_api) -> Committee::Drivers::OpenAPI3::Schema
+      end
+    end
+  end
+end

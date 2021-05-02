@@ -37,13 +37,13 @@ module Committee
           :open_api_3
         end
 
+        def schema_class
+          Committee::Drivers::OpenAPI3::Schema
+        end
+
         # @return [Committee::Drivers::OpenAPI3::Schema]
         def parse(open_api)
           schema_class.new(self, open_api)
-        end
-
-        def schema_class
-          Committee::Drivers::OpenAPI3::Schema
         end
       end
     end

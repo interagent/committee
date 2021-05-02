@@ -1,0 +1,988 @@
+module Committee
+  def self.debug?: () -> untyped
+
+  def self.log_debug: (untyped message) -> untyped
+
+  def self.warn_deprecated: (untyped message) -> untyped
+end
+
+module Committee
+  module Bin
+    # CommitteeStub internalizes the functionality of bin/committee-stub so
+    # that we can test code that would otherwise be difficult to get at in an
+    # executable.
+    class CommitteeStub
+      # Gets a Rack app suitable for use as a stub.
+      def get_app: (untyped schema, untyped options) -> untyped
+
+      # Gets an option parser for command line arguments.
+      def get_options_parser: () -> ::Array[untyped]
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    # Gets a driver instance from the specified name. Raises ArgumentError for
+    # an unknown driver name.
+    def self.driver_from_name: (untyped name) -> untyped
+
+    # load and build drive from JSON file
+    # @param [String] schema_path
+    # @return [Committee::Driver]
+    def self.load_from_json: (untyped schema_path) -> untyped
+
+    # load and build drive from YAML file
+    # @param [String] schema_path
+    # @return [Committee::Driver]
+    def self.load_from_yaml: (untyped schema_path) -> untyped
+
+    # load and build drive from file
+    # @param [String] schema_path
+    # @return [Committee::Driver]
+    def self.load_from_file: (untyped schema_path) -> untyped
+
+    # load and build drive from Hash object
+    # @param [Hash] hash
+    # @return [Committee::Driver]
+    def self.load_from_data: (untyped hash, ?untyped? schema_path) -> untyped
+  end
+end
+
+module Committee
+  module Drivers
+    # Driver is a base class for driver implementations.
+    class Driver
+      # Whether parameters that were form-encoded will be coerced by default.
+      def default_coerce_form_params: () -> untyped
+
+      # Use GET request body to request parameter (request body merge to parameter)
+      def default_allow_get_body: () -> untyped
+
+      # Whether parameters in a request's path will be considered and coerced
+      # by default.
+      def default_path_params: () -> untyped
+
+      # Whether parameters in a request's query string will be considered and
+      # coerced by default.
+      def default_query_params: () -> untyped
+
+      def name: () -> untyped
+
+      # Parses an API schema and builds a set of route definitions for use with
+      # Committee.
+      #
+      # The expected input format is a data hash with keys as strings (as
+      # opposed to symbols) like the kind produced by JSON.parse or YAML.load.
+      def parse: (untyped data) -> untyped
+
+      def schema_class: () -> untyped
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module HyperSchema
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module HyperSchema
+      class Driver < ::Committee::Drivers::Driver
+        def default_coerce_date_times: () -> ::FalseClass
+
+        # Whether parameters that were form-encoded will be coerced by default.
+        def default_coerce_form_params: () -> ::FalseClass
+
+        def default_allow_get_body: () -> ::TrueClass
+
+        # Whether parameters in a request's path will be considered and coerced by
+        # default.
+        def default_path_params: () -> ::FalseClass
+
+        # Whether parameters in a request's query string will be considered and
+        # coerced by default.
+        def default_query_params: () -> ::FalseClass
+
+        def default_validate_success_only: () -> ::TrueClass
+
+        def name: () -> :hyper_schema
+
+        # Parses an API schema and builds a set of route definitions for use with
+        # Committee.
+        #
+        # The expected input format is a data hash with keys as strings (as opposed
+        # to symbols) like the kind produced by JSON.parse or YAML.load.
+        def parse: (untyped schema) -> untyped
+
+        def schema_class: () -> untyped
+
+        private
+
+        def build_routes: (untyped hyper_schema) -> untyped
+
+        def href_to_regex: (untyped href) -> untyped
+
+        def parse_link: (untyped link) -> (untyped | ::Array[untyped])
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module HyperSchema
+      # Link abstracts an API link specifically for JSON hyper-schema.
+      #
+      # For most operations, it's a simple pass through to a
+      # JsonSchema::Schema::Link, but implements some exotic behavior in a few
+      # places.
+      class Link
+        def initialize: (untyped hyper_schema_link) -> untyped
+
+        # The link's input media type. i.e. How requests should be encoded.
+        def enc_type: () -> untyped
+
+        def href: () -> untyped
+
+        # The link's output media type. i.e. How responses should be encoded.
+        def media_type: () -> untyped
+
+        def method: () -> untyped
+
+        # Passes through a link's parent resource. Note that this is *not* part
+        # of the Link interface and is here to support a legacy Heroku-ism
+        # behavior that allowed a link tagged with rel=instances to imply that a
+        # list will be returned.
+        def parent: () -> untyped
+
+        def rel: () -> untyped
+
+        # The link's input schema. i.e. How we validate an endpoint's incoming
+        # parameters.
+        def schema: () -> untyped
+
+        def status_success: () -> untyped
+
+        # The link's output schema. i.e. How we validate an endpoint's response
+        # data.
+        def target_schema: () -> untyped
+
+        private
+
+        attr_accessor hyper_schema_link: untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module HyperSchema
+      class Schema < ::Committee::Drivers::Schema
+        # A link back to the derivative instance of Committee::Drivers::Driver
+        # that create this schema.
+        attr_accessor driver: untyped
+
+        attr_accessor routes: untyped
+
+        attr_reader validator_option: untyped
+
+        def build_router: (untyped options) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI2
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI2
+      class Driver < ::Committee::Drivers::Driver
+        def default_coerce_date_times: () -> ::FalseClass
+
+        # Whether parameters that were form-encoded will be coerced by default.
+        def default_coerce_form_params: () -> ::TrueClass
+
+        def default_allow_get_body: () -> ::TrueClass
+
+        # Whether parameters in a request's path will be considered and coerced by
+        # default.
+        def default_path_params: () -> ::TrueClass
+
+        # Whether parameters in a request's query string will be considered and
+        # coerced by default.
+        def default_query_params: () -> ::TrueClass
+
+        def default_validate_success_only: () -> ::TrueClass
+
+        def name: () -> :open_api_2
+
+        # Parses an API schema and builds a set of route definitions for use with
+        # Committee.
+        #
+        # The expected input format is a data hash with keys as strings (as opposed
+        # to symbols) like the kind produced by JSON.parse or YAML.load.
+        def parse: (untyped data) -> untyped
+
+        def schema_class: () -> untyped
+
+        private
+
+        DEFINITIONS_PSEUDO_URI: ::String
+
+        # These are fields that the OpenAPI 2 spec considers mandatory to be
+        # included in the document's top level.
+        REQUIRED_FIELDS: untyped
+
+        def find_best_fit_response: (untyped link_data) -> untyped
+
+        def href_to_regex: (untyped href) -> untyped
+
+        def parse_definitions!: (untyped data) -> ::Array[untyped]
+
+        def parse_routes!: (untyped data, untyped schema, untyped store) -> untyped
+
+        def rewrite_references_and_parse: (untyped schemas_data, untyped store) -> untyped
+
+        def rewrite_references: (untyped schema) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI2
+      class HeaderSchemaBuilder < SchemaBuilder
+        def call: () -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI2
+      # Link abstracts an API link specifically for OpenAPI 2.
+      class Link
+        # The link's input media type. i.e. How requests should be encoded.
+        attr_accessor enc_type: untyped
+
+        attr_accessor href: untyped
+
+        # The link's output media type. i.e. How responses should be encoded.
+        attr_accessor media_type: untyped
+
+        attr_accessor method: untyped
+
+        # The link's input schema. i.e. How we validate an endpoint's incoming
+        # parameters.
+        attr_accessor schema: untyped
+
+        attr_accessor status_success: untyped
+
+        # The link's output schema. i.e. How we validate an endpoint's response
+        # data.
+        attr_accessor target_schema: untyped
+
+        attr_accessor header_schema: untyped
+
+        def rel: () -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI2
+      # ParameterSchemaBuilder converts OpenAPI 2 link parameters, which are not
+      # quite JSON schemas (but will be in OpenAPI 3) into synthetic schemas that
+      # we can use to do some basic request validation.
+      class ParameterSchemaBuilder < SchemaBuilder
+        # Returns a tuple of (schema, schema_data) where only one of the two
+        # values is present. This is either a full schema that's ready to go _or_
+        # a hash of unparsed schema data.
+        def call: () -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI2
+      class Schema < ::Committee::Drivers::Schema
+        attr_accessor base_path: untyped
+
+        attr_accessor consumes: untyped
+
+        # A link back to the derivative instance of Committee::Drivers::Driver
+        # that create this schema.
+        attr_accessor driver: untyped
+
+        attr_accessor definitions: untyped
+
+        attr_accessor produces: untyped
+
+        attr_accessor routes: untyped
+
+        attr_reader validator_option: untyped
+
+        def build_router: (untyped options) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI2
+      class SchemaBuilder
+        def initialize: (untyped link_data) -> untyped
+
+        private
+
+        LINK_REQUIRED_FIELDS: untyped
+
+        attr_accessor link_data: untyped
+
+        def check_required_fields!: (untyped param_data) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI3
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    module OpenAPI3
+      class Schema < ::Committee::Drivers::Schema
+        attr_reader open_api: untyped
+
+        attr_reader validator_option: untyped
+
+        def initialize: (untyped driver, untyped open_api) -> untyped
+
+        def supports_stub?: () -> ::FalseClass
+
+        def driver: () -> untyped
+
+        def build_router: (untyped options) -> untyped
+
+        # OpenAPI3 only
+        def operation_object: (untyped path, untyped method) -> (nil | untyped)
+      end
+    end
+  end
+end
+
+module Committee
+  module Drivers
+    # Schema is a base class for driver schema implementations.
+    class Schema
+      # A link back to the derivative instance of Committee::Drivers::Driver
+      # that create this schema.
+      def driver: () -> untyped
+
+      def build_router: (untyped options) -> untyped
+
+      # Stubs are supported in JSON Hyper-Schema and OpenAPI 2, but not yet in OpenAPI 3
+      def supports_stub?: () -> ::TrueClass
+    end
+  end
+end
+
+module Committee
+  class Error < StandardError
+  end
+
+  class BadRequest < Error
+  end
+
+  class InvalidRequest < Error
+    attr_reader original_error: untyped
+
+    def initialize: (?untyped? error_message, ?original_error: untyped? original_error) -> untyped
+  end
+
+  class InvalidResponse < Error
+    attr_reader original_error: untyped
+
+    def initialize: (?untyped? error_message, ?original_error: untyped? original_error) -> untyped
+  end
+
+  class NotFound < Error
+  end
+
+  class ReferenceNotFound < Error
+  end
+
+  class OpenAPI3Unsupported < Error
+  end
+end
+
+module Committee
+  module Middleware
+  end
+end
+
+module Committee
+  module Middleware
+    class Base
+      def initialize: (untyped app, ?::Hash[untyped, untyped] options) -> untyped
+
+      def call: (untyped env) -> untyped
+
+      def self.get_schema: (untyped options) -> untyped
+
+      private
+
+      def build_schema_validator: (untyped request) -> untyped
+    end
+  end
+end
+
+module Committee
+  module Middleware
+    class RequestValidation < Base
+      def initialize: (untyped app, ?::Hash[untyped, untyped] options) -> untyped
+
+      def handle: (untyped request) -> untyped
+
+      private
+
+      def handle_exception: (untyped e, untyped env) -> (nil | untyped)
+    end
+  end
+end
+
+module Committee
+  module Middleware
+    class ResponseValidation < Base
+      attr_reader validate_success_only: untyped
+
+      def initialize: (untyped app, ?::Hash[untyped, untyped] options) -> untyped
+
+      def handle: (untyped request) -> (untyped | ::Array[untyped])
+
+      def self.validate?: (untyped status, untyped validate_success_only) -> untyped
+
+      private
+
+      def handle_exception: (untyped e, untyped env) -> (nil | untyped)
+    end
+  end
+end
+
+module Committee
+  module Middleware
+    class Stub < Base
+      def initialize: (untyped app, ?::Hash[untyped, untyped] options) -> untyped
+
+      def handle: (untyped request) -> untyped
+
+      private
+
+      def cache: (untyped link) { () -> untyped } -> untyped
+    end
+  end
+end
+
+module Committee
+  class RequestUnpacker
+    def initialize: (untyped request, ?::Hash[untyped, untyped] options) -> untyped
+
+    def call: () -> untyped
+
+    private
+
+    # Creates a Hash with indifferent access.
+    #
+    # (Copied from Sinatra)
+    def indifferent_hash: () -> untyped
+
+    # Enable string or symbol key access to the nested params hash.
+    #
+    # (Copied from Sinatra)
+    def indifferent_params: (untyped object) -> untyped
+
+    def parse_json: () -> (nil | untyped)
+
+    def headers: () -> untyped
+  end
+end
+
+module Committee
+  module SchemaValidator
+    def self.request_media_type: (untyped request) -> untyped
+
+    # @param [String] prefix
+    # @return [Regexp]
+    def self.build_prefix_regexp: (untyped prefix) -> (nil | untyped)
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class HyperSchema
+      attr_reader link: untyped
+
+      attr_reader param_matches: untyped
+
+      attr_reader validator_option: untyped
+
+      def initialize: (untyped router, untyped request, untyped validator_option) -> untyped
+
+      def request_validate: (untyped request) -> untyped
+
+      def response_validate: (untyped status, untyped headers, untyped response, ?bool _test_method) -> (nil | untyped)
+
+      def link_exist?: () -> untyped
+
+      def coerce_form_params: (untyped parameter) -> (nil | untyped)
+
+      private
+
+      def coerce_path_params: () -> (nil | untyped)
+
+      def coerce_query_params: (untyped request) -> (nil | untyped)
+
+      def request_unpack: (untyped request) -> untyped
+
+      def request_schema_validation: (untyped request) -> (nil | untyped)
+
+      def parameter_coerce!: (untyped request, untyped link, untyped coerce_key) -> (nil | untyped)
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class HyperSchema
+      class ParameterCoercer
+        def initialize: (untyped params, untyped schema, ?::Hash[untyped, untyped] options) -> untyped
+
+        def call!: () -> untyped
+
+        private
+
+        def coerce_object!: (untyped hash, untyped schema) -> (::FalseClass | untyped)
+
+        def coerce_value!: (untyped original_val, untyped s) -> untyped
+
+        def coerce_array_data!: (untyped original_val, untyped schema) -> (::FalseClass | untyped)
+
+        def parse_date_time: (untyped original_val) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class HyperSchema
+      class RequestValidator
+        def initialize: (untyped link, ?::Hash[untyped, untyped] options) -> untyped
+
+        def call: (untyped request, untyped params, untyped headers) -> untyped
+
+        private
+
+        def check_content_type!: (untyped request, untyped data) -> untyped
+
+        def empty_request?: (untyped request) -> (::TrueClass | untyped)
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class HyperSchema
+      class ResponseGenerator
+        def call: (untyped link) -> ::Array[untyped]
+
+        private
+
+        # These are basic types that are part of the JSON schema for which we'll
+        # emit zero values when generating a response. For a schema that allows
+        # multiple of the types in the list, types are preferred in the order in
+        # which they're defined.
+        SCALAR_TYPES: untyped
+
+        def generate_properties: (untyped link, untyped schema) -> untyped
+
+        def legacy_hyper_schema_rel?: (untyped link) -> untyped
+
+        # Gets the target schema of a link. This is normally just the standard
+        # response schema, but we allow some legacy behavior for hyper-schema links
+        # tagged with rel=instances to instead use the schema of their parent
+        # resource.
+        def target_schema: (untyped link) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class HyperSchema
+      class ResponseValidator
+        attr_reader validate_success_only: untyped
+
+        def initialize: (untyped link, ?::Hash[untyped, untyped] options) -> untyped
+
+        def call: (untyped status, untyped headers, untyped data) -> (nil | untyped)
+
+        private
+
+        def response_media_type: (untyped response) -> untyped
+
+        def check_content_type!: (untyped response) -> untyped
+
+        def legacy_hyper_schema_rel?: (untyped link) -> untyped
+
+        # Gets the target schema of a link. This is normally just the standard
+        # response schema, but we allow some legacy behavior for hyper-schema links
+        # tagged with rel=instances to instead use the schema of their parent
+        # resource.
+        def target_schema: (untyped link) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class HyperSchema
+      class Router
+        def initialize: (untyped schema, untyped validator_option) -> untyped
+
+        def includes?: (untyped path) -> untyped
+
+        def includes_request?: (untyped request) -> untyped
+
+        def find_link: (untyped method, untyped path) -> untyped
+
+        def find_request_link: (untyped request) -> untyped
+
+        def build_schema_validator: (untyped request) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class HyperSchema
+      # StringParamsCoercer takes parameters that are specified over a medium that
+      # can only accept strings (for example in a URL path or in query parameters)
+      # and attempts to coerce them into known types based of a link's schema
+      # definition.
+      #
+      # Currently supported types: null, integer, number and boolean.
+      #
+      # +call+ returns a hash of all params which could be coerced - coercion
+      # errors are simply ignored and expected to be handled later by schema
+      # validation.
+      class StringParamsCoercer
+        def initialize: (untyped query_hash, untyped schema, ?::Hash[untyped, untyped] options) -> untyped
+
+        def call!: () -> untyped
+
+        private
+
+        def coerce_object!: (untyped hash, untyped schema) -> (::FalseClass | untyped)
+
+        def coerce_value!: (untyped original_val, untyped s) -> untyped
+
+        def coerce_array_data!: (untyped original_val, untyped schema) -> (::FalseClass | untyped)
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class OpenAPI3
+      # @param [Committee::SchemaValidator::Option] validator_option
+      def initialize: (untyped router, untyped request, untyped validator_option) -> untyped
+
+      def request_validate: (untyped request) -> (nil | untyped)
+
+      def response_validate: (untyped status, untyped headers, untyped response, ?bool test_method) -> untyped
+
+      def link_exist?: () -> untyped
+
+      def coerce_form_params: (untyped _parameter) -> nil
+
+      private
+
+      attr_reader validator_option: untyped
+
+      def coerce_path_params: () -> untyped
+
+      def request_schema_validation: (untyped request) -> (nil | untyped)
+
+      def header: (untyped request) -> untyped
+
+      def request_unpack: (untyped request) -> untyped
+
+      def copy_coerced_data_to_query_hash: (untyped request) -> (nil | untyped)
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class OpenAPI3
+      class OperationWrapper
+        # # @param request_operation [OpenAPIParser::RequestOperation]
+        def initialize: (untyped request_operation) -> untyped
+
+        def path_params: () -> untyped
+
+        def original_path: () -> untyped
+
+        def http_method: () -> untyped
+
+        def coerce_path_parameter: (untyped validator_option) -> untyped
+
+        # @param [Boolean] strict when not content_type or status code definition, raise error
+        def validate_response_params: (untyped status_code, untyped headers, untyped response_data, untyped strict, untyped check_header) -> untyped
+
+        def validate_request_params: (untyped params, untyped headers, untyped validator_option) -> untyped
+
+        def valid_request_content_type?: (untyped content_type) -> untyped
+
+        def request_content_types: () -> untyped
+
+        private
+
+        attr_reader request_operation: untyped
+
+        # @return [OpenAPIParser::SchemaValidator::Options]
+        def build_openapi_parser_path_option: (untyped validator_option) -> untyped
+
+        # @return [OpenAPIParser::SchemaValidator::Options]
+        def build_openapi_parser_post_option: (untyped validator_option) -> untyped
+
+        # @return [OpenAPIParser::SchemaValidator::Options]
+        def build_openapi_parser_get_option: (untyped validator_option) -> untyped
+
+        def validate_get_request_params: (untyped params, untyped headers, untyped validator_option) -> untyped
+
+        def validate_post_request_params: (untyped params, untyped headers, untyped validator_option) -> untyped
+
+        def response_validate_options: (untyped strict, untyped check_header) -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class OpenAPI3
+      class RequestValidator
+        # @param [SchemaValidator::OpenAPI3::OperationWrapper] operation_object
+        # @param [Committee::SchemaValidator::Option] validator_option
+        def initialize: (untyped operation_object, validator_option: untyped validator_option) -> untyped
+
+        def call: (untyped request, untyped params, untyped headers) -> untyped
+
+        private
+
+        def check_content_type: (untyped request, untyped content_type) -> (::TrueClass | untyped)
+
+        def valid_content_types: () -> untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class OpenAPI3
+      class ResponseValidator
+        attr_reader validate_success_only: untyped
+
+        # @param [Committee::SchemaValidator::Options] validator_option
+        # @param [Committee::SchemaValidator::OpenAPI3::OperationWrapper] operation_wrapper
+        def initialize: (untyped operation_wrapper, untyped validator_option) -> untyped
+
+        def call: (untyped status, untyped headers, untyped response_data, untyped strict) -> (nil | untyped)
+
+        private
+
+        attr_reader operation_wrapper: untyped
+
+        attr_reader check_header: untyped
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class OpenAPI3
+      class Router
+        # @param [Committee::SchemaValidator::Option] validator_option
+        def initialize: (untyped schema, untyped validator_option) -> untyped
+
+        def includes_request?: (untyped request) -> (::TrueClass | untyped)
+
+        def build_schema_validator: (untyped request) -> untyped
+
+        def operation_object: (untyped request) -> (nil | untyped)
+
+        private
+
+        def prefix_request?: (untyped request) -> (::FalseClass | untyped)
+      end
+    end
+  end
+end
+
+module Committee
+  module SchemaValidator
+    class Option
+      # Boolean Options
+      attr_reader allow_form_params: untyped
+
+      # Boolean Options
+      attr_reader allow_get_body: untyped
+
+      # Boolean Options
+      attr_reader allow_query_params: untyped
+
+      # Boolean Options
+      attr_reader check_content_type: untyped
+
+      # Boolean Options
+      attr_reader check_header: untyped
+
+      # Boolean Options
+      attr_reader coerce_date_times: untyped
+
+      # Boolean Options
+      attr_reader coerce_form_params: untyped
+
+      # Boolean Options
+      attr_reader coerce_path_params: untyped
+
+      # Boolean Options
+      attr_reader coerce_query_params: untyped
+
+      # Boolean Options
+      attr_reader coerce_recursive: untyped
+
+      # Boolean Options
+      attr_reader optimistic_json: untyped
+
+      # Boolean Options
+      attr_reader validate_success_only: untyped
+
+      # Boolean Options
+      attr_reader parse_response_by_content_type: untyped
+
+      # Non-boolean options:
+      attr_reader headers_key: untyped
+
+      # Non-boolean options:
+      attr_reader params_key: untyped
+
+      # Non-boolean options:
+      attr_reader query_hash_key: untyped
+
+      # Non-boolean options:
+      attr_reader prefix: untyped
+
+      def initialize: (untyped options, untyped schema, untyped schema_type) -> untyped
+    end
+  end
+end
+
+module Committee
+  module Test
+    module Methods
+      def assert_schema_conform: (?untyped? expected_status) -> untyped
+
+      def assert_request_schema_confirm: () -> untyped
+
+      def assert_response_schema_confirm: (?untyped? expected_status) -> untyped
+
+      def committee_options: () -> untyped
+
+      def request_object: () -> untyped
+
+      def response_data: () -> untyped
+
+      def validate_response?: (untyped status) -> untyped
+
+      def schema: () -> untyped
+
+      def router: () -> untyped
+
+      def schema_validator: () -> untyped
+
+      def schema_coverage: () -> (nil | untyped)
+
+      def old_behavior: () -> untyped
+    end
+  end
+end
+
+module Committee
+  module Test
+    class SchemaCoverage
+      attr_reader schema: untyped
+
+      def self.merge_report: (untyped first, untyped second) -> untyped
+
+      def self.flatten_report: (untyped report) -> { responses: untyped }
+
+      def initialize: (untyped schema) -> untyped
+
+      def update_response_coverage!: (untyped path, untyped method, untyped response_status) -> untyped
+
+      def report: () -> untyped
+
+      def report_flatten: () -> untyped
+    end
+  end
+end
+
+module Committee
+  class ValidationError
+    attr_reader id: untyped
+
+    attr_reader message: untyped
+
+    attr_reader status: untyped
+
+    attr_reader request: untyped
+
+    def initialize: (untyped status, untyped id, untyped message, ?untyped? request) -> untyped
+
+    def error_body: () -> { id: untyped, message: untyped }
+
+    def render: () -> ::Array[untyped | ::Hash[::String, "application/json"] | ::Array[untyped]]
+  end
+end

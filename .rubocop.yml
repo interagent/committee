@@ -9,6 +9,7 @@ AllCops:
   Exclude:
     - 'examples/**/*'
     - 'vendor/**/*'
+    - Steepfile
 
 Performance:
   Exclude:
