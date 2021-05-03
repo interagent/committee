@@ -29,5 +29,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "pry-byebug"
   s.add_development_dependency "rubocop", "< 1.13.0"
   s.add_development_dependency "rubocop-performance"
+  s.add_development_dependency "rubocop-minitest"
+  s.add_development_dependency "rubocop-rake"
   s.add_development_dependency "simplecov"
 end
