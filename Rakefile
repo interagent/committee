@@ -14,4 +14,8 @@ end
 
 RuboCop::RakeTask.new
 
-task default: [:rubocop, :test]
+task :steep do
+  sh 'steep check'
+end
+
+task default: [:steep, :rubocop, :test]
