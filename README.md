@@ -52,6 +52,7 @@ Non-boolean options:
 |accept_request_filter  | Proc Object | supported | supported | A proc that accepts a Request and returns a boolean. It indicates whether to validate the current request, or not. (e.g. `-> (request) { request.path.start_with?('/something') }`) |
 |params_key| String | supported | supported | Save checked parameter value to request.env using this key. Default value is `committee.params` |
 |headers_key| String | supported | supported | Save checked header value to request.env using this key. Default value is `committee.headers` |
+|query_hash_key| String | supported | supported | Save checked query parameter value to request.env using this key. Default value is `committee.query_hash` |
 
 Note that Hyper-Schema and OpenAPI 2 get the same defaults for options.
 
