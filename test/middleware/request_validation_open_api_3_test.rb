@@ -485,6 +485,22 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  describe "request parameter option" do
+    it "default setting" do
+      @app = new_rack_app_with_lambda(lambda do |env|
+        assert_equal env['committee.params']['integer'], 21 # use path parameter for meged params (like rails)
+        assert_equal env['committee.path_hash']['integer'], 21
+        assert_equal env['committee.query_hash']['integer'], 42
+        assert_equal env['committee.request_body_hash']['integer'], 84
+        [204, {}, []]
+      end, schema: open_api_3_schema, raise: true, query_hash_key: 'committee.query_hash')
+
+      header "Content-Type", "application/json"
+      post '/parameter_option_test/21?integer=42', JSON.generate(integer: 84)
+      assert_equal 204, last_response.status
+    end
+  end
+
   private
 
   def new_rack_app(options = {})
