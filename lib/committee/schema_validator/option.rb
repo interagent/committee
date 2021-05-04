@@ -22,6 +22,7 @@ module Committee
       attr_reader :headers_key,
                   :params_key,
                   :query_hash_key,
+                  :path_hash_key,
                   :prefix
 
       def initialize(options, schema, schema_type)
@@ -34,6 +35,7 @@ module Committee
         else
           options.fetch(:query_hash_key)
         end
+        @path_hash_key      = options[:path_hash_key] || "committee.path_hash"
 
         @prefix              = options[:prefix]
 

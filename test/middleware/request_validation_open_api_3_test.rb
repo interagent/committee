@@ -412,6 +412,20 @@ describe Committee::Middleware::RequestValidation do
     get "/coerce_path_params/1"
   end
 
+  it "corce string and save path hash" do
+    @app = new_rack_app_with_lambda(lambda do |env|
+      assert_equal env['committee.params']['integer'], 21
+      assert_equal env['committee.params'][:integer], 21
+      assert_equal env['committee.path_hash']['integer'], 21
+      assert_equal env['committee.path_hash'][:integer], 21
+      [204, {}, []]
+    end, schema: open_api_3_schema)
+
+    header "Content-Type", "application/json"
+    post '/parameter_option_test/21'
+    assert_equal 204, last_response.status
+  end
+
   it "OpenAPI3 raise not support method" do
     @app = new_rack_app(schema: open_api_3_schema)
 
