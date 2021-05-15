@@ -7,10 +7,7 @@ module Committee
 
       def initialize(app, options = {})
         super
-
-        unless options[:strict].nil?
-          Committee.warn_deprecated("Committee: Committee::Middleware::ResponseValidation doesn't support strict option now but we'll support this option. This change break backward compatibility so please remove strict option from ResponseValidation")
-        end
+        @strict = options[:strict]
         @validate_success_only = @schema.validator_option.validate_success_only
       end
 
@@ -19,7 +16,7 @@ module Committee
 
         begin
           v = build_schema_validator(request)
-          v.response_validate(status, headers, response) if v.link_exist? && self.class.validate?(status, validate_success_only)
+          v.response_validate(status, headers, response, @strict) if v.link_exist? && self.class.validate?(status, validate_success_only)
 
         rescue Committee::InvalidResponse
           handle_exception($!, request.env)
