@@ -2,6 +2,31 @@
 
 module Committee
   class RequestUnpacker
+    class << self
+      # Creates a Hash with indifferent access.
+      #
+      # (Copied from Sinatra)
+      def indifferent_hash
+        Hash.new { |hash,key| hash[key.to_s] if Symbol === key }
+      end
+
+      # Enable string or symbol key access to the nested params hash.
+      #
+      # (Copied from Sinatra)
+      def indifferent_params(object)
+        case object
+        when Hash
+          new_hash = indifferent_hash
+          object.each { |key, value| new_hash[key] = indifferent_params(value) }
+          new_hash
+        when Array
+          object.map { |item| indifferent_params(item) }
+        else
+          object
+        end
+      end
+    end
+
     def initialize(request, options={})
       @request = request
 
@@ -41,36 +66,13 @@ module Committee
       end
 
       if @allow_query_params
-        [indifferent_params(@request.GET).merge(params), headers]
+        [self.class.indifferent_params(@request.GET).merge(params), headers]
       else
         [params, headers]
       end
     end
 
     private
-
-    # Creates a Hash with indifferent access.
-    #
-    # (Copied from Sinatra)
-    def indifferent_hash
-      Hash.new { |hash,key| hash[key.to_s] if Symbol === key }
-    end
-
-    # Enable string or symbol key access to the nested params hash.
-    #
-    # (Copied from Sinatra)
-    def indifferent_params(object)
-      case object
-      when Hash
-        new_hash = indifferent_hash
-        object.each { |key, value| new_hash[key] = indifferent_params(value) }
-        new_hash
-      when Array
-        object.map { |item| indifferent_params(item) }
-      else
-        object
-      end
-    end
 
     def parse_json
       return nil if @request.request_method == "GET" && !@allow_get_body
@@ -87,7 +89,7 @@ module Committee
         raise BadRequest,
               "Invalid JSON input. Require object with parameters as keys."
       end
-      indifferent_params(hash)
+      self.class.indifferent_params(hash)
     end
 
     def headers

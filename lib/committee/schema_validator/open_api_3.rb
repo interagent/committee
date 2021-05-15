@@ -14,7 +14,8 @@ module Committee
       def request_validate(request)
         return unless link_exist?
 
-        path_params = validator_option.coerce_path_params ? coerce_path_params : {}
+        path_params = validator_option.coerce_path_params ? coerce_path_params : Committee::RequestUnpacker.indifferent_hash
+        request.env[validator_option.path_hash_key] = path_params
 
         request_unpack(request)
 
@@ -58,7 +59,7 @@ module Committee
       attr_reader :validator_option
 
       def coerce_path_params
-        @operation_object.coerce_path_parameter(@validator_option)
+        Committee::RequestUnpacker.indifferent_params(@operation_object.coerce_path_parameter(@validator_option))
       end
 
       def request_schema_validation(request)
