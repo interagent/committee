@@ -9,8 +9,8 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({ "x" => "y" }, params)
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([{ "x" => "y" }, false], unpacker.unpack_request_params(request))
   end
 
   it "unpacks JSON on Content-Type: application/vnd.api+json" do
@@ -19,8 +19,8 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({ "x" => "y" }, params)
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([{ "x" => "y" }, false], unpacker.unpack_request_params(request))
   end
 
   it "unpacks JSON on no Content-Type" do
@@ -28,8 +28,8 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({ "x" => "y" }, params)
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([{ "x" => "y" }, false], unpacker.unpack_request_params(request))
   end
 
   it "doesn't unpack JSON on application/x-ndjson" do
@@ -38,8 +38,8 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}\n{"a":"b"}'),
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({}, params)
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([{}, false], unpacker.unpack_request_params(request))
   end
 
   it "doesn't unpack JSON under other Content-Types" do
@@ -49,8 +49,8 @@ describe Committee::RequestUnpacker do
         "rack.input"   => StringIO.new('{"x":"y"}'),
       }
       request = Rack::Request.new(env)
-      params, _ = Committee::RequestUnpacker.new(request).call
-      assert_equal({}, params)
+      unpacker = Committee::RequestUnpacker.new
+      assert_equal([{}, false], unpacker.unpack_request_params(request))
     end
   end
 
@@ -61,8 +61,8 @@ describe Committee::RequestUnpacker do
         "rack.input"   => StringIO.new('{"x":"y"}'),
       }
       request = Rack::Request.new(env)
-      params, _ = Committee::RequestUnpacker.new(request, optimistic_json: true).call
-      assert_equal({ "x" => "y" }, params)
+      unpacker = Committee::RequestUnpacker.new(optimistic_json: true)
+      assert_equal([{ "x" => "y" }, false], unpacker.unpack_request_params(request))
     end
   end
 
@@ -73,8 +73,8 @@ describe Committee::RequestUnpacker do
         "rack.input"   => StringIO.new('x=y&foo=42'),
       }
       request = Rack::Request.new(env)
-      params, _ = Committee::RequestUnpacker.new(request, optimistic_json: true).call
-      assert_equal({}, params)
+      unpacker = Committee::RequestUnpacker.new(optimistic_json: true)
+      assert_equal([{}, false], unpacker.unpack_request_params(request))
     end
   end
 
@@ -84,8 +84,8 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new(""),
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({}, params)
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([{}, false], unpacker.unpack_request_params(request))
   end
 
   it "doesn't unpack form params" do
@@ -95,8 +95,8 @@ describe Committee::RequestUnpacker do
         "rack.input"   => StringIO.new("x=y"),
       }
       request = Rack::Request.new(env)
-      params, _ = Committee::RequestUnpacker.new(request).call
-      assert_equal({}, params)
+      unpacker = Committee::RequestUnpacker.new
+      assert_equal([{}, false], unpacker.unpack_request_params(request))
     end
   end
 
@@ -107,96 +107,8 @@ describe Committee::RequestUnpacker do
         "rack.input"   => StringIO.new("x=y"),
       }
       request = Rack::Request.new(env)
-      params, _ = Committee::RequestUnpacker.new(request, allow_form_params: true).call
-      assert_equal({ "x" => "y" }, params)
-    end
-  end
-
-  it "coerces form params with coerce_form_params and a schema" do
-    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
-      env = {
-          "CONTENT_TYPE" => content_type,
-          "rack.input"   => StringIO.new("x=1"),
-      }
-      request = Rack::Request.new(env)
-
-      options = {}
-      # TODO: delete when 5.0.0 released because default value changed
-      options[:parse_response_by_content_type] = false
-      router = hyper_schema.build_router(options)
-      validator = router.build_schema_validator(request)
-
-      schema = JsonSchema::Schema.new
-      schema.properties = { "x" => JsonSchema::Schema.new }
-      schema.properties["x"].type = ["integer"]
-
-      link_class = Struct.new(:schema)
-      link_object = link_class.new(schema)
-
-      validator.instance_variable_set(:@link, link_object)
-
-      params, _ = Committee::RequestUnpacker.new(
-        request,
-        allow_form_params: true,
-        coerce_form_params: true,
-        schema_validator: validator,
-      ).call
-      assert_equal({ "x" => 1 }, params)
-    end
-  end
-
-  it "coerces form params with coerce_form_params and an OpenAPI3 schema" do
-    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
-      env = {
-          "CONTENT_TYPE" => content_type,
-          "rack.input"   => StringIO.new("limit=20"),
-          "PATH_INFO" => "/characters",
-          "SCRIPT_NAME" => "",
-          "REQUEST_METHOD" => "GET",
-      }
-      request = Rack::Request.new(env)
-
-      options = {}
-      # TODO: delete when 5.0.0 released because default value changed
-      options[:parse_response_by_content_type] = false
-      router = open_api_3_schema.build_router(options)
-      validator = router.build_schema_validator(request)
-
-      params, _ = Committee::RequestUnpacker.new(
-          request,
-          allow_form_params: true,
-          coerce_form_params: true,
-          schema_validator: validator,
-          ).call
-      # openapi3 not support coerce in request unpacker
-      assert_equal({ "limit" => '20' }, params)
-    end
-  end
-
-  it "coerces error params with coerce_form_params and a OpenAPI3 schema" do
-    %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
-      env = {
-          "CONTENT_TYPE" => content_type,
-          "rack.input"   => StringIO.new("limit=twenty"),
-          "PATH_INFO" => "/characters",
-          "SCRIPT_NAME" => "",
-          "REQUEST_METHOD" => "GET",
-      }
-      request = Rack::Request.new(env)
-
-      options = {}
-      # TODO: delete when 5.0.0 released because default value changed
-      options[:parse_response_by_content_type] = false
-      router = open_api_3_schema.build_router(options)
-      validator = router.build_schema_validator(request)
-
-      params, _ = Committee::RequestUnpacker.new(
-          request,
-          allow_form_params: true,
-          coerce_form_params: true,
-          schema_validator: validator,
-          ).call
-      assert_equal({ "limit" => "twenty" }, params)
+      unpacker = Committee::RequestUnpacker.new(allow_form_params: true)
+      assert_equal([{ "x" => "y" }, true], unpacker.unpack_request_params(request))
     end
   end
 
@@ -208,8 +120,8 @@ describe Committee::RequestUnpacker do
         "QUERY_STRING" => "a=b"
       }
       request = Rack::Request.new(env)
-      params, _ = Committee::RequestUnpacker.new(request, allow_form_params: true, allow_query_params: true).call
-      assert_equal({ "x" => "y", "a" => "b" }, params)
+      unpacker = Committee::RequestUnpacker.new(allow_form_params: true, allow_query_params: true)
+      assert_equal([ { "x" => "y"}, true], unpacker.unpack_request_params(request))
     end
   end
 
@@ -219,8 +131,8 @@ describe Committee::RequestUnpacker do
       "QUERY_STRING" => "a=b"
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request, allow_query_params: true).call
-    assert_equal({ "a" => "b" }, params)
+    unpacker = Committee::RequestUnpacker.new(allow_query_params: true)
+    assert_equal({ "a" => "b" }, unpacker.unpack_query_params(request))
   end
 
   it "errors if JSON is not an object" do
@@ -230,7 +142,7 @@ describe Committee::RequestUnpacker do
     }
     request = Rack::Request.new(env)
     assert_raises(Committee::BadRequest) do
-      Committee::RequestUnpacker.new(request).call
+      Committee::RequestUnpacker.new.unpack_request_params(request)
     end
   end
 
@@ -240,8 +152,8 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new('{"x":"y"}'),
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({}, params)
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([{}, false], unpacker.unpack_request_params(request))
   end
 
   # this is mostly here for line coverage
@@ -250,8 +162,8 @@ describe Committee::RequestUnpacker do
       "rack.input" => StringIO.new('{"x":[]}'),
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request).call
-    assert_equal({ "x" => [] }, params)
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([{ "x" => [] }, false], unpacker.unpack_request_params(request))
   end
 
   it "unpacks http header" do
@@ -260,8 +172,8 @@ describe Committee::RequestUnpacker do
       "rack.input"   => StringIO.new(""),
     }
     request = Rack::Request.new(env)
-    _, headers = Committee::RequestUnpacker.new(request, { allow_header_params: true }).call
-    assert_equal({ "FOO-BAR" => "some header value" }, headers)
+    unpacker = Committee::RequestUnpacker.new({ allow_header_params: true })
+    assert_equal({ "FOO-BAR" => "some header value" }, unpacker.unpack_headers(request))
   end
 
   it "includes request body when`use_get_body` is true" do
@@ -271,8 +183,8 @@ describe Committee::RequestUnpacker do
         "QUERY_STRING"=>"data=value&x=aaa",
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request, { allow_query_params: true, allow_get_body: true }).call
-    assert_equal({ 'data' => 'value', 'x' => 1, 'y' => 2 }, params)
+    unpacker = Committee::RequestUnpacker.new({ allow_query_params: true, allow_get_body: true })
+    assert_equal([{ 'x' => 1, 'y' => 2 }, false], unpacker.unpack_request_params(request))
   end
 
   it "doesn't include request body when `use_get_body` is false" do
@@ -282,7 +194,7 @@ describe Committee::RequestUnpacker do
         "QUERY_STRING"=>"data=value&x=aaa",
     }
     request = Rack::Request.new(env)
-    params, _ = Committee::RequestUnpacker.new(request, { allow_query_params: true, use_get_body: false }).call
-    assert_equal({ 'data' => 'value', 'x' => 'aaa' }, params)
+    unpacker = Committee::RequestUnpacker.new({ allow_query_params: true, use_get_body: false })
+    assert_equal({ 'data' => 'value', 'x' => 'aaa' }, unpacker.unpack_query_params(request))
   end
 end

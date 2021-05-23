@@ -426,6 +426,21 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 204, last_response.status
   end
 
+  it "unpacker test" do
+    @app = new_rack_app_with_lambda(lambda do |env|
+      assert_equal env['committee.params']['integer'], 42
+      assert_equal env['committee.params'][:integer], 42
+      # overwrite by request body...
+      assert_equal env['rack.request.query_hash']['integer'], 42
+      # assert_equal env['rack.request.query_hash'][:integer], 42
+      [204, {}, []]
+    end, schema: open_api_3_schema, raise: true)
+
+    header "Content-Type", "application/x-www-form-urlencoded"
+    post '/validate?integer=21', "integer=42"
+    assert_equal 204, last_response.status
+  end
+
   it "OpenAPI3 raise not support method" do
     @app = new_rack_app(schema: open_api_3_schema)
 

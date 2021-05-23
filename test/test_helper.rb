@@ -55,6 +55,10 @@ def open_api_2_schema
   @open_api_2_schema ||= Committee::Drivers.load_from_file(open_api_2_schema_path)
 end
 
+def open_api_2_form_schema
+  @open_api_2_form_schema ||= Committee::Drivers.load_from_file(open_api_2_form_schema_path)
+end
+
 def open_api_3_schema
   @open_api_3_schema ||= Committee::Drivers.load_from_file(open_api_3_schema_path)
 end
@@ -73,6 +77,10 @@ def open_api_2_data
   JSON.parse(File.read(open_api_2_schema_path))
 end
 
+def open_api_2_form_data
+  JSON.parse(File.read(open_api_2_form_schema_path))
+end
+
 def open_api_3_data
   YAML.load_file(open_api_3_schema_path)
 end
@@ -83,6 +91,10 @@ end
 
 def open_api_2_schema_path
   "./test/data/openapi2/petstore-expanded.json"
+end
+
+def open_api_2_form_schema_path
+  "./test/data/openapi2/petstore-expanded-form.json"
 end
 
 def open_api_3_schema_path

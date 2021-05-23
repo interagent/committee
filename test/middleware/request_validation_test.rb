@@ -435,6 +435,18 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "aacorce form params" do
+    check_parameter = lambda { |env|
+      assert_equal 3, env['committee.params']['age']
+      [200, {}, []]
+    }
+
+    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_2_form_schema, raise: true, allow_form_params: true, coerce_form_params: true)
+    header "Content-Type", "application/x-www-form-urlencoded"
+    post "/api/pets", "age=3&name=ab"
+    assert_equal 200, last_response.status
+  end
+
   it "detects an invalid request for OpenAPI" do
     @app = new_rack_app(schema: open_api_2_schema)
     get "/api/pets?limit=foo", nil, { "HTTP_AUTH_TOKEN" => "xxx" }

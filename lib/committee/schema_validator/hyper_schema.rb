@@ -50,12 +50,6 @@ module Committee
         !link.nil?
       end
 
-      def coerce_form_params(parameter)
-        return unless link_exist?
-        return unless link.schema
-        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(parameter, link.schema).call!
-      end
-
       private
 
         def coerce_path_params
@@ -73,15 +67,26 @@ module Committee
         end
 
         def request_unpack(request)
-          request.env[validator_option.params_key], request.env[validator_option.headers_key] = Committee::RequestUnpacker.new(
-              request,
-              allow_form_params:  validator_option.allow_form_params,
-              allow_get_body:     validator_option.allow_get_body,
-              allow_query_params: validator_option.allow_query_params,
-              coerce_form_params: validator_option.coerce_form_params,
-              optimistic_json:    validator_option.optimistic_json,
-              schema_validator:   self
-          ).call
+          unpacker = Committee::RequestUnpacker.new(
+            allow_form_params:  validator_option.allow_form_params,
+            allow_get_body:     validator_option.allow_get_body,
+            allow_query_params: validator_option.allow_query_params,
+            optimistic_json:    validator_option.optimistic_json,
+          )
+
+          query_param = unpacker.unpack_query_params(request)
+          request_param, is_form_params = unpacker.unpack_request_params(request)
+
+          coerce_form_params(request_param) if validator_option.coerce_form_params && is_form_params
+          request.env[validator_option.params_key] = query_param.merge(request_param)
+
+          request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
+        end
+
+        def coerce_form_params(parameter)
+          return unless link_exist?
+          return unless link.schema
+          Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(parameter, link.schema).call!
         end
 
         def request_schema_validation(request)
