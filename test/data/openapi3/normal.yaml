@@ -313,7 +313,12 @@ paths:
                   enum:
                   - 1.0
                   - 2.1
-
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                integer:
+                  type: integer
       responses:
         '200':
           description: success

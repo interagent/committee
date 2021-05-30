@@ -156,7 +156,6 @@ module Committee
 
             methods.each do |method, link_data|
               method = method.upcase
-
               link = Link.new
               link.enc_type = schema.consumes
               link.href = href
