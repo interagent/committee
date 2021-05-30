@@ -426,6 +426,22 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 204, last_response.status
   end
 
+  it "corce string and save request body hash" do
+    @app = new_rack_app_with_lambda(lambda do |env|
+      assert_equal env['committee.params']['integer'], 21 # use path parameter
+      assert_equal env['committee.params'][:integer], 21
+      assert_equal env['committee.request_body_hash']['integer'], 42
+      assert_equal env['committee.request_body_hash'][:integer], 42
+      [204, {}, []]
+    end, schema: open_api_3_schema)
+
+    params = {integer: 42}
+
+    header "Content-Type", "application/json"
+    post '/parameter_option_test/21', JSON.generate(params)
+    assert_equal 204, last_response.status
+  end
+
   it "unpacker test" do
     @app = new_rack_app_with_lambda(lambda do |env|
       assert_equal env['committee.params']['integer'], 42

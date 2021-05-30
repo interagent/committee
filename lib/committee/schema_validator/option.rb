@@ -22,6 +22,7 @@ module Committee
       attr_reader :headers_key,
                   :params_key,
                   :query_hash_key,
+                  :request_body_hash_key,
                   :path_hash_key,
                   :prefix
 
@@ -36,6 +37,7 @@ module Committee
           options.fetch(:query_hash_key)
         end
         @path_hash_key      = options[:path_hash_key] || "committee.path_hash"
+        @request_body_hash_key = options[:request_body_hash_key] || "committee.request_body_hash"
 
         @prefix              = options[:prefix]
 

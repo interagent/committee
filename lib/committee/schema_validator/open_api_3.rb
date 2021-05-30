@@ -14,13 +14,7 @@ module Committee
       def request_validate(request)
         return unless link_exist?
 
-        path_params = validator_option.coerce_path_params ? coerce_path_params : Committee::RequestUnpacker.indifferent_hash
-        request.env[validator_option.path_hash_key] = path_params
-
         request_unpack(request)
-
-        request.env[validator_option.params_key]&.merge!(path_params) unless path_params.empty?
-
         request_schema_validation(request)
 
         copy_coerced_data_to_query_hash(request)
@@ -55,6 +49,7 @@ module Committee
       attr_reader :validator_option
 
       def coerce_path_params
+        return Committee::Utils.indifferent_hash unless validator_option.coerce_path_params
         Committee::RequestUnpacker.indifferent_params(@operation_object.coerce_path_parameter(@validator_option))
       end
 
@@ -77,11 +72,18 @@ module Committee
           optimistic_json:    validator_option.optimistic_json,
         )
 
-        query_param = unpacker.unpack_query_params(request)
-        request_param, is_form_params = unpacker.unpack_request_params(request)
-        request.env[validator_option.params_key] = query_param.merge(request_param)
-
         request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
+
+        request_param, is_form_params = unpacker.unpack_request_params(request)
+        request.env[validator_option.request_body_hash_key] = request_param
+        request.env[validator_option.path_hash_key] = coerce_path_params
+
+        query_param = unpacker.unpack_query_params(request)
+
+        request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
+        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(query_param))
+        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[validator_option.request_body_hash_key]))
+        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[validator_option.path_hash_key]))
       end
 
       def copy_coerced_data_to_query_hash(request)

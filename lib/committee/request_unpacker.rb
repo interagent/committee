@@ -3,20 +3,13 @@
 module Committee
   class RequestUnpacker
     class << self
-      # Creates a Hash with indifferent access.
-      #
-      # (Copied from Sinatra)
-      def indifferent_hash
-        Hash.new { |hash,key| hash[key.to_s] if Symbol === key }
-      end
-
       # Enable string or symbol key access to the nested params hash.
       #
       # (Copied from Sinatra)
       def indifferent_params(object)
         case object
         when Hash
-          new_hash = indifferent_hash
+          new_hash = Committee::Utils.indifferent_hash
           object.each { |key, value| new_hash[key] = indifferent_params(value) }
           new_hash
         when Array
