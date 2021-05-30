@@ -15,6 +15,14 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  # TODO: remove 5.0.0
+  it "passes through a valid response" do
+    # will show deprecated message
+    @app = new_rack_app(JSON.generate([ValidApp]), {}, schema: hyper_schema, strict: true)
+    get "/apps"
+    assert_equal 200, last_response.status
+  end
+
   it "doesn't call error_handler (has a arg) when response is valid" do
     called = false
     pr = ->(_e) { called = true }

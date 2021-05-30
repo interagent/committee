@@ -7,9 +7,6 @@ module Committee
         super
 
         @strict  = options[:strict]
-
-        # deprecated
-        @allow_extra = options[:allow_extra]
       end
 
       def handle(request)

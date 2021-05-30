@@ -7,6 +7,10 @@ module Committee
 
       def initialize(app, options = {})
         super
+
+        unless options[:strict].nil?
+          Committee.warn_deprecated("Committee: Committee::Middleware::ResponseValidation doesn't support strict option now but we'll support this option. This change break backward compatibility so please remove strict option from ResponseValidation")
+        end
         @validate_success_only = @schema.validator_option.validate_success_only
       end
 
