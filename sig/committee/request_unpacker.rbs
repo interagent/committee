@@ -8,11 +8,11 @@ module Committee
 
     def self.indifferent_params: (untyped object) -> untyped
     def initialize: (?Hash[bot, bot] options) -> nil
-    def unpack_request_params: (untyped request) -> [Hash[bot, bot], bool]
-    def unpack_query_params: (untyped request) -> Hash[bot, bot]
-    def unpack_headers: (untyped request) -> Hash[bot, bot]
+    def unpack_request_params: (Rack::Request request) -> [Hash[bot, bot], bool]
+    def unpack_query_params: (Rack::Request request) -> Hash[bot, bot]
+    def unpack_headers: (Rack::Request request) -> Hash[bot, bot]
 
     private
-    def parse_json: (untyped request) -> nil
+    def parse_json: (Rack::Request request) -> nil
   end
 end
