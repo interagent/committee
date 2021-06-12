@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.0] - 2021-06-12
+- Please read [4.4.0.rc1] section
+
+
 ## [4.4.0.rc1] - 2021-05-31
 - We refactoring request unpacker so please check and feedback if we add bug or break backward compatibility.
 - Please set `query_hash_key` like `rack.request.query_hash` bacause will break backward compatibility on 5.0.0. If you doesn't access `rack.request.query_hash`, we recoomennded set `committee.query_hash` (default value in 5.0.0)
@@ -258,7 +262,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add the `coerce_query_params` option to allow queries with basic types to be checked against a schema/
 
-[Unreleased]: https://github.com/interagent/committee/compare/v4.4.0.rc1...HEAD
+[Unreleased]: https://github.com/interagent/committee/compare/v4.4.0...HEAD
+[4.4.0]: https://github.com/interagent/committee/compare/v4.4.0.rc1...v4.4.0
 [4.4.0.rc1]: https://github.com/interagent/committee/compare/v4.3.0...v4.4.0.cr1
 [4.3.0]: https://github.com/interagent/committee/compare/v4.2.1...v4.3.0
 [4.2.1]: https://github.com/interagent/committee/compare/v4.2.0...v4.2.1
