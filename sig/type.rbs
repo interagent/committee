@@ -506,30 +506,6 @@ module Committee
 end
 
 module Committee
-  class RequestUnpacker
-    def initialize: (untyped request, ?::Hash[untyped, untyped] options) -> untyped
-
-    def call: () -> untyped
-
-    private
-
-    # Creates a Hash with indifferent access.
-    #
-    # (Copied from Sinatra)
-    def indifferent_hash: () -> untyped
-
-    # Enable string or symbol key access to the nested params hash.
-    #
-    # (Copied from Sinatra)
-    def indifferent_params: (untyped object) -> untyped
-
-    def parse_json: () -> (nil | untyped)
-
-    def headers: () -> untyped
-  end
-end
-
-module Committee
   module SchemaValidator
     def self.request_media_type: (untyped request) -> untyped
 

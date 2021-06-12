@@ -1,0 +1,18 @@
+# Classes
+module Committee
+  class RequestUnpacker
+    @allow_form_params: nil
+    @allow_get_body: nil
+    @allow_query_params: nil
+    @optimistic_json: nil
+
+    def self.indifferent_params: (untyped object) -> untyped
+    def initialize: (?Hash[bot, bot] options) -> nil
+    def unpack_request_params: (untyped request) -> [Hash[bot, bot], bool]
+    def unpack_query_params: (untyped request) -> Hash[bot, bot]
+    def unpack_headers: (untyped request) -> Hash[bot, bot]
+
+    private
+    def parse_json: (untyped request) -> nil
+  end
+end
