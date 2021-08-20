@@ -51,6 +51,8 @@ module Committee
                   validate_post_request_params(params, headers, validator_option)
                 when 'delete'
                   validate_get_request_params(params, headers, validator_option)
+                when 'head'
+                  validate_get_request_params(params, headers, validator_option)
                 else
                   raise "Committee OpenAPI3 not support #{request_operation.http_method} method"
                 end
