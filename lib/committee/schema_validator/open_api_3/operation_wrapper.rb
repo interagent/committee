@@ -41,18 +41,10 @@ module Committee
 
         def validate_request_params(params, headers, validator_option)
           ret, err = case request_operation.http_method
-                when 'get'
+                when 'get', 'delete', 'head'
                   validate_get_request_params(params, headers, validator_option)
-                when 'post'
+                when 'post', 'put', 'patch'
                   validate_post_request_params(params, headers, validator_option)
-                when 'put'
-                  validate_post_request_params(params, headers, validator_option)
-                when 'patch'
-                  validate_post_request_params(params, headers, validator_option)
-                when 'delete'
-                  validate_get_request_params(params, headers, validator_option)
-                when 'head'
-                  validate_get_request_params(params, headers, validator_option)
                 else
                   raise "Committee OpenAPI3 not support #{request_operation.http_method} method"
                 end
