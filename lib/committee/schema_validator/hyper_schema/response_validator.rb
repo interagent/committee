@@ -14,7 +14,7 @@ module Committee
         end
 
         def call(status, headers, data)
-          unless status == 204 # 204 No Content
+          unless [204, 304].include?(status) # 204 No Content or 304 Not Modified
             response = Rack::Response.new(data, status, headers)
             check_content_type!(response)
           end

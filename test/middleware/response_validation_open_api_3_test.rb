@@ -64,6 +64,12 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 204, last_response.status
   end
 
+  it "passes through a 304 (not modified) response" do
+    @app = new_response_rack("", {}, {schema: open_api_3_schema}, {status: 304})
+    post "/validate"
+    assert_equal 304, last_response.status
+  end
+
   it "passes through a valid response with prefix" do
     @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, schema: open_api_3_schema, prefix: "/v1")
     get "/v1/characters"

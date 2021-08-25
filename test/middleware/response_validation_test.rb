@@ -85,6 +85,12 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 204, last_response.status
   end
 
+  it "passes through a 304 (not modified) response" do
+    @app = new_rack_app("", {}, app_status: 304, schema: hyper_schema)
+    get "/apps"
+    assert_equal 304, last_response.status
+  end
+
   it "skip validation when 4xx" do
     @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema, validate_success_only: true, app_status: 400)
     get "/apps"
