@@ -67,6 +67,11 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
     call_response_validator
   end
 
+  it "passes through a 304 Not Modified response" do
+    @status, @headers, @data = 304, {}, nil
+    call_response_validator
+  end
+
   private
 
   def call_response_validator(strict = false)

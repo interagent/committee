@@ -38,6 +38,11 @@ describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
     call
   end
 
+  it "passes through a 304 Not Modified response" do
+    @status, @headers, @data = 304, {}, nil
+    call
+  end
+
   it "passes through a valid list response for for rel instances links" do
     @link = @list_link
 
@@ -88,6 +93,11 @@ describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
 
   it "allows no Content-Type for 204 No Content" do
     @status, @headers = 204, {}
+    call
+  end
+
+  it "allows no Content-Type for 304 Not Modified" do
+    @status, @headers = 304, {}
     call
   end
 
