@@ -113,6 +113,26 @@ paths:
                 properties:
                   integer:
                     type: integer
+      parameters:
+        - name: limit
+          in: query
+          description: maximum number of characters
+          required: false
+          schema:
+            type: integer
+            format: int32
+    options:
+      description: preflight request
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integer:
+                    type: integer
 
   /string_params_coercer:
     get:

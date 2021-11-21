@@ -155,6 +155,28 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       end
     end
 
+    describe 'support head method' do
+      before do
+        @path = '/characters'
+        @method = 'head'
+      end
+
+      it 'correct' do
+        operation_object.validate_request_params({"limit" => "1"}, HEADER, @validator_option)
+
+        assert true
+      end
+
+      it 'invalid type' do
+        e = assert_raises(Committee::InvalidRequest) {
+          operation_object.validate_request_params({"limit" => "a"}, HEADER, @validator_option)
+        }
+
+        assert_match(/expected integer, but received String: "a"/i, e.message)
+        assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
+      end
+    end
+
     describe '#content_types' do
       it 'returns supported content types' do
         @path = '/validate_content_types'
