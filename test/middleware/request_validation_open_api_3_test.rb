@@ -461,10 +461,10 @@ describe Committee::Middleware::RequestValidation do
     @app = new_rack_app(schema: open_api_3_schema)
 
     e = assert_raises(RuntimeError) {
-      head "/characters", {}
+      options "/characters", {}
     }
 
-    assert_equal 'Committee OpenAPI3 not support head method', e.message
+    assert_equal 'Committee OpenAPI3 not support options method', e.message
   end
 
   describe 'check header' do

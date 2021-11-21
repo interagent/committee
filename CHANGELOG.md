@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Allow HEAD method in v3 #331
+  - backport https://github.com/interagent/committee/pull/331
+
 ## [4.4.0] - 2021-06-12
 - Please read [4.4.0.rc1] section
 
