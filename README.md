@@ -299,7 +299,7 @@ use Committee::Middleware::RequestValidation,
 
 Committee has few options which enable convert request data.
 By default committee save converted data to `committee.params` and rails dose not read it.
-So we need save convertd value to `'action_dispatch.request.request_parameters'` bacause rails create parameter from this value.
+So we need save convertd value to `'action_dispatch.request.request_parameters'` because rails create parameter from this value.
 
 ## Using OpenAPI 3
 
