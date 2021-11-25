@@ -28,7 +28,8 @@ module Committee
     # @param [String] schema_path
     # @return [Committee::Driver]
     def self.load_from_yaml(schema_path)
-      load_from_data(YAML.load_file(schema_path), schema_path)
+      data = YAML.respond_to?(:unsafe_load_file) ? YAML.unsafe_load_file(schema_path) : YAML.load_file(schema_path)
+      load_from_data(data, schema_path)
     end
 
     # load and build drive from file

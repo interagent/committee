@@ -82,7 +82,11 @@ def open_api_2_form_data
 end
 
 def open_api_3_data
-  YAML.load_file(open_api_3_schema_path)
+  if YAML.respond_to?(:unsafe_load_file)
+    YAML.unsafe_load_file(open_api_3_schema_path)
+  else
+    YAML.load_file(open_api_3_schema_path)
+  end
 end
 
 def hyper_schema_schema_path
