@@ -42,6 +42,15 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
     assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
   end
 
+  it "raises InvalidResponse when a invalid status code with strict option" do
+    @status = 201
+    e = assert_raises(Committee::InvalidResponse) {
+      call_response_validator(true)
+    }
+
+    assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
+  end
+
   it "passes through a valid response with no Content-Type" do
     @headers = {}
     call_response_validator

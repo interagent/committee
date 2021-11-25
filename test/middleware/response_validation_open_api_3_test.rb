@@ -234,6 +234,42 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  it "strict and invalid status" do    
+    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, {schema: open_api_3_schema, strict: true}, {status: 201})
+    get "/characters"
+    assert_equal 500, last_response.status
+  end
+
+  it "strict and invalid status with raise" do
+    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, {schema: open_api_3_schema, strict: true, raise: true}, {status: 201})
+
+    assert_raises(Committee::InvalidResponse) do
+      get "/characters"
+    end
+  end
+
+  it "strict and invalid content type" do
+    @app = new_response_rack("abc", 
+      {}, 
+      {schema: open_api_3_schema, strict: true},
+      {content_type: 'application/text'}
+    )
+    get "/characters"
+    assert_equal 500, last_response.status
+  end
+
+  it "strict and invalid content type with raise" do
+    @app = new_response_rack("abc",
+      {},
+      {schema: open_api_3_schema, strict: true, raise: true},
+      {content_type: 'application/text'}
+    )
+
+    assert_raises(Committee::InvalidResponse) do
+      get "/characters"
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})
@@ -241,8 +277,9 @@ describe Committee::Middleware::ResponseValidation do
     options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
 
     status = rack_options[:status] || 200
+    content_type = rack_options[:content_type] || "application/json"
     headers = {
-      "Content-Type" => "application/json"
+      "Content-Type" => content_type
     }.merge(headers)
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, options

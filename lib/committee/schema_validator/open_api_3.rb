@@ -34,6 +34,7 @@ module Committee
           full_body
         end
 
+        # TODO: refactoring name
         strict = test_method
         Committee::SchemaValidator::OpenAPI3::ResponseValidator.
             new(@operation_object, validator_option).

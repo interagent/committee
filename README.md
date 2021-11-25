@@ -161,6 +161,7 @@ Option values and defaults:
 |validate_success_only| true | false | Also validate non-2xx responses only. |
 |ignore_error| false | false | Validate and ignore result even if validation is error. So always return original data. |
 |parse_response_by_content_type| false | false | Parse response body to JSON only if Content-Type header is 'application/json'. When false, this always optimistically parses as JSON without checking for Content-Type header. |
+|strict| false | false | Puts the middleware into strict mode, meaning that response code and content type does not defined in the schema will be responded to with a 500 instead of application's status code. |
 
 No boolean option values:
 
