@@ -27,7 +27,7 @@ module Committee
       @optimistic_json    = options[:optimistic_json]
     end
 
-    # reutrn params and is_form_params
+    # return params and is_form_params
     def unpack_request_params(request)
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON

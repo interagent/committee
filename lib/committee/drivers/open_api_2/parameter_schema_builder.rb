@@ -62,7 +62,7 @@ module Committee
                 # And same idea: despite parameters not being schemas, the items
                 # key (if preset) is actually a schema that defines each item of an
                 # array type, so we can just reflect that directly onto our
-                # artifical schema.
+                # artificial schema.
                 if param_data["type"] == "array" && param_data["items"]
                   param_schema.items = param_data["items"]
                 end
