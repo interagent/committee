@@ -2,7 +2,7 @@ require:
   - rubocop-performance
 
 AllCops:
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.6
   # RuboCop has a bunch of cops enabled by default. This setting tells RuboCop
   # to ignore them, so only the ones explicitly set in this file are enabled.
   DisabledByDefault: true
@@ -23,6 +23,9 @@ Style/FrozenStringLiteralComment:
 
 # Use Ruby >= 1.9 syntax for hashes. Prefer { a: :b } over { :a => :b }.
 Style/HashSyntax:
+  Enabled: true
+
+Gemspec/RequiredRubyVersion:
   Enabled: true
 
 Performance/RedundantMerge:

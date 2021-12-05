@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.4.0.rc1] - 2021-05-31
 - We refactoring request unpacker so please check and feedback if we add bug or break backward compatibility.
-- Please set `query_hash_key` like `rack.request.query_hash` because will break backward compatibility on 5.0.0. If you doesn't access `rack.request.query_hash`, we recoomennded set `committee.query_hash` (default value in 5.0.0)
+- Please set `query_hash_key` like `rack.request.query_hash` because will break backward compatibility on 5.0.0. If you doesn't access `rack.request.query_hash`, we recommended set `committee.query_hash` (default value in 5.0.0)
 
 
 ### Added
@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Dose not suppress application error. (#279)
+- Does not suppress application error. (#279)
 
 ## [4.1.0] - 2020-06-27
 
