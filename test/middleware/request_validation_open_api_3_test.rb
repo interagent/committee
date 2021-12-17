@@ -457,16 +457,6 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 204, last_response.status
   end
 
-  it "OpenAPI3 raise not support method" do
-    @app = new_rack_app(schema: open_api_3_schema)
-
-    e = assert_raises(RuntimeError) {
-      options "/characters", {}
-    }
-
-    assert_equal 'Committee OpenAPI3 not support options method', e.message
-  end
-
   describe 'check header' do
     [
       { check_header: true, description: 'valid value', value: 1, expected: { status: 200 } },
@@ -482,7 +472,7 @@ describe Committee::Middleware::RequestValidation do
       value = h[:value]
       expected = h[:expected]
       describe "when #{check_header}" do
-        %w(get post put patch delete).each do |method|
+        %w(get post put patch delete options).each do |method|
           describe method do
             describe description do
               it (expected[:error].nil? ? 'should pass' : 'should fail') do

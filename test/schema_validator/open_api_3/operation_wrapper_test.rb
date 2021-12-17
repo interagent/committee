@@ -177,6 +177,19 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       end
     end
 
+    it 'support options method' do
+      @method = "options"
+      operation_object.validate_request_params({"integer" => 1}, HEADER, @validator_option)
+
+      e = assert_raises(Committee::InvalidRequest) {
+        operation_object.validate_request_params({"integer" => "str"}, HEADER, @validator_option)
+      }
+
+      assert_match(/expected integer, but received String: "str"/i, e.message)
+      assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
+    end
+
+
     describe '#content_types' do
       it 'returns supported content types' do
         @path = '/validate_content_types'
