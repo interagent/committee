@@ -142,7 +142,7 @@ describe Committee::Middleware::ResponseValidation do
       header = h[:header]
       expected = h[:expected]
       describe "when #{check_header}" do
-        %w(get post put patch delete).each do |method|
+        %w(get post put patch delete options).each do |method|
           describe method do
             describe description do
               if expected[:error].nil?

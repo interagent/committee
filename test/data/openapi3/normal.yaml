@@ -394,6 +394,26 @@ paths:
                 properties:
                   string:
                     type: string
+    options:
+      description: validate options metodhd
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                integer:
+                  type: integer
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  string:
+                    type: string
 
   /validate_content_types:
     post:
@@ -565,6 +585,12 @@ paths:
         '200':
           $ref: '#/components/responses/header_integer_required'
     delete:
+      parameters:
+        - $ref: '#/components/parameters/header_integer_required'
+      responses:
+        '200':
+          $ref: '#/components/responses/header_integer_required'
+    options:
       parameters:
         - $ref: '#/components/parameters/header_integer_required'
       responses:
