@@ -30,11 +30,12 @@ module Committee
       class << self
         def get_schema(options)
           schema = options[:schema]
-          unless schema
-            schema = Committee::Drivers::load_from_file(options[:schema_path]) if options[:schema_path]
-
-            raise(ArgumentError, "Committee: need option `schema` or `schema_path`") unless schema
+          if !schema && options[:schema_path]
+            # In the future, we could have `parser_options` as an exposed config?
+            parser_options = options.key?(:strict_reference_validation) ? { strict_reference_validation: options[:strict_reference_validation] } : {}
+            schema = Committee::Drivers::load_from_file(options[:schema_path], parser_options)
           end
+          raise(ArgumentError, "Committee: need option `schema` or `schema_path`") unless schema
 
           # Expect the type we want by now. If we don't have it, the user passed
           # something else non-standard in.
