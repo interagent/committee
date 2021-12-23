@@ -108,3 +108,7 @@ end
 def open_api_3_0_1_schema_path
   "./test/data/openapi3/3_0_1.yaml"
 end
+
+def open_api_3_invalid_reference_path
+  "./test/data/openapi3/invalid_reference.yaml"
+end

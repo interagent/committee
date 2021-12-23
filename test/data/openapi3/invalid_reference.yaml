@@ -1,0 +1,29 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  title: OpenAPI3 Test
+  description: A Sample file
+paths:
+  /characters:
+    get:
+      description: get characters
+      parameters:
+        - name: school_name
+          in: query
+          description: school name to filter by
+          required: false
+          style: form
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          # Does not exist, `ThisIsDefined` exists
+          $ref: '#/components/responses/ThisIsNotDefinedAnywhere'
+
+components:
+  responses:
+    # Not used
+    ThisIsDefined:
+      type: object

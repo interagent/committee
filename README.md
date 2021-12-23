@@ -22,7 +22,7 @@ use Committee::Middleware::RequestValidation, schema_path: 'docs/schema.json', c
 
 This piece of middleware validates the parameters of incoming requests to make sure that they're formatted according to the constraints imposed by a particular schema.
 
-Options and their defaults:
+### Configuration Options
 
 | name | Hyper-Schema | OpenAPI 3 | Description |
 |-----------:|------------:|------------:| :------------ |
@@ -39,6 +39,7 @@ Options and their defaults:
 |optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |
+|strict_reference_validation| always false | false | Raises an exception (`OpenAPIParser::MissingReferenceError`) on middleware load if the provided schema file contains unresolvable references (`$ref:"#/something/not/here"`). Not supported on Hyper-schema parser. Defaults to `false` on OpenAPI3 but will default to `true` in next major version. |
 |ignore_error| false | false | Validate and ignore result even if validation is error. So always return original data. |
 
 Non-boolean options:
@@ -153,7 +154,7 @@ use Committee::Middleware::ResponseValidation, schema_path: 'docs/schema.json'
 
 This piece of middleware validates the contents of the response received from up the stack for any route that matches the JSON Schema. A hyper-schema link's `targetSchema` property is used to determine what a valid response looks like.
 
-Option values and defaults:
+### Configuration Options
 
 | name | Hyper-Schema | OpenAPI 3 | Description |
 |-----------:|------------:|------------:| :------------ |
@@ -161,6 +162,8 @@ Option values and defaults:
 |validate_success_only| true | false | Also validate non-2xx responses only. |
 |ignore_error| false | false | Validate and ignore result even if validation is error. So always return original data. |
 |parse_response_by_content_type| false | false | Parse response body to JSON only if Content-Type header is 'application/json'. When false, this always optimistically parses as JSON without checking for Content-Type header. |
+|strict| false | false | Puts the middleware into strict mode, meaning that response code and content type does not defined in the schema will be responded to with a 500 instead of application's status code. |
+|strict_reference_validation| always false | false | Raises an exception (`OpenAPIParser::MissingReferenceError`) on middleware load if the provided schema file contains unresolvable references (`$ref:"#/something/not/here"`). Not supported on Hyper-schema parser. Defaults to `false` on OpenAPI3 but will default to `true` in next major version. |
 
 No boolean option values:
 
@@ -333,13 +336,20 @@ Committee 3.* has many breaking changes so we recommend upgrading to the latest 
 
 Important changes are also described below.
 
-
 ### Upgrading from Committee 4.* to 5.*
 
 Committee 5.* has few breaking changes so we recommend upgrading to the latest release on 4.* and fixing any deprecation errors you see before upgrading.
 (Now we doesn't release 5.* yet)
 
 - change `parse_response_by_content_type`'s default value from `false` to `true`.
+
+#### Future Updates (5.*~)
+OpenAPI3 Schema Users: Newly-added `strict_reference_validation` option defaults to `false` if not set.
+From a later major version of Committee, we want to change it to `true` (or remove the option entirely and force
+`true` to be passed to the OpenAPI3 parser (see: https://github.com/interagent/committee/issues/343).
+
+To remove deprecation warnings, pass `strict_reference_validation: true` as an option when loading the middleware
+(because this is about schema parsing/initialization, the setting is valid for both request and response validation).
 
 ### Setting schemas in middleware
 
