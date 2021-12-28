@@ -8,3 +8,4 @@ Gemfile.lock
 !/examples/heroku_api/Gemfile.lock
 .DS_Store
 /coverage/
+.idea

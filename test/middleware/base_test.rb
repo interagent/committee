@@ -119,6 +119,20 @@ describe Committee::Middleware::Base do
       b = Committee::Middleware::Base.new(nil, schema_path: open_api_3_schema_path, parse_response_by_content_type: false)
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, b.instance_variable_get(:@schema)
     end
+
+    it "accepts OpenAPI3 parser config of strict_reference_validation and raises" do
+      assert_raises(OpenAPIParser::MissingReferenceError) do
+        Committee::Middleware::Base.new(nil, schema_path: open_api_3_invalid_reference_path, strict_reference_validation: true)
+      end
+    end
+
+    it "does not raise by default even with invalid reference OpenAPI3 specification" do
+      b = Committee::Middleware::Base.new(nil, schema_path: open_api_3_invalid_reference_path, strict_reference_validation: false)
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, b.instance_variable_get(:@schema)
+
+      b = Committee::Middleware::Base.new(nil, schema_path: open_api_3_invalid_reference_path)
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, b.instance_variable_get(:@schema)
+    end
   end
 
   private
