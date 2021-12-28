@@ -457,6 +457,16 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 204, last_response.status
   end
 
+  it "OpenAPI3 raise not support method" do
+    @app = new_rack_app(schema: open_api_3_schema)
+
+    e = assert_raises(RuntimeError) {
+      custom_request('TRACE', "/characters")
+    }
+
+    assert_equal 'Committee OpenAPI3 not support trace method', e.message
+  end  
+
   describe 'check header' do
     [
       { check_header: true, description: 'valid value', value: 1, expected: { status: 200 } },

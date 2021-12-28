@@ -136,6 +136,18 @@ paths:
                 properties:
                   integer:
                     type: integer
+    trace:
+      description: trace request
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integer:
+                    type: integer
 
   /string_params_coercer:
     get:
