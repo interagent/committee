@@ -1,7 +1,7 @@
 require "committee"
 require "json"
 require "securerandom"
-require "sinatra/base"
+require "sinatra"
 require "yaml"
 
 class App < Sinatra::Base
@@ -16,7 +16,7 @@ class App < Sinatra::Base
   # This handler suppresses the stubbed response and returns its own.
   get "/posts" do
     content_type :json
-    status 204
+    { foo: "bar" }.to_json
   end
 
   post "/dont_allow_additional_parameter" do
