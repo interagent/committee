@@ -49,7 +49,7 @@ describe Committee::Middleware::RequestValidation do
     params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
 
     check_parameter = lambda { |env|
-      assert_equal nil, env['committee.query_hash']
+      assert_nil env['committee.query_hash']
       assert_equal DateTime, env['rack.request.query_hash']["datetime_string"].class
       [200, {}, []]
     }
@@ -65,7 +65,7 @@ describe Committee::Middleware::RequestValidation do
 
     @app = new_rack_app(schema: open_api_3_schema, allow_get_body: true)
 
-    get "/get_endpoint_with_requered_parameter", { no_problem: true }, { input: params.to_json }
+    get "/get_endpoint_with_required_parameter", { no_problem: true }, { input: params.to_json }
     assert_equal 200, last_response.status
   end
 
@@ -74,7 +74,7 @@ describe Committee::Middleware::RequestValidation do
 
     @app = new_rack_app(schema: open_api_3_schema, allow_get_body: false)
 
-    get "/get_endpoint_with_requered_parameter", { no_problem: true }, { input: params.to_json }
+    get "/get_endpoint_with_required_parameter", { no_problem: true }, { input: params.to_json }
     assert_equal 400, last_response.status
   end
 
@@ -412,12 +412,12 @@ describe Committee::Middleware::RequestValidation do
     get "/coerce_path_params/1"
   end
 
-  it "corce string and save path hash" do
+  it "coerce string and save path hash" do
     @app = new_rack_app_with_lambda(lambda do |env|
-      assert_equal env['committee.params']['integer'], 21
-      assert_equal env['committee.params'][:integer], 21
-      assert_equal env['committee.path_hash']['integer'], 21
-      assert_equal env['committee.path_hash'][:integer], 21
+      assert_equal 21, env['committee.params']['integer']
+      assert_equal 21, env['committee.params'][:integer]
+      assert_equal 21, env['committee.path_hash']['integer']
+      assert_equal 21, env['committee.path_hash'][:integer]
       [204, {}, []]
     end, schema: open_api_3_schema)
 
@@ -426,12 +426,12 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 204, last_response.status
   end
 
-  it "corce string and save request body hash" do
+  it "coerce string and save request body hash" do
     @app = new_rack_app_with_lambda(lambda do |env|
-      assert_equal env['committee.params']['integer'], 21 # use path parameter
-      assert_equal env['committee.params'][:integer], 21
-      assert_equal env['committee.request_body_hash']['integer'], 42
-      assert_equal env['committee.request_body_hash'][:integer], 42
+      assert_equal 21, env['committee.params']['integer'] # path parameter has precedence
+      assert_equal 21, env['committee.params'][:integer]
+      assert_equal 42, env['committee.request_body_hash']['integer']
+      assert_equal 42, env['committee.request_body_hash'][:integer]
       [204, {}, []]
     end, schema: open_api_3_schema)
 
@@ -444,11 +444,10 @@ describe Committee::Middleware::RequestValidation do
 
   it "unpacker test" do
     @app = new_rack_app_with_lambda(lambda do |env|
-      assert_equal env['committee.params']['integer'], 42
-      assert_equal env['committee.params'][:integer], 42
-      # overwrite by request body...
-      assert_equal env['rack.request.query_hash']['integer'], 42
-      # assert_equal env['rack.request.query_hash'][:integer], 42
+      assert_equal '21', env['committee.params']['integer'] # query parameter has precedence
+      assert_equal '21', env['committee.params'][:integer]
+      assert_equal '21', env['rack.request.query_hash']['integer']
+      assert_equal 42, env['committee.request_body_hash']['integer']
       [204, {}, []]
     end, schema: open_api_3_schema, raise: true)
 

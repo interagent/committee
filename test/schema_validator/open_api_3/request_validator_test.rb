@@ -71,6 +71,16 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       assert_equal 200, last_response.status
     end
 
+    it "does not mix up parameters and requestBody" do
+      @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
+      params = {
+          "last_name" => "Skywalker"
+      }
+      header "Content-Type", "application/json"
+      post "/additional_properties?first_name=Luke", JSON.generate(params)
+      assert_equal 200, last_response.status
+    end
+
     def new_rack_app(options = {})
       # TODO: delete when 5.0.0 released because default value changed
       options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil

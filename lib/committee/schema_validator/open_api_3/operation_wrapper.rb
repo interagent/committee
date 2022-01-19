@@ -39,12 +39,12 @@ module Committee
           raise Committee::InvalidResponse.new(e.message, original_error: e)
         end
 
-        def validate_request_params(params, headers, validator_option)
+        def validate_request_params(path_params, query_params, body_params, headers, validator_option)
           ret, err = case request_operation.http_method
                 when 'get', 'delete', 'head'
-                  validate_get_request_params(params, headers, validator_option)
+                  validate_get_request_params(path_params, query_params, headers, validator_option)
                 when 'post', 'put', 'patch', 'options'
-                  validate_post_request_params(params, headers, validator_option)
+                  validate_post_request_params(path_params, query_params, body_params, headers, validator_option)
                 else
                   raise "Committee OpenAPI3 not support #{request_operation.http_method} method"
                 end
@@ -74,18 +74,17 @@ module Committee
         #   @return [OpenAPIParser::RequestOperation]
 
         # @return [OpenAPIParser::SchemaValidator::Options]
+        def build_openapi_parser_body_option(validator_option)
+          build_openapi_parser_option(validator_option, validator_option.coerce_form_params)
+        end
+
+        # @return [OpenAPIParser::SchemaValidator::Options]
         def build_openapi_parser_path_option(validator_option)
-          coerce_value = validator_option.coerce_path_params
-          datetime_coerce_class = validator_option.coerce_date_times ? DateTime : nil
-          validate_header = validator_option.check_header
-          OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,
-                                                      datetime_coerce_class: datetime_coerce_class,
-                                                      validate_header: validate_header)
+          build_openapi_parser_option(validator_option, validator_option.coerce_query_params)
         end
 
         # @return [OpenAPIParser::SchemaValidator::Options]
-        def build_openapi_parser_post_option(validator_option)
-          coerce_value = validator_option.coerce_form_params
+        def build_openapi_parser_option(validator_option, coerce_value)
           datetime_coerce_class = validator_option.coerce_date_times ? DateTime : nil
           validate_header = validator_option.check_header
           OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,
@@ -93,32 +92,38 @@ module Committee
                                                       validate_header: validate_header)
         end
 
-        # @return [OpenAPIParser::SchemaValidator::Options]
-        def build_openapi_parser_get_option(validator_option)
-          coerce_value = validator_option.coerce_query_params
-          datetime_coerce_class = validator_option.coerce_date_times ? DateTime : nil
-          validate_header = validator_option.check_header
-          OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,
-                                                      datetime_coerce_class: datetime_coerce_class,
-                                                      validate_header: validate_header)
-        end
-
-        def validate_get_request_params(params, headers, validator_option)
+        def validate_get_request_params(path_params, query_params, headers, validator_option)
           # bad performance because when we coerce value, same check
-          request_operation.validate_request_parameter(params, headers, build_openapi_parser_get_option(validator_option))
+          validate_path_and_query_params(path_params, query_params, headers, validator_option)
         rescue OpenAPIParser::OpenAPIError => e
           raise Committee::InvalidRequest.new(e.message, original_error: e)
         end
 
-        def validate_post_request_params(params, headers, validator_option)
+        def validate_post_request_params(path_params, query_params, body_params, headers, validator_option)
           content_type = headers['Content-Type'].to_s.split(";").first.to_s
 
           # bad performance because when we coerce value, same check
-          schema_validator_options = build_openapi_parser_post_option(validator_option)
-          request_operation.validate_request_parameter(params, headers, schema_validator_options)
-          request_operation.validate_request_body(content_type, params, schema_validator_options)
+          validate_path_and_query_params(path_params, query_params, headers, validator_option)
+          request_operation.validate_request_body(content_type, body_params, build_openapi_parser_body_option(validator_option))
         rescue => e
           raise Committee::InvalidRequest.new(e.message, original_error: e)
+        end
+
+        def validate_path_and_query_params(path_params, query_params, headers, validator_option)
+          # it's currently impossible to validate path params and query params separately
+          # so we have to resort to this workaround
+
+          path_keys = path_params.keys.to_set
+          query_keys = query_params.keys.to_set
+
+          merged_params = query_params.merge(path_params)
+
+          request_operation.validate_request_parameter(merged_params, headers, build_openapi_parser_path_option(validator_option))
+
+          merged_params.each do |k, v|
+            path_params[k] = v if path_keys.include?(k)
+            query_params[k] = v if query_keys.include?(k)
+          end
         end
 
         def response_validate_options(strict, check_header)

@@ -6,6 +6,26 @@ info:
 servers:
 - url: https://github.com/interagent/committee/
 paths:
+  /additional_properties:
+    post:
+      description: post additional_properties
+      parameters:
+        - name: first_name
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                last_name:
+                  type: string
+              required:
+                - last_name
+              additionalProperties: false
   /csv:
     get:
       description: get csv
@@ -609,7 +629,7 @@ paths:
         '200':
           $ref: '#/components/responses/header_integer_required'
 
-  /get_endpoint_with_requered_parameter:
+  /get_endpoint_with_required_parameter:
     get:
       description: get body test
       parameters:
