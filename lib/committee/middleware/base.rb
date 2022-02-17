@@ -7,6 +7,7 @@ module Committee
         @app = app
 
         @error_class = options.fetch(:error_class, Committee::ValidationError)
+        @error_class = @error_class.call if @error_class.respond_to?(:call)
         @error_handler = options[:error_handler]
         @ignore_error = options.fetch(:ignore_error, false)
 
