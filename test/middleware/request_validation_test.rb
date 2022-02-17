@@ -522,6 +522,33 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  class CustomErrorClass
+    def initialize(status, id, message, request)
+      @data = [status, id, message, request]
+    end
+
+    def render
+      [400, { 'Custom Header' => 'Custom Value' }, @data.to_json]
+    end
+  end
+
+  it 'accepts :error_class option to override response object' do
+    @app = new_rack_app(schema: hyper_schema, error_class: CustomErrorClass)
+    post "/apps", "{x:y}"
+
+    assert_equal 400, last_response.status
+    assert_equal 'Custom Value', last_response.headers['Custom Header']
+    _status, id, _message, _request = JSON.parse(last_response.body)
+    assert_equal 'bad_request', id
+  end
+
+  it 'accepts callable value for :error_class option' do
+    @app = new_rack_app(schema: hyper_schema, error_class: -> { CustomErrorClass })
+    post "/apps", "{x:y}"
+
+    assert_equal 'Custom Value', last_response.headers['Custom Header']
+  end
+
   private
 
   def new_rack_app(options = {})
