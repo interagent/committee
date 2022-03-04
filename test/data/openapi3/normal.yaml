@@ -461,6 +461,29 @@ paths:
                   integer:
                     type: integer
 
+  /validate_empty_optional_body:
+    patch:
+      description: validate empty optional body
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                integer:
+                  type: integer
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  integer:
+                    type: integer
+
   /validate_response_array:
     get:
       responses:
@@ -645,7 +668,7 @@ paths:
         in: query
         required: true
         schema:
-          type: integer    
+          type: integer
       requestBody:
         content:
           application/json:
