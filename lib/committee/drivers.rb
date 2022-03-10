@@ -50,7 +50,7 @@ module Committee
     # @return [Committee::Driver]
     def self.load_from_data(hash)
       if hash['openapi']&.start_with?('3.0.')
-        parser = OpenAPIParser.parse(hash)
+        parser = OpenAPIParser.parse(hash, { strict_reference_validation: false })
         return Committee::Drivers::OpenAPI3::Driver.new.parse(parser)
       end
 
