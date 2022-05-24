@@ -48,7 +48,7 @@ module Committee
         private
 
         def response_media_type(response)
-          response.content_type.to_s.split(";").first.to_s
+          response.media_type.to_s.split(";").first.to_s
         end
 
         def check_content_type!(response)
