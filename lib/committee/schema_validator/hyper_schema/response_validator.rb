@@ -49,7 +49,7 @@ module Committee
 
         def response_media_type(response)
           if response.respond_to?(:media_type)
-            response.media_type.to_s.split(";").first.to_s
+            response.media_type.to_s
           else
             # for rack compatibility. In rack v 1.5.0, Rack::Response doesn't have media_type
             response.content_type.to_s.split(";").first.to_s
