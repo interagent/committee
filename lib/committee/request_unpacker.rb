@@ -79,12 +79,6 @@ module Committee
 
       request.body.rewind
       hash = JSON.parse(body)
-      # We want a hash specifically. '42', 42, and [42] will all be
-      # decoded properly, but we can't use them here.
-      if !hash.is_a?(Hash)
-        raise BadRequest,
-              "Invalid JSON input. Require object with parameters as keys."
-      end
       self.class.indifferent_params(hash)
     end
   end
