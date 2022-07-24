@@ -92,6 +92,14 @@ module Committee
         request.env[validator_option.path_hash_key] = coerce_path_params
 
         query_param = unpacker.unpack_query_params(request)
+        param_matches_hash = request.env[validator_option.path_hash_key]
+
+        raise BadRequest, "Invalid JSON input. Require object with parameters as keys when path parameter exists." if !request_param.is_a?(Hash) && (query_param != {} || param_matches_hash != {})
+
+        request.env[validator_option.params_key] = Committee::Utils.deep_copy(request_param) || Committee::Utils.indifferent_hash
+        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(query_param)) if query_param != {}
+        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(param_matches_hash)) if param_matches_hash != {}
+
         query_param.merge!(request_param) if request.get? && validator_option.allow_get_body
         request.env[validator_option.query_hash_key] = query_param
       end
