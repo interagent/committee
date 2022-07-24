@@ -13,7 +13,7 @@ module Committee
         end
 
         def call!
-          coerce_object!(@params, @schema)
+          coerce_value!(@params, @schema)
         end
 
         private

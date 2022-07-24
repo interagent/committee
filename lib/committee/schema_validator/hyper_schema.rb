@@ -79,10 +79,11 @@ module Committee
           coerce_form_params(request_param) if validator_option.coerce_form_params && is_form_params
           request.env[validator_option.request_body_hash_key] = request_param
 
-          request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(query_param))
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request_param))
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(param_matches_hash))
+          raise BadRequest, "Invalid JSON input. Require object with parameters as keys when path parameter exists." if !request_param.is_a?(Hash) && (query_param != {} || param_matches_hash != {})
+
+          request.env[validator_option.params_key] = Committee::Utils.deep_copy(request_param) || Committee::Utils.indifferent_hash
+          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(query_param)) if query_param != {}
+          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(param_matches_hash)) if param_matches_hash != {}
         end
 
         def coerce_form_params(parameter)
