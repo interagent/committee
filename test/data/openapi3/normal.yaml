@@ -367,7 +367,7 @@ paths:
         '204':
           description: no content
     put:
-      description: validate put metodhd
+      description: validate put method
       requestBody:
         content:
           application/json:
@@ -387,7 +387,7 @@ paths:
                   string:
                     type: string
     patch:
-      description: validate patch metodhd
+      description: validate patch method
       requestBody:
         content:
           application/json:
@@ -407,7 +407,7 @@ paths:
                   string:
                     type: string
     options:
-      description: validate options metodhd
+      description: validate options method
       requestBody:
         content:
           application/json:
