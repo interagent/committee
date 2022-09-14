@@ -609,7 +609,7 @@ paths:
         '200':
           $ref: '#/components/responses/header_integer_required'
 
-  /get_endpoint_with_requered_parameter:
+  /get_endpoint_with_request_parameter:
     get:
       description: get body test
       parameters:

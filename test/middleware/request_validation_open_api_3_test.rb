@@ -65,7 +65,7 @@ describe Committee::Middleware::RequestValidation do
 
     @app = new_rack_app(schema: open_api_3_schema, allow_get_body: true)
 
-    get "/get_endpoint_with_requered_parameter", { no_problem: true }, { input: params.to_json }
+    get "/get_endpoint_with_request_parameter", { no_problem: true }, { input: params.to_json }
     assert_equal 200, last_response.status
   end
 
@@ -74,7 +74,7 @@ describe Committee::Middleware::RequestValidation do
 
     @app = new_rack_app(schema: open_api_3_schema, allow_get_body: false)
 
-    get "/get_endpoint_with_requered_parameter", { no_problem: true }, { input: params.to_json }
+    get "/get_endpoint_with_request_parameter", { no_problem: true }, { input: params.to_json }
     assert_equal 400, last_response.status
   end
 
