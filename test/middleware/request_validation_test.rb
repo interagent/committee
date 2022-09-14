@@ -435,7 +435,7 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "corce form params" do
+  it "coerce form params" do
     check_parameter = lambda { |env|
       assert_equal 3, env['committee.params']['age']
       assert_equal 3, env['committee.request_body_hash']['age']

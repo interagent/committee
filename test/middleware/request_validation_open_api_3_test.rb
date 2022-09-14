@@ -412,7 +412,7 @@ describe Committee::Middleware::RequestValidation do
     get "/coerce_path_params/1"
   end
 
-  it "corce string and save path hash" do
+  it "coerce string and save path hash" do
     @app = new_rack_app_with_lambda(lambda do |env|
       assert_equal env['committee.params']['integer'], 21
       assert_equal env['committee.params'][:integer], 21
@@ -426,7 +426,7 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 204, last_response.status
   end
 
-  it "corce string and save request body hash" do
+  it "coerce string and save request body hash" do
     @app = new_rack_app_with_lambda(lambda do |env|
       assert_equal env['committee.params']['integer'], 21 # use path parameter
       assert_equal env['committee.params'][:integer], 21
