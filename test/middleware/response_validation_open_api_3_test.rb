@@ -92,7 +92,7 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
-  it "not parameter requset" do
+  it "not parameter request" do
     @app = new_response_rack({integer: '1'}.to_json, {}, schema: open_api_3_schema, raise: true)
 
     assert_raises(Committee::InvalidResponse) do
