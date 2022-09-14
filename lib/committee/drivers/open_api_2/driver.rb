@@ -59,7 +59,7 @@ module Committee
           schema.base_path = data['basePath'] || ''
 
           # Arbitrarily choose the first media type found in these arrays. This
-          # appraoch could probably stand to be improved, but at least users will
+          # approach could probably stand to be improved, but at least users will
           # for now have the option of turning media type validation off if they so
           # choose.
           schema.consumes = data['consumes'].first
