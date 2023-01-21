@@ -11,19 +11,19 @@ GEM
   specs:
     byebug (11.1.3)
     json_schema (0.21.0)
-    mustermann (1.1.1)
+    mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
     openapi_parser (1.0.0.beta1)
     rack (2.2.6.2)
-    rack-protection (2.1.0)
+    rack-protection (2.2.3)
       rack
     ruby2_keywords (0.0.5)
-    sinatra (2.1.0)
-      mustermann (~> 1.0)
+    sinatra (2.2.3)
+      mustermann (~> 2.0)
       rack (~> 2.2)
-      rack-protection (= 2.1.0)
+      rack-protection (= 2.2.3)
       tilt (~> 2.0)
-    tilt (2.0.10)
+    tilt (2.0.11)
     webrick (1.7.0)
 
 PLATFORMS
