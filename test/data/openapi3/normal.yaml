@@ -50,7 +50,7 @@ paths:
                     type: string
                   time_string_1:
                     type: string
-                    exmaple: 2021-09-22T05:36:45Z
+                    example: 2021-09-22T05:36:45Z
                   array_1:
                     type: array
                     items:
@@ -367,7 +367,7 @@ paths:
         '204':
           description: no content
     put:
-      description: validate put metodhd
+      description: validate put method
       requestBody:
         content:
           application/json:
@@ -387,7 +387,7 @@ paths:
                   string:
                     type: string
     patch:
-      description: validate patch metodhd
+      description: validate patch method
       requestBody:
         content:
           application/json:
@@ -407,7 +407,7 @@ paths:
                   string:
                     type: string
     options:
-      description: validate options metodhd
+      description: validate options method
       requestBody:
         content:
           application/json:
@@ -609,7 +609,7 @@ paths:
         '200':
           $ref: '#/components/responses/header_integer_required'
 
-  /get_endpoint_with_requered_parameter:
+  /get_endpoint_with_request_parameter:
     get:
       description: get body test
       parameters:
