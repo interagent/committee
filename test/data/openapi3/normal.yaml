@@ -467,6 +467,22 @@ paths:
               type: string
               format: binary
 
+  /validate_request_array:
+    post:
+      description: validate request with array
+      responses:
+        '200':
+          description: no content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                anyOf:
+                - type: string
+                - type: boolean
+
   /validate_no_parameter:
     patch:
       description: validate no body
