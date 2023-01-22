@@ -16,7 +16,8 @@ module Committee
                   :coerce_recursive,
                   :optimistic_json,
                   :validate_success_only,
-                  :parse_response_by_content_type
+                  :parse_response_by_content_type,
+                  :parameter_overwite_by_rails_rule
 
       # Non-boolean options:
       attr_reader :headers_key,
@@ -31,7 +32,7 @@ module Committee
         @headers_key         = options[:headers_key]    || "committee.headers"
         @params_key          = options[:params_key]     || "committee.params"
         @query_hash_key      = if options[:query_hash_key].nil?
-          Committee.warn_deprecated('Committee: please set query_hash_key = rack.request.query_hash because we\'ll change default value in next major version.') 
+          Committee.warn_deprecated('Committee: please set query_hash_key = rack.request.query_hash because we\'ll change default value to "committee.query_hash" in next major version.') 
           'rack.request.query_hash'
         else
           options.fetch(:query_hash_key)
@@ -53,6 +54,12 @@ module Committee
           false
         else
           options.fetch(:parse_response_by_content_type)
+        end
+        @parameter_overwite_by_rails_rule      = if options[:parameter_overwite_by_rails_rule].nil?
+          Committee.warn_deprecated('Committee: please set parameter_overwite_by_rails_rule = false because we\'ll change default value to "true" in next major version.') 
+          false
+        else
+          options.fetch(:parameter_overwite_by_rails_rule)
         end
 
         # Boolean options and have a different value by default
