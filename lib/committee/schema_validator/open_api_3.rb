@@ -97,10 +97,18 @@ module Committee
       end
 
       def copy_coerced_data_to_params(request)
+        order = if validator_option.parameter_overwite_by_rails_rule
+          # (high priority) path_hash_key -> query_param -> request_body_hash          
+          [validator_option.request_body_hash_key, validator_option.query_hash_key, validator_option.path_hash_key]
+        else
+          # (high priority) path_hash_key -> request_body_hash -> query_param
+          [validator_option.query_hash_key, validator_option.request_body_hash_key, validator_option.path_hash_key]
+        end
+
         request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
-        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[validator_option.request_body_hash_key]))
-        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[validator_option.query_hash_key]))
-        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[validator_option.path_hash_key]))
+        order.each do |key|
+          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[key]))
+        end
       end
     end
   end
