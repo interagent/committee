@@ -11,11 +11,11 @@ module Committee
           @validator_option = validator_option
         end
 
-        def call(request, params, headers)
+        def call(request, path_params, query_params, body_params, headers)
           content_type = ::Committee::SchemaValidator.request_media_type(request)
           check_content_type(request, content_type) if @validator_option.check_content_type
 
-          @operation_object.validate_request_params(params, headers, @validator_option)
+          @operation_object.validate_request_params(path_params, query_params, body_params, headers, @validator_option)
         end
 
         private
