@@ -1,28 +1,28 @@
 PATH
   remote: ../..
   specs:
-    committee (4.3.0)
+    committee (5.0.0.beta1)
       json_schema (~> 0.14, >= 0.14.3)
-      openapi_parser (>= 0.11.1)
+      openapi_parser (= 1.0.0.beta1)
       rack (>= 1.5)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    json_schema (0.20.9)
-    mustermann (1.1.1)
+    json_schema (0.21.0)
+    mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
-    openapi_parser (0.12.1)
-    rack (2.2.3)
-    rack-protection (2.1.0)
+    openapi_parser (1.0.0.beta1)
+    rack (2.2.6.2)
+    rack-protection (2.2.3)
       rack
-    ruby2_keywords (0.0.2)
-    sinatra (2.1.0)
-      mustermann (~> 1.0)
+    ruby2_keywords (0.0.5)
+    sinatra (2.2.3)
+      mustermann (~> 2.0)
       rack (~> 2.2)
-      rack-protection (= 2.1.0)
+      rack-protection (= 2.2.3)
       tilt (~> 2.0)
-    tilt (2.0.10)
+    tilt (2.0.11)
 
 PLATFORMS
   ruby

@@ -11,7 +11,7 @@ describe Committee::SchemaValidator::HyperSchema::StringParamsCoercer do
   end
 
   it "doesn't coerce params not in the schema" do
-    check_convert("onwer", "admin", "admin")
+    check_convert("owner", "admin", "admin")
   end
 
   it "skips values for string param" do
