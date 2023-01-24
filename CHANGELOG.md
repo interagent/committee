@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Drop ruby 2.4 and 2.5 #326
+- Don't validate response for status 304(Not Modified) #332
+- Allow HEAD method in OpenAPI 3 #331
+- Support strict response validation #319
+- Support Psych v4.0.0 #335
+- Support Http OPTIONS method #344
+- Add OpenAPI3 strict references option to Committee (#343) #346
+  - When there is a reference objects with no referent, we'll raise error.
+- Validate path, query and request parameters separately #349
+- Change parameter_overwite_by_rails_rule option's default #374
+- Change query_hash key option's default #375
+
+
 ## [4.99.0.beta1] - 2023-01-24
 - We add backport parameter overwrite rule #373
   - We provide merged parameter for `committee.params` ( `params_key` option)
