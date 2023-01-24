@@ -16,7 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - (high priority) path_hash_key -> request_body_hash -> query_param
   - If you don't want to change, please set false (current rule)
     - (high priority) path_hash_key -> query_param -> request_body_hash
-
+- Support newest ruby version 
+  - backport #368
 
 ## [4.4.0] - 2021-06-12
 - Please read [4.4.0.rc1] section
