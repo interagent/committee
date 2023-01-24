@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validate path, query and request parameters separately #349
 - Change parameter_overwite_by_rails_rule option's default #374
 - Change query_hash key option's default #375
+- Change error handler option #379
+  - error handler take two args (this is deprecation in 4.99.x)
 
 
 ## [4.99.0.beta1] - 2023-01-24
