@@ -17,6 +17,10 @@ module Committee
     $stderr.puts(message) if debug?
   end
 
+  def self.need_good_option(message)
+    warn(message)
+  end
+
   def self.warn_deprecated_until_6(cond, message)
     raise "remove deprecated!"  unless Committee::VERSION.start_with?("5")
     warn("[DEPRECATION] #{message}") if cond
