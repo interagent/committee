@@ -34,12 +34,12 @@ describe Committee::Middleware::RequestValidation do
     params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
 
     check_parameter = lambda { |env|
-      assert_equal DateTime, env['committee.query_hash']["datetime_string"].class
+      assert_equal DateTime, env['test.query_hash']["datetime_string"].class
       assert_equal String, env['rack.request.query_hash']["datetime_string"].class
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, coerce_date_times: true, query_hash_key: "committee.query_hash")
+    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, coerce_date_times: true, query_hash_key: "test.query_hash")
 
     get "/string_params_coercer", params
     assert_equal 200, last_response.status
@@ -170,8 +170,7 @@ describe Committee::Middleware::RequestValidation do
     }
 
     check_parameter = lambda { |env|
-      # hash = env["committee.query_hash"] # 5.0.x-
-      hash = env["rack.request.query_hash"]
+      hash = env["committee.query_hash"]
       assert_equal DateTime, hash['nested_array'].first['update_time'].class
       assert_equal 1, hash['nested_array'].first['per_page']
 
@@ -377,8 +376,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes through a valid request for OpenAPI3" do
     check_parameter = lambda { |env|
-      # assert_equal 3, env['committee.query_hash']['limit'] #5.0.x-
-      assert_equal 3, env['rack.request.query_hash']['limit'] #5.0.x-
+      assert_equal 3, env['committee.query_hash']['limit'] #5.0.x-
       [200, {}, []]
     }
 
@@ -418,7 +416,7 @@ describe Committee::Middleware::RequestValidation do
       @app = new_rack_app_with_lambda(lambda do |env|
         assert_equal env['committee.params']['integer'], 42
         assert_equal env['committee.params'][:integer], 42
-        assert_equal env['rack.request.query_hash']['integer'], 42
+        assert_equal env['committee.query_hash']['integer'], 42
         #assert_equal env['rack.request.query_hash'][:integer], 42 # this isn't hash indifferent hash because we use rack.request.query_hash
         [204, {}, []]
       end, schema: open_api_3_schema, parameter_overwite_by_rails_rule: false)
@@ -434,7 +432,7 @@ describe Committee::Middleware::RequestValidation do
         assert_equal env['committee.params'][:integer], 21
         assert_equal env['committee.request_body_hash']['integer'], 21
         assert_equal env['committee.request_body_hash'][:integer], 21
-        assert_equal env['rack.request.query_hash']['integer'], 42
+        assert_equal env['committee.query_hash']['integer'], 42
         [204, {}, []]
       end, schema: open_api_3_schema, parameter_overwite_by_rails_rule: false)
 
@@ -453,7 +451,7 @@ describe Committee::Middleware::RequestValidation do
         assert_equal env['committee.path_hash'][:integer], 84
         assert_equal env['committee.request_body_hash']['integer'], 21
         assert_equal env['committee.request_body_hash'][:integer], 21
-        assert_equal env['rack.request.query_hash']['integer'], 84 # we can't use query_parameter :(
+        assert_equal env['committee.query_hash']['integer'], 84 # we can't use query_parameter :(
         #assert_equal env['rack.request.query_hash'][:integer], 21 # this isn't hash indifferent hash because we use rack.request.query_hash
         [204, {}, []]
       end, schema: open_api_3_schema, parameter_overwite_by_rails_rule: false)
@@ -490,7 +488,7 @@ describe Committee::Middleware::RequestValidation do
         assert_equal env['committee.params'][:integer], 42
         assert_equal env['committee.request_body_hash']['integer'], 21
         assert_equal env['committee.request_body_hash'][:integer], 21
-        assert_equal env['rack.request.query_hash']['integer'], 42
+        assert_equal env['committee.query_hash']['integer'], 42
         [204, {}, []]
       end, schema: open_api_3_schema)
 
@@ -507,7 +505,7 @@ describe Committee::Middleware::RequestValidation do
         assert_equal env['committee.params'][:integer], 84
         assert_equal env['committee.request_body_hash']['integer'], 21
         assert_equal env['committee.request_body_hash'][:integer], 21
-        assert_equal env['rack.request.query_hash']['integer'], 84 # we can't use query_parameter :(
+        assert_equal env['committee.query_hash']['integer'], 84 # we can't use query_parameter :(
         assert_equal env['committee.path_hash']['integer'], 84
         assert_equal env['committee.path_hash'][:integer], 84
         [204, {}, []]
