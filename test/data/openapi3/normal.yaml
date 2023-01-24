@@ -652,7 +652,28 @@ paths:
               schema:
                 $ref: referee.yaml#/components/schemas/referred_schema
 
-  /parameter_option_test/{integer}:
+  /overwrite_same_parameter:
+    post:
+      description: parameter option test
+      parameters:
+      - name: integer
+        in: query
+        required: false
+        schema:
+          type: integer    
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                integer:
+                  type: integer
+      responses:
+        '204':
+          description: sample of remote schema reference
+
+  /overwrite_same_parameter/{integer}:
     post:
       description: parameter option test
       parameters:
