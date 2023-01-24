@@ -31,7 +31,6 @@ module Committee
         # Non-boolean options
         @headers_key         = options[:headers_key]    || "committee.headers"
         @params_key          = options[:params_key]     || "committee.params"
-        Committee.warn_deprecated_until_6(options[:query_hash_key].nil?, 'Committee: please set query_hash_key = rack.request.query_hash because we\'ll change default value in next major version.') 
         @query_hash_key      = options[:query_hash_key] || "committee.query_hash"
         @path_hash_key      = options[:path_hash_key] || "committee.path_hash"
         @request_body_hash_key = options[:request_body_hash_key] || "committee.request_body_hash"
