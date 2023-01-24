@@ -44,12 +44,7 @@ module Committee
         @check_header        = options.fetch(:check_header, true)
         @coerce_recursive    = options.fetch(:coerce_recursive, true)
         @optimistic_json     = options.fetch(:optimistic_json, false)
-        @parse_response_by_content_type = if options[:parse_response_by_content_type].nil?
-          Committee.warn_deprecated('Committee: please set parse_response_by_content_type = false because we\'ll change default value in next major version.') 
-          false
-        else
-          options.fetch(:parse_response_by_content_type)
-        end
+        @parse_response_by_content_type = options.fetch(:parse_response_by_content_type, true)
         @parameter_overwite_by_rails_rule = options.fetch(:parameter_overwite_by_rails_rule, true)
 
         # Boolean options and have a different value by default
