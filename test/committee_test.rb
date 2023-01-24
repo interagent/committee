@@ -37,12 +37,27 @@ describe Committee do
     $stderr = StringIO.new
     begin
       $VERBOSE = nil
-      Committee.warn_deprecated "blah"
+      Committee.warn_deprecated_until_6 true, "blah"
       assert_equal "", $stderr.string
 
       $VERBOSE = true
-      Committee.warn_deprecated "blah"
+      Committee.warn_deprecated_until_6 true, "blah"
       assert_equal "[DEPRECATION] blah\n", $stderr.string
+    ensure
+      $stderr = old_stderr
+      $VERBOSE = old_verbose
+    end
+  end
+
+
+  it "doesn't warns on deprecated if cond is false" do
+    old_stderr = $stderr
+    old_verbose = $VERBOSE
+    $stderr = StringIO.new
+    begin
+      $VERBOSE = true
+      Committee.warn_deprecated_until_6 false, "blah"
+      assert_equal "", $stderr.string
     ensure
       $stderr = old_stderr
       $VERBOSE = old_verbose
