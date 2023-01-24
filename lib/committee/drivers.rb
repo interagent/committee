@@ -55,12 +55,12 @@ module Committee
         # as a parser option here, but since it may break existing implementations, just warn
         # if it is not explicitly set. See: https://github.com/interagent/committee/issues/343#issuecomment-997400329
         opts = parser_options.dup
-        unless opts.key?(:strict_reference_validation)
-          Committee.warn_deprecated('openapi_parser will default to strict reference validation ' +
-                                        'from next version. Pass config `strict_reference_validation: true` (or false, if you must) ' +
-                                        'to quiet this warning.')
-          opts[:strict_reference_validation] = false
-        end
+
+        Committee.warn_deprecated_until_6(!opts.key?(:strict_reference_validation), 'openapi_parser will default to strict reference validation ' +
+        'from next version. Pass config `strict_reference_validation: true` (or false, if you must) ' +
+        'to quiet this warning.')
+        opts[:strict_reference_validation] ||= false
+        
         openapi = OpenAPIParser.parse_with_filepath(hash, schema_path, opts)
         return Committee::Drivers::OpenAPI3::Driver.new.parse(openapi)
       end

@@ -6,6 +6,8 @@ require "json_schema"
 require "rack"
 require 'openapi_parser'
 
+require_relative "committee/version"
+
 module Committee
   def self.debug?
     ENV["COMMITTEE_DEBUG"]
@@ -15,8 +17,9 @@ module Committee
     $stderr.puts(message) if debug?
   end
 
-  def self.warn_deprecated(message)
-    warn("[DEPRECATION] #{message}")
+  def self.warn_deprecated_until_6(cond, message)
+    raise "remove deprecated!"  unless Committee::VERSION.start_with?("5")
+    warn("[DEPRECATION] #{message}") if cond
   end
 end
 
