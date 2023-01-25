@@ -60,11 +60,11 @@ def open_api_2_form_schema
 end
 
 def open_api_3_schema
-  @open_api_3_schema ||= Committee::Drivers.load_from_file(open_api_3_schema_path)
+  @open_api_3_schema ||= Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{strict_reference_validation: true})
 end
 
 def open_api_3_coverage_schema
-  @open_api_3_coverage_schema ||= Committee::Drivers.load_from_file(open_api_3_coverage_schema_path)
+  @open_api_3_coverage_schema ||= Committee::Drivers.load_from_file(open_api_3_coverage_schema_path, parser_options:{strict_reference_validation: true})
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.

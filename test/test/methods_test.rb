@@ -89,14 +89,14 @@ describe Committee::Test::Methods do
       it "passes through a valid response" do
         @app = new_rack_app(JSON.generate([ValidApp]))
         get "/apps"
-        assert_response_schema_confirm
+        assert_response_schema_confirm(200)
       end
 
       it "detects an invalid response Content-Type" do
         @app = new_rack_app(JSON.generate([ValidApp]), {})
         get "/apps"
         e = assert_raises(Committee::InvalidResponse) do
-          assert_response_schema_confirm
+          assert_response_schema_confirm(200)
         end
         assert_match(/response header must be set to/i, e.message)
       end
@@ -123,14 +123,14 @@ describe Committee::Test::Methods do
       it "passes through a valid response" do
         @app = new_rack_app(JSON.generate(@correct_response))
         get "/characters"
-        assert_schema_conform
+        assert_schema_conform(200)
       end
 
       it "detects an invalid response Content-Type" do
         @app = new_rack_app(JSON.generate([@correct_response]), {})
         get "/characters"
         e = assert_raises(Committee::InvalidResponse) do
-          assert_schema_conform
+          assert_schema_conform(200)
         end
         assert_match(/response definition does not exist/i, e.message)
       end
@@ -141,7 +141,7 @@ describe Committee::Test::Methods do
         get "/characters"
 
         e = assert_raises(Committee::InvalidResponse) do
-          assert_schema_conform
+          assert_schema_conform(419)
         end
         assert_match(/status code definition does not exist/i, e.message)
       end
@@ -178,14 +178,14 @@ describe Committee::Test::Methods do
       it "passes through a valid response" do
         @app = new_rack_app(JSON.generate(@correct_response))
         get "/characters"
-        assert_response_schema_confirm
+        assert_response_schema_confirm(200)
       end
 
       it "detects an invalid response Content-Type" do
         @app = new_rack_app(JSON.generate([@correct_response]), {})
         get "/characters"
         e = assert_raises(Committee::InvalidResponse) do
-          assert_response_schema_confirm
+          assert_response_schema_confirm(200)
         end
         assert_match(/response definition does not exist/i, e.message)
       end
@@ -196,7 +196,7 @@ describe Committee::Test::Methods do
         get "/characters"
 
         e = assert_raises(Committee::InvalidResponse) do
-          assert_response_schema_confirm
+          assert_response_schema_confirm(419)
         end
         assert_match(/status code definition does not exist/i, e.message)
       end
@@ -229,7 +229,7 @@ describe Committee::Test::Methods do
         end
         it 'records openapi coverage' do
           get "/posts"
-          assert_response_schema_confirm
+          assert_response_schema_confirm(200)
           assert_equal({
             '/threads/{id}' => {
               'get' => {
@@ -270,7 +270,7 @@ describe Committee::Test::Methods do
         it 'can record openapi coverage correctly when prefix is set' do
           @committee_options.merge!(prefix: '/api')
           post "/api/likes"
-          assert_response_schema_confirm
+          assert_response_schema_confirm(200)
           assert_equal({
             '/threads/{id}' => {
               'get' => {
@@ -310,7 +310,7 @@ describe Committee::Test::Methods do
 
         it 'records openapi coverage correctly with path param' do
           get "/threads/asd"
-          assert_response_schema_confirm
+          assert_response_schema_confirm(200)
           assert_equal({
             '/threads/{id}' => {
               'get' => {

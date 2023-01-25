@@ -20,27 +20,27 @@ module Committee
     # load and build drive from JSON file
     # @param [String] schema_path
     # @return [Committee::Driver]
-    def self.load_from_json(schema_path, parser_options = {})
-      load_from_data(JSON.parse(File.read(schema_path)), schema_path, parser_options)
+    def self.load_from_json(schema_path, parser_options: {})
+      load_from_data(JSON.parse(File.read(schema_path)), schema_path, parser_options: parser_options)
     end
 
     # load and build drive from YAML file
     # @param [String] schema_path
     # @return [Committee::Driver]
-    def self.load_from_yaml(schema_path, parser_options = {})
+    def self.load_from_yaml(schema_path, parser_options: {})
       data = YAML.respond_to?(:unsafe_load_file) ? YAML.unsafe_load_file(schema_path) : YAML.load_file(schema_path)
-      load_from_data(data, schema_path, parser_options)
+      load_from_data(data, schema_path, parser_options: parser_options)
     end
 
     # load and build drive from file
     # @param [String] schema_path
     # @return [Committee::Driver]
-    def self.load_from_file(schema_path, parser_options = {})
+    def self.load_from_file(schema_path, parser_options: {})
       case File.extname(schema_path)
       when '.json'
-        load_from_json(schema_path, parser_options)
+        load_from_json(schema_path, parser_options: parser_options)
       when '.yaml', '.yml'
-        load_from_yaml(schema_path, parser_options)
+        load_from_yaml(schema_path, parser_options: parser_options)
       else
         raise "Committee only supports the following file extensions: '.json', '.yaml', '.yml'"
       end
@@ -49,7 +49,7 @@ module Committee
     # load and build drive from Hash object
     # @param [Hash] hash
     # @return [Committee::Driver]
-    def self.load_from_data(hash, schema_path = nil, parser_options = {})
+    def self.load_from_data(hash, schema_path = nil, parser_options: {})
       if hash['openapi']&.start_with?('3.0.')
         # From the next major version, we want to ensure `{ strict_reference_validation: true }`
         # as a parser option here, but since it may break existing implementations, just warn
