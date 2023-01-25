@@ -353,7 +353,8 @@ Important changes are also described below.
 Committee 5.* has few breaking changes so we recommend upgrading to the latest release on 4.* and fixing any deprecation errors you see before upgrading.
 (Now we doesn't release 5.* yet)
 
-- change `parse_response_by_content_type`'s default value from `false` to `true`.
+- set `parse_response_by_content_type=true` by default (old versions set `false`)
+- set `parameter_overwite_by_rails_rule=true` by default (old version set `false`)
 
 #### Future Updates (5.*~)
 OpenAPI3 Schema Users: Newly-added `strict_reference_validation` option defaults to `false` if not set.
