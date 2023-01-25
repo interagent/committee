@@ -20,7 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change query_hash key option's default #375
 - Change error handler option #379
   - error handler take two args (this is deprecation in 4.99.x)
-
+- Change old assert behavior #380
+  - when we use `assert_schema_conform` we validate response only by default.
+  - But we validate request by default
+  - This deafult behavior is deprecation in 4.99.x
 
 ## [4.99.0.beta1] - 2023-01-24
 - We add backport parameter overwrite rule #373

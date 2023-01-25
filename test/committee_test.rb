@@ -31,6 +31,17 @@ describe Committee do
     end
   end
 
+  it "warns need_good_option" do
+    old_stderr = $stderr
+    $stderr = StringIO.new
+    begin
+      Committee.need_good_option "show"
+      assert_equal "show\n", $stderr.string
+    ensure
+      $stderr = old_stderr
+    end
+  end
+
   it "warns on deprecated unless $VERBOSE is nil" do
     old_stderr = $stderr
     old_verbose = $VERBOSE
