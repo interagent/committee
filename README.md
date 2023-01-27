@@ -517,3 +517,7 @@ bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
     ```
     bundle exec rake release
     ```
+
+## Tutorials
+
+- [Validating requests and responses using OpenAPI specification with Committee](https://nicolasiensen.github.io/2022-04-18-validating-requests-and-responses-using-openapi-specification-with-committee/)
