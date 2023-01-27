@@ -48,8 +48,14 @@ module Committee
         private
 
         def response_media_type(response)
-          response.content_type.to_s.split(";").first.to_s
+          if response.respond_to?(:media_type)
+            response.media_type.to_s
+          else
+            # for rack compatibility. In rack v 1.5.0, Rack::Response doesn't have media_type
+            response.content_type.to_s.split(";").first.to_s
+          end
         end
+
 
         def check_content_type!(response)
           if @link.media_type
