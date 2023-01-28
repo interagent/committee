@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0] - 2023-01-28
+- Skip content-type validation in OpenAPI 3 when body is both optional & empty #355
+  - Support RequestBody.required for OpenAPI 3
+
 ## [5.0.0.beta1] - 2023-01-25
 - Drop ruby 2.4 and 2.5 #326
 - Don't validate response for status 304(Not Modified) #332
@@ -25,8 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - when we use `assert_schema_conform` we validate response only by default.
   - But we validate request by default
   - This deafult behavior is deprecation in 4.99.x
-- Skip content-type validation in OpenAPI 3 when body is both optional & empty #355
-  - Support RequestBody.required for OpenAPI 3
+
+## [4.99.0] - 2023-01-28
+
+- Please read [4.4.99.beta1] section
 
 ## [4.99.0.beta1] - 2023-01-24
 - We add backport parameter overwrite rule #373
