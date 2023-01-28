@@ -6,6 +6,26 @@ info:
 servers:
 - url: https://github.com/interagent/committee/
 paths:
+  /additional_properties:
+    post:
+      description: post additional_properties
+      parameters:
+        - name: first_name
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                last_name:
+                  type: string
+              required:
+                - last_name
+              additionalProperties: false
   /csv:
     get:
       description: get csv
@@ -50,7 +70,7 @@ paths:
                     type: string
                   time_string_1:
                     type: string
-                    exmaple: 2021-09-22T05:36:45Z
+                    example: 2021-09-22T05:36:45Z
                   array_1:
                     type: array
                     items:
@@ -367,7 +387,7 @@ paths:
         '204':
           description: no content
     put:
-      description: validate put metodhd
+      description: validate put method
       requestBody:
         content:
           application/json:
@@ -387,7 +407,7 @@ paths:
                   string:
                     type: string
     patch:
-      description: validate patch metodhd
+      description: validate patch method
       requestBody:
         content:
           application/json:
@@ -407,7 +427,7 @@ paths:
                   string:
                     type: string
     options:
-      description: validate options metodhd
+      description: validate options method
       requestBody:
         content:
           application/json:
@@ -632,7 +652,7 @@ paths:
         '200':
           $ref: '#/components/responses/header_integer_required'
 
-  /get_endpoint_with_requered_parameter:
+  /get_endpoint_with_required_parameter:
     get:
       description: get body test
       parameters:
@@ -655,7 +675,28 @@ paths:
               schema:
                 $ref: referee.yaml#/components/schemas/referred_schema
 
-  /parameter_option_test/{integer}:
+  /overwrite_same_parameter:
+    post:
+      description: parameter option test
+      parameters:
+      - name: integer
+        in: query
+        required: false
+        schema:
+          type: integer    
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                integer:
+                  type: integer
+      responses:
+        '204':
+          description: sample of remote schema reference
+
+  /overwrite_same_parameter/{integer}:
     post:
       description: parameter option test
       parameters:

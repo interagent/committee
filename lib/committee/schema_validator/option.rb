@@ -16,7 +16,8 @@ module Committee
                   :coerce_recursive,
                   :optimistic_json,
                   :validate_success_only,
-                  :parse_response_by_content_type
+                  :parse_response_by_content_type,
+                  :parameter_overwite_by_rails_rule
 
       # Non-boolean options:
       attr_reader :headers_key,
@@ -30,12 +31,7 @@ module Committee
         # Non-boolean options
         @headers_key         = options[:headers_key]    || "committee.headers"
         @params_key          = options[:params_key]     || "committee.params"
-        @query_hash_key      = if options[:query_hash_key].nil?
-          Committee.warn_deprecated('Committee: please set query_hash_key = rack.request.query_hash because we\'ll change default value in next major version.') 
-          'rack.request.query_hash'
-        else
-          options.fetch(:query_hash_key)
-        end
+        @query_hash_key      = options[:query_hash_key] || "committee.query_hash"
         @path_hash_key      = options[:path_hash_key] || "committee.path_hash"
         @request_body_hash_key = options[:request_body_hash_key] || "committee.request_body_hash"
 
@@ -48,12 +44,8 @@ module Committee
         @check_header        = options.fetch(:check_header, true)
         @coerce_recursive    = options.fetch(:coerce_recursive, true)
         @optimistic_json     = options.fetch(:optimistic_json, false)
-        @parse_response_by_content_type = if options[:parse_response_by_content_type].nil?
-          Committee.warn_deprecated('Committee: please set parse_response_by_content_type = false because we\'ll change default value in next major version.') 
-          false
-        else
-          options.fetch(:parse_response_by_content_type)
-        end
+        @parse_response_by_content_type = options.fetch(:parse_response_by_content_type, true)
+        @parameter_overwite_by_rails_rule = options.fetch(:parameter_overwite_by_rails_rule, true)
 
         # Boolean options and have a different value by default
         @allow_get_body      = options.fetch(:allow_get_body, schema.driver.default_allow_get_body)

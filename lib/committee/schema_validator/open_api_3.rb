@@ -17,7 +17,7 @@ module Committee
         request_unpack(request)
         request_schema_validation(request)
 
-        copy_coerced_data_to_query_hash(request)
+        copy_coerced_data_to_params(request)
       end
 
       def response_validate(status, headers, response, test_method = false)
@@ -58,7 +58,19 @@ module Committee
         return unless @operation_object
 
         validator = Committee::SchemaValidator::OpenAPI3::RequestValidator.new(@operation_object, validator_option: validator_option)
-        validator.call(request, request.env[validator_option.params_key], header(request))
+        validator.call(request, path_params(request), query_params(request), body_params(request), header(request))
+      end
+
+      def path_params(request)
+        request.env[validator_option.path_hash_key]
+      end
+
+      def query_params(request)
+        request.env[validator_option.query_hash_key]
+      end
+
+      def body_params(request)
+        request.env[validator_option.request_body_hash_key]
       end
 
       def header(request)
@@ -80,22 +92,22 @@ module Committee
         request.env[validator_option.path_hash_key] = coerce_path_params
 
         query_param = unpacker.unpack_query_params(request)
-
-        request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
-        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(query_param))
-        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[validator_option.request_body_hash_key]))
-        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[validator_option.path_hash_key]))
+        query_param.merge!(request_param) if request.get? && validator_option.allow_get_body
+        request.env[validator_option.query_hash_key] = query_param
       end
 
-      def copy_coerced_data_to_query_hash(request)
-        return if request.env["rack.request.query_hash"].nil? || request.env["rack.request.query_hash"].empty?
+      def copy_coerced_data_to_params(request)
+        order = if validator_option.parameter_overwite_by_rails_rule
+          # (high priority) path_hash_key -> query_param -> request_body_hash          
+          [validator_option.request_body_hash_key, validator_option.query_hash_key, validator_option.path_hash_key]
+        else
+          # (high priority) path_hash_key -> request_body_hash -> query_param
+          [validator_option.query_hash_key, validator_option.request_body_hash_key, validator_option.path_hash_key]
+        end
 
-        query_hash_key = @validator_option.query_hash_key
-        return unless query_hash_key
-
-        request.env[query_hash_key] = {} unless request.env[query_hash_key]
-        request.env["rack.request.query_hash"].keys.each do |k|
-          request.env[query_hash_key][k] = request.env[validator_option.params_key][k]
+        request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
+        order.each do |key|
+          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[key]))
         end
       end
     end

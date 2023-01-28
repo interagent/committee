@@ -51,14 +51,7 @@ module Committee
       private
 
       def handle_exception(e, env)
-        return unless @error_handler
-
-        if @error_handler.arity > 1
-          @error_handler.call(e, env)
-        else
-          Committee.warn_deprecated('Using `error_handler.call(exception)` is deprecated and will be change to `error_handler.call(exception, request.env)` in next major version.')
-          @error_handler.call(e)
-        end
+        @error_handler.call(e, env) if @error_handler
       end
     end
   end

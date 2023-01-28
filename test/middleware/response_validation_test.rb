@@ -105,17 +105,6 @@ describe Committee::Middleware::ResponseValidation do
     assert_match(/valid json/i, last_response.body)
   end
 
-  it "calls error_handler (has a arg) when it rescues JSON errors" do
-    called_err = nil
-    pr = ->(e) { called_err = e }
-    @app = new_rack_app("[{x:y}]", {}, schema: hyper_schema, error_handler: pr)
-    _, err = capture_io do
-      get "/apps"
-    end
-    assert_kind_of JSON::ParserError, called_err
-    assert_match(/\[DEPRECATION\]/i, err)
-  end
-
   it "calls error_handler (has two args) when it rescues JSON errors" do
     called_err = nil
     pr = ->(e, _env) { called_err = e }
@@ -135,20 +124,6 @@ describe Committee::Middleware::ResponseValidation do
     @app = new_rack_app("[{x:y}]", {}, raise: true, schema: hyper_schema)
     assert_raises(Committee::InvalidResponse) do
       get "/apps"
-    end
-  end
-
-  it "calls error_handler (has a arg) when it rescues JSON errors" do
-    called_err = nil
-    pr = ->(e) { called_err = e }
-    @app = new_rack_app("[{x:y}]", {}, raise: true, schema: hyper_schema, error_handler: pr)
-    assert_raises(Committee::InvalidResponse) do
-      _, err = capture_io do
-        get "/apps"
-      end
-
-      assert_kind_of JSON::ParserError, called_err
-      assert_match(/\[DEPRECATION\]/i, err)
     end
   end
 

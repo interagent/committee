@@ -33,7 +33,7 @@ module Committee
           if !schema && options[:schema_path]
             # In the future, we could have `parser_options` as an exposed config?
             parser_options = options.key?(:strict_reference_validation) ? { strict_reference_validation: options[:strict_reference_validation] } : {}
-            schema = Committee::Drivers::load_from_file(options[:schema_path], parser_options)
+            schema = Committee::Drivers::load_from_file(options[:schema_path], parser_options: parser_options)
           end
           raise(ArgumentError, "Committee: need option `schema` or `schema_path`") unless schema
 

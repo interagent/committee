@@ -72,7 +72,7 @@ describe Committee::Test::Methods do
       @committee_options.merge!(validate_success_only: true)
       @app = new_rack_app(JSON.generate([ValidApp]), 400, {})
       get "/apps"
-      assert_schema_conform
+      assert_schema_conform(400)
     end
 
     it "detects an invalid response Content-Type and check all status code" do

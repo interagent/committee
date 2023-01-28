@@ -34,12 +34,12 @@ describe Committee::Middleware::RequestValidation do
     params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
 
     check_parameter = lambda { |env|
-      assert_equal DateTime, env['committee.query_hash']["datetime_string"].class
+      assert_equal DateTime, env['test.query_hash']["datetime_string"].class
       assert_equal String, env['rack.request.query_hash']["datetime_string"].class
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, coerce_date_times: true, query_hash_key: "committee.query_hash")
+    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, coerce_date_times: true, query_hash_key: "test.query_hash")
 
     get "/string_params_coercer", params
     assert_equal 200, last_response.status
@@ -49,7 +49,7 @@ describe Committee::Middleware::RequestValidation do
     params = { "datetime_string" => "2016-04-01T16:00:00.000+09:00" }
 
     check_parameter = lambda { |env|
-      assert_equal nil, env['committee.query_hash']
+      assert_nil env['committee.query_hash']
       assert_equal DateTime, env['rack.request.query_hash']["datetime_string"].class
       [200, {}, []]
     }
@@ -65,7 +65,7 @@ describe Committee::Middleware::RequestValidation do
 
     @app = new_rack_app(schema: open_api_3_schema, allow_get_body: true)
 
-    get "/get_endpoint_with_requered_parameter", { no_problem: true }, { input: params.to_json }
+    get "/get_endpoint_with_required_parameter", { no_problem: true }, { input: params.to_json }
     assert_equal 200, last_response.status
   end
 
@@ -74,7 +74,7 @@ describe Committee::Middleware::RequestValidation do
 
     @app = new_rack_app(schema: open_api_3_schema, allow_get_body: false)
 
-    get "/get_endpoint_with_requered_parameter", { no_problem: true }, { input: params.to_json }
+    get "/get_endpoint_with_required_parameter", { no_problem: true }, { input: params.to_json }
     assert_equal 400, last_response.status
   end
 
@@ -170,8 +170,7 @@ describe Committee::Middleware::RequestValidation do
     }
 
     check_parameter = lambda { |env|
-      # hash = env["committee.query_hash"] # 5.0.x-
-      hash = env["rack.request.query_hash"]
+      hash = env["committee.query_hash"]
       assert_equal DateTime, hash['nested_array'].first['update_time'].class
       assert_equal 1, hash['nested_array'].first['per_page']
 
@@ -377,8 +376,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes through a valid request for OpenAPI3" do
     check_parameter = lambda { |env|
-      # assert_equal 3, env['committee.query_hash']['limit'] #5.0.x-
-      assert_equal 3, env['rack.request.query_hash']['limit'] #5.0.x-
+      assert_equal 3, env['committee.query_hash']['limit'] #5.0.x-
       [200, {}, []]
     }
 
@@ -412,43 +410,121 @@ describe Committee::Middleware::RequestValidation do
     get "/coerce_path_params/1"
   end
 
-  it "corce string and save path hash" do
-    @app = new_rack_app_with_lambda(lambda do |env|
-      assert_equal env['committee.params']['integer'], 21
-      assert_equal env['committee.params'][:integer], 21
-      assert_equal env['committee.path_hash']['integer'], 21
-      assert_equal env['committee.path_hash'][:integer], 21
-      [204, {}, []]
-    end, schema: open_api_3_schema)
+  describe "overwrite same parameter (old rule)" do
+    # (high priority) path_hash_key -> request_body_hash -> query_param
+    it "set query parameter to committee.params and query hash" do
+      @app = new_rack_app_with_lambda(lambda do |env|
+        assert_equal env['committee.params']['integer'], 42
+        assert_equal env['committee.params'][:integer], 42
+        assert_equal env['committee.query_hash']['integer'], 42
+        #assert_equal env['rack.request.query_hash'][:integer], 42 # this isn't hash indifferent hash because we use rack.request.query_hash
+        [204, {}, []]
+      end, schema: open_api_3_schema, parameter_overwite_by_rails_rule: false)
 
-    header "Content-Type", "application/json"
-    post '/parameter_option_test/21'
-    assert_equal 204, last_response.status
+      header "Content-Type", "application/json"
+      post '/overwrite_same_parameter?integer=42'
+      assert_equal 204, last_response.status
+    end
+
+    it "request body precedence over query parameter" do
+      @app = new_rack_app_with_lambda(lambda do |env|
+        assert_equal env['committee.params']['integer'], 21
+        assert_equal env['committee.params'][:integer], 21
+        assert_equal env['committee.request_body_hash']['integer'], 21
+        assert_equal env['committee.request_body_hash'][:integer], 21
+        assert_equal env['committee.query_hash']['integer'], 42
+        [204, {}, []]
+      end, schema: open_api_3_schema, parameter_overwite_by_rails_rule: false)
+
+      params = {integer: 21}
+
+      header "Content-Type", "application/json"
+      post '/overwrite_same_parameter?integer=42', JSON.generate(params)
+      assert_equal 204, last_response.status
+    end
+
+    it "path parameter precedence over request body" do
+      @app = new_rack_app_with_lambda(lambda do |env|
+        assert_equal env['committee.params']['integer'], 84
+        assert_equal env['committee.params'][:integer], 84
+        assert_equal env['committee.path_hash']['integer'], 84
+        assert_equal env['committee.path_hash'][:integer], 84
+        assert_equal env['committee.request_body_hash']['integer'], 21
+        assert_equal env['committee.request_body_hash'][:integer], 21
+        assert_equal env['committee.query_hash']['integer'], 84 # we can't use query_parameter :(
+        #assert_equal env['rack.request.query_hash'][:integer], 21 # this isn't hash indifferent hash because we use rack.request.query_hash
+        [204, {}, []]
+      end, schema: open_api_3_schema, parameter_overwite_by_rails_rule: false)
+
+      params = {integer: 21}
+
+      header "Content-Type", "application/json"
+      post '/overwrite_same_parameter/84?integer=42', JSON.generate(params)
+      assert_equal 204, last_response.status
+    end
   end
 
-  it "corce string and save request body hash" do
-    @app = new_rack_app_with_lambda(lambda do |env|
-      assert_equal env['committee.params']['integer'], 21 # use path parameter
-      assert_equal env['committee.params'][:integer], 21
-      assert_equal env['committee.request_body_hash']['integer'], 42
-      assert_equal env['committee.request_body_hash'][:integer], 42
-      [204, {}, []]
-    end, schema: open_api_3_schema)
+  describe "overwrite same parameter (new rule and seme to Rails)" do
+    # (high priority) path_hash_key -> query_param -> request_body_hash
+    it "set request body to committee.params and query hash" do
+      @app = new_rack_app_with_lambda(lambda do |env|
+        assert_equal env['committee.params']['integer'], 21
+        assert_equal env['committee.params'][:integer], 21
+        assert_equal env['committee.request_body_hash']['integer'], 21
+        assert_equal env['committee.request_body_hash'][:integer], 21
+        [204, {}, []]
+      end, schema: open_api_3_schema)
 
-    params = {integer: 42}
+      params = {integer: 21}
 
-    header "Content-Type", "application/json"
-    post '/parameter_option_test/21', JSON.generate(params)
-    assert_equal 204, last_response.status
+      header "Content-Type", "application/json"
+      post '/overwrite_same_parameter', JSON.generate(params)
+      assert_equal 204, last_response.status
+    end
+
+    it "query parameter precedence over request body" do
+      @app = new_rack_app_with_lambda(lambda do |env|
+        assert_equal env['committee.params']['integer'], 42
+        assert_equal env['committee.params'][:integer], 42
+        assert_equal env['committee.request_body_hash']['integer'], 21
+        assert_equal env['committee.request_body_hash'][:integer], 21
+        assert_equal env['committee.query_hash']['integer'], 42
+        [204, {}, []]
+      end, schema: open_api_3_schema)
+
+      params = {integer: 21}
+
+      header "Content-Type", "application/json"
+      post '/overwrite_same_parameter?integer=42', JSON.generate(params)
+      assert_equal 204, last_response.status
+    end
+
+    it "path path parameter precedence over query parameter" do
+      @app = new_rack_app_with_lambda(lambda do |env|
+        assert_equal env['committee.params']['integer'], 84
+        assert_equal env['committee.params'][:integer], 84
+        assert_equal env['committee.request_body_hash']['integer'], 21
+        assert_equal env['committee.request_body_hash'][:integer], 21
+        assert_equal env['committee.query_hash']['integer'], 84 # we can't use query_parameter :(
+        assert_equal env['committee.path_hash']['integer'], 84
+        assert_equal env['committee.path_hash'][:integer], 84
+        [204, {}, []]
+      end, schema: open_api_3_schema)
+
+      params = {integer: 21}
+
+      header "Content-Type", "application/json"
+      post '/overwrite_same_parameter/84?integer=42', JSON.generate(params)
+      assert_equal 204, last_response.status
+    end
   end
 
   it "unpacker test" do
     @app = new_rack_app_with_lambda(lambda do |env|
-      assert_equal env['committee.params']['integer'], 42
-      assert_equal env['committee.params'][:integer], 42
-      # overwrite by request body...
-      assert_equal env['rack.request.query_hash']['integer'], 42
-      # assert_equal env['rack.request.query_hash'][:integer], 42
+      assert_equal '21', env['committee.params']['integer'] # query parameter has precedence
+      assert_equal '21', env['committee.params'][:integer]
+      assert_equal '21', env['rack.request.query_hash']['integer']
+      assert_equal 42, env['committee.request_body_hash']['integer']
       [204, {}, []]
     end, schema: open_api_3_schema, raise: true)
 

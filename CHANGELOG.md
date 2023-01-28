@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.0.0.beta1] - 2023-01-25
+- Drop ruby 2.4 and 2.5 #326
+- Don't validate response for status 304(Not Modified) #332
+- Allow HEAD method in OpenAPI 3 #331
+- Support strict response validation #319
+- Support Psych v4.0.0 #335
+- Support Http OPTIONS method #344
+- Add OpenAPI3 strict references option to Committee (#343) #346
+  - When there is a reference objects with no referent, we'll raise error.
+- Validate path, query and request parameters separately #349
+- Change parameter_overwite_by_rails_rule option's default #374
+- Change query_hash key option's default #375
+- Change error handler option #379
+  - error handler take two args (this is deprecation in 4.99.x)
+- Change old assert behavior #380
+  - when we use `assert_schema_conform` we validate response only by default.
+  - But we validate request by default
+  - This deafult behavior is deprecation in 4.99.x
+
+## [4.99.0.beta1] - 2023-01-24
+- We add backport parameter overwrite rule #373
+  - We provide merged parameter for `committee.params` ( `params_key` option)
+  - When a same parameter name exist in path/query/request body, it overwrited.
+  - We we change overwrite rule next version.
+  - Please set `parameter_overwite_by_rails_rule=true` for Rails rule (v5.0.0)
+    - (high priority) path_hash_key -> request_body_hash -> query_param
+  - If you don't want to change, please set false (current rule)
+    - (high priority) path_hash_key -> query_param -> request_body_hash
+- Support newest ruby version 
+  - backport #368
+
+
 ## [4.4.0] - 2021-06-12
 - Please read [4.4.0.rc1] section
 

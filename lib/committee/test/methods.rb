@@ -26,7 +26,7 @@ module Committee
         status, headers, body = response_data
 
         if expected_status.nil?
-          Committee.warn_deprecated('Pass expected response status code to check it against the corresponding schema explicitly.')
+          Committee.need_good_option('Pass expected response status code to check it against the corresponding schema explicitly.')
         elsif expected_status != status
           response = "Expected `#{expected_status}` status code, but it was `#{status}`."
           raise Committee::InvalidResponse.new(response)
@@ -77,12 +77,7 @@ module Committee
       end
 
       def old_behavior
-        old_assert_behavior = committee_options.fetch(:old_assert_behavior, nil)
-        if old_assert_behavior.nil?
-          Committee.warn_deprecated('Now assert_schema_conform check response schema only. but we will change check request and response in future major version. so if you want to conform response only, please use assert_response_schema_confirm, or you can suppress this message and keep old behavior by setting old_assert_behavior=true.')
-          old_assert_behavior = true
-        end
-        old_assert_behavior
+        committee_options.fetch(:old_assert_behavior, false)
       end
     end
   end

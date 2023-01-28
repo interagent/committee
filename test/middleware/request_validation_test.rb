@@ -306,21 +306,6 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "calls error_handler (has a arg) when request is invalid" do
-    called_err = nil
-    pr = ->(e) { called_err = e }
-    @app = new_rack_app(schema: hyper_schema, error_handler: pr)
-    header "Content-Type", "application/json"
-    params = {
-      "name" => 1
-    }
-    _, err = capture_io do
-      post "/apps", JSON.generate(params)
-    end
-    assert_kind_of Committee::InvalidRequest, called_err
-    assert_match(/\[DEPRECATION\]/i, err)
-  end
-
   it "calls error_handler (has two args) when request is invalid" do
     called_err = nil
     pr = ->(e, _env) { called_err = e }
@@ -339,18 +324,6 @@ describe Committee::Middleware::RequestValidation do
     post "/apps", "{x:y}"
     assert_equal 400, last_response.status
     assert_match(/valid json/i, last_response.body)
-  end
-
-  it "calls error_handler (has a arg) when it rescues JSON errors" do
-    called_err = nil
-    pr = ->(e) { called_err = e }
-    @app = new_rack_app(schema: hyper_schema, error_handler: pr)
-    header "Content-Type", "application/json"
-    _, err = capture_io do
-      post "/apps", "{x:y}"
-    end
-    assert_kind_of JSON::ParserError, called_err
-    assert_match(/\[DEPRECATION\]/i, err)
   end
 
   it "calls error_handler (has two args) when it rescues JSON errors" do
@@ -435,7 +408,7 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "corce form params" do
+  it "coerce form params" do
     check_parameter = lambda { |env|
       assert_equal 3, env['committee.params']['age']
       assert_equal 3, env['committee.request_body_hash']['age']

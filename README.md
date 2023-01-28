@@ -10,6 +10,7 @@ Committee is tested on the following MRI versions:
 - 2.7
 - 3.0
 - 3.1
+- 3.2
 
 ## Committee::Middleware::RequestValidation
 
@@ -265,21 +266,33 @@ describe Committee::Middleware::Stub do
     @committee_options ||= { schema: Committee::Drivers::load_from_file('docs/schema.json'), prefix: "/v1" }
   end
 
+  def request_object
+    last_request
+  end
+
+  def response_data
+    [last_response.status, last_response.headers, last_response.body]
+  end
+
   describe "GET /" do
     it "conforms to schema with 200 response code" do
+      get "/"
       assert_schema_conform(200)
     end
 
     it "conforms to request schema" do
+      get "/"
       assert_request_schema_confirm
     end
 
     it "conforms to response schema with 200 response code" do
+      get "/"
       assert_response_schema_confirm(200)
     end
 
     it "conforms to response and request schema with 200 response code" do
       @committee_options[:old_assert_behavior] = false
+      get "/"
       assert_schema_conform(200)
     end
   end
@@ -340,7 +353,8 @@ Important changes are also described below.
 Committee 5.* has few breaking changes so we recommend upgrading to the latest release on 4.* and fixing any deprecation errors you see before upgrading.
 (Now we doesn't release 5.* yet)
 
-- change `parse_response_by_content_type`'s default value from `false` to `true`.
+- set `parse_response_by_content_type=true` by default (old versions set `false`)
+- set `parameter_overwite_by_rails_rule=true` by default (old version set `false`)
 
 #### Future Updates (5.*~)
 OpenAPI3 Schema Users: Newly-added `strict_reference_validation` option defaults to `false` if not set.
@@ -503,3 +517,7 @@ bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
     ```
     bundle exec rake release
     ```
+
+## Tutorials
+
+- [Validating requests and responses using OpenAPI specification with Committee](https://nicolasiensen.github.io/2022-04-18-validating-requests-and-responses-using-openapi-specification-with-committee/)
