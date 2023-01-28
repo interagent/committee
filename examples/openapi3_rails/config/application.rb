@@ -41,7 +41,8 @@ module Openapi3Rails
       schema_path: 'openapi.yaml',
       coerce_date_times: true,
       params_key: 'action_dispatch.request.request_parameters',
-      query_hash_key: 'action_dispatch.request.query_parameters'
-    config.middleware.use Committee::Middleware::ResponseValidation, schema_path: 'openapi.yaml'
+      query_hash_key: 'action_dispatch.request.query_parameters',
+      strict_reference_validation: true
+    config.middleware.use Committee::Middleware::ResponseValidation, schema_path: 'openapi.yaml', strict_reference_validation: true
   end
 end
