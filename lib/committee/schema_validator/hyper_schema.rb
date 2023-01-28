@@ -80,7 +80,7 @@ module Committee
           request.env[validator_option.request_body_hash_key] = request_param
 
           if request_param.is_a?(Array)
-            raise BadRequest, "Invalid JSON input. Require object with parameters as keys when path parameter exists." if !query_param.empty? || !param_matches_hash.empty?
+            raise BadRequest, "Invalid JSON input. Require request body typed by object when path/query parameter exists." if !query_param.empty? || !param_matches_hash.empty?
 
             request.env[validator_option.params_key] = Committee::Utils.deep_copy(request_param)
           else
