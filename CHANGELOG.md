@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.99.1] - 2023-01-28
+- supress parse_response_by_content_type deprecated message for request validation #383
+
 ## [4.99.0] - 2023-01-28
 
 - Please read [4.4.99.beta1] section
