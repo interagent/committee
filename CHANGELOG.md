@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - when we use `assert_schema_conform` we validate response only by default.
   - But we validate request by default
   - This deafult behavior is deprecation in 4.99.x
+- Skip content-type validation in OpenAPI 3 when body is both optional & empty #355
+  - Support RequestBody.required for OpenAPI 3
 
 ## [4.99.0.beta1] - 2023-01-24
 - We add backport parameter overwrite rule #373
