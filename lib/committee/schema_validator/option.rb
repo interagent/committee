@@ -27,12 +27,12 @@ module Committee
                   :path_hash_key,
                   :prefix
 
-      def initialize(options, schema, schema_type)
+      def initialize(options, schema, schema_type, is_request)
         # Non-boolean options
         @headers_key         = options[:headers_key]    || "committee.headers"
         @params_key          = options[:params_key]     || "committee.params"
         @query_hash_key      = if options[:query_hash_key].nil?
-          Committee.warn_deprecated('Committee: please set query_hash_key = rack.request.query_hash because we\'ll change default value to "committee.query_hash" in next major version.') 
+          Committee.warn_deprecated('Committee: please set query_hash_key = "rack.request.query_hash" because we\'ll change default value to "committee.query_hash" in next major version.') 
           'rack.request.query_hash'
         else
           options.fetch(:query_hash_key)
@@ -50,7 +50,9 @@ module Committee
         @coerce_recursive    = options.fetch(:coerce_recursive, true)
         @optimistic_json     = options.fetch(:optimistic_json, false)
         @parse_response_by_content_type = if options[:parse_response_by_content_type].nil?
-          Committee.warn_deprecated('Committee: please set parse_response_by_content_type = false because we\'ll change default value in next major version.') 
+          if !is_request
+            Committee.warn_deprecated('Committee: please set parse_response_by_content_type = false because we\'ll change default value in next major version.') 
+          end
           false
         else
           options.fetch(:parse_response_by_content_type)

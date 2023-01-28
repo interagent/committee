@@ -61,7 +61,7 @@ module Committee
       end
 
       def router
-        @router ||= schema.build_router(committee_options)
+        @router ||= schema.build_router(committee_options, true)
       end
 
       def schema_validator

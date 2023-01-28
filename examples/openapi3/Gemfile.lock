@@ -1,28 +1,29 @@
 PATH
   remote: ../..
   specs:
-    committee (4.0.0)
+    committee (4.99.0)
       json_schema (~> 0.14, >= 0.14.3)
-      openapi_parser (>= 0.11.1)
+      openapi_parser (>= 0.11.1, < 1.0)
       rack (>= 1.5)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    json_schema (0.20.9)
-    mustermann (1.1.1)
+    json_schema (0.21.0)
+    mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
-    openapi_parser (0.11.2)
-    rack (2.2.3)
-    rack-protection (2.0.8.1)
+    openapi_parser (0.15.0)
+    rack (2.2.6.2)
+    rack-protection (3.0.5)
       rack
-    ruby2_keywords (0.0.2)
-    sinatra (2.0.8.1)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.8.1)
+    ruby2_keywords (0.0.5)
+    sinatra (3.0.5)
+      mustermann (~> 3.0)
+      rack (~> 2.2, >= 2.2.4)
+      rack-protection (= 3.0.5)
       tilt (~> 2.0)
-    tilt (2.0.10)
+    tilt (2.0.11)
+    webrick (1.8.1)
 
 PLATFORMS
   ruby
@@ -30,6 +31,7 @@ PLATFORMS
 DEPENDENCIES
   committee!
   sinatra
+  webrick
 
 BUNDLED WITH
-   1.17.3
+   2.4.5

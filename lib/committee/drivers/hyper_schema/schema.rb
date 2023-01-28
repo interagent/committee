@@ -12,8 +12,8 @@ module Committee
 
         attr_reader :validator_option
 
-        def build_router(options)
-          @validator_option = Committee::SchemaValidator::Option.new(options, self, :hyper_schema)
+        def build_router(options, is_request)
+          @validator_option = Committee::SchemaValidator::Option.new(options, self, :hyper_schema, is_request)
           Committee::SchemaValidator::HyperSchema::Router.new(self, @validator_option)
         end
       end

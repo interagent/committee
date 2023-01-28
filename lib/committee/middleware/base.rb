@@ -13,7 +13,7 @@ module Committee
         @raise = options[:raise]
         @schema = self.class.get_schema(options)
 
-        @router = @schema.build_router(options)
+        @router = @schema.build_router(options, is_request: Committee::Middleware::RequestValidation == self.class)
         @accept_request_filter = options[:accept_request_filter] || -> (_) { true }
       end
 

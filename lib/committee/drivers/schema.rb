@@ -10,7 +10,7 @@ module Committee
         raise "needs implementation"
       end
 
-      def build_router(options)
+      def build_router(options, is_request)
         raise "needs implementation"
       end
 
