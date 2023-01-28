@@ -92,21 +92,8 @@ module Committee
         request.env[validator_option.path_hash_key] = coerce_path_params
 
         query_param = unpacker.unpack_query_params(request)
-        param_matches_hash = request.env[validator_option.path_hash_key]
-
-        if request_param.is_a?(Array)
-          raise BadRequest, "Invalid JSON input. Require object with parameters as keys when path parameter exists." if !query_param.empty? || !param_matches_hash.empty?
-
-          request.env[validator_option.params_key] = Committee::Utils.deep_copy(request_param)
-        else
-          request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(query_param))
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request_param))
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(param_matches_hash))
-
-          query_param.merge!(request_param) if request.get? && validator_option.allow_get_body
-          request.env[validator_option.query_hash_key] = query_param
-        end
+        query_param.merge!(request_param) if request.get? && validator_option.allow_get_body
+        request.env[validator_option.query_hash_key] = query_param
       end
 
       def copy_coerced_data_to_params(request)
@@ -118,9 +105,17 @@ module Committee
           [validator_option.query_hash_key, validator_option.request_body_hash_key, validator_option.path_hash_key]
         end
 
-        request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
-        order.each do |key|
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[key]))
+        if request.env[validator_option.request_body_hash_key].is_a?(Array)
+          if (!request.env[validator_option.query_hash_key].empty? || !request.env[validator_option.path_hash_key].empty?)
+            raise BadRequest, "Invalid JSON input. Require object with parameters as keys when path parameter exists."
+          end
+
+          request.env[validator_option.params_key] = Committee::Utils.deep_copy(request.env[validator_option.request_body_hash_key])
+        else
+          request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
+          order.each do |key|
+            request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[key]))
+          end
         end
       end
     end
