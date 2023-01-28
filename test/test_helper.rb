@@ -11,8 +11,10 @@ SimpleCov.start do
   add_filter "/test/"
 
   # This library has a pretty modest number of lines, so let's try to stick
-  # to a 100% coverage target for a while and see what happens.
-  minimum_coverage 100
+  # to a 99% coverage target for a while and see what happens.
+  # We can't use 100% because old rack version doesn't support media_type and it's not testable :(
+  # https://github.com/interagent/committee/pull/360/files#diff-ce1125b6594690a88a70dbe2869f7fcfa2962c2bca80751f3720888920e2dfabR54
+  minimum_coverage 99
 end
 
 require "minitest"
