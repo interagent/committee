@@ -88,6 +88,13 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       assert_equal 200, last_response.status
     end
 
+    it "error because content_type check with body" do
+      @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
+      header "Content-Type", "application/x-www-form-urlencoded"
+      patch "/validate_empty_optional_body", "{}"
+      assert_equal 400, last_response.status
+    end    
+
     def new_rack_app(options = {})
       # TODO: delete when 5.0.0 released because default value changed
       options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
