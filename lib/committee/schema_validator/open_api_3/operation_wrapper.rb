@@ -52,6 +52,10 @@ module Committee
           ret
         end
 
+        def optional_body?
+          !request_operation.operation_object&.request_body&.required
+        end
+
         def valid_request_content_type?(content_type)
           if (request_body = request_operation.operation_object&.request_body)
             !request_body.select_media_type(content_type).nil?

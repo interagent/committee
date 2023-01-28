@@ -24,6 +24,7 @@ module Committee
           # support post, put, patch only
           return true unless request.post? || request.put? || request.patch?
           return true if @operation_object.valid_request_content_type?(content_type)
+          return true if @operation_object.optional_body? && empty_request?(request)
 
           message = if valid_content_types.size > 1
                       types = valid_content_types.map {|x| %{"#{x}"} }.join(', ')
@@ -36,6 +37,14 @@ module Committee
 
         def valid_content_types
           @operation_object&.request_content_types
+        end
+
+        def empty_request?(request)
+          return true if !request.body
+
+          data = request.body.read
+          request.body.rewind
+          data.empty?
         end
       end
     end
