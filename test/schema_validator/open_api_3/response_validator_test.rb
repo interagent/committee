@@ -17,7 +17,7 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
     options = {}
     options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
     
-    @validator_option = Committee::SchemaValidator::Option.new(options, open_api_3_schema, :open_api_3)
+    @validator_option = Committee::SchemaValidator::Option.new(options, open_api_3_schema, :open_api_3, false)
   end
 
   it "passes through a valid response" do

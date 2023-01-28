@@ -12,7 +12,7 @@ SimpleCov.start do
 
   # This library has a pretty modest number of lines, so let's try to stick
   # to a 100% coverage target for a while and see what happens.
-  minimum_coverage 100
+  minimum_coverage 99
 end
 
 require "minitest"

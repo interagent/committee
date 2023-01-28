@@ -125,7 +125,7 @@ end
 describe Committee::Drivers::Schema do
   SCHEMA_METHODS = {
     driver: [],
-    build_router: [validator_option: nil, prefix: nil]
+    build_router: [[validator_option: nil, prefix: nil], true]
   }
 
   it "has a set of abstract methods" do

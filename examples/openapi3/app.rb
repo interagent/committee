@@ -6,8 +6,8 @@ require "yaml"
 
 class App < Sinatra::Base
   SCHEMA_PATH = File.expand_path("../openapi.yaml", __FILE__)
-  use Committee::Middleware::RequestValidation, schema_path: SCHEMA_PATH, strict: true, raise: true
-  use Committee::Middleware::ResponseValidation, schema_path: SCHEMA_PATH
+  use Committee::Middleware::RequestValidation, schema_path: SCHEMA_PATH, strict: true, raise: true, query_hash_key: 'committee.query_hash', parameter_overwite_by_rails_rule: true
+  #use Committee::Middleware::ResponseValidation, schema_path: SCHEMA_PATH
 
   # This handler is called into, but its response is ignored.
   get "/apps" do
