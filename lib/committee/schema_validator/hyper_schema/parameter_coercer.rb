@@ -13,7 +13,7 @@ module Committee
         end
 
         def call!
-          coerce_value!(@params, @schema)
+          @params.is_a?(Array) ? coerce_array_data!(@params, @schema) : coerce_object!(@params, @schema)
         end
 
         private
