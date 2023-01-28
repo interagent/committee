@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.99.0] - 2023-01-28
+
+- Please read [4.4.99.beta1] section
+
 ## [4.99.0.beta1] - 2023-01-24
 - We add backport parameter overwrite rule #373
   - We provide merged parameter for `committee.params` ( `params_key` option)
