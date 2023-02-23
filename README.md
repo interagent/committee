@@ -351,7 +351,6 @@ Important changes are also described below.
 ### Upgrading from Committee 4.* to 5.*
 
 Committee 5.* has few breaking changes so we recommend upgrading to the latest release on 4.* and fixing any deprecation errors you see before upgrading.
-(Now we doesn't release 5.* yet)
 
 - set `parse_response_by_content_type=true` by default (old versions set `false`)
 - set `parameter_overwite_by_rails_rule=true` by default (old version set `false`)
