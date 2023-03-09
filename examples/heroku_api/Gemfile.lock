@@ -3,7 +3,7 @@ PATH
   specs:
     committee (5.0.0.beta1)
       json_schema (~> 0.14, >= 0.14.3)
-      openapi_parser (= 1.0.0.beta1)
+      openapi_parser (~> 1.0)
       rack (>= 1.5)
 
 GEM
@@ -12,8 +12,8 @@ GEM
     json_schema (0.21.0)
     mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
-    openapi_parser (1.0.0.beta1)
-    rack (2.2.6.2)
+    openapi_parser (1.0.0)
+    rack (2.2.6.3)
     rack-protection (2.2.3)
       rack
     ruby2_keywords (0.0.5)
