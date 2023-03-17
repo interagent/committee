@@ -14,7 +14,7 @@ GEM
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
     openapi_parser (1.0.0)
-    rack (2.2.6.3)
+    rack (2.2.6.4)
     rack-protection (3.0.5)
       rack
     ruby2_keywords (0.0.5)
