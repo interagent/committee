@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'digest'
+
 module Committee
   module Drivers
     # Gets a driver instance from the specified name. Raises ArgumentError for
@@ -36,13 +38,16 @@ module Committee
     # @param [String] schema_path
     # @return [Committee::Driver]
     def self.load_from_file(schema_path, parser_options: {})
-      case File.extname(schema_path)
-      when '.json'
-        load_from_json(schema_path, parser_options: parser_options)
-      when '.yaml', '.yml'
-        load_from_yaml(schema_path, parser_options: parser_options)
-      else
-        raise "Committee only supports the following file extensions: '.json', '.yaml', '.yml'"
+      @__load_from_file_cache ||= {}
+      @__load_from_file_cache[cache_key(schema_path, parser_options)] ||= begin
+        case File.extname(schema_path)
+        when '.json'
+          load_from_json(schema_path, parser_options: parser_options)
+        when '.yaml', '.yml'
+          load_from_yaml(schema_path, parser_options: parser_options)
+        else
+          raise "Committee only supports the following file extensions: '.json', '.yaml', '.yml'"
+        end
       end
     end
 
@@ -73,6 +78,17 @@ module Committee
 
       # TODO: in the future, pass `opts` here and allow optionality in other drivers?
       driver.parse(hash)
+    end
+
+    class << self
+      private
+
+      def cache_key(schema_path, parser_options)
+        [
+          File.exist?(schema_path) ? Digest::MD5.hexdigest(File.read(schema_path)) : nil,
+          parser_options.hash,
+        ].join('_')
+      end
     end
   end
 end

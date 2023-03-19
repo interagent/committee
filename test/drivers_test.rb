@@ -67,6 +67,35 @@ describe Committee::Drivers do
       end
       assert_equal "Committee only supports the following file extensions: '.json', '.yaml', '.yml'", e.message
     end
+
+    describe 'cache behavior' do
+      describe 'when loading the same file' do
+        it 'returns the same object when the options are identical' do
+          assert_equal(
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{strict_reference_validation: true}).object_id,
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{strict_reference_validation: true}).object_id,
+          )
+        end
+
+        it 'returns different objects if the options are different' do
+          refute_equal(
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{strict_reference_validation: true}).object_id,
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{strict_reference_validation: false}).object_id,
+          )
+        end
+
+        it 'returns different objects if the file contents have changed' do
+          object_id = Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{strict_reference_validation: true}).object_id
+          original_file_contents = File.read(open_api_3_schema_path)
+          File.write(open_api_3_schema_path, original_file_contents + "\n")
+          refute_equal(
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{strict_reference_validation: true}).object_id,
+            object_id,
+          )
+          File.write(open_api_3_schema_path, original_file_contents)
+        end
+      end
+    end
   end
 
   describe 'load_from_json(schema_path)' do
