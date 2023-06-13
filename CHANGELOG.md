@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change old assert behavior #380
   - when we use `assert_schema_conform` we validate response only by default.
   - But we validate request by default
-  - This deafult behavior is deprecation in 4.99.x
+  - This default behavior is deprecation in 4.99.x
 
 ## [4.99.0] - 2023-01-28
 
