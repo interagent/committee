@@ -17,7 +17,7 @@ module Committee
                   :optimistic_json,
                   :validate_success_only,
                   :parse_response_by_content_type,
-                  :parameter_overwite_by_rails_rule
+                  :parameter_overwrite_by_rails_rule
 
       # Non-boolean options:
       attr_reader :headers_key,
@@ -45,7 +45,7 @@ module Committee
         @coerce_recursive                 = options.fetch(:coerce_recursive, true)
         @optimistic_json                  = options.fetch(:optimistic_json, false)
         @parse_response_by_content_type   = options.fetch(:parse_response_by_content_type, true)
-        @parameter_overwite_by_rails_rule = options.fetch(:parameter_overwite_by_rails_rule, true)
+        @parameter_overwrite_by_rails_rule = options.fetch(:parameter_overwrite_by_rails_rule, true)
 
         # Boolean options and have a different value by default
         @allow_get_body        = options.fetch(:allow_get_body, schema.driver.default_allow_get_body)

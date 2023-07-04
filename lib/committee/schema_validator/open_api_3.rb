@@ -97,7 +97,7 @@ module Committee
       end
 
       def copy_coerced_data_to_params(request)
-        order = if validator_option.parameter_overwite_by_rails_rule
+        order = if validator_option.parameter_overwrite_by_rails_rule
           # (high priority) path_hash_key -> query_param -> request_body_hash          
           [validator_option.request_body_hash_key, validator_option.query_hash_key, validator_option.path_hash_key]
         else
