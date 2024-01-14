@@ -6,7 +6,6 @@ A collection of middleware to help build services with JSON Schema, OpenAPI 2, O
 
 Committee is tested on the following MRI versions:
 
-- 2.6
 - 2.7
 - 3.0
 - 3.1
