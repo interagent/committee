@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.1.0] - 2024-01-16
+- Implement cache in schema loading #385
+- Upgrade `openapi_parser` dependency to 2.0 #400
+- Drop support for Ruby 2.6 #403
+
 ## [5.0.0] - 2023-01-28
 - Skip content-type validation in OpenAPI 3 when body is both optional & empty #355
   - Support RequestBody.required for OpenAPI 3
