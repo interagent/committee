@@ -10,6 +10,9 @@ AllCops:
     - 'examples/**/*'
     - 'vendor/**/*'
 
+Layout/ExtraSpacing:
+  Enabled: true
+
 Performance:
   Exclude:
     - 'test/**/*'

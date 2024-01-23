@@ -32,7 +32,7 @@ module Committee
         @headers_key         = options[:headers_key]    || "committee.headers"
         @params_key          = options[:params_key]     || "committee.params"
         @query_hash_key      = options[:query_hash_key] || "committee.query_hash"
-        @path_hash_key      = options[:path_hash_key] || "committee.path_hash"
+        @path_hash_key = options[:path_hash_key] || "committee.path_hash"
         @request_body_hash_key = options[:request_body_hash_key] || "committee.request_body_hash"
 
         @prefix              = options[:prefix]

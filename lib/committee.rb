@@ -22,7 +22,7 @@ module Committee
   end
 
   def self.warn_deprecated_until_6(cond, message)
-    raise "remove deprecated!"  unless Committee::VERSION.start_with?("5")
+    raise "remove deprecated!" unless Committee::VERSION.start_with?("5")
     warn("[DEPRECATION] #{message}") if cond
   end
 end
