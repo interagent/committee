@@ -6,7 +6,7 @@ module Committee
       def initialize(app, options={})
         super
 
-        @strict  = options[:strict]
+        @strict = options[:strict]
       end
 
       def handle(request)
