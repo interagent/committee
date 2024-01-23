@@ -273,9 +273,6 @@ describe Committee::Middleware::ResponseValidation do
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})
-    # TODO: delete when 5.0.0 released because default value changed
-    options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
-
     status = rack_options[:status] || 200
     content_type = rack_options[:content_type] || "application/json"
     headers = {
