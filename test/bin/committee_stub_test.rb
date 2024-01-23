@@ -44,8 +44,6 @@ describe Committee::Bin::CommitteeStub, "app" do
 
   def app
     options = {}
-    # TODO: delete when 5.0.0 released because default value changed
-    options[:parse_response_by_content_type] = false
 
     @bin.get_app(hyper_schema, options)
   end

@@ -9,12 +9,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
     before do
       @path = '/validate'
       @method = 'post'
-
-      # TODO: delete when 5.0.0 released because default value changed
-      options = {}
-      options[:parse_response_by_content_type] = true if options[:parse_response_by_content_type] == nil
-
-      @validator_option = Committee::SchemaValidator::Option.new(options, open_api_3_schema, :open_api_3)
+      @validator_option = Committee::SchemaValidator::Option.new({}, open_api_3_schema, :open_api_3)
     end
 
     def operation_object

@@ -30,9 +30,6 @@ describe Committee::Test::Methods do
     @committee_schema = nil
 
     @committee_options = {schema: hyper_schema}
-
-    # TODO: delete when 5.0.0 released because default value changed
-    @committee_options[:parse_response_by_content_type] = false
   end
 
   describe "#assert_schema_conform" do
