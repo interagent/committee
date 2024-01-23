@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
   s.executables   << "committee-stub"
   s.files         = Dir["{bin,lib,test}/**/*.rb"]
 
-  s.required_ruby_version = ">= 2.6.0"
+  s.required_ruby_version = ">= 2.7.0"
 
   s.add_dependency "json_schema", "~> 0.14", ">= 0.14.3"
 
