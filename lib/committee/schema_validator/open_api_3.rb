@@ -87,7 +87,7 @@ module Committee
 
         request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
 
-        request_param, is_form_params = unpacker.unpack_request_params(request)
+        request_param, _is_form_params = unpacker.unpack_request_params(request)
         request.env[validator_option.request_body_hash_key] = request_param
         request.env[validator_option.path_hash_key] = coerce_path_params
 
