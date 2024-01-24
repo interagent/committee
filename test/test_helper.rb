@@ -21,7 +21,6 @@ require "minitest"
 require "minitest/spec"
 require "minitest/autorun"
 require "rack/test"
-require "rr"
 require "pry"
 require "stringio"
 
