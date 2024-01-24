@@ -19,13 +19,15 @@ describe Committee do
     old_stderr = $stderr
     $stderr = StringIO.new
     begin
-      stub(Committee).debug? { false }
-      Committee.log_debug "blah"
-      assert_equal "", $stderr.string
+      Committee.stub(:debug?, false) do
+        Committee.log_debug "blah"
+        assert_equal "", $stderr.string
+      end
 
-      stub(Committee).debug? { true }
-      Committee.log_debug "blah"
-      assert_equal "blah\n", $stderr.string
+      Committee.stub(:debug?, true) do
+        Committee.log_debug "blah"
+        assert_equal "blah\n", $stderr.string
+      end
     ensure
       $stderr = old_stderr
     end
