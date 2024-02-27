@@ -4,11 +4,12 @@ module Committee
   module SchemaValidator
     class HyperSchema
       class ResponseValidator
-        attr_reader :validate_success_only
+        attr_reader :validate_success_only, :permit_blank_structures
 
         def initialize(link, options = {})
           @link = link
           @validate_success_only = options[:validate_success_only]
+          @permit_blank_structures = options[:permit_blank_structures]
 
           @validator = JsonSchema::Validator.new(target_schema(link))
         end
@@ -39,9 +40,18 @@ module Committee
             return if data == nil
           end
 
-          if Committee::Middleware::ResponseValidation.validate?(status, validate_success_only) && !@validator.validate(data)
-            errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
-            raise InvalidResponse, "Invalid response.\n\n#{errors}"
+          if permit_blank_structures && @link.is_a?(Committee::Drivers::OpenAPI2::Link) && !@link.target_schema
+            return if data.nil?
+          end
+
+          begin
+            if Committee::Middleware::ResponseValidation.validate?(status, validate_success_only) && !@validator.validate(data)
+              errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
+              raise InvalidResponse, "Invalid response.\n\n#{errors}"
+            end
+          rescue => e
+            raise InvalidResponse, "Invalid response.\n\nschema is undefined" if /undefined method .all_of. for nil/ =~ e.message
+            raise e
           end
         end
 
