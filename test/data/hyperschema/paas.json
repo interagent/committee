@@ -262,6 +262,19 @@
             "$ref": "#/definitions/app"
           },
           "title": "abc"
+        },
+        {
+          "description": "Create new apps.",
+          "href": "/apps",
+          "method": "PUT",
+          "rel": "collection",
+          "targetSchema": {
+            "items": {
+              "$ref": "#/definitions/app"
+            },
+            "type": "array"
+          },
+          "title": "Create Apps"
         }
       ],
       "properties": {

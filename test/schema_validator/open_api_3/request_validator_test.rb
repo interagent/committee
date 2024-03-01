@@ -95,6 +95,14 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       assert_equal 400, last_response.status
     end    
 
+    it "validates array request" do
+      @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
+      params = ["1", true]
+      header "Content-Type", "application/json"
+      post "/validate_request_array", JSON.generate(params)
+      assert_equal 200, last_response.status
+    end
+
     def new_rack_app(options = {})
       Rack::Builder.new {
         use Committee::Middleware::RequestValidation, options

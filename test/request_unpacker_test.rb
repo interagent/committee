@@ -135,15 +135,14 @@ describe Committee::RequestUnpacker do
     assert_equal({ "a" => "b" }, unpacker.unpack_query_params(request))
   end
 
-  it "errors if JSON is not an object" do
+  it "unpacks if JSON is not an object" do
     env = {
       "CONTENT_TYPE" => "application/json",
       "rack.input"   => StringIO.new('[2]'),
     }
     request = Rack::Request.new(env)
-    assert_raises(Committee::BadRequest) do
-      Committee::RequestUnpacker.new.unpack_request_params(request)
-    end
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([[2], false], unpacker.unpack_request_params(request))
   end
 
   it "errors on an unknown Content-Type" do
