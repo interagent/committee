@@ -90,6 +90,14 @@ def open_api_3_data
   end
 end
 
+def open_api_3_1_data
+  if YAML.respond_to?(:unsafe_load_file)
+    YAML.unsafe_load_file(open_api_3_1_schema_path)
+  else
+    YAML.load_file(open_api_3_1_schema_path)
+  end
+end
+
 def hyper_schema_schema_path
   "./test/data/hyperschema/paas.json"
 end
@@ -112,6 +120,10 @@ end
 
 def open_api_3_0_1_schema_path
   "./test/data/openapi3/3_0_1.yaml"
+end
+
+def open_api_3_1_schema_path
+  "./test/data/openapi3/3_1.yaml"
 end
 
 def open_api_3_invalid_reference_path
