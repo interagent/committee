@@ -510,7 +510,7 @@ bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
 
 ## Release
 
-1. Update the version in `committee.gemspec` as appropriate for [semantic
+1. Update the version in `lib/committee/version.rb` as appropriate for [semantic
    versioning](http://semver.org) and add details to `CHANGELOG.md`.
 2. Commit those changes. Use a commit message like `Bump version to 1.2.3`.
 3. Run the `release` task:
