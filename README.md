@@ -2,6 +2,8 @@
 
 A collection of middleware to help build services with JSON Schema, OpenAPI 2, OpenAPI 3.
 
+**MAINTENANCE WARNING:** Committee is an old project that's currently under extremely minimal maintenance. New users should look for alternatives instead.
+
 ## Supported Ruby Versions
 
 Committee is tested on the following MRI versions:
