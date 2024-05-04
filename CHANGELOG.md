@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Error explicitly that OpenAPI 3.1+ isn't supported #418
+
 ## [5.1.0] - 2024-01-16
 - Implement cache in schema loading #385
 - Upgrade `openapi_parser` dependency to 2.0 #400
