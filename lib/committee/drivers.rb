@@ -70,6 +70,10 @@ module Committee
         return Committee::Drivers::OpenAPI3::Driver.new.parse(openapi)
       end
 
+      if hash['openapi']&.start_with?('3.1.')
+        raise OpenAPI3Unsupported.new('Committee does not support OpenAPI 3.1 yet')
+      end
+
       driver = if hash['swagger'] == '2.0'
                  Committee::Drivers::OpenAPI2::Driver.new
                else
