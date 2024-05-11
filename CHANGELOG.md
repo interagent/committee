@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Add `allow_blank_structures` option #417
+  - Allow Empty Response Body. supported on Hyper-schema parser but will default to true in next major version.
+
 ## [5.2.0] - 2024-05-04
 - Error explicitly that OpenAPI 3.1+ isn't supported #418
 
