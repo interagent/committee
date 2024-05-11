@@ -4,12 +4,12 @@ module Committee
   module SchemaValidator
     class HyperSchema
       class ResponseValidator
-        attr_reader :validate_success_only, :permit_blank_structures
+        attr_reader :allow_blank_structures, :validate_success_only
 
         def initialize(link, options = {})
           @link = link
           @validate_success_only = options[:validate_success_only]
-          @permit_blank_structures = options[:permit_blank_structures]
+          @allow_blank_structures = options[:allow_blank_structures]
 
           @validator = JsonSchema::Validator.new(target_schema(link))
         end
@@ -40,7 +40,7 @@ module Committee
             return if data == nil
           end
 
-          if permit_blank_structures && @link.is_a?(Committee::Drivers::OpenAPI2::Link) && !@link.target_schema
+          if allow_blank_structures && @link.is_a?(Committee::Drivers::OpenAPI2::Link) && !@link.target_schema
             return if data.nil?
           end
 

@@ -4,7 +4,8 @@ module Committee
   module SchemaValidator
     class Option
       # Boolean Options
-      attr_reader :allow_form_params,
+      attr_reader :allow_blank_structures,
+                  :allow_form_params,
                   :allow_get_body,
                   :allow_query_params,
                   :check_content_type,
@@ -17,8 +18,7 @@ module Committee
                   :optimistic_json,
                   :validate_success_only,
                   :parse_response_by_content_type,
-                  :parameter_overwite_by_rails_rule,
-                  :permit_blank_structures
+                  :parameter_overwite_by_rails_rule
 
       # Non-boolean options:
       attr_reader :headers_key,
@@ -39,6 +39,7 @@ module Committee
         @prefix                = options[:prefix]
 
         # Boolean options and have a common value by default
+        @allow_blank_structures           = options.fetch(:allow_blank_structures, false)
         @allow_form_params                = options.fetch(:allow_form_params, true)
         @allow_query_params               = options.fetch(:allow_query_params, true)
         @check_content_type               = options.fetch(:check_content_type, true)
@@ -47,7 +48,6 @@ module Committee
         @optimistic_json                  = options.fetch(:optimistic_json, false)
         @parse_response_by_content_type   = options.fetch(:parse_response_by_content_type, true)
         @parameter_overwite_by_rails_rule = options.fetch(:parameter_overwite_by_rails_rule, true)
-        @permit_blank_structures          = options.fetch(:permit_blank_structures, false)
 
         # Boolean options and have a different value by default
         @allow_get_body        = options.fetch(:allow_get_body, schema.driver.default_allow_get_body)

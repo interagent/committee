@@ -136,24 +136,24 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
-  it "passes through a valid response for OpenAPI when data=nil, target_schema=empty, permit_blank_structures=true" do
+  it "passes through a valid response for OpenAPI when data=nil, target_schema=empty, allow_blank_structures=true" do
     @app = new_rack_app("null", {},
-                        permit_blank_structures: true, schema: open_api_2_schema)
+                        allow_blank_structures: true, schema: open_api_2_schema)
     get "/api/pets/cat"
     assert_equal 200, last_response.status
   end
 
-  it "invalid responses for OpenAPI when data=nil, target_schema=empty, permit_blank_structures=false" do
+  it "invalid responses for OpenAPI when data=nil, target_schema=empty, allow_blank_structures=false" do
     @app = new_rack_app("null", {},
-                        permit_blank_structures: false, schema: open_api_2_schema)
+                        allow_blank_structures: false, schema: open_api_2_schema)
     get "/api/pets/cat"
     assert_equal 500, last_response.status
     assert_match(/Invalid response/i, last_response.body)
   end
 
-  it "passes through a valid response for OpenAPI when data=nil, target_schema=present, permit_blank_structures=true" do
+  it "passes through a valid response for OpenAPI when data=nil, target_schema=present, allow_blank_structures=true" do
     @app = new_rack_app("null", {},
-                        permit_blank_structures: true, schema: open_api_2_schema)
+                        allow_blank_structures: true, schema: open_api_2_schema)
     get "/api/pets/dog"
     assert_equal 500, last_response.status
     assert_match(/nil is not an array/i, last_response.body)

@@ -33,7 +33,7 @@ module Committee
           data = JSON.parse(full_body) if parse_to_json
         end
 
-        Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link, validate_success_only: validator_option.validate_success_only, permit_blank_structures: validator_option.permit_blank_structures).call(status, headers, data)
+        Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link, validate_success_only: validator_option.validate_success_only, allow_blank_structures: validator_option.allow_blank_structures).call(status, headers, data)
       end
 
       def link_exist?
