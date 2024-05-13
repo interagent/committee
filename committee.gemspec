@@ -33,4 +33,11 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rubocop"
   s.add_development_dependency "rubocop-performance"
   s.add_development_dependency "simplecov"
+
+  s.metadata = {
+    "bug_tracker_uri" => "https://github.com/interagent/committee/issues",
+    "changelog_uri" => "https://github.com/interagent/committee/blob/master/CHANGELOG.md",
+    "rubygems_mfa_required" => "true",
+    "source_code_uri" => "https://github.com/interagent/committee"
+  }
 end
