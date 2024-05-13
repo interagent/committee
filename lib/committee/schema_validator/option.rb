@@ -4,7 +4,8 @@ module Committee
   module SchemaValidator
     class Option
       # Boolean Options
-      attr_reader :allow_form_params,
+      attr_reader :allow_blank_structures,
+                  :allow_form_params,
                   :allow_get_body,
                   :allow_query_params,
                   :check_content_type,
@@ -38,6 +39,7 @@ module Committee
         @prefix                = options[:prefix]
 
         # Boolean options and have a common value by default
+        @allow_blank_structures           = options.fetch(:allow_blank_structures, false)
         @allow_form_params                = options.fetch(:allow_form_params, true)
         @allow_query_params               = options.fetch(:allow_query_params, true)
         @check_content_type               = options.fetch(:check_content_type, true)

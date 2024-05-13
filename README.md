@@ -28,6 +28,7 @@ This piece of middleware validates the parameters of incoming requests to make s
 
 | name | Hyper-Schema | OpenAPI 3 | Description |
 |-----------:|------------:|------------:| :------------ |
+|allow_blank_structures | false | always true | Allow Empty Response Body. supported on Hyper-schema parser but will default to true in next major version. |
 |allow_form_params | true | true | Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations. |
 |allow_get_body | true | false | Allow GET request body, which merge to request parameter. See (#211) |
 |allow_query_params | true | true | Specifies that query string parameters will be taken into consideration when doing validation. |

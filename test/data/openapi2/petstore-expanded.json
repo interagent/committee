@@ -184,6 +184,17 @@
           }
         }
       }
+    },
+    "/pets/cat": {
+      "get": {
+        "description": "Returns pets which are cats",
+        "operationId": "find pets which are cats",
+        "responses": {
+          "200": {
+            "description": "empty schema"
+          }
+        }
+      }
     }
   },
   "definitions": {
