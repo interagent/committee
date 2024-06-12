@@ -46,7 +46,11 @@ module Committee
       if @allow_form_params && %w[application/x-www-form-urlencoded multipart/form-data].include?(request.media_type)
         # Actually, POST means anything in the request body, could be from
         # PUT or PATCH too. Silly Rack.
-        return [request.POST, true] if request.POST
+        begin
+          return [request.POST, true] if request.POST
+        ensure
+          request.body.rewind
+        end
       end
 
       [{}, false]
