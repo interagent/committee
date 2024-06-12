@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency "openapi_parser", "~> 2.0"
 
   s.add_development_dependency "minitest", "~> 5.3"
-  s.add_development_dependency "rack-test", "~> 0.8"
+  s.add_development_dependency "rack-test"
   s.add_development_dependency "rake", "~> 13.1"
   s.add_development_dependency "pry"
   s.add_development_dependency "pry-byebug"
