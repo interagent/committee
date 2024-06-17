@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.4.0] - 2024-06-17
+
+### Changed
+
+- Ensure request body is always rewound [#425](https://github.com/interagent/committee/pull/425)
+  - `Rack::Request#POST` no longer rewind, it because removed in rack/rack@42aff22f708123839ba706cbe659d108b47c40c7.
+
 ## [5.3.0] - 2024-05-16
 
 ### Added
