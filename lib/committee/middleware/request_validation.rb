@@ -20,6 +20,7 @@ module Committee
           raise if @raise
           return @error_class.new(400, :bad_request, $!.message, request).render unless @ignore_error
         rescue Committee::NotFound => e
+          handle_exception($!, request.env)
           raise if @raise
           return @error_class.new(404, :not_found, e.message, request).render unless @ignore_error
         rescue JSON::ParserError
