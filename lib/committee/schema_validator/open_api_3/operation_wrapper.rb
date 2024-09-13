@@ -40,7 +40,7 @@ module Committee
         end
 
         def validate_request_params(path_params, query_params, body_params, headers, validator_option)
-          ret, err = case request_operation.http_method
+          ret = case request_operation.http_method
                 when 'get', 'delete', 'head'
                   validate_get_request_params(path_params, query_params, headers, validator_option)
                 when 'post', 'put', 'patch', 'options'
@@ -48,7 +48,6 @@ module Committee
                 else
                   raise "Committee OpenAPI3 not support #{request_operation.http_method} method"
                 end
-          raise err if err
           ret
         end
 

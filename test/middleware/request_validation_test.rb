@@ -53,13 +53,23 @@ describe Committee::Middleware::RequestValidation do
       }
   ]
 
-  it "passes through a valid request" do
+  it "passes through a valid request typed by object" do
     @app = new_rack_app(schema: hyper_schema)
     params = {
       "name" => "cloudnasium"
     }
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
+    assert_equal 200, last_response.status
+  end
+
+  it "passes through a valid request typed by array" do
+    @app = new_rack_app(schema: hyper_schema)
+    params = [{
+      "name" => "cloudnasium"
+    }]
+    header "Content-Type", "application/json"
+    put "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
   end
 
