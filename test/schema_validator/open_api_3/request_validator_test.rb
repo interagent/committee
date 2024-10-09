@@ -95,6 +95,13 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       assert_equal 400, last_response.status
     end    
 
+    it "validates content_type for option request" do
+      @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
+      header "Content-Type", "text/html"
+      options "/validate", "{}"
+      assert_equal 400, last_response.status
+    end
+
     def new_rack_app(options = {})
       Rack::Builder.new {
         use Committee::Middleware::RequestValidation, options
