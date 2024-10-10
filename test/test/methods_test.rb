@@ -58,13 +58,13 @@ describe Committee::Test::Methods do
 
     describe "assert_request_schema_confirm" do
       it "passes through a valid request" do
-        @app = new_rack_app([])
+        @app = new_rack_app
         get "/apps"
         assert_request_schema_confirm
       end
 
       it "not exist required" do
-        @app = new_rack_app([])
+        @app = new_rack_app
         get "/search/apps", {}
         e = assert_raises(Committee::InvalidRequest) do
           assert_request_schema_confirm
@@ -73,7 +73,7 @@ describe Committee::Test::Methods do
       end
 
       it "path undefined in schema" do
-        @app = new_rack_app([])
+        @app = new_rack_app
         get "/undefined"
         e = assert_raises(Committee::InvalidRequest) do
           assert_request_schema_confirm
@@ -146,13 +146,13 @@ describe Committee::Test::Methods do
 
     describe "assert_request_schema_confirm" do
       it "passes through a valid request" do
-        @app = new_rack_app([])
+        @app = new_rack_app
         get "/characters"
         assert_request_schema_confirm
       end
 
       it "not exist required" do
-        @app = new_rack_app([])
+        @app = new_rack_app
         get "/validate", {"query_string" => "query", "query_integer_list" => [1, 2]}
         e = assert_raises(Committee::InvalidRequest) do
           assert_request_schema_confirm
@@ -162,7 +162,7 @@ describe Committee::Test::Methods do
       end
 
       it "path undefined in schema" do
-        @app = new_rack_app([])
+        @app = new_rack_app
         get "/undefined"
         e = assert_raises(Committee::InvalidRequest) do
           assert_request_schema_confirm
@@ -350,7 +350,7 @@ describe Committee::Test::Methods do
 
   private
 
-  def new_rack_app(response, headers={ "Content-Type" => "application/json" }, status_code = 200)
+  def new_rack_app(response = nil, headers={ "Content-Type" => "application/json" }, status_code = 200)
     Rack::Builder.new {
       run lambda { |_|
         [status_code, headers, [response]]
