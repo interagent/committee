@@ -77,6 +77,7 @@ module Committee
     def parse_json(request)
       return nil if request.request_method == "GET" && !@allow_get_body
 
+      return nil if request.body.nil?
       body = request.body.read
       # if request body is empty, we just have empty params
       return nil if body.length == 0
