@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [5.5.0] - 2024-11-25
+
+### Added
+
+- basic dependabot config
+- security policy
+
+### Changed
+
+- invoke error_handler on Committee::NotFound [#427](https://github.com/interagent/committee/pull/427)
+- update rack requirement [#431](https://github.com/interagent/committee/pull/431)
+- drop Gemfile.lock files from examples (were triggering as vulnerability scans)
+- bump rails version in openapi3 rails examples
+- update README to match 5.* breaking changes
+
 ## [5.4.0] - 2024-06-17
 
 ### Changed
@@ -19,12 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `allow_blank_structures` option [#417](https://github.com/interagent/committee/pull/417)
-  - Allow Empty Response Body. supported on Hyper-schema parser but will default to true in next major version.
+- Allow Empty Response Body. supported on Hyper-schema parser but will default to true in next major version.
 
 ### Changed
 
 - Rename `parameter_overwite_by_rails_rule` to `parameter_overwrite_by_rails_rule` [#396](https://github.com/interagent/committee/pull/396)
-  - You can use old option name but it will be deprecated in next major version.
+- You can use old option name but it will be deprecated in next major version.
 
 ## [5.2.0] - 2024-05-04
 - Error explicitly that OpenAPI 3.1+ isn't supported [#418](https://github.com/interagent/committee/pull/418)
@@ -70,7 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - (high priority) path_hash_key -> request_body_hash -> query_param
   - If you don't want to change, please set false (current rule)
     - (high priority) path_hash_key -> query_param -> request_body_hash
-- Support newest ruby version 
+- Support newest ruby version
   - backport #368
 
 
