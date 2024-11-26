@@ -23,12 +23,19 @@ module Committee
 
         # The link's output schema. i.e. How we validate an endpoint's response
         # data.
-        attr_accessor :target_schema
+        attr_accessor :target_schemas
 
         attr_accessor :header_schema
 
         def rel
           raise "Committee: rel not implemented for OpenAPI"
+        end
+
+        def target_schema
+          target_schemas[status_success] ||
+            target_schemas[200] ||
+            target_schemas[201] ||
+            target_schemas.values.first
         end
       end
     end
