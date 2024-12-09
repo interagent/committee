@@ -6,19 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 25
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: Width, AllowedPatterns.
-Layout/IndentationWidth:
-  Exclude:
-    - 'lib/committee/request_unpacker.rb'
-    - 'lib/committee/schema_validator/hyper_schema.rb'
-    - 'lib/committee/schema_validator/hyper_schema/parameter_coercer.rb'
-    - 'lib/committee/schema_validator/hyper_schema/string_params_coercer.rb'
-    - 'lib/committee/schema_validator/open_api_3.rb'
-    - 'lib/committee/utils.rb'
-    - 'lib/committee/version.rb'
-
 # Offense count: 3
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: AllowDoxygenCommentStyle, AllowGemfileRubyComment, AllowRBSInlineAnnotation, AllowSteepAnnotation.

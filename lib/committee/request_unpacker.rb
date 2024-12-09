@@ -32,7 +32,7 @@ module Committee
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON
       params = if !request.media_type || request.media_type =~ %r{application/(?:.*\+)?json}
-        parse_json(request)
+                 parse_json(request)
       elsif @optimistic_json
         begin
           parse_json(request)
