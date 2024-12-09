@@ -6,17 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 9
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: AllowForAlignment, EnforcedStyleForExponentOperator, EnforcedStyleForRationalLiterals.
-# SupportedStylesForExponentOperator: space, no_space
-# SupportedStylesForRationalLiterals: space, no_space
-Layout/SpaceAroundOperators:
-  Exclude:
-    - 'committee.gemspec'
-    - 'test/drivers/open_api_3/driver_test.rb'
-    - 'test/request_unpacker_test.rb'
-
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBraces.

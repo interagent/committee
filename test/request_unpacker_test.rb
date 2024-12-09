@@ -18,7 +18,7 @@ describe Committee::RequestUnpacker do
   end
 
   it "unpacks JSON on no Content-Type" do
-    env = { "rack.input"   => StringIO.new('{"x":"y"}'), }
+    env = { "rack.input" => StringIO.new('{"x":"y"}'), }
     request = Rack::Request.new(env)
     unpacker = Committee::RequestUnpacker.new
     assert_equal([{ "x" => "y" }, false], unpacker.unpack_request_params(request))
@@ -93,7 +93,7 @@ describe Committee::RequestUnpacker do
   end
 
   it "unpacks query params with allow_query_params" do
-    env = { "rack.input"   => StringIO.new(""), "QUERY_STRING" => "a=b" }
+    env = { "rack.input" => StringIO.new(""), "QUERY_STRING" => "a=b" }
     request = Rack::Request.new(env)
     unpacker = Committee::RequestUnpacker.new(allow_query_params: true)
     assert_equal({ "a" => "b" }, unpacker.unpack_query_params(request))
@@ -133,7 +133,7 @@ describe Committee::RequestUnpacker do
     env = {
         "rack.input" => StringIO.new('{"x":1, "y":2}'),
         "REQUEST_METHOD" => "GET",
-        "QUERY_STRING"=>"data=value&x=aaa",
+        "QUERY_STRING" => "data=value&x=aaa",
     }
     request = Rack::Request.new(env)
     unpacker = Committee::RequestUnpacker.new({ allow_query_params: true, allow_get_body: true })
@@ -144,7 +144,7 @@ describe Committee::RequestUnpacker do
     env = {
         "rack.input" => StringIO.new('{"x":1, "y":2}'),
         "REQUEST_METHOD" => "GET",
-        "QUERY_STRING"=>"data=value&x=aaa",
+        "QUERY_STRING" => "data=value&x=aaa",
     }
     request = Rack::Request.new(env)
     unpacker = Committee::RequestUnpacker.new({ allow_query_params: true, use_get_body: false })

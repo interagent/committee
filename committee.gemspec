@@ -15,8 +15,8 @@ Gem::Specification.new do |s|
   s.homepage      = "https://github.com/interagent/committee"
   s.license       = "MIT"
 
-  s.executables   << "committee-stub"
-  s.files         = Dir["{bin,lib,test}/**/*.rb"]
+  s.executables << "committee-stub"
+  s.files = Dir["{bin,lib,test}/**/*.rb"]
 
   s.required_ruby_version = ">= 2.7.0"
 
