@@ -19,7 +19,7 @@ module Committee
       end
 
         if from.is_a?(Array)
-          return from.map{ |v| deep_copy(v) }
+          return from.map { |v| deep_copy(v) }
         end
 
         return from
