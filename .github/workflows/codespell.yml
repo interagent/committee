@@ -1,0 +1,15 @@
+name: CodeSpell
+on:
+  - pull_request
+jobs:
+  codespell:
+    name: CodeSpell
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: CodeSpell
+        uses: codespell-project/actions-codespell@master
+        with:
+          check_filenames: true
+          ignore_words_file: .codespellignore
+          exclude_file: examples/openapi3_rails/config/storage.yml,test/data/openapi2/petstore-expanded.json
