@@ -88,7 +88,7 @@ describe Committee::RequestUnpacker do
       env = { "CONTENT_TYPE" => content_type, "rack.input" => StringIO.new("x=y"), "QUERY_STRING" => "a=b" }
       request = Rack::Request.new(env)
       unpacker = Committee::RequestUnpacker.new(allow_form_params: true, allow_query_params: true)
-      assert_equal([ { "x" => "y" }, true], unpacker.unpack_request_params(request))
+      assert_equal([{ "x" => "y" }, true], unpacker.unpack_request_params(request))
     end
   end
 
