@@ -131,7 +131,7 @@ describe Committee::SchemaValidator::HyperSchema::StringParamsCoercer do
     end
   end
 
-  def call(data, options={})
+  def call(data, options = {})
     Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(data, @link.schema, options).call!
   end
 end

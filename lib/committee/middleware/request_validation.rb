@@ -3,7 +3,7 @@
 module Committee
   module Middleware
     class RequestValidation < Base
-      def initialize(app, options={})
+      def initialize(app, options = {})
         super
 
         @strict = options[:strict]

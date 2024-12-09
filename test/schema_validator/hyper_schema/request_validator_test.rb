@@ -92,7 +92,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
 
     private
 
-    def call(data, headers={}, options={})
+    def call(data, headers = {}, options = {})
       # hyper-schema link should be dropped into driver wrapper before it's used
       link = Committee::Drivers::HyperSchema::Link.new(@link)
       Committee::SchemaValidator::HyperSchema::RequestValidator.new(link, options).call(@request, data, headers)
@@ -133,7 +133,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
 
     private
 
-    def call(data, headers={}, options={})
+    def call(data, headers = {}, options = {})
       # hyper-schema link should be dropped into driver wrapper before it's used
       Committee::SchemaValidator::HyperSchema::RequestValidator.new(@link, options).call(@request, data, headers)
     end

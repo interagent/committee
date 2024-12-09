@@ -84,7 +84,7 @@ describe Committee::Test::Methods do
 
   private
 
-  def new_rack_app(response, status=200, headers={ "Content-Type" => "application/json" })
+  def new_rack_app(response, status = 200, headers = { "Content-Type" => "application/json" })
     Rack::Builder.new {
       run lambda { |_|
         [status, headers, [response]]

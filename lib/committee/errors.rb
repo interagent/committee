@@ -10,7 +10,7 @@ module Committee
   class InvalidRequest < Error
     attr_reader :original_error
 
-    def initialize(error_message=nil, original_error: nil)
+    def initialize(error_message = nil, original_error: nil)
       @original_error = original_error
       super(error_message)
     end
@@ -19,7 +19,7 @@ module Committee
   class InvalidResponse < Error
     attr_reader :original_error
 
-    def initialize(error_message=nil, original_error: nil)
+    def initialize(error_message = nil, original_error: nil)
       @original_error = original_error
       super(error_message)
     end

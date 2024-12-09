@@ -104,7 +104,7 @@ describe Committee::SchemaValidator::HyperSchema::ParameterCoercer do
 
   class HashLikeObject < Hash; end
 
-  def call(params, options={})
+  def call(params, options = {})
     link = Committee::Drivers::HyperSchema::Link.new(@link)
     Committee::SchemaValidator::HyperSchema::ParameterCoercer.new(params, link.schema, options).call!
   end

@@ -3,7 +3,7 @@
 module Committee
   module Middleware
     class Base
-      def initialize(app, options={})
+      def initialize(app, options = {})
         @app = app
 
         @error_class = options.fetch(:error_class, Committee::ValidationError)

@@ -20,7 +20,7 @@ module Committee
       end
     end
 
-    def initialize(options={})
+    def initialize(options = {})
       @allow_form_params  = options[:allow_form_params]
       @allow_get_body     = options[:allow_get_body]
       @allow_query_params = options[:allow_query_params]

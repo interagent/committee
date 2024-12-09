@@ -6,23 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 15
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: space, no_space
-Layout/SpaceAroundEqualsInParameterDefault:
-  Exclude:
-    - 'lib/committee/errors.rb'
-    - 'lib/committee/middleware/base.rb'
-    - 'lib/committee/middleware/request_validation.rb'
-    - 'lib/committee/middleware/stub.rb'
-    - 'lib/committee/request_unpacker.rb'
-    - 'test/schema_validator/hyper_schema/parameter_coercer_test.rb'
-    - 'test/schema_validator/hyper_schema/request_validator_test.rb'
-    - 'test/schema_validator/hyper_schema/string_params_coercer_test.rb'
-    - 'test/test/methods_new_version_test.rb'
-    - 'test/test/methods_test.rb'
-
 # Offense count: 9
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: AllowForAlignment, EnforcedStyleForExponentOperator, EnforcedStyleForRationalLiterals.

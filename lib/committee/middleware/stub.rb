@@ -5,7 +5,7 @@
 module Committee
   module Middleware
     class Stub < Base
-      def initialize(app, options={})
+      def initialize(app, options = {})
         super
 
         # A bug in Committee's cache implementation meant that it wasn't working
