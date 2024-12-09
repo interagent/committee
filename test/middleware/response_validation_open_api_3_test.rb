@@ -202,8 +202,8 @@ describe Committee::Middleware::ResponseValidation do
   describe ':accept_request_filter' do
     [
       { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 500 } },
-      { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 500 } },
-      { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
+      { description: 'when predicate matches, performs validation', accept_request_filter: ->(request) { request.path.start_with?('/v1/c') }, expected: { status: 500 } },
+      { description: 'when predicate does not match, skips validation', accept_request_filter: ->(request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
     ].each do |h|
       description = h[:description]
       accept_request_filter = h[:accept_request_filter]

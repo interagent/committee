@@ -14,7 +14,7 @@ module Committee
         @schema = self.class.get_schema(options)
 
         @router = @schema.build_router(options)
-        @accept_request_filter = options[:accept_request_filter] || -> (_) { true }
+        @accept_request_filter = options[:accept_request_filter] || ->(_) { true }
       end
 
       def call(env)

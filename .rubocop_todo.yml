@@ -6,18 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 9
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: require_no_space, require_space
-Layout/SpaceInLambdaLiteral:
-  Exclude:
-    - 'lib/committee/middleware/base.rb'
-    - 'test/middleware/request_validation_open_api_3_test.rb'
-    - 'test/middleware/request_validation_test.rb'
-    - 'test/middleware/response_validation_open_api_3_test.rb'
-    - 'test/middleware/response_validation_test.rb'
-
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: EnforcedStyle, EnforcedStyleForEmptyBrackets.
