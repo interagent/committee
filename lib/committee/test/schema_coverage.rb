@@ -93,4 +93,3 @@ module Committee
     end
   end
 end
-

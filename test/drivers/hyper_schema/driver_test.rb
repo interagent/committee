@@ -46,4 +46,3 @@ describe Committee::Drivers::HyperSchema::Driver do
     assert_equal false, @driver.default_query_params
   end
 end
-

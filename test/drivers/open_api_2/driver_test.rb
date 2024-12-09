@@ -152,4 +152,3 @@ describe Committee::Drivers::OpenAPI2::Driver do
     }
   end
 end
-
