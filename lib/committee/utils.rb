@@ -6,7 +6,7 @@ module Committee
       #
       # (Copied from Sinatra)
     def self.indifferent_hash
-      Hash.new { |hash,key| hash[key.to_s] if Symbol === key }
+      Hash.new { |hash, key| hash[key.to_s] if Symbol === key }
     end
 
     def self.deep_copy(from)
