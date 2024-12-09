@@ -11,9 +11,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "OpenAPI3 pass through a valid request" do
     @app = new_rack_app(schema: open_api_3_schema)
-    params = {
-        "string_post_1" => "cloudnasium"
-    }
+    params = { "string_post_1" => "cloudnasium" }
     header "Content-Type", "application/json"
     post "/characters", JSON.generate(params)
 
@@ -22,12 +20,12 @@ describe Committee::Middleware::RequestValidation do
 
   it "not parameter request" do
     check_parameter_string = lambda { |_|
-      [200, {integer: 1}, []]
+      [200, { integer: 1 }, []]
     }
 
     @app = new_rack_app_with_lambda(check_parameter_string, schema: open_api_3_schema)
 
-    put "/validate_no_parameter", {no_schema: 'no'}
+    put "/validate_no_parameter", { no_schema: 'no' }
   end
 
   it "passes given a datetime and with coerce_date_times enabled on GET endpoint" do
@@ -150,9 +148,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes given an invalid datetime string with coerce_date_times enabled" do
     @app = new_rack_app(schema: open_api_3_schema, coerce_date_times: true)
-    params = {
-        "datetime_string" => "invalid_datetime_format"
-    }
+    params = { "datetime_string" => "invalid_datetime_format" }
     get "/string_params_coercer", params
 
     assert_equal 400, last_response.status
@@ -160,14 +156,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "passes a nested object with recursive option" do
-    params = {
-        "nested_array" => [
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-                "per_page" => "1",
-            }
-        ],
-    }
+    params = { "nested_array" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", "per_page" => "1", }], }
 
     check_parameter = lambda { |env|
       hash = env["committee.query_hash"]
@@ -248,9 +237,7 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter,
-                                    coerce_date_times: true,
-                                    schema: open_api_3_schema)
+    @app = new_rack_app_with_lambda(check_parameter, coerce_date_times: true, schema: open_api_3_schema)
 
     header "Content-Type", "application/json"
     post "/string_params_coercer", JSON.generate(params)
@@ -260,9 +247,7 @@ describe Committee::Middleware::RequestValidation do
   it "OpenAPI3 detects an invalid request" do
     @app = new_rack_app(schema: open_api_3_schema, strict: true)
     header "Content-Type", "application/json"
-    params = {
-        "string_post_1" => 1
-    }
+    params = { "string_post_1" => 1 }
     post "/characters", JSON.generate(params)
     assert_equal 400, last_response.status
     assert_match(/expected string, but received Integer:/i, last_response.body)
@@ -278,9 +263,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "take a prefix" do
     @app = new_rack_app(prefix: "/v1", schema: open_api_3_schema)
-    params = {
-        "string_post_1" => "cloudnasium"
-    }
+    params = { "string_post_1" => "cloudnasium" }
     header "Content-Type", "application/json"
     post "/v1/characters", JSON.generate(params)
     assert_equal 200, last_response.status
@@ -288,9 +271,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "take a prefix with invalid data" do
     @app = new_rack_app(prefix: "/v1", schema: open_api_3_schema)
-    params = {
-        "string_post_1" => 1
-    }
+    params = { "string_post_1" => 1 }
     header "Content-Type", "application/json"
     post "/v1/characters", JSON.generate(params)
     assert_equal 400, last_response.status
@@ -299,9 +280,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "ignores paths outside the prefix" do
     @app = new_rack_app(prefix: "/v1", schema: open_api_3_schema)
-    params = {
-        "string_post_1" => 1
-    }
+    params = { "string_post_1" => 1 }
     header "Content-Type", "application/json"
     post "/characters", JSON.generate(params)
     assert_equal 200, last_response.status
@@ -309,9 +288,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "don't check prefix with no option" do
     @app = new_rack_app(schema: open_api_3_schema)
-    params = {
-        "string_post_1" => 1
-    }
+    params = { "string_post_1" => 1 }
     header "Content-Type", "application/json"
     post "/v1/characters", JSON.generate(params)
     assert_equal 200, last_response.status
@@ -361,14 +338,14 @@ describe Committee::Middleware::RequestValidation do
   it "optionally coerces query params" do
     @app = new_rack_app(coerce_query_params: true, schema: open_api_3_schema)
     header "Content-Type", "application/json"
-    get "/string_params_coercer", {"integer_1" => "1"}
+    get "/string_params_coercer", { "integer_1" => "1" }
     assert_equal 200, last_response.status
   end
 
   it "still raises an error if query param coercion is not possible" do
     @app = new_rack_app(coerce_query_params: false, schema: open_api_3_schema)
     header "Content-Type", "application/json"
-    get "/string_params_coercer", {"integer_1" => "1"}
+    get "/string_params_coercer", { "integer_1" => "1" }
 
     assert_equal 400, last_response.status
     assert_match(/expected integer, but received String:/i, last_response.body)
@@ -376,7 +353,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes through a valid request for OpenAPI3" do
     check_parameter = lambda { |env|
-      assert_equal 3, env['committee.query_hash']['limit'] #5.0.x-
+      assert_equal 3, env['committee.query_hash']['limit'] # 5.0.x-
       [200, {}, []]
     }
 
@@ -417,7 +394,7 @@ describe Committee::Middleware::RequestValidation do
         assert_equal env['committee.params']['integer'], 42
         assert_equal env['committee.params'][:integer], 42
         assert_equal env['committee.query_hash']['integer'], 42
-        #assert_equal env['rack.request.query_hash'][:integer], 42 # this isn't hash indifferent hash because we use rack.request.query_hash
+        # assert_equal env['rack.request.query_hash'][:integer], 42 # this isn't hash indifferent hash because we use rack.request.query_hash
         [204, {}, []]
       end, schema: open_api_3_schema, parameter_overwrite_by_rails_rule: false)
 
@@ -436,7 +413,7 @@ describe Committee::Middleware::RequestValidation do
         [204, {}, []]
       end, schema: open_api_3_schema, parameter_overwrite_by_rails_rule: false)
 
-      params = {integer: 21}
+      params = { integer: 21 }
 
       header "Content-Type", "application/json"
       post '/overwrite_same_parameter?integer=42', JSON.generate(params)
@@ -452,11 +429,11 @@ describe Committee::Middleware::RequestValidation do
         assert_equal env['committee.request_body_hash']['integer'], 21
         assert_equal env['committee.request_body_hash'][:integer], 21
         assert_equal env['committee.query_hash']['integer'], 84 # we can't use query_parameter :(
-        #assert_equal env['rack.request.query_hash'][:integer], 21 # this isn't hash indifferent hash because we use rack.request.query_hash
+        # assert_equal env['rack.request.query_hash'][:integer], 21 # this isn't hash indifferent hash because we use rack.request.query_hash
         [204, {}, []]
       end, schema: open_api_3_schema, parameter_overwrite_by_rails_rule: false)
 
-      params = {integer: 21}
+      params = { integer: 21 }
 
       header "Content-Type", "application/json"
       post '/overwrite_same_parameter/84?integer=42', JSON.generate(params)
@@ -475,7 +452,7 @@ describe Committee::Middleware::RequestValidation do
         [204, {}, []]
       end, schema: open_api_3_schema)
 
-      params = {integer: 21}
+      params = { integer: 21 }
 
       header "Content-Type", "application/json"
       post '/overwrite_same_parameter', JSON.generate(params)
@@ -492,7 +469,7 @@ describe Committee::Middleware::RequestValidation do
         [204, {}, []]
       end, schema: open_api_3_schema)
 
-      params = {integer: 21}
+      params = { integer: 21 }
 
       header "Content-Type", "application/json"
       post '/overwrite_same_parameter?integer=42', JSON.generate(params)
@@ -511,7 +488,7 @@ describe Committee::Middleware::RequestValidation do
         [204, {}, []]
       end, schema: open_api_3_schema)
 
-      params = {integer: 21}
+      params = { integer: 21 }
 
       header "Content-Type", "application/json"
       post '/overwrite_same_parameter/84?integer=42', JSON.generate(params)
@@ -541,7 +518,7 @@ describe Committee::Middleware::RequestValidation do
     }
 
     assert_equal 'Committee OpenAPI3 not support trace method', e.message
-  end  
+  end
 
   describe 'check header' do
     [
@@ -580,8 +557,8 @@ describe Committee::Middleware::RequestValidation do
   describe ':accept_request_filter' do
     [
       { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 400 } },
-      { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 400 } },
-      { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
+      { description: 'when predicate matches, performs validation', accept_request_filter: ->(request) { request.path.start_with?('/v1/c') }, expected: { status: 400 } },
+      { description: 'when predicate does not match, skips validation', accept_request_filter: ->(request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
     ].each do |h|
       description = h[:description]
       accept_request_filter = h[:accept_request_filter]

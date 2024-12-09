@@ -62,7 +62,6 @@ describe Committee do
     end
   end
 
-
   it "doesn't warns on deprecated if cond is false" do
     old_stderr = $stderr
     old_verbose = $VERBOSE

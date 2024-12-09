@@ -10,17 +10,14 @@ module Committee
 
         private
 
-        LINK_REQUIRED_FIELDS = [
-          :name
-        ].map(&:to_s).freeze
+        LINK_REQUIRED_FIELDS = [:name].map(&:to_s).freeze
 
         attr_accessor :link_data
 
         def check_required_fields!(param_data)
           LINK_REQUIRED_FIELDS.each do |field|
             if !param_data[field]
-              raise ArgumentError,
-                    "Committee: no #{field} section in link data."
+              raise ArgumentError, "Committee: no #{field} section in link data."
             end
           end
         end

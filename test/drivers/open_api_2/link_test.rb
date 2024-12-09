@@ -49,4 +49,3 @@ describe Committee::Drivers::OpenAPI2::Link do
     assert_equal({ "title" => "target" }, @link.target_schema)
   end
 end
-

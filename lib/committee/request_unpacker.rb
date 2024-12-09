@@ -20,7 +20,7 @@ module Committee
       end
     end
 
-    def initialize(options={})
+    def initialize(options = {})
       @allow_form_params  = options[:allow_form_params]
       @allow_get_body     = options[:allow_get_body]
       @allow_query_params = options[:allow_query_params]
@@ -32,7 +32,7 @@ module Committee
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON
       params = if !request.media_type || request.media_type =~ %r{application/(?:.*\+)?json}
-        parse_json(request)
+                 parse_json(request)
       elsif @optimistic_json
         begin
           parse_json(request)
@@ -87,8 +87,7 @@ module Committee
       # We want a hash specifically. '42', 42, and [42] will all be
       # decoded properly, but we can't use them here.
       if !hash.is_a?(Hash)
-        raise BadRequest,
-              "Invalid JSON input. Require object with parameters as keys."
+        raise BadRequest, "Invalid JSON input. Require object with parameters as keys."
       end
       self.class.indifferent_params(hash)
     end

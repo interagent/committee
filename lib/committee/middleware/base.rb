@@ -3,7 +3,7 @@
 module Committee
   module Middleware
     class Base
-      def initialize(app, options={})
+      def initialize(app, options = {})
         @app = app
 
         @error_class = options.fetch(:error_class, Committee::ValidationError)
@@ -14,7 +14,7 @@ module Committee
         @schema = self.class.get_schema(options)
 
         @router = @schema.build_router(options)
-        @accept_request_filter = options[:accept_request_filter] || -> (_) { true }
+        @accept_request_filter = options[:accept_request_filter] || ->(_) { true }
       end
 
       def call(env)

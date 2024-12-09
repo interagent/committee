@@ -27,16 +27,14 @@ describe Committee::Middleware::Stub do
     @app = new_rack_app(call: true, schema: hyper_schema)
     get "/apps/heroku-api"
     assert_equal 200, last_response.status
-    assert_equal ValidApp,
-      JSON.parse(last_response.headers["Committee-Response"])
+    assert_equal ValidApp, JSON.parse(last_response.headers["Committee-Response"])
   end
 
   it "optionally returns the application's response" do
     @app = new_rack_app(call: true, schema: hyper_schema, suppress: true)
     get "/apps/heroku-api"
     assert_equal 429, last_response.status
-    assert_equal ValidApp,
-      JSON.parse(last_response.headers["Committee-Response"])
+    assert_equal ValidApp, JSON.parse(last_response.headers["Committee-Response"])
     assert_equal "", last_response.body
   end
 
@@ -44,8 +42,7 @@ describe Committee::Middleware::Stub do
     @app = new_rack_app(call: true, schema: hyper_schema, suppress: true)
     get "/apps/heroku-api"
     assert_equal 429, last_response.status
-    assert_equal "#/definitions/app/links/2/targetSchema",
-      last_response.headers["Committee-Response-Schema"]
+    assert_equal "#/definitions/app/links/2/targetSchema", last_response.headers["Committee-Response-Schema"]
     assert_equal "", last_response.body
   end
 
@@ -122,15 +119,11 @@ describe Committee::Middleware::Stub do
 
         headers = {}
         if res = env["committee.response"]
-          headers.merge!({
-            "Committee-Response" => JSON.generate(res)
-          })
+          headers.merge!({ "Committee-Response" => JSON.generate(res) })
         end
 
         if res = env["committee.response_schema"]
-          headers.merge!({
-            "Committee-Response-Schema" => res.pointer,
-          })
+          headers.merge!({ "Committee-Response-Schema" => res.pointer, })
         end
 
         env["committee.suppress"] = suppress

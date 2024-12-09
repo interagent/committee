@@ -18,11 +18,7 @@ describe Committee::Bin::CommitteeStub do
     parser.parse!(["--help"])
     assert_equal true, options[:help]
 
-    parser.parse!([
-      "--driver", "open_api_2",
-      "--tolerant", "true",
-      "--port", "1234"
-    ])
+    parser.parse!(["--driver", "open_api_2", "--tolerant", "true", "--port", "1234"])
     assert_equal :open_api_2, options[:driver]
     assert_equal true, options[:tolerant]
     assert_equal "1234", options[:port]

@@ -36,7 +36,7 @@ describe Committee::Test::Methods do
       sc = JsonSchema.parse!(hyper_schema_data)
       sc.expand_references!
       s = Committee::Drivers::HyperSchema::Driver.new.parse(sc)
-      @committee_options.merge!({schema: s})
+      @committee_options.merge!({ schema: s })
     end
 
     describe "#assert_schema_conform" do
@@ -111,7 +111,7 @@ describe Committee::Test::Methods do
 
   describe "OpenAPI3" do
     before do
-      @committee_options.merge!({schema: open_api_3_schema})
+      @committee_options.merge!({ schema: open_api_3_schema })
 
       @correct_response = { string_1: :honoka }
     end
@@ -153,7 +153,7 @@ describe Committee::Test::Methods do
 
       it "not exist required" do
         @app = new_rack_app
-        get "/validate", {"query_string" => "query", "query_integer_list" => [1, 2]}
+        get "/validate", { "query_string" => "query", "query_integer_list" => [1, 2] }
         e = assert_raises(Committee::InvalidRequest) do
           assert_request_schema_confirm
         end
@@ -208,7 +208,7 @@ describe Committee::Test::Methods do
       end
 
       it "raises error when path does not match prefix" do
-        @committee_options.merge!({prefix: '/api'})
+        @committee_options.merge!({ prefix: '/api' })
         @app = new_rack_app(JSON.generate(@correct_response))
         get "/characters"
         e = assert_raises(Committee::InvalidResponse) do
@@ -350,7 +350,7 @@ describe Committee::Test::Methods do
 
   private
 
-  def new_rack_app(response = nil, headers={ "Content-Type" => "application/json" }, status_code = 200)
+  def new_rack_app(response = nil, headers = { "Content-Type" => "application/json" }, status_code = 200)
     Rack::Builder.new {
       run lambda { |_|
         [status_code, headers, [response]]

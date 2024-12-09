@@ -5,10 +5,8 @@ require "test_helper"
 describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
   before do
     @status = 200
-    @headers = {
-      "Content-Type" => "application/json"
-    }
-    @data = {"string" => "Honoka.Kousaka"}
+    @headers = { "Content-Type" => "application/json" }
+    @data = { "string" => "Honoka.Kousaka" }
 
     @path = '/validate'
     @method = 'post'

@@ -42,71 +42,71 @@ module Committee
 
       private
 
-        def coerce_path_params
-          return {} unless link_exist?
+      def coerce_path_params
+        return {} unless link_exist?
 
-          Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
-          param_matches
-        end
+        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(param_matches, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+        param_matches
+      end
 
-        def coerce_query_params(request)
-          return unless link_exist?
-          return if request.GET.nil? || link.schema.nil?
+      def coerce_query_params(request)
+        return unless link_exist?
+        return if request.GET.nil? || link.schema.nil?
 
-          Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
-        end
+        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+      end
 
-        def request_unpack(request)
-          unpacker = Committee::RequestUnpacker.new(
-            allow_form_params:  validator_option.allow_form_params,
-            allow_get_body:     validator_option.allow_get_body,
-            allow_query_params: validator_option.allow_query_params,
-            optimistic_json:    validator_option.optimistic_json,
-          )
+      def request_unpack(request)
+        unpacker = Committee::RequestUnpacker.new(
+          allow_form_params:  validator_option.allow_form_params,
+          allow_get_body:     validator_option.allow_get_body,
+          allow_query_params: validator_option.allow_query_params,
+          optimistic_json:    validator_option.optimistic_json,
+        )
 
-          request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
+        request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
 
-          # Attempts to coerce parameters that appear in a link's URL to Ruby
-          # types that can be validated with a schema.
-          param_matches_hash = validator_option.coerce_path_params ? coerce_path_params : {}
+        # Attempts to coerce parameters that appear in a link's URL to Ruby
+        # types that can be validated with a schema.
+        param_matches_hash = validator_option.coerce_path_params ? coerce_path_params : {}
 
-          # Attempts to coerce parameters that appear in a query string to Ruby
-          # types that can be validated with a schema.
-          coerce_query_params(request) if validator_option.coerce_query_params
+        # Attempts to coerce parameters that appear in a query string to Ruby
+        # types that can be validated with a schema.
+        coerce_query_params(request) if validator_option.coerce_query_params
 
-          query_param = unpacker.unpack_query_params(request)
-          request_param, is_form_params = unpacker.unpack_request_params(request)
-          coerce_form_params(request_param) if validator_option.coerce_form_params && is_form_params
-          request.env[validator_option.request_body_hash_key] = request_param
+        query_param = unpacker.unpack_query_params(request)
+        request_param, is_form_params = unpacker.unpack_request_params(request)
+        coerce_form_params(request_param) if validator_option.coerce_form_params && is_form_params
+        request.env[validator_option.request_body_hash_key] = request_param
 
-          request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(query_param))
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request_param))
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(param_matches_hash))
-        end
+        request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
+        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(query_param))
+        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request_param))
+        request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(param_matches_hash))
+      end
 
-        def coerce_form_params(parameter)
-          return unless link_exist?
-          return unless link.schema
-          Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(parameter, link.schema).call!
-        end
+      def coerce_form_params(parameter)
+        return unless link_exist?
+        return unless link.schema
+        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(parameter, link.schema).call!
+      end
 
-        def request_schema_validation(request)
-          return unless link_exist?
-          validator = Committee::SchemaValidator::HyperSchema::RequestValidator.new(link, check_content_type: validator_option.check_content_type, check_header: validator_option.check_header)
-          validator.call(request, request.env[validator_option.params_key], request.env[validator_option.headers_key])
-        end
+      def request_schema_validation(request)
+        return unless link_exist?
+        validator = Committee::SchemaValidator::HyperSchema::RequestValidator.new(link, check_content_type: validator_option.check_content_type, check_header: validator_option.check_header)
+        validator.call(request, request.env[validator_option.params_key], request.env[validator_option.headers_key])
+      end
 
-        def parameter_coerce!(request, link, coerce_key)
-          return unless link_exist?
+      def parameter_coerce!(request, link, coerce_key)
+        return unless link_exist?
 
-          Committee::SchemaValidator::HyperSchema::ParameterCoercer.
-              new(request.env[coerce_key],
-                  link.schema,
-                  coerce_date_times: validator_option.coerce_date_times,
-                  coerce_recursive: validator_option.coerce_recursive).
-              call!
-        end
+        Committee::SchemaValidator::HyperSchema::ParameterCoercer.
+            new(request.env[coerce_key],
+                link.schema,
+                coerce_date_times: validator_option.coerce_date_times,
+                coerce_recursive: validator_option.coerce_recursive).
+            call!
+      end
     end
   end
 end

@@ -26,10 +26,10 @@ module Committee
           full_body << chunk
         end
 
-        parse_to_json = !validator_option.parse_response_by_content_type || 
+        parse_to_json = !validator_option.parse_response_by_content_type ||
                         headers.fetch('Content-Type', nil)&.start_with?('application/json')
         data = if parse_to_json
-          full_body.empty? ? {} : JSON.parse(full_body)
+                 full_body.empty? ? {} : JSON.parse(full_body)
         else
           full_body
         end
@@ -98,8 +98,8 @@ module Committee
 
       def copy_coerced_data_to_params(request)
         order = if validator_option.parameter_overwrite_by_rails_rule
-          # (high priority) path_hash_key -> query_param -> request_body_hash          
-          [validator_option.request_body_hash_key, validator_option.query_hash_key, validator_option.path_hash_key]
+          # (high priority) path_hash_key -> query_param -> request_body_hash
+                  [validator_option.request_body_hash_key, validator_option.query_hash_key, validator_option.path_hash_key]
         else
           # (high priority) path_hash_key -> request_body_hash -> query_param
           [validator_option.query_hash_key, validator_option.request_body_hash_key, validator_option.path_hash_key]

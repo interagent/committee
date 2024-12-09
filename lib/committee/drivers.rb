@@ -65,7 +65,7 @@ module Committee
         'from next version. Pass config `strict_reference_validation: true` (or false, if you must) ' +
         'to quiet this warning.')
         opts[:strict_reference_validation] ||= false
-        
+
         openapi = OpenAPIParser.parse_with_filepath(hash, schema_path, opts)
         return Committee::Drivers::OpenAPI3::Driver.new.parse(openapi)
       end

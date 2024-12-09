@@ -5,7 +5,7 @@ require "test_helper"
 describe Committee::Middleware::ResponseValidation do
   include Rack::Test::Methods
 
-  CHARACTERS_RESPONSE = {"Otonokizaka" => ["Honoka.Kousaka"]}
+  CHARACTERS_RESPONSE = { "Otonokizaka" => ["Honoka.Kousaka"] }
 
   def app
     @app
@@ -35,7 +35,7 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "passes through a invalid json with parse_response_by_content_type option" do
-    @app = new_response_rack("csv response", { "Content-Type" => "test/csv"}, schema: open_api_3_schema, parse_response_by_content_type: true)
+    @app = new_response_rack("csv response", { "Content-Type" => "test/csv" }, schema: open_api_3_schema, parse_response_by_content_type: true)
 
     get "/csv"
 
@@ -59,13 +59,13 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "passes through a 204 (no content) response" do
-    @app = new_response_rack("", {}, {schema: open_api_3_schema}, {status: 204})
+    @app = new_response_rack("", {}, { schema: open_api_3_schema }, { status: 204 })
     post "/validate"
     assert_equal 204, last_response.status
   end
 
   it "passes through a 304 (not modified) response" do
-    @app = new_response_rack("", {}, {schema: open_api_3_schema}, {status: 304})
+    @app = new_response_rack("", {}, { schema: open_api_3_schema }, { status: 304 })
     post "/validate"
     assert_equal 304, last_response.status
   end
@@ -93,10 +93,10 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "not parameter request" do
-    @app = new_response_rack({integer: '1'}.to_json, {}, schema: open_api_3_schema, raise: true)
+    @app = new_response_rack({ integer: '1' }.to_json, {}, schema: open_api_3_schema, raise: true)
 
     assert_raises(Committee::InvalidResponse) do
-      patch "/validate_no_parameter", {no_schema: 'no'}
+      patch "/validate_no_parameter", { no_schema: 'no' }
     end
   end
 
@@ -178,7 +178,6 @@ describe Committee::Middleware::ResponseValidation do
                                raise: true,
                                validate_success_only: false)
 
-
       e = assert_raises(Committee::InvalidResponse) do
         get "/characters"
       end
@@ -194,7 +193,6 @@ describe Committee::Middleware::ResponseValidation do
                                raise: true,
                                validate_success_only: true)
 
-
       get "/characters"
 
       assert_equal 400, last_response.status
@@ -204,8 +202,8 @@ describe Committee::Middleware::ResponseValidation do
   describe ':accept_request_filter' do
     [
       { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 500 } },
-      { description: 'when predicate matches, performs validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/c') }, expected: { status: 500 } },
-      { description: 'when predicate does not match, skips validation', accept_request_filter: -> (request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
+      { description: 'when predicate matches, performs validation', accept_request_filter: ->(request) { request.path.start_with?('/v1/c') }, expected: { status: 500 } },
+      { description: 'when predicate does not match, skips validation', accept_request_filter: ->(request) { request.path.start_with?('/v1/x') }, expected: { status: 200 } },
     ].each do |h|
       description = h[:description]
       accept_request_filter = h[:accept_request_filter]
@@ -223,9 +221,9 @@ describe Committee::Middleware::ResponseValidation do
 
   it 'does not suppress application error' do
     @app = Rack::Builder.new {
-      use Committee::Middleware::ResponseValidation, {schema: open_api_3_schema, raise: true}
+      use Committee::Middleware::ResponseValidation, { schema: open_api_3_schema, raise: true }
       run lambda { |_|
-        JSON.load('-') # invalid json  
+        JSON.load('-') # invalid json
       }
     }
 
@@ -234,14 +232,14 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
-  it "strict and invalid status" do    
-    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, {schema: open_api_3_schema, strict: true}, {status: 201})
+  it "strict and invalid status" do
+    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, { schema: open_api_3_schema, strict: true }, { status: 201 })
     get "/characters"
     assert_equal 500, last_response.status
   end
 
   it "strict and invalid status with raise" do
-    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, {schema: open_api_3_schema, strict: true, raise: true}, {status: 201})
+    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, { schema: open_api_3_schema, strict: true, raise: true }, { status: 201 })
 
     assert_raises(Committee::InvalidResponse) do
       get "/characters"
@@ -249,11 +247,7 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "strict and invalid content type" do
-    @app = new_response_rack("abc", 
-      {}, 
-      {schema: open_api_3_schema, strict: true},
-      {content_type: 'application/text'}
-    )
+    @app = new_response_rack("abc", {}, { schema: open_api_3_schema, strict: true }, { content_type: 'application/text' })
     get "/characters"
     assert_equal 500, last_response.status
   end
@@ -261,8 +255,8 @@ describe Committee::Middleware::ResponseValidation do
   it "strict and invalid content type with raise" do
     @app = new_response_rack("abc",
       {},
-      {schema: open_api_3_schema, strict: true, raise: true},
-      {content_type: 'application/text'}
+      { schema: open_api_3_schema, strict: true, raise: true },
+      { content_type: 'application/text' }
     )
 
     assert_raises(Committee::InvalidResponse) do
@@ -275,9 +269,7 @@ describe Committee::Middleware::ResponseValidation do
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})
     status = rack_options[:status] || 200
     content_type = rack_options[:content_type] || "application/json"
-    headers = {
-      "Content-Type" => content_type
-    }.merge(headers)
+    headers = { "Content-Type" => content_type }.merge(headers)
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, options
       run lambda { |_|

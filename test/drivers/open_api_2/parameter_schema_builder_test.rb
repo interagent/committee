@@ -7,14 +7,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "reflects a basic type into a schema" do
-    data = {
-      "parameters" => [
-        {
-          "name" => "limit",
-          "type" => "integer",
-        }
-      ]
-    }
+    data = { "parameters" => [{ "name" => "limit", "type" => "integer", }] }
     schema, schema_data = call(data)
 
     assert_nil schema_data
@@ -37,14 +30,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "reflects a required property into a schema" do
-    data = {
-      "parameters" => [
-        {
-          "name" => "limit",
-          "required" => true,
-        }
-      ]
-    }
+    data = { "parameters" => [{ "name" => "limit", "required" => true, }] }
     schema, schema_data = call(data)
 
     assert_nil schema_data
@@ -77,15 +63,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "reflects a enum property into a schema" do
-    data = {
-      "parameters" => [
-        {
-          "name" => "type",
-          "type" => "string",
-          "enum" => ["hoge", "fuga"]
-        }
-      ]
-    }
+    data = { "parameters" => [{ "name" => "type", "type" => "string", "enum" => ["hoge", "fuga"] }] }
     schema, schema_data = call(data)
 
     assert_nil schema_data
@@ -157,12 +135,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "requires that certain fields are present" do
-    data = {
-      "parameters" => [
-        {
-        }
-      ]
-    }
+    data = { "parameters" => [{}] }
     e = assert_raises ArgumentError do
       call(data)
     end
@@ -170,23 +143,11 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "requires that body parameters not be mixed with form parameters" do
-    data = {
-      "parameters" => [
-        {
-          "name" => "payload",
-          "in" => "body",
-        },
-        {
-          "name" => "limit",
-          "in" => "form",
-        },
-      ]
-    }
+    data = { "parameters" => [{ "name" => "payload", "in" => "body", }, { "name" => "limit", "in" => "form", },] }
     e = assert_raises ArgumentError do
       call(data)
     end
-    assert_equal "Committee: can't mix body parameter with form parameters.",
-      e.message
+    assert_equal "Committee: can't mix body parameter with form parameters.", e.message
   end
 
   def call(data)

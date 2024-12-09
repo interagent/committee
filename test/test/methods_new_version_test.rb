@@ -29,7 +29,7 @@ describe Committee::Test::Methods do
     @committee_router = nil
     @committee_schema = nil
 
-    @committee_options = {schema: hyper_schema}
+    @committee_options = { schema: hyper_schema }
   end
 
   describe "#assert_schema_conform" do
@@ -84,7 +84,7 @@ describe Committee::Test::Methods do
 
   private
 
-  def new_rack_app(response, status=200, headers={ "Content-Type" => "application/json" })
+  def new_rack_app(response, status = 200, headers = { "Content-Type" => "application/json" })
     Rack::Builder.new {
       run lambda { |_|
         [status, headers, [response]]

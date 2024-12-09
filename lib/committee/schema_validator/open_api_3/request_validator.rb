@@ -27,7 +27,7 @@ module Committee
           return true if @operation_object.optional_body? && empty_request?(request)
 
           message = if valid_content_types.size > 1
-                      types = valid_content_types.map {|x| %{"#{x}"} }.join(', ')
+                      types = valid_content_types.map { |x| %{"#{x}"} }.join(', ')
                       %{"Content-Type" request header must be set to any of the following: [#{types}].}
                     else
                       %{"Content-Type" request header must be set to "#{valid_content_types.first}".}

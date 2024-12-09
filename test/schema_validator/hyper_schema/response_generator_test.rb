@@ -65,8 +65,8 @@ describe Committee::SchemaValidator::HyperSchema::ResponseGenerator do
     end
 
     expected = <<-eos.gsub(/\n +/, "").strip
-      At "get /apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fname)}" 
-      "#/definitions/app/properties/maintenance": no "example" attribute and 
+      At "get /apps/{(%23%2Fdefinitions%2Fapp%2Fdefinitions%2Fname)}"#{' '}
+      "#/definitions/app/properties/maintenance": no "example" attribute and#{' '}
       "null" is not allowed; don't know how to generate property.
     eos
     assert_equal expected, e.message

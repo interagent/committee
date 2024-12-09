@@ -21,12 +21,7 @@ module Committee
                   :parameter_overwrite_by_rails_rule
 
       # Non-boolean options:
-      attr_reader :headers_key,
-                  :params_key,
-                  :query_hash_key,
-                  :request_body_hash_key,
-                  :path_hash_key,
-                  :prefix
+      attr_reader :headers_key, :params_key, :query_hash_key, :request_body_hash_key, :path_hash_key, :prefix
 
       def initialize(options, schema, schema_type)
         # Non-boolean options

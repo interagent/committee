@@ -24,9 +24,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
     end
 
     it "passes through a valid request" do
-      data = {
-        "name" => "heroku-api",
-      }
+      data = { "name" => "heroku-api", }
       call(data)
     end
 
@@ -36,9 +34,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
                             "CONTENT_TYPE" => "application/json; charset=utf-8",
                             "rack.input"   => StringIO.new("{}"),
                           })
-      data = {
-        "name" => "heroku-api",
-      }
+      data = { "name" => "heroku-api", }
       call(data)
     end
 
@@ -51,8 +47,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
                             })
         call({})
       }
-      message =
-        %{"Content-Type" request header must be set to "application/json".}
+      message = %{"Content-Type" request header must be set to "application/json".}
       assert_equal message, e.message
     end
 
@@ -87,9 +82,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
     end
 
     it "detects a parameter of the wrong pattern" do
-      data = {
-        "name" => "%@!"
-      }
+      data = { "name" => "%@!" }
       e = assert_raises(Committee::InvalidRequest) do
         call(data)
       end
@@ -99,7 +92,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
 
     private
 
-    def call(data, headers={}, options={})
+    def call(data, headers = {}, options = {})
       # hyper-schema link should be dropped into driver wrapper before it's used
       link = Committee::Drivers::HyperSchema::Link.new(@link)
       Committee::SchemaValidator::HyperSchema::RequestValidator.new(link, options).call(@request, data, headers)
@@ -117,11 +110,8 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
                                    })
     end
 
-
     it "passes through a valid request" do
-      headers = {
-        "AUTH-TOKEN" => "xxx"
-      }
+      headers = { "AUTH-TOKEN" => "xxx" }
       call({}, headers)
     end
 
@@ -143,7 +133,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
 
     private
 
-    def call(data, headers={}, options={})
+    def call(data, headers = {}, options = {})
       # hyper-schema link should be dropped into driver wrapper before it's used
       Committee::SchemaValidator::HyperSchema::RequestValidator.new(@link, options).call(@request, data, headers)
     end

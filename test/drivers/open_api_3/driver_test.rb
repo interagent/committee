@@ -52,31 +52,31 @@ describe Committee::Drivers::OpenAPI3::Driver do
         it "gets a nested template path" do
           obj = open_api_3_schema.operation_object("/path_template_test/abc/nested", "get")
           assert_equal "/path_template_test/{template_name}/nested", obj.original_path
-          assert_equal({"template_name"=>"abc"}, obj.path_params)
+          assert_equal({ "template_name" => "abc" }, obj.path_params)
         end
 
         it "gets a double nested template path" do
           obj = open_api_3_schema.operation_object("/path_template_test/test/nested/abc", "get")
           assert_equal "/path_template_test/{template_name}/nested/{nested_parameter}", obj.original_path
-          assert_equal({"template_name"=>"test", "nested_parameter" => "abc"}, obj.path_params)
+          assert_equal({ "template_name" => "test", "nested_parameter" => "abc" }, obj.path_params)
         end
 
         it "gets a twice nested template path" do
           obj = open_api_3_schema.operation_object("/path_template_test/test/abc", "get")
           assert_equal "/path_template_test/{template_name}/{nested_parameter}", obj.original_path
-          assert_equal({"template_name"=>"test", "nested_parameter" => "abc"}, obj.path_params)
+          assert_equal({ "template_name" => "test", "nested_parameter" => "abc" }, obj.path_params)
         end
 
         it "gets a twice nested concrete path" do
           obj = open_api_3_schema.operation_object("/path_template_test/test/abc/finish", "get")
           assert_equal "/path_template_test/{template_name}/{nested_parameter}/finish", obj.original_path
-          assert_equal({"template_name"=>"test", "nested_parameter" => "abc"}, obj.path_params)
+          assert_equal({ "template_name" => "test", "nested_parameter" => "abc" }, obj.path_params)
         end
 
         it "gets an ambiguous path" do
           obj = open_api_3_schema.operation_object("/ambiguous/no_template", "get")
           assert_equal "/{ambiguous}/no_template", obj.original_path
-          assert_equal({"ambiguous"=>"ambiguous"}, obj.path_params)
+          assert_equal({ "ambiguous" => "ambiguous" }, obj.path_params)
         end
       end
     end

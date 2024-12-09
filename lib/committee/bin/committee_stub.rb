@@ -30,12 +30,7 @@ module Committee
 
       # Gets an option parser for command line arguments.
       def get_options_parser
-        options = {
-          driver: nil,
-          help: false,
-          port: 9292,
-          tolerant: false,
-        }
+        options = { driver: nil, help: false, port: 9292, tolerant: false, }
 
         parser = OptionParser.new do |opts|
           opts.banner = "Usage: rackup [options] [JSON Schema file]"
