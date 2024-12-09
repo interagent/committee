@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [4.99.0.beta1] - 2023-01-24
 - We add backport parameter overwrite rule [#373](https://github.com/interagent/committee/pull/373)
   - We provide merged parameter for `committee.params` ( `params_key` option)
-  - When a same parameter name exist in path/query/request body, it overwritten.
+  - When a parameter of the same name exists in the path/query/request body, it will be overwritten.
   - We we change overwrite rule next version.
   - Please set `parameter_overwite_by_rails_rule=true` for Rails rule (v5.0.0)
     - (high priority) path_hash_key -> request_body_hash -> query_param
