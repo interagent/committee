@@ -68,7 +68,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       patch "/validate_empty_optional_body"
       assert_equal 200, last_response.status
     end
-    
+
     it "does not mix up parameters and requestBody" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
       params = { "last_name" => "Skywalker" }
@@ -82,7 +82,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       header "Content-Type", "application/x-www-form-urlencoded"
       patch "/validate_empty_optional_body", "{}"
       assert_equal 400, last_response.status
-    end    
+    end
 
     it "validates content_type for option request" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)

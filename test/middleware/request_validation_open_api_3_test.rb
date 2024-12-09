@@ -518,7 +518,7 @@ describe Committee::Middleware::RequestValidation do
     }
 
     assert_equal 'Committee OpenAPI3 not support trace method', e.message
-  end  
+  end
 
   describe 'check header' do
     [

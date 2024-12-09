@@ -223,7 +223,7 @@ describe Committee::Middleware::ResponseValidation do
     @app = Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, { schema: open_api_3_schema, raise: true }
       run lambda { |_|
-        JSON.load('-') # invalid json  
+        JSON.load('-') # invalid json
       }
     }
 
@@ -232,7 +232,7 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
-  it "strict and invalid status" do    
+  it "strict and invalid status" do
     @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), {}, { schema: open_api_3_schema, strict: true }, { status: 201 })
     get "/characters"
     assert_equal 500, last_response.status
