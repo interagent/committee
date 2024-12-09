@@ -33,20 +33,20 @@ describe Committee::Drivers do
     end
 
     it 'loads OpenAPI 3' do
-      s = Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{ strict_reference_validation: true })
+      s = Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options: { strict_reference_validation: true })
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
     it 'load OpenAPI 3 (patch version 3.0.1)' do
-      s = Committee::Drivers.load_from_file(open_api_3_0_1_schema_path, parser_options:{ strict_reference_validation: true })
+      s = Committee::Drivers.load_from_file(open_api_3_0_1_schema_path, parser_options: { strict_reference_validation: true })
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
     it 'fails to load OpenAPI 3.1+' do
       e = assert_raises(Committee::OpenAPI3Unsupported) do
-        Committee::Drivers.load_from_file(open_api_3_1_schema_path, parser_options:{ strict_reference_validation: true })
+        Committee::Drivers.load_from_file(open_api_3_1_schema_path, parser_options: { strict_reference_validation: true })
       end
       assert_equal 'Committee does not support OpenAPI 3.1+ yet', e.message
     end
@@ -60,13 +60,13 @@ describe Committee::Drivers do
 
     # This test can be removed when the test above (raising on invalid reference) becomes default behavior?
     it 'allows loading OpenAPI 3 with invalid reference as existing behavior' do
-      s = Committee::Drivers.load_from_file(open_api_3_invalid_reference_path, parser_options:{ strict_reference_validation: false })
+      s = Committee::Drivers.load_from_file(open_api_3_invalid_reference_path, parser_options: { strict_reference_validation: false })
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
     it 'errors on an unsupported file extension' do
       e = assert_raises(StandardError) do
-        Committee::Drivers.load_from_file('test.xml', parser_options:{ strict_reference_validation: true })
+        Committee::Drivers.load_from_file('test.xml', parser_options: { strict_reference_validation: true })
       end
       assert_equal "Committee only supports the following file extensions: '.json', '.yaml', '.yml'", e.message
     end
@@ -75,24 +75,24 @@ describe Committee::Drivers do
       describe 'when loading the same file' do
         it 'returns the same object when the options are identical' do
           assert_equal(
-            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{ strict_reference_validation: true }).object_id,
-            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{ strict_reference_validation: true }).object_id,
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options: { strict_reference_validation: true }).object_id,
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options: { strict_reference_validation: true }).object_id,
           )
         end
 
         it 'returns different objects if the options are different' do
           refute_equal(
-            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{ strict_reference_validation: true }).object_id,
-            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{ strict_reference_validation: false }).object_id,
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options: { strict_reference_validation: true }).object_id,
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options: { strict_reference_validation: false }).object_id,
           )
         end
 
         it 'returns different objects if the file contents have changed' do
-          object_id = Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{ strict_reference_validation: true }).object_id
+          object_id = Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options: { strict_reference_validation: true }).object_id
           original_file_contents = File.read(open_api_3_schema_path)
           File.write(open_api_3_schema_path, original_file_contents + "\n")
           refute_equal(
-            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{ strict_reference_validation: true }).object_id,
+            Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options: { strict_reference_validation: true }).object_id,
             object_id,
           )
           File.write(open_api_3_schema_path, original_file_contents)
@@ -103,13 +103,13 @@ describe Committee::Drivers do
 
   describe 'load_from_json(schema_path)' do
     it 'loads OpenAPI2' do
-      s = Committee::Drivers.load_from_json(open_api_2_schema_path, parser_options:{ strict_reference_validation: true })
+      s = Committee::Drivers.load_from_json(open_api_2_schema_path, parser_options: { strict_reference_validation: true })
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI2::Schema, s
     end
 
     it 'loads Hyper-Schema' do
-      s = Committee::Drivers.load_from_json(hyper_schema_schema_path, parser_options:{ strict_reference_validation: true })
+      s = Committee::Drivers.load_from_json(hyper_schema_schema_path, parser_options: { strict_reference_validation: true })
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
     end
@@ -117,7 +117,7 @@ describe Committee::Drivers do
 
   describe 'load_from_yaml(schema_path)' do
     it 'loads OpenAPI3' do
-      s = Committee::Drivers.load_from_yaml(open_api_3_schema_path, parser_options:{ strict_reference_validation: true })
+      s = Committee::Drivers.load_from_yaml(open_api_3_schema_path, parser_options: { strict_reference_validation: true })
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
@@ -125,7 +125,7 @@ describe Committee::Drivers do
 
   describe 'load_from_data(schema_path)' do
     it 'loads OpenAPI3' do
-      s = Committee::Drivers.load_from_data(open_api_3_data, parser_options:{ strict_reference_validation: false })
+      s = Committee::Drivers.load_from_data(open_api_3_data, parser_options: { strict_reference_validation: false })
       assert_kind_of Committee::Drivers::Schema, s
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
