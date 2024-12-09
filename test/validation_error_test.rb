@@ -14,11 +14,7 @@ describe Committee::ValidationError do
   it "creates a Rack response object to render" do
     body = { id: :bad_request, message: "Error" }
 
-    response = [
-      400,
-      { "Content-Type" => "application/json" },
-      [JSON.generate(body)]
-    ]
+    response = [400, { "Content-Type" => "application/json" }, [JSON.generate(body)]]
 
     assert_equal @error.render, response
   end

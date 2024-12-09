@@ -11,7 +11,7 @@ describe Committee::SchemaValidator::HyperSchema::ParameterCoercer do
   end
 
   it "pass datetime string" do
-    params = { "update_time" => "2016-04-01T16:00:00.000+09:00"}
+    params = { "update_time" => "2016-04-01T16:00:00.000+09:00" }
     call(params, coerce_date_times: true)
 
     assert_kind_of DateTime, params["update_time"]
@@ -28,7 +28,7 @@ describe Committee::SchemaValidator::HyperSchema::ParameterCoercer do
 
   it "pass invalid datetime string, not convert" do
     invalid_datetime = "llmfllmf"
-    params = { "update_time" => invalid_datetime}
+    params = { "update_time" => invalid_datetime }
     call(params, coerce_date_times: true)
 
     assert_equal invalid_datetime, params["update_time"]

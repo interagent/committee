@@ -55,9 +55,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes through a valid request" do
     @app = new_rack_app(schema: hyper_schema)
-    params = {
-      "name" => "cloudnasium"
-    }
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
@@ -67,9 +65,7 @@ describe Committee::Middleware::RequestValidation do
     called_error = false
     pr = ->(_e) { called_error = true }
     @app = new_rack_app(schema: hyper_schema, error_handler: pr)
-    params = {
-      "name" => "cloudnasium"
-    }
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert !called_error
@@ -79,9 +75,7 @@ describe Committee::Middleware::RequestValidation do
     called_error = false
     pr = ->(_e, _env) { called_error = true }
     @app = new_rack_app(schema: hyper_schema, error_handler: pr)
-    params = {
-      "name" => "cloudnasium"
-    }
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert !called_error
@@ -89,10 +83,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes given a datetime and with coerce_date_times enabled on GET endpoint" do
     key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium"
-    }
+    params = { key_name => "2016-04-01T16:00:00.000+09:00", "query" => "cloudnasium" }
 
     check_parameter = lambda { |env|
       assert_equal DateTime, env['rack.request.query_hash'][key_name].class
@@ -165,10 +156,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes given a nested datetime and with coerce_recursive=true and coerce_date_times=true on POST endpoint" do
     key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "array_property" => ARRAY_PROPERTY
-    }
+    params = { key_name => "2016-04-01T16:00:00.000+09:00", "array_property" => ARRAY_PROPERTY }
 
     check_parameter = lambda { |env|
       hash = env['committee.params']
@@ -191,10 +179,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes given a nested datetime and with coerce_recursive=true and coerce_date_times=true on POST endpoint" do
     key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "array_property" => ARRAY_PROPERTY
-    }
+    params = { key_name => "2016-04-01T16:00:00.000+09:00", "array_property" => ARRAY_PROPERTY }
 
     check_parameter = lambda { |env|
       hash = env['committee.params']
@@ -217,10 +202,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes given a nested datetime and with coerce_recursive=false and coerce_date_times=true on POST endpoint" do
     key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "array_property" => ARRAY_PROPERTY
-    }
+    params = { key_name => "2016-04-01T16:00:00.000+09:00", "array_property" => ARRAY_PROPERTY }
 
     check_parameter = lambda { |env|
       hash = env['committee.params']
@@ -243,10 +225,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes given a nested datetime and with coerce_recursive=false and coerce_date_times=false on POST endpoint" do
     key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "array_property" => ARRAY_PROPERTY
-    }
+    params = { key_name => "2016-04-01T16:00:00.000+09:00", "array_property" => ARRAY_PROPERTY }
 
     check_parameter = lambda { |env|
       hash = env['committee.params']
@@ -269,9 +248,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes given an invalid datetime string with coerce_date_times enabled" do
     @app = new_rack_app(coerce_date_times: true, schema: hyper_schema)
-    params = {
-        "update_time" => "invalid_datetime_format"
-    }
+    params = { "update_time" => "invalid_datetime_format" }
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 400, last_response.status
@@ -288,9 +265,7 @@ describe Committee::Middleware::RequestValidation do
   it "detects an invalid request" do
     @app = new_rack_app(schema: hyper_schema)
     header "Content-Type", "application/json"
-    params = {
-      "name" => 1
-    }
+    params = { "name" => 1 }
     post "/apps", JSON.generate(params)
     assert_equal 400, last_response.status
     assert_match(/invalid request/i, last_response.body)
@@ -299,9 +274,7 @@ describe Committee::Middleware::RequestValidation do
   it "ignores errors when ignore_error: true" do
     @app = new_rack_app(schema: hyper_schema, ignore_error: true)
     header "Content-Type", "application/json"
-    params = {
-      "name" => 1
-    }
+    params = { "name" => 1 }
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
   end
@@ -311,9 +284,7 @@ describe Committee::Middleware::RequestValidation do
     pr = ->(e, _env) { called_err = e }
     @app = new_rack_app(schema: hyper_schema, error_handler: pr)
     header "Content-Type", "application/json"
-    params = {
-      "name" => 1
-    }
+    params = { "name" => 1 }
     post "/apps", JSON.generate(params)
     assert_kind_of Committee::InvalidRequest, called_err
   end
@@ -337,9 +308,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "takes a prefix" do
     @app = new_rack_app(prefix: "/v1", schema: hyper_schema)
-    params = {
-      "name" => "cloudnasium"
-    }
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
     post "/v1/apps", JSON.generate(params)
     assert_equal 200, last_response.status
@@ -374,9 +343,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "optionally skip content_type check" do
     @app = new_rack_app(check_content_type: false, schema: hyper_schema)
-    params = {
-      "name" => "cloudnasium"
-    }
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "text/html"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
@@ -385,14 +352,14 @@ describe Committee::Middleware::RequestValidation do
   it "optionally coerces query params" do
     @app = new_rack_app(coerce_query_params: true, schema: hyper_schema)
     header "Content-Type", "application/json"
-    get "/search/apps", {"per_page" => "10", "query" => "cloudnasium"}
+    get "/search/apps", { "per_page" => "10", "query" => "cloudnasium" }
     assert_equal 200, last_response.status
   end
 
   it "still raises an error if query param coercion is not possible" do
     @app = new_rack_app(coerce_query_params: true, schema: hyper_schema)
     header "Content-Type", "application/json"
-    get "/search/apps", {"per_page" => "foo", "query" => "cloudnasium"}
+    get "/search/apps", { "per_page" => "foo", "query" => "cloudnasium" }
     assert_equal 400, last_response.status
     assert_match(/invalid request/i, last_response.body)
   end
@@ -470,7 +437,7 @@ describe Committee::Middleware::RequestValidation do
         coerce_recursive: true
     }
 
-    @app = new_rack_app({schema: hyper_schema}.merge(options))
+    @app = new_rack_app({ schema: hyper_schema }.merge(options))
     header "Content-Type", "application/x-www-form-urlencoded"
     post "/unknown"
     assert_equal 200, last_response.status
@@ -502,7 +469,6 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }, options)
   end
-
 
   def new_rack_app_with_lambda(check_lambda, options = {})
     Rack::Builder.new {

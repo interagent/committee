@@ -21,9 +21,7 @@ describe Committee::Test::SchemaCoverage do
     end
     it 'can record and report coverage properly' do
       @schema_coverage.update_response_coverage!('/posts', 'get', '200')
-      assert_equal([
-        '/posts get 200',
-      ], covered_responses)
+      assert_equal(['/posts get 200',], covered_responses)
       assert_equal([
         '/threads/{id} get 200',
         '/posts get 404',
@@ -34,10 +32,7 @@ describe Committee::Test::SchemaCoverage do
       ], uncovered_responses)
 
       @schema_coverage.update_response_coverage!('/likes', 'post', '200')
-      assert_equal([
-        '/posts get 200',
-        '/likes post 200',
-      ], covered_responses)
+      assert_equal(['/posts get 200', '/likes post 200',], covered_responses)
       assert_equal([
         '/threads/{id} get 200',
         '/posts get 404',
@@ -47,11 +42,7 @@ describe Committee::Test::SchemaCoverage do
       ], uncovered_responses)
 
       @schema_coverage.update_response_coverage!('/likes', 'delete', '200')
-      assert_equal([
-        '/posts get 200',
-        '/likes post 200',
-        '/likes delete 200',
-      ], covered_responses)
+      assert_equal(['/posts get 200', '/likes post 200', '/likes delete 200',], covered_responses)
       assert_equal([
         '/threads/{id} get 200',
         '/posts get 404',
@@ -66,11 +57,7 @@ describe Committee::Test::SchemaCoverage do
         '/likes post 200',
         '/likes delete 200',
       ], covered_responses)
-      assert_equal([
-        '/threads/{id} get 200',
-        '/posts get 404',
-        '/posts post 200',
-      ], uncovered_responses)
+      assert_equal(['/threads/{id} get 200', '/posts get 404', '/posts post 200',], uncovered_responses)
 
       assert_equal({
         '/threads/{id}' => {

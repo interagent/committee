@@ -52,7 +52,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
     it 'invalid params' do
       e = assert_raises(Committee::InvalidRequest) {
-        operation_object.validate_request_params({}, {}, {"string" => 1}, HEADER, @validator_option)
+        operation_object.validate_request_params({}, {}, { "string" => 1 }, HEADER, @validator_option)
       }
 
       assert_match(/expected string, but received Integer: 1/i, e.message)
@@ -61,10 +61,10 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
     it 'support put method' do
       @method = "put"
-      operation_object.validate_request_params({}, {}, {"string" => "str"}, HEADER, @validator_option)
+      operation_object.validate_request_params({}, {}, { "string" => "str" }, HEADER, @validator_option)
 
       e = assert_raises(Committee::InvalidRequest) {
-        operation_object.validate_request_params({}, {}, {"string" => 1}, HEADER, @validator_option)
+        operation_object.validate_request_params({}, {}, { "string" => 1 }, HEADER, @validator_option)
       }
 
       assert_match(/expected string, but received Integer: 1/i, e.message)
@@ -73,10 +73,10 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
     it 'support patch method' do
       @method = "patch"
-      operation_object.validate_request_params({}, {}, {"integer" => 1}, HEADER, @validator_option)
+      operation_object.validate_request_params({}, {}, { "integer" => 1 }, HEADER, @validator_option)
 
       e = assert_raises(Committee::InvalidRequest) {
-        operation_object.validate_request_params({}, {}, {"integer" => "str"}, HEADER, @validator_option)
+        operation_object.validate_request_params({}, {}, { "integer" => "str" }, HEADER, @validator_option)
       }
 
       assert_match(/expected integer, but received String: "str"/i, e.message)
@@ -84,7 +84,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
     end
 
     it 'unknown param' do
-      operation_object.validate_request_params({}, {}, {"unknown" => 1}, HEADER, @validator_option)
+      operation_object.validate_request_params({}, {}, { "unknown" => 1 }, HEADER, @validator_option)
     end
 
     describe 'support get method' do
@@ -95,7 +95,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       it 'correct' do
         operation_object.validate_request_params(
             {},
-            {"query_string" => "query", "query_integer_list" => [1, 2]},
+            { "query_string" => "query", "query_integer_list" => [1, 2] },
             {},
             HEADER,
             @validator_option
@@ -103,7 +103,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
         operation_object.validate_request_params(
             {},
-            {"query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => 1},
+            { "query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => 1 },
             {},
             HEADER,
             @validator_option
@@ -114,7 +114,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
       it 'not exist required' do
         e = assert_raises(Committee::InvalidRequest) {
-          operation_object.validate_request_params({}, {"query_integer_list" => [1, 2]}, {}, HEADER, @validator_option)
+          operation_object.validate_request_params({}, { "query_integer_list" => [1, 2] }, {}, HEADER, @validator_option)
         }
 
         assert_match(/missing required parameters: query_string/i, e.message)
@@ -125,7 +125,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         e = assert_raises(Committee::InvalidRequest) {
           operation_object.validate_request_params(
               {},
-              {"query_string" => 1, "query_integer_list" => [1, 2], "optional_integer" => 1},
+              { "query_string" => 1, "query_integer_list" => [1, 2], "optional_integer" => 1 },
               {},
               HEADER,
               @validator_option
@@ -144,14 +144,14 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       end
 
       it 'correct' do
-        operation_object.validate_request_params({}, {"limit" => "1"}, {}, HEADER, @validator_option)
+        operation_object.validate_request_params({}, { "limit" => "1" }, {}, HEADER, @validator_option)
 
         assert true
       end
 
       it 'invalid type' do
         e = assert_raises(Committee::InvalidRequest) {
-          operation_object.validate_request_params({}, {"limit" => "a"}, {}, HEADER, @validator_option)
+          operation_object.validate_request_params({}, { "limit" => "a" }, {}, HEADER, @validator_option)
         }
 
         assert_match(/expected integer, but received String: "a"/i, e.message)
@@ -166,14 +166,14 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       end
 
       it 'correct' do
-        operation_object.validate_request_params({}, {"limit" => "1"}, {}, HEADER, @validator_option)
+        operation_object.validate_request_params({}, { "limit" => "1" }, {}, HEADER, @validator_option)
 
         assert true
       end
 
       it 'invalid type' do
         e = assert_raises(Committee::InvalidRequest) {
-          operation_object.validate_request_params({}, {"limit" => "a"}, {}, HEADER, @validator_option)
+          operation_object.validate_request_params({}, { "limit" => "a" }, {}, HEADER, @validator_option)
         }
 
         assert_match(/expected integer, but received String: "a"/i, e.message)
@@ -183,16 +183,15 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
     it 'support options method' do
       @method = "options"
-      operation_object.validate_request_params({}, {}, {"integer" => 1}, HEADER, @validator_option)
+      operation_object.validate_request_params({}, {}, { "integer" => 1 }, HEADER, @validator_option)
 
       e = assert_raises(Committee::InvalidRequest) {
-        operation_object.validate_request_params({}, {}, {"integer" => "str"}, HEADER, @validator_option)
+        operation_object.validate_request_params({}, {}, { "integer" => "str" }, HEADER, @validator_option)
       }
 
       assert_match(/expected integer, but received String: "str"/i, e.message)
       assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
     end
-
 
     describe '#content_types' do
       it 'returns supported content types' do

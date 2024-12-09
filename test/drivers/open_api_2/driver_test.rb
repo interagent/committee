@@ -46,8 +46,7 @@ describe Committee::Drivers::OpenAPI2::Driver do
 
   it "names capture groups into href regexes" do
     schema = @driver.parse(open_api_2_data)
-    assert_equal %r{^\/api\/pets\/(?<id>[^\/]+)$}.inspect,
-      schema.routes["DELETE"][0][0].inspect
+    assert_equal %r{^\/api\/pets\/(?<id>[^\/]+)$}.inspect, schema.routes["DELETE"][0][0].inspect
   end
 
   it "prefers a 200 response first" do

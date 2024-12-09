@@ -106,8 +106,7 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "takes a prefix" do
-    @app = new_rack_app(JSON.generate([ValidApp]), {}, prefix: "/v1",
-      schema: hyper_schema)
+    @app = new_rack_app(JSON.generate([ValidApp]), {}, prefix: "/v1", schema: hyper_schema)
     get "/v1/apps"
     assert_equal 200, last_response.status
   end
@@ -130,30 +129,26 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "passes through a valid response for OpenAPI" do
-    @app = new_rack_app(JSON.generate([ValidPet]), {},
-      schema: open_api_2_schema)
+    @app = new_rack_app(JSON.generate([ValidPet]), {}, schema: open_api_2_schema)
     get "/api/pets"
     assert_equal 200, last_response.status
   end
 
   it "passes through a valid response for OpenAPI when data=nil, target_schema=empty, allow_blank_structures=true" do
-    @app = new_rack_app("null", {},
-                        allow_blank_structures: true, schema: open_api_2_schema)
+    @app = new_rack_app("null", {}, allow_blank_structures: true, schema: open_api_2_schema)
     get "/api/pets/cat"
     assert_equal 200, last_response.status
   end
 
   it "invalid responses for OpenAPI when data=nil, target_schema=empty, allow_blank_structures=false" do
-    @app = new_rack_app("null", {},
-                        allow_blank_structures: false, schema: open_api_2_schema)
+    @app = new_rack_app("null", {}, allow_blank_structures: false, schema: open_api_2_schema)
     get "/api/pets/cat"
     assert_equal 500, last_response.status
     assert_match(/Invalid response/i, last_response.body)
   end
 
   it "passes through a valid response for OpenAPI when data=nil, target_schema=present, allow_blank_structures=true" do
-    @app = new_rack_app("null", {},
-                        allow_blank_structures: true, schema: open_api_2_schema)
+    @app = new_rack_app("null", {}, allow_blank_structures: true, schema: open_api_2_schema)
     get "/api/pets/dog"
     assert_equal 500, last_response.status
     assert_match(/nil is not an array/i, last_response.body)
@@ -188,9 +183,7 @@ describe Committee::Middleware::ResponseValidation do
   private
 
   def new_rack_app(response, headers = {}, options = {})
-    headers = {
-      "Content-Type" => "application/json"
-    }.merge(headers)
+    headers = { "Content-Type" => "application/json" }.merge(headers)
     Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, options
       run lambda { |_|

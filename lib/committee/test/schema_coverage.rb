@@ -28,12 +28,7 @@ module Committee
             path_coverage.each do |method, method_coverage|
               responses_coverage = method_coverage['responses']
               responses_coverage.each do |response_status, is_covered|
-                responses << {
-                  path: path_name,
-                  method: method,
-                  status: response_status,
-                  is_covered: is_covered,
-                }
+                responses << { path: path_name, method: method, status: response_status, is_covered: is_covered, }
               end
             end
           end

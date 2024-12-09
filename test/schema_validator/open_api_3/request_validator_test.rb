@@ -20,16 +20,13 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
 
     it "optionally content_type check" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
-      params = {
-        "string_post_1" => "cloudnasium"
-      }
+      params = { "string_post_1" => "cloudnasium" }
       header "Content-Type", "text/html"
       post "/characters", JSON.generate(params)
       assert_equal 400, last_response.status
 
       body = JSON.parse(last_response.body)
-      message =
-          %{"Content-Type" request header must be set to "application/json".}
+      message = %{"Content-Type" request header must be set to "application/json".}
 
       assert_equal "bad_request", body['id']
       assert_equal message, body['message']
@@ -37,9 +34,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
 
     it "validates content_type" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
-      params = {
-        "string_post_1" => "cloudnasium"
-      }
+      params = { "string_post_1" => "cloudnasium" }
       header "Content-Type", "text/html"
       post "/validate_content_types", JSON.generate(params)
       assert_equal 400, last_response.status
@@ -53,9 +48,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
 
     it "optionally skip content_type check" do
       @app = new_rack_app(check_content_type: false, schema: open_api_3_schema)
-      params = {
-          "string_post_1" => "cloudnasium"
-      }
+      params = { "string_post_1" => "cloudnasium" }
       header "Content-Type", "text/html"
       post "/characters", JSON.generate(params)
       assert_equal 200, last_response.status
@@ -63,9 +56,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
 
     it "if not exist requestBody definition, skip content_type check" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
-      params = {
-          "string_post_1" => "cloudnasium"
-      }
+      params = { "string_post_1" => "cloudnasium" }
       header "Content-Type", "application/json"
       patch "/validate_no_parameter", JSON.generate(params)
       assert_equal 200, last_response.status
@@ -80,9 +71,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
     
     it "does not mix up parameters and requestBody" do
       @app = new_rack_app(check_content_type: true, schema: open_api_3_schema)
-      params = {
-          "last_name" => "Skywalker"
-      }
+      params = { "last_name" => "Skywalker" }
       header "Content-Type", "application/json"
       post "/additional_properties?first_name=Luke", JSON.generate(params)
       assert_equal 200, last_response.status

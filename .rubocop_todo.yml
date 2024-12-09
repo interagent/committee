@@ -6,17 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 7
-# This cop supports safe autocorrection (--autocorrect).
-Layout/EmptyLines:
-  Exclude:
-    - 'lib/committee/schema_validator/hyper_schema/response_validator.rb'
-    - 'test/committee_test.rb'
-    - 'test/middleware/request_validation_test.rb'
-    - 'test/middleware/response_validation_open_api_3_test.rb'
-    - 'test/schema_validator/hyper_schema/request_validator_test.rb'
-    - 'test/schema_validator/open_api_3/operation_wrapper_test.rb'
-
 # Offense count: 25
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: Width, AllowedPatterns.

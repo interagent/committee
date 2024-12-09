@@ -121,7 +121,7 @@ describe Committee::SchemaValidator::HyperSchema::StringParamsCoercer do
   private
 
   def check_convert(key, before_value, after_value)
-    data = {key => before_value}
+    data = { key => before_value }
     call(data)
 
     if !after_value.nil?

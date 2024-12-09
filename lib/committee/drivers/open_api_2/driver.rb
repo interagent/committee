@@ -81,13 +81,7 @@ module Committee
 
         # These are fields that the OpenAPI 2 spec considers mandatory to be
         # included in the document's top level.
-        REQUIRED_FIELDS = [
-          :consumes,
-          :definitions,
-          :paths,
-          :produces,
-          :swagger,
-        ].map(&:to_s).freeze
+        REQUIRED_FIELDS = [:consumes, :definitions, :paths, :produces, :swagger,].map(&:to_s).freeze
 
         def find_best_fit_response(link_data)
           if response_data = link_data["responses"]["200"] || response_data = link_data["responses"][200]
@@ -97,8 +91,7 @@ module Committee
           else
             # Sort responses so that we can try to prefer any 3-digit status code.
             # If there are none, we'll just take anything from the list.
-            ordered_responses = link_data["responses"].
-              select { |k, v| k.to_s =~ /[0-9]{3}/ }
+            ordered_responses = link_data["responses"].select { |k, v| k.to_s =~ /[0-9]{3}/ }
             if first = ordered_responses.first
               [first[0].to_i, first[1]]
             else
@@ -117,9 +110,7 @@ module Committee
           # that all references to it will still have correct paths (i.e. we can
           # still find a resource at '#/definitions/resource' instead of
           # '#/resource').
-          schema = JsonSchema.parse!({
-            "definitions" => data['definitions'],
-          })
+          schema = JsonSchema.parse!({ "definitions" => data['definitions'], })
           schema.expand_references!
           schema.uri = DEFINITIONS_PSEUDO_URI
 
@@ -182,8 +173,7 @@ module Committee
 
                 # A link need not necessarily specify a target schema.
                 if response_data["schema"]
-                  target_schemas_data["properties"][href]["properties"][method] =
-                    response_data["schema"]
+                  target_schemas_data["properties"][href]["properties"][method] = response_data["schema"]
                 end
               end
 
@@ -199,10 +189,8 @@ module Committee
           # #parse_definitions!, but what we're doing here is prefixing references
           # with a specialized internal URI so that they can reference definitions
           # from another document in the store.
-          schemas =
-            rewrite_references_and_parse(schemas_data, store)
-          target_schemas =
-            rewrite_references_and_parse(target_schemas_data, store)
+          schemas = rewrite_references_and_parse(schemas_data, store)
+          target_schemas = rewrite_references_and_parse(target_schemas_data, store)
 
           # As noted above, now that we've parsed our aggregate response schema, go
           # back through each link and them their response schema.
@@ -218,8 +206,7 @@ module Committee
               end
 
               # response
-              link.target_schema =
-                target_schemas.properties[link.href].properties[method]
+              link.target_schema = target_schemas.properties[link.href].properties[method]
             end
           end
 

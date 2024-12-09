@@ -17,8 +17,7 @@ module Committee
               check_required_fields!(body_param)
 
               if link_data["parameters"].detect { |p| p["in"] == "form" } != nil
-                raise ArgumentError, "Committee: can't mix body parameter " \
-                  "with form parameters."
+                raise ArgumentError, "Committee: can't mix body parameter with form parameters."
               end
 
               schema_data = body_param["schema"]

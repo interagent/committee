@@ -5,9 +5,7 @@ require "test_helper"
 describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
   before do
     @status = 200
-    @headers = {
-      "Content-Type" => "application/json"
-    }
+    @headers = { "Content-Type" => "application/json" }
     @data = ValidApp.dup
     @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
@@ -78,16 +76,14 @@ describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
   it "detects a blank response Content-Type" do
     @headers = {}
     e = assert_raises(Committee::InvalidResponse) { call }
-    message =
-      %{"Content-Type" response header must be set to "#{@link.enc_type}".}
+    message = %{"Content-Type" response header must be set to "#{@link.enc_type}".}
     assert_equal message, e.message
   end
 
   it "detects an invalid response Content-Type" do
     @headers = { "Content-Type" => "text/html" }
     e = assert_raises(Committee::InvalidResponse) { call }
-    message =
-      %{"Content-Type" response header must be set to "#{@link.enc_type}".}
+    message = %{"Content-Type" response header must be set to "#{@link.enc_type}".}
     assert_equal message, e.message
   end
 

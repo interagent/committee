@@ -10,12 +10,8 @@ describe Committee::Middleware::Base do
   end
 
   it "accepts just a schema object" do
-    @app = new_rack_app(
-      schema: hyper_schema
-    )
-    params = {
-      "name" => "cloudnasium"
-    }
+    @app = new_rack_app(schema: hyper_schema)
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
@@ -23,69 +19,50 @@ describe Committee::Middleware::Base do
 
   it "accepts just a OpenAPI3 schema object" do
     @app = new_rack_app(schema: open_api_3_schema)
-    params = {
-        "name" => "cloudnasium"
-    }
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
     post "/apps", JSON.generate(params)
     assert_equal 200, last_response.status
   end
 
   it "doesn't accept a schema string" do
-    @app = new_rack_app(
-      schema: JSON.dump(hyper_schema_data)
-    )
-    params = {
-      "name" => "cloudnasium"
-    }
+    @app = new_rack_app(schema: JSON.dump(hyper_schema_data))
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
 
     e = assert_raises(ArgumentError) do
       post "/apps", JSON.generate(params)
     end
 
-    assert_equal "Committee: schema expected to be an instance " +
-                     "of Committee::Drivers::Schema.", e.message
+    assert_equal "Committee: schema expected to be an instance " + "of Committee::Drivers::Schema.", e.message
   end
 
   it "doesn't accept a schema hash" do
-    @app = new_rack_app(
-      schema: hyper_schema_data
-    )
-    params = {
-      "name" => "cloudnasium"
-    }
+    @app = new_rack_app(schema: hyper_schema_data)
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
 
     e = assert_raises(ArgumentError) do
       post "/apps", JSON.generate(params)
     end
 
-    assert_equal "Committee: schema expected to be an instance " +
-                     "of Committee::Drivers::Schema.", e.message
+    assert_equal "Committee: schema expected to be an instance " + "of Committee::Drivers::Schema.", e.message
   end
 
   it "doesn't accept a JsonSchema::Schema object" do
-    @app = new_rack_app(
-      schema: JsonSchema.parse!(hyper_schema_data)
-    )
-    params = {
-      "name" => "cloudnasium"
-    }
+    @app = new_rack_app(schema: JsonSchema.parse!(hyper_schema_data))
+    params = { "name" => "cloudnasium" }
     header "Content-Type", "application/json"
 
     e = assert_raises(ArgumentError) do
       post "/apps", JSON.generate(params)
     end
 
-    assert_equal "Committee: schema expected to be an instance " +
-                     "of Committee::Drivers::Schema.", e.message
+    assert_equal "Committee: schema expected to be an instance " + "of Committee::Drivers::Schema.", e.message
   end
 
   it "doesn't accept other schema types" do
-    @app = new_rack_app(
-      schema: 7,
-    )
+    @app = new_rack_app(schema: 7,)
     e = assert_raises(ArgumentError) do
       post "/apps"
     end

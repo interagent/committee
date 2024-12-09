@@ -29,7 +29,7 @@ describe Committee::Test::Methods do
     @committee_router = nil
     @committee_schema = nil
 
-    @committee_options = {schema: hyper_schema}
+    @committee_options = { schema: hyper_schema }
   end
 
   describe "#assert_schema_conform" do

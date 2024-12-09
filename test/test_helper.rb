@@ -36,17 +36,10 @@ JsonSchema.configure do |c|
 end
 
 # For our hyper-schema example.
-ValidApp = {
-  "maintenance" => false,
-  "name"        => "example",
-}.freeze
+ValidApp = { "maintenance" => false, "name" => "example", }.freeze
 
 # For our OpenAPI example.
-ValidPet = {
-  "id"   => 123,
-  "name" => "example",
-  "tag"  => "tag-123",
-}.freeze
+ValidPet = { "id" => 123, "name" => "example", "tag" => "tag-123", }.freeze
 
 def hyper_schema
   @hyper_schema ||= Committee::Drivers.load_from_json(hyper_schema_schema_path)
@@ -61,11 +54,11 @@ def open_api_2_form_schema
 end
 
 def open_api_3_schema
-  @open_api_3_schema ||= Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{strict_reference_validation: true})
+  @open_api_3_schema ||= Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options:{ strict_reference_validation: true })
 end
 
 def open_api_3_coverage_schema
-  @open_api_3_coverage_schema ||= Committee::Drivers.load_from_file(open_api_3_coverage_schema_path, parser_options:{strict_reference_validation: true})
+  @open_api_3_coverage_schema ||= Committee::Drivers.load_from_file(open_api_3_coverage_schema_path, parser_options:{ strict_reference_validation: true })
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.
