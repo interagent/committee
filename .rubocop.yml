@@ -110,7 +110,7 @@ Layout/SpaceInsideArrayPercentLiteral:
 Layout/SpaceInsideBlockBraces:
   Enabled: true
 
-SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   Enabled: true
 
 Layout/SpaceInsideParens:
