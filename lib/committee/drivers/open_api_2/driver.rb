@@ -85,17 +85,17 @@ module Committee
 
         def find_best_fit_response(link_data)
           if response_data = link_data["responses"]["200"] || response_data = link_data["responses"][200]
-            [200, response_data]
+            200
           elsif response_data = link_data["responses"]["201"] || response_data = link_data["responses"][201]
-            [201, response_data]
+            201
           else
             # Sort responses so that we can try to prefer any 3-digit status code.
             # If there are none, we'll just take anything from the list.
             ordered_responses = link_data["responses"].select { |k, v| k.to_s =~ /[0-9]{3}/ }
             if first = ordered_responses.first
-              [first[0].to_i, first[1]]
+              first[0].to_i
             else
-              [nil, nil]
+              nil
             end
           end
         end
@@ -165,17 +165,15 @@ module Committee
                 schemas_data["properties"][href]["properties"][method] = schema_data
               end
 
-              # Arbitrarily pick one response for the time being. Prefers in order:
-              # a 200, 201, any 3-digit numerical response, then anything at all.
-              status, response_data = find_best_fit_response(link_data)
-              if status
-                link.status_success = status
+              target_schemas_data["properties"][href]["properties"][method] ||= { "properties" => {} }
+              link_data["responses"].each do |key, response_data|
+                status = key.to_i
+                next unless response_data["schema"]
 
-                # A link need not necessarily specify a target schema.
-                if response_data["schema"]
-                  target_schemas_data["properties"][href]["properties"][method] = response_data["schema"]
-                end
+                target_schemas_data["properties"][href]["properties"][method]["properties"][status] = response_data["schema"]
               end
+
+              link.status_success = find_best_fit_response(link_data)
 
               rx = %r{^#{href_to_regex(link.href)}$}
               Committee.log_debug "Created route: #{link.method} #{link.href} (regex #{rx})"
@@ -206,7 +204,10 @@ module Committee
               end
 
               # response
-              link.target_schema = target_schemas.properties[link.href].properties[method]
+              link.target_schemas = {}
+              target_schemas.properties[link.href].properties[method].properties.each do |status, schema|
+                link.target_schemas[status] = schema
+              end
             end
           end
 

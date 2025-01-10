@@ -74,52 +74,57 @@ describe Committee::SchemaValidator::HyperSchema::ResponseGenerator do
 
   it "generates first enum value for a schema with enum" do
     link = Committee::Drivers::OpenAPI2::Link.new
-    link.target_schema = JsonSchema::Schema.new
-    link.target_schema.enum = ["foo"]
-    link.target_schema.type = ["string"]
+    target_schema = JsonSchema::Schema.new
+    target_schema.enum = ["foo"]
+    target_schema.type = ["string"]
+    link.target_schemas = { 200 => target_schema }
     data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal("foo", data)
   end
 
   it "generates basic types" do
     link = Committee::Drivers::OpenAPI2::Link.new
-    link.target_schema = JsonSchema::Schema.new
+    target_schema = JsonSchema::Schema.new
+    link.target_schemas = { 200 => target_schema }
 
-    link.target_schema.type = ["integer"]
+    target_schema.type = ["integer"]
     data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal 0, data
 
-    link.target_schema.type = ["null"]
+    target_schema.type = ["null"]
     data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_nil data
 
-    link.target_schema.type = ["string"]
+    target_schema.type = ["string"]
     data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal "", data
   end
 
   it "generates an empty array for an array type" do
     link = Committee::Drivers::OpenAPI2::Link.new
-    link.target_schema = JsonSchema::Schema.new
-    link.target_schema.type = ["array"]
+    target_schema = JsonSchema::Schema.new
+    link.target_schemas = { 200 => target_schema }
+    target_schema.type = ["array"]
     data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal([], data)
   end
 
   it "generates an empty object for an object with no fields" do
     link = Committee::Drivers::OpenAPI2::Link.new
-    link.target_schema = JsonSchema::Schema.new
-    link.target_schema.type = ["object"]
+    target_schema = JsonSchema::Schema.new
+    link.target_schemas = { 200 => target_schema }
+    target_schema.type = ["object"]
     data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal({}, data)
   end
 
   it "prefers an example to a built-in value" do
     link = Committee::Drivers::OpenAPI2::Link.new
-    link.target_schema = JsonSchema::Schema.new
+    target_schema = JsonSchema::Schema.new
+    link.target_schemas = { 200 => target_schema }
 
-    link.target_schema.data = { "example" => 123 }
-    link.target_schema.type = ["integer"]
+    target_schema.data = { "example" => 123 }
+    target_schema.type = ["integer"]
 
     data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal 123, data
@@ -127,9 +132,10 @@ describe Committee::SchemaValidator::HyperSchema::ResponseGenerator do
 
   it "prefers non-null types to null types" do
     link = Committee::Drivers::OpenAPI2::Link.new
-    link.target_schema = JsonSchema::Schema.new
+    target_schema = JsonSchema::Schema.new
+    link.target_schemas = { 200 => target_schema }
 
-    link.target_schema.type = ["null", "integer"]
+    target_schema.type = ["null", "integer"]
     data, _schema = Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
     assert_equal 0, data
   end

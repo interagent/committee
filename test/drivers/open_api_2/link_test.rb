@@ -11,7 +11,7 @@ describe Committee::Drivers::OpenAPI2::Link do
     @link.method = "GET"
     @link.status_success = 200
     @link.schema = { "title" => "input" }
-    @link.target_schema = { "title" => "target" }
+    @link.target_schemas = { 200 => { "title" => "target" } }
   end
 
   it "uses set #enc_type" do
