@@ -21,7 +21,7 @@ require "minitest"
 require "minitest/spec"
 require "minitest/autorun"
 require "rack/test"
-require "pry"
+require "debug"
 require "stringio"
 
 require_relative "../lib/committee"
