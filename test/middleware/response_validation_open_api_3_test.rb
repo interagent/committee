@@ -17,6 +17,22 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "passes through a valid response with content-type (lower-case)" do
+    status = 200
+    headers = { "content-type" => "application/json" }
+    response = JSON.generate(CHARACTERS_RESPONSE)
+
+    @app = Rack::Builder.new {
+      use Committee::Middleware::ResponseValidation, {schema: open_api_3_schema}
+      run lambda { |_|
+        [status, headers, [response]]
+      }
+    }
+
+    get "/characters"
+    assert_equal 200, last_response.status
+  end
+
   it "passes through a invalid json" do
     @app = new_response_rack("not_json", {}, schema: open_api_3_schema)
 

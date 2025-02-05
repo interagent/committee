@@ -27,9 +27,10 @@ module Committee
         end
 
         parse_to_json = !validator_option.parse_response_by_content_type ||
-                        headers.fetch('Content-Type', nil)&.start_with?('application/json')
+                        headers.fetch('Content-Type', nil)&.start_with?('application/json') ||
+                        headers.fetch('content-type', nil)&.start_with?('application/json')
         data = if parse_to_json
-                 full_body.empty? ? {} : JSON.parse(full_body)
+          full_body.empty? ? {} : JSON.parse(full_body)
         else
           full_body
         end

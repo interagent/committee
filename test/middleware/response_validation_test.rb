@@ -15,6 +15,23 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "passes through a valid response with content-type (lower-case)" do
+    options = { schema: hyper_schema }
+    status = 200
+    headers = { 'content-type' => 'application/json' }
+    response = JSON.generate([ValidApp])
+    @app = Rack::Builder.new {
+      use Committee::Middleware::ResponseValidation, options
+      run lambda { |_|
+        [status, headers, [response]]
+      }
+    }
+
+    get "/apps"
+    puts(last_response.body)
+    assert_equal 200, last_response.status
+  end
+
   it "doesn't call error_handler (has a arg) when response is valid" do
     called = false
     pr = ->(_e) { called = true }
