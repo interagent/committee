@@ -28,9 +28,13 @@ module Committee
 
         data = {}
         unless full_body.empty?
-          parse_to_json = !validator_option.parse_response_by_content_type ||
-                          headers.fetch('Content-Type', nil)&.start_with?('application/json') ||
-                          headers.fetch('content-type', nil)&.start_with?('application/json')
+          parse_to_json = if validator_option.parse_response_by_content_type
+            content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
+            headers.fetch(content_type_key, nil)&.start_with?('application/json')
+          else
+            true
+          end
+
           data = JSON.parse(full_body) if parse_to_json
         end
 
@@ -102,11 +106,11 @@ module Committee
         return unless link_exist?
 
         Committee::SchemaValidator::HyperSchema::ParameterCoercer.
-            new(request.env[coerce_key],
-                link.schema,
-                coerce_date_times: validator_option.coerce_date_times,
-                coerce_recursive: validator_option.coerce_recursive).
-            call!
+          new(request.env[coerce_key],
+            link.schema,
+            coerce_date_times: validator_option.coerce_date_times,
+            coerce_recursive: validator_option.coerce_recursive).
+          call!
       end
     end
   end
