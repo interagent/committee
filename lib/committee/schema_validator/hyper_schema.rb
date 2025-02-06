@@ -29,7 +29,7 @@ module Committee
         data = {}
         unless full_body.empty?
           parse_to_json = if validator_option.parse_response_by_content_type
-            content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
+                            content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
             headers.fetch(content_type_key, nil)&.start_with?('application/json')
           else
             true

@@ -28,7 +28,6 @@ describe Committee::Middleware::ResponseValidation do
     }
 
     get "/apps"
-    puts(last_response.body)
     assert_equal 200, last_response.status
   end
 
