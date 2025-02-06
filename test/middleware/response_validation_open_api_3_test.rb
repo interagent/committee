@@ -23,7 +23,7 @@ describe Committee::Middleware::ResponseValidation do
     response = JSON.generate(CHARACTERS_RESPONSE)
 
     @app = Rack::Builder.new {
-      use Committee::Middleware::ResponseValidation, {schema: open_api_3_schema}
+      use Committee::Middleware::ResponseValidation, { schema: open_api_3_schema }
       run lambda { |_|
         [status, headers, [response]]
       }
