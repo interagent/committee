@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.5.1 - 2025-02-06
+
+- enabled layout cops
+- added codespell workflow to spell check PRs
+- fix for SpaceInsideHashLiteralBraces cop
+- add support for multiple response schemas to openapi 2
+- replace pry and pry-debug with debug in dev deps
+- update .ruby-version to latest tested
+- fix to properly support non-titlecase content-type
+
 ## [5.5.0] - 2024-11-25
 
 ### Added
