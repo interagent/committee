@@ -31,6 +31,7 @@ This piece of middleware validates the parameters of incoming requests to make s
 |allow_form_params | true | true | Specifies that input can alternatively be specified as `application/x-www-form-urlencoded` parameters when possible. This won't work for more complex schema validations. |
 |allow_get_body | true | false | Allow GET request body, which merge to request parameter. See (#211) |
 |allow_query_params | true | true | Specifies that query string parameters will be taken into consideration when doing validation. |
+|allow_non_get_query_params | false | false | Allow GET and non-GET query string parameters to be taken into consideration when doing validation. |
 |check_content_type | true | true | Specifies that `Content-Type` should be verified according to JSON Hyper-schema or OpenAPI 3 definition. |
 |check_header | true | true | Check header data using JSON Hyper-schema or OpenAPI 3 definition. |
 |coerce_date_times | false | true | Convert the string with `"format": "date-time"` parameter to DateTime object. |
