@@ -8,6 +8,7 @@ module Committee
                   :allow_form_params,
                   :allow_get_body,
                   :allow_query_params,
+                  :allow_non_get_query_params,
                   :check_content_type,
                   :check_header,
                   :coerce_date_times,
@@ -37,6 +38,7 @@ module Committee
         @allow_blank_structures           = options.fetch(:allow_blank_structures, false)
         @allow_form_params                = options.fetch(:allow_form_params, true)
         @allow_query_params               = options.fetch(:allow_query_params, true)
+        @allow_non_get_query_params       = options.fetch(:allow_non_get_query_params, false)
         @check_content_type               = options.fetch(:check_content_type, true)
         @check_header                     = options.fetch(:check_header, true)
         @coerce_recursive                 = options.fetch(:coerce_recursive, true)

@@ -21,10 +21,11 @@ module Committee
     end
 
     def initialize(options = {})
-      @allow_form_params  = options[:allow_form_params]
-      @allow_get_body     = options[:allow_get_body]
-      @allow_query_params = options[:allow_query_params]
-      @optimistic_json    = options[:optimistic_json]
+      @allow_form_params          = options[:allow_form_params]
+      @allow_get_body             = options[:allow_get_body]
+      @allow_query_params         = options[:allow_query_params]
+      @allow_non_get_query_params = options[:allow_non_get_query_params]
+      @optimistic_json            = options[:optimistic_json]
     end
 
     # return params and is_form_params
@@ -57,7 +58,15 @@ module Committee
     end
 
     def unpack_query_params(request)
-      @allow_query_params ? self.class.indifferent_params(request.GET) : {}
+      unless @allow_query_params
+        return {}
+      end
+
+      if @allow_non_get_query_params
+        self.class.indifferent_params(request.params)
+      else
+        self.class.indifferent_params(request.GET)
+      end
     end
 
     def unpack_headers(request)

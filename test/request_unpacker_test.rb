@@ -99,6 +99,13 @@ describe Committee::RequestUnpacker do
     assert_equal({ "a" => "b" }, unpacker.unpack_query_params(request))
   end
 
+  it "unpacks query params from non-get requests with allow_non_get_query_params" do
+    env = { "rack.input" => StringIO.new(""), "REQUEST_METHOD" => "PUT", "QUERY_STRING" => "a=b" }
+    request = Rack::Request.new(env)
+    unpacker = Committee::RequestUnpacker.new({ allow_query_params: true, allow_non_get_query_params: true })
+    assert_equal({ "a" => "b" }, unpacker.unpack_query_params(request))
+  end
+
   it "errors if JSON is not an object" do
     env = { "CONTENT_TYPE" => "application/json", "rack.input" => StringIO.new('[2]'), }
     request = Rack::Request.new(env)

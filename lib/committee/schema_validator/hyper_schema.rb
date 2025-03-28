@@ -66,6 +66,7 @@ module Committee
           allow_form_params:  validator_option.allow_form_params,
           allow_get_body:     validator_option.allow_get_body,
           allow_query_params: validator_option.allow_query_params,
+          allow_non_get_query_params: validator_option.allow_non_get_query_params,
           optimistic_json:    validator_option.optimistic_json,
         )
 
