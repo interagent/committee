@@ -75,6 +75,76 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
     call_response_validator
   end
 
+  describe 'allow_empty_date_and_datetime' do
+    it "errors given an empty date string with allow_empty_date_and_datetime disabled" do
+      @path = '/date_time'
+      @method = 'get'
+      @data = { 'date' => '' }
+
+      e = assert_raises(Committee::InvalidResponse) {
+        call_response_validator
+      }
+      assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
+      assert_match(/\"\" is not conformant with date format/i, e.message)
+    end
+
+    it "errors given an empty date-time string with allow_empty_date_and_datetime disabled" do
+      @path = '/date_time'
+      @method = 'get'
+      @data = { 'date-time' => '' }
+
+      e = assert_raises(Committee::InvalidResponse) {
+        call_response_validator
+      }
+      assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
+      assert_match(/\"\" is not conformant with date-time format/i, e.message)
+    end
+
+    it "passes given an empty date string with allow_empty_date_and_datetime enabled" do
+      @validator_option = Committee::SchemaValidator::Option.new(
+        { allow_empty_date_and_datetime: true },
+        open_api_3_schema,
+        :open_api_3)
+
+      @path = '/date_time'
+      @method = 'get'
+      @data = { 'date' => '' }
+
+      if OpenAPIParser::VERSION >= "2.2.6"
+        response = call_response_validator
+        assert_equal({ 'date' => '' }, response)
+      else
+        e = assert_raises(Committee::InvalidResponse) {
+          call_response_validator
+        }
+        assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
+        assert_match(/\"\" is not conformant with date format/i, e.message)
+      end
+    end
+
+    it "passes given an empty date-time string with allow_empty_date_and_datetime enabled" do
+      @validator_option = Committee::SchemaValidator::Option.new(
+        { allow_empty_date_and_datetime: true },
+        open_api_3_schema,
+        :open_api_3)
+
+      @path = '/date_time'
+      @method = 'get'
+      @data = { 'date-time' => '' }
+
+      if OpenAPIParser::VERSION >= "2.2.6"
+        response = call_response_validator
+        assert_equal({ 'date-time' => '' }, response)
+      else
+        e = assert_raises(Committee::InvalidResponse) {
+          call_response_validator
+        }
+        assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
+        assert_match(/\"\" is not conformant with date-time format/i, e.message)
+      end
+    end
+  end
+
   private
 
   def call_response_validator(strict = false)

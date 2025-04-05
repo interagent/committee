@@ -205,6 +205,12 @@ paths:
         schema:
           type: string
           format: date-time
+      - name: date_string
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
       - name: normal_array
         in: query
         description: number data
@@ -683,7 +689,7 @@ paths:
         in: query
         required: false
         schema:
-          type: integer    
+          type: integer
       requestBody:
         content:
           application/json:
@@ -721,6 +727,26 @@ paths:
       responses:
         '204':
           description: sample of remote schema reference
+
+  /date_time:
+    get:
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date
+                  date-time:
+                    type: string
+                    format: date-time
+              example:
+                date: 2020-05-12
+                date-time: 2020-05-12T00:00:00.00Z
 
 components:
   schemas:

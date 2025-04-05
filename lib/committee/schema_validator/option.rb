@@ -5,6 +5,7 @@ module Committee
     class Option
       # Boolean Options
       attr_reader :allow_blank_structures,
+                  :allow_empty_date_and_datetime,
                   :allow_form_params,
                   :allow_get_body,
                   :allow_query_params,
@@ -36,6 +37,7 @@ module Committee
 
         # Boolean options and have a common value by default
         @allow_blank_structures           = options.fetch(:allow_blank_structures, false)
+        @allow_empty_date_and_datetime    = options.fetch(:allow_empty_date_and_datetime, false)
         @allow_form_params                = options.fetch(:allow_form_params, true)
         @allow_query_params               = options.fetch(:allow_query_params, true)
         @allow_non_get_query_params       = options.fetch(:allow_non_get_query_params, false)

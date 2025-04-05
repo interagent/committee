@@ -31,10 +31,12 @@ module Committee
         end
 
         # @param [Boolean] strict when not content_type or status code definition, raise error
-        def validate_response_params(status_code, headers, response_data, strict, check_header)
+        def validate_response_params(status_code, headers, response_data, strict, check_header, validator_options: {})
           response_body = OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, response_data, headers)
 
-          return request_operation.validate_response_body(response_body, response_validate_options(strict, check_header))
+          return request_operation.validate_response_body(
+            response_body,
+            response_validate_options(strict, check_header, validator_options: validator_options))
         rescue OpenAPIParser::OpenAPIError => e
           raise Committee::InvalidResponse.new(e.message, original_error: e)
         end
@@ -89,11 +91,15 @@ module Committee
 
         # @return [OpenAPIParser::SchemaValidator::Options]
         def build_openapi_parser_option(validator_option, coerce_value)
-          datetime_coerce_class = validator_option.coerce_date_times ? DateTime : nil
-          validate_header = validator_option.check_header
-          OpenAPIParser::SchemaValidator::Options.new(coerce_value: coerce_value,
-                                                      datetime_coerce_class: datetime_coerce_class,
-                                                      validate_header: validate_header)
+          parser_options = {
+            coerce_value: coerce_value,
+            datetime_coerce_class: validator_option.coerce_date_times ? DateTime : nil,
+            validate_header: validator_option.check_header,
+          }
+          if OpenAPIParser::SchemaValidator::Options.method_defined?(:allow_empty_date_and_datetime)
+            parser_options[:allow_empty_date_and_datetime] = validator_option.allow_empty_date_and_datetime
+          end
+          OpenAPIParser::SchemaValidator::Options.new(**parser_options)
         end
 
         def validate_get_request_params(path_params, query_params, headers, validator_option)
@@ -130,8 +136,14 @@ module Committee
           end
         end
 
-        def response_validate_options(strict, check_header)
-          ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(strict: strict, validate_header: check_header)
+        def response_validate_options(strict, check_header, validator_options: {})
+          options = { strict: strict, validate_header: check_header }
+
+          if OpenAPIParser::SchemaValidator::ResponseValidateOptions.method_defined?(:validator_options)
+            ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(**options, **validator_options)
+          else
+            ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(**options)
+          end
         end
       end
     end
