@@ -146,7 +146,7 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
-  it "passes given an invalid datetime string with coerce_date_times enabled" do
+  it "errors given an invalid datetime string with coerce_date_times enabled" do
     @app = new_rack_app(schema: open_api_3_schema, coerce_date_times: true)
     params = { "datetime_string" => "invalid_datetime_format" }
     get "/string_params_coercer", params
@@ -242,6 +242,50 @@ describe Committee::Middleware::RequestValidation do
     header "Content-Type", "application/json"
     post "/string_params_coercer", JSON.generate(params)
     assert_equal 200, last_response.status
+  end
+
+  it "errors given an empty datetime string with allow_empty_date_and_datetime disabled" do
+    @app = new_rack_app(schema: open_api_3_schema)
+    params = { "datetime_string" => "" }
+    get "/string_params_coercer", params
+
+    assert_equal 400, last_response.status
+    assert_match(/\\"\\" is not conformant with date-time format/i, last_response.body)
+  end
+
+  it "passes given an empty datetime string with allow_empty_date_and_datetime enabled" do
+    @app = new_rack_app(schema: open_api_3_schema, allow_empty_date_and_datetime: true)
+    params = { "datetime_string" => "" }
+    get "/string_params_coercer", params
+
+    if OpenAPIParser::VERSION >= "2.2.5"
+      assert_equal 200, last_response.status
+    else
+      assert_equal 400, last_response.status
+      assert_match(/\\"\\" is not conformant with date-time format/i, last_response.body)
+    end
+  end
+
+  it "errors given an empty date string with allow_empty_date_and_datetime disabled" do
+    @app = new_rack_app(schema: open_api_3_schema)
+    params = { "date_string" => "" }
+    get "/string_params_coercer", params
+
+    assert_equal 400, last_response.status
+    assert_match(/\\"\\" is not conformant with date format/i, last_response.body)
+  end
+
+  it "passes given an empty date string with allow_empty_date_and_datetime enabled" do
+    @app = new_rack_app(schema: open_api_3_schema, allow_empty_date_and_datetime: true)
+    params = { "date_string" => "" }
+    get "/string_params_coercer", params
+
+    if OpenAPIParser::VERSION >= "2.2.5"
+      assert_equal 200, last_response.status
+    else
+      assert_equal 400, last_response.status
+      assert_match(/\\"\\" is not conformant with date format/i, last_response.body)
+    end
   end
 
   it "OpenAPI3 detects an invalid request" do

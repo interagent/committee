@@ -21,11 +21,12 @@ module Committee
     end
 
     def initialize(options = {})
-      @allow_form_params          = options[:allow_form_params]
-      @allow_get_body             = options[:allow_get_body]
-      @allow_query_params         = options[:allow_query_params]
-      @allow_non_get_query_params = options[:allow_non_get_query_params]
-      @optimistic_json            = options[:optimistic_json]
+      @allow_empty_date_and_datetime = options[:allow_empty_date_and_datetime]
+      @allow_form_params             = options[:allow_form_params]
+      @allow_get_body                = options[:allow_get_body]
+      @allow_query_params            = options[:allow_query_params]
+      @allow_non_get_query_params    = options[:allow_non_get_query_params]
+      @optimistic_json               = options[:optimistic_json]
     end
 
     # return params and is_form_params

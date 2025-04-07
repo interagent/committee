@@ -84,6 +84,7 @@ module Committee
 
       def request_unpack(request)
         unpacker = Committee::RequestUnpacker.new(
+          allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime,
           allow_form_params:  validator_option.allow_form_params,
           allow_get_body:     validator_option.allow_get_body,
           allow_query_params: validator_option.allow_query_params,
