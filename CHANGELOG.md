@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.5.3 - 2025-04-07
+
+- add option to allow empty date and date-time strings #444
+
 ## 5.5.2 - 2025-03-28
 
 - add `allow_non_get_query_params` option to validate query on all methods
