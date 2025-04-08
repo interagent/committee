@@ -88,11 +88,12 @@ module Committee
       return nil if request.request_method == "GET" && !@allow_get_body
 
       return nil if request.body.nil?
+      rewind_body(request.body)
       body = request.body.read
       # if request body is empty, we just have empty params
       return nil if body.length == 0
 
-      request.body.rewind
+      rewind_body(request.body)
       hash = JSON.parse(body)
       # We want a hash specifically. '42', 42, and [42] will all be
       # decoded properly, but we can't use them here.
@@ -100,6 +101,10 @@ module Committee
         raise BadRequest, "Invalid JSON input. Require object with parameters as keys."
       end
       self.class.indifferent_params(hash)
+    end
+
+    def rewind_body(body)
+      body.rewind if body.respond_to?(:rewind)
     end
   end
 end
