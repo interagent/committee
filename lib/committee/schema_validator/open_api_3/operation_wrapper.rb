@@ -110,7 +110,8 @@ module Committee
         end
 
         def validate_post_request_params(path_params, query_params, body_params, headers, validator_option)
-          content_type = headers['Content-Type'].to_s.split(";").first.to_s
+          content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
+          content_type = headers[content_type_key].to_s.split(';').first.to_s
 
           # bad performance because when we coerce value, same check
           validate_path_and_query_params(path_params, query_params, headers, validator_option)
