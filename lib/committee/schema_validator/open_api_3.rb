@@ -28,16 +28,16 @@ module Committee
 
         parse_to_json = if validator_option.parse_response_by_content_type
                           content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
-          headers.fetch(content_type_key, nil)&.start_with?('application/json')
-        else
-          true
-        end
+                          headers.fetch(content_type_key, nil)&.start_with?('application/json')
+                        else
+                          true
+                        end
 
         data = if parse_to_json
                  full_body.empty? ? {} : JSON.parse(full_body)
-        else
-          full_body
-        end
+               else
+                 full_body
+               end
 
         # TODO: refactoring name
         strict = test_method
