@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## 5.5.4 - 2025-05-14
+
+- fix caps-sensitive content-type reference
+
 ## 5.5.3 - 2025-04-07
 
 - add option to allow empty date and date-time strings #444
