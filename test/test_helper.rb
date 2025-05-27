@@ -61,6 +61,10 @@ def open_api_3_coverage_schema
   @open_api_3_coverage_schema ||= Committee::Drivers.load_from_file(open_api_3_coverage_schema_path, parser_options: { strict_reference_validation: true })
 end
 
+def open_api_3_streaming_response_schema
+  @open_api_3_streaming_response_schema ||= Committee::Drivers.load_from_file(open_api_3_streaming_response_schema_path, parser_options: { strict_reference_validation: true })
+end
+
 # Don't cache this because we'll often manipulate the created hash in tests.
 def hyper_schema_data
   JSON.parse(File.read(hyper_schema_schema_path))
@@ -121,4 +125,8 @@ end
 
 def open_api_3_invalid_reference_path
   "./test/data/openapi3/invalid_reference.yaml"
+end
+
+def open_api_3_streaming_response_schema_path
+  "./test/data/openapi3/streaming_response.yaml"
 end
