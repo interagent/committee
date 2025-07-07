@@ -335,6 +335,8 @@ use Committee::Middleware::ResponseValidation,
 
 This allows you to validate streaming response formats by providing custom parsers for specific content types. The parser lambda receives the complete response body as a string and should return the parsed data for validation.
 
+**Note:** This feature uses `Rack::BodyProxy` internally, which buffers the entire response body in memory before validation. This can consume significant memory for large streaming responses. Consider this limitation when validating large data streams.
+
 Limitation: For standard Content-Types, it is possible to intervene in the actual response when validation fails (e.g., by setting the HTTP status code to 500). However, for Content-Types specified via the `streaming_content_parsers` option, validation is performed only after the entire response body has been read—that is, after it has already been returned to the client—making it impossible to modify the response. In such cases, only `handle_exception` is called, and an error is raised if necessary.
 
 ## Using OpenAPI 3
