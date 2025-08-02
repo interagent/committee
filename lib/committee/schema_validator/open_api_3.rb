@@ -20,7 +20,7 @@ module Committee
         copy_coerced_data_to_params(request)
       end
 
-      def response_validate(status, headers, response, test_method = false)
+      def response_validate(status, headers, response, test_method = false, custom_body_parser = nil)
         full_body = +""
         response.each do |chunk|
           full_body << chunk
@@ -33,7 +33,9 @@ module Committee
                           true
                         end
 
-        data = if parse_to_json
+        data = if custom_body_parser
+                 custom_body_parser.call(full_body)
+               elsif parse_to_json
                  full_body.empty? ? {} : JSON.parse(full_body)
                else
                  full_body

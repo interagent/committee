@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Server-Sent Events API
+  description: API demonstrating Server-Sent Events with text/event-stream
+paths:
+  /events/stream:
+    get:
+      description: Stream real-time events
+      responses:
+        "200":
+          description: Event stream established successfully
+          content:
+            text/event-stream:
+              schema:
+                type: string
+                description: |
+                  Server-Sent Events stream. Each event follows the SSE format:
+
+                  data: Hello
+
+                  data: World
+  /events/stream/json:
+    get:
+      description: Stream real-time events in JSON format
+      responses:
+        "200":
+          description: Event stream established successfully
+          content:
+            application/x-json-stream:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The event ID
+                  message:
+                    type: string
+                    description: The event message
+                required:
+                  - id
+                  - message

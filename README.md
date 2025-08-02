@@ -175,6 +175,7 @@ No boolean option values:
 |prefix| String | support | support | Mounts the middleware to respond at a configured prefix. |
 |error_class| StandardError | support | support | Specifies the class to use for formatting and outputting validation errors (defaults to `Committee::ValidationError`). |
 |error_handler| Proc Object | support | support | A proc which will be called when error occurs. Take an Error instance as first argument, and request.env as second argument. (e.g. `-> (ex, env) { Raven.capture_exception(ex, extra: { rack_env: env }) }`) |
+|streaming_content_parsers| Hash[String, Proc] | support | support | A hash mapping content types to custom parser lambdas for streaming responses (e.g. `{ 'text/event-stream' => ->(body) { body } }`). Used for validating streaming response formats like Server-Sent Events. |
 
 Given a simple Sinatra app that responds for an endpoint in an incomplete fashion:
 
@@ -318,6 +319,25 @@ use Committee::Middleware::RequestValidation,
 Committee has few options which enable convert request data.
 By default committee save converted data to `committee.params` and rails does not read it.
 So we need to save converted value to `'action_dispatch.request.request_parameters'` because rails create parameter from this value.
+
+### Streaming Response Validation
+
+Committee supports validating streaming responses like Server-Sent Events or custom streaming formats using the `streaming_content_parsers` option:
+
+```ruby
+use Committee::Middleware::ResponseValidation,
+  schema_path: 'docs/schema.json',
+  streaming_content_parsers: {
+    'text/event-stream' => ->(body) { body },  # Pass through SSE as string
+    'application/x-json-stream' => ->(body) { JSON.parse(body) }  # Parse custom JSON stream
+  }
+```
+
+This allows you to validate streaming response formats by providing custom parsers for specific content types. The parser lambda receives the complete response body as a string and should return the parsed data for validation.
+
+**Note:** This feature uses `Rack::BodyProxy` internally, which buffers the entire response body in memory before validation. This can consume significant memory for large streaming responses. Consider this limitation when validating large data streams.
+
+Limitation: For standard Content-Types, it is possible to intervene in the actual response when validation fails (e.g., by setting the HTTP status code to 500). However, for Content-Types specified via the `streaming_content_parsers` option, validation is performed only after the entire response body has been read—that is, after it has already been returned to the client—making it impossible to modify the response. In such cases, only `handle_exception` is called, and an error is raised if necessary.
 
 ## Using OpenAPI 3
 

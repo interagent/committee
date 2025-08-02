@@ -18,7 +18,7 @@ module Committee
         parameter_coerce!(request, link, "rack.request.query_hash") if link_exist? && !request.GET.nil? && !link.schema.nil?
       end
 
-      def response_validate(status, headers, response, _test_method = false)
+      def response_validate(status, headers, response, _test_method = false, custom_body_parser = nil)
         return unless link_exist?
 
         full_body = +""
@@ -26,8 +26,9 @@ module Committee
           full_body << chunk
         end
 
-        data = {}
-        unless full_body.empty?
+        data = if custom_body_parser
+                 custom_body_parser.call(full_body)
+        elsif !full_body.empty?
           parse_to_json = if validator_option.parse_response_by_content_type
                             content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
             headers.fetch(content_type_key, nil)&.start_with?('application/json')
@@ -35,7 +36,9 @@ module Committee
             true
           end
 
-          data = JSON.parse(full_body) if parse_to_json
+          JSON.parse(full_body) if parse_to_json
+        else
+          {}
         end
 
         Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link, validate_success_only: validator_option.validate_success_only, allow_blank_structures: validator_option.allow_blank_structures).call(status, headers, data)

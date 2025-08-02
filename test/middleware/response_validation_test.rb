@@ -196,6 +196,74 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  describe 'streaming response' do
+    describe "text/event-stream; e.g. server-sent events" do
+      it 'validates the response stream as a string' do
+        options = {
+          schema: open_api_3_streaming_response_schema,
+          streaming_content_parsers: { 'text/event-stream' => ->(body) { body } },
+        }
+        status = 200
+        headers = { 'content-type' => 'text/event-stream' }
+        @app = Rack::Builder.new {
+          use Committee::Middleware::ResponseValidation, options
+          run lambda { |_|
+            [status, headers, ["hello"]]
+          }
+        }
+
+        get "/events/stream"
+        assert_equal 200, last_response.status
+      end
+    end
+
+    describe 'application/x-json-stream; customized streaming event' do
+      it "successfully validates the response as a special stream using a customized parser" do
+        error_handler_called = false
+        error_handler = ->(_e, _env) { error_handler_called = true }
+        options = {
+          schema: open_api_3_streaming_response_schema,
+          streaming_content_parsers: { 'application/x-json-stream' => ->(body) { JSON.parse!(body) } },
+          error_handler: error_handler,
+        }
+        status = 200
+        headers = { 'content-type' => 'application/x-json-stream' }
+        @app = Rack::Builder.new {
+          use Committee::Middleware::ResponseValidation, options
+          run lambda { |_|
+            [status, headers, [JSON.dump({ "id" => 12345, "message" => "hello" })]]
+          }
+        }
+
+        get "/events/stream/json"
+        assert_equal 200, last_response.status
+        assert_equal false, error_handler_called
+      end
+
+      it "fails to validate the response as a special stream using a customized parser due to a schema mismatch" do
+        error_handler_called = false
+        error_handler = ->(_e, _env) { error_handler_called = true }
+        options = {
+          schema: open_api_3_streaming_response_schema,
+          streaming_content_parsers: { 'application/x-json-stream' => ->(body) { JSON.parse!(body) } },
+          error_handler: error_handler,
+        }
+        status = 200
+        headers = { 'content-type' => 'application/x-json-stream' }
+        @app = Rack::Builder.new {
+          use Committee::Middleware::ResponseValidation, options
+          run lambda { |_|
+            [status, headers, [JSON.dump({ "message" => "hello" })]] # Missing 'id' field
+          }
+        }
+
+        get "/events/stream/json"
+        assert_equal 200, last_response.status
+        assert_equal true, error_handler_called
+      end
+    end
+  end
+
   private
 
   def new_rack_app(response, headers = {}, options = {})
