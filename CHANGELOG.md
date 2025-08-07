@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.5.5 - 2025-08-07
+
+- add support for `streaming_content_parsers`
+- update to optimistic rack dependency
 
 ## 5.5.4 - 2025-05-14
 
