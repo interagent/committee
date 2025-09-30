@@ -9,6 +9,8 @@ describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
     @data = ValidApp.dup
     @schema = JsonSchema.parse!(hyper_schema_data)
     @schema.expand_references!
+    # POST /apps
+    @create_link = @schema.properties["app"].links[0]
     # GET /apps/:id
     @get_link = @link = @schema.properties["app"].links[2]
     # GET /apps
@@ -38,6 +40,12 @@ describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
 
   it "passes through a 304 Not Modified response" do
     @status, @headers, @data = 304, {}, nil
+    call
+  end
+
+  it "allows non-201 on create" do
+    @link = @create_link
+    @status = 200
     call
   end
 
