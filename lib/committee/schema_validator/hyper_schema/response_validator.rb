@@ -11,13 +11,14 @@ module Committee
           @validate_success_only = options[:validate_success_only]
           @allow_blank_structures = options[:allow_blank_structures]
 
+          @validator = nil
           @validators = {}
           if link.is_a? Drivers::OpenAPI2::Link
             link.target_schemas.each do |status, schema|
               @validators[status] = JsonSchema::Validator.new(target_schema(link))
             end
           else
-            @validators[link.status_success] = JsonSchema::Validator.new(target_schema(link))
+            @validator = JsonSchema::Validator.new(target_schema(link))
           end
         end
 
@@ -53,10 +54,17 @@ module Committee
 
           begin
             if Committee::Middleware::ResponseValidation.validate?(status, validate_success_only)
-              raise InvalidResponse, "Invalid response.#{@link.href} status code #{status} definition does not exist" if @validators[status].nil?
-              if !@validators[status].validate(data)
-                errors = JsonSchema::SchemaError.aggregate(@validators[status].errors).join("\n")
-                raise InvalidResponse, "Invalid response.\n\n#{errors}"
+              if @link.is_a?(Drivers::OpenAPI2::Link)
+                raise InvalidResponse, "Invalid response.#{@link.href} status code #{status} definition does not exist" if @validators[status].nil?
+                if !@validators[status].validate(data)
+                  errors = JsonSchema::SchemaError.aggregate(@validators[status].errors).join("\n")
+                  raise InvalidResponse, "Invalid response.\n\n#{errors}"
+                end
+              else
+                if !@validator.validate(data)
+                  errors = JsonSchema::SchemaError.aggregate(@validator.errors).join("\n")
+                  raise InvalidResponse, "Invalid response.\n\n#{errors}"
+                end
               end
             end
           rescue => e
