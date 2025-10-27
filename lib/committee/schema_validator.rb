@@ -4,7 +4,7 @@ module Committee
   module SchemaValidator
     class << self
       def request_media_type(request)
-        request.media_type.to_s
+        Rack::MediaType.type(request.env['CONTENT_TYPE'])
       end
 
       # @param [String] prefix
