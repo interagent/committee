@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.6.1 - 2025-10-30
+
+- fix content type parsing for complex types #455
+
 ## 5.6.0 - 2025-10-01
 
 - bump actions/checkout #450
