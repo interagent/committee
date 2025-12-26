@@ -33,4 +33,15 @@ module Committee
 
   class OpenAPI3Unsupported < Error
   end
+
+  class ParameterDeserializationError < InvalidRequest
+    attr_reader :parameter_name, :style, :raw_value
+
+    def initialize(param_name, style, raw_value, message)
+      @parameter_name = param_name
+      @style = style
+      @raw_value = raw_value
+      super("Parameter '#{param_name}' (style: #{style}): #{message}")
+    end
+  end
 end

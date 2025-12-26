@@ -70,12 +70,11 @@ module Committee
           request_operation.operation_object&.request_body&.content&.keys || []
         end
 
-        private
-
+        # Expose request_operation for parameter deserialization
+        # @return [OpenAPIParser::RequestOperation]
         attr_reader :request_operation
 
-        # @!attribute [r] request_operation
-        #   @return [OpenAPIParser::RequestOperation]
+        private
 
         # @return [OpenAPIParser::SchemaValidator::Options]
         def build_openapi_parser_body_option(validator_option)

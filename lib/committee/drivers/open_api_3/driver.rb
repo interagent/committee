@@ -33,6 +33,11 @@ module Committee
           false
         end
 
+        # Whether to deserialize parameters based on OpenAPI 3 style/explode settings
+        def default_deserialize_parameters
+          true
+        end
+
         def name
           :open_api_3
         end
