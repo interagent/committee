@@ -53,7 +53,7 @@ module Committee
           end
 
           begin
-            if Committee::Middleware::ResponseValidation.validate?(status, validate_success_only)
+            if validate?(status)
               if @link.is_a?(Drivers::OpenAPI2::Link)
                 raise InvalidResponse, "Invalid response.#{@link.href} status code #{status} definition does not exist" if @validators[status].nil?
                 if !@validators[status].validate(data)
@@ -70,6 +70,19 @@ module Committee
           rescue => e
             raise InvalidResponse, "Invalid response.\n\nschema is undefined" if /undefined method .all_of. for nil/ =~ e.message
             raise e
+          end
+        end
+
+        def validate?(status)
+          case status
+          when 204
+            false
+          when 200..299
+            true
+          when 304
+            false
+          else
+            !validate_success_only
           end
         end
 
