@@ -22,182 +22,35 @@ describe Committee::Test::SchemaCoverage do
     it 'can record and report coverage properly' do
       @schema_coverage.update_response_coverage!('/posts', 'get', '200')
       assert_equal(['/posts get 200',], covered_responses)
-      assert_equal([
-        '/threads/{id} get 200',
-        '/posts get 404',
-        '/posts get default',
-        '/posts post 200',
-        '/likes post 200',
-        '/likes delete 200',
-      ], uncovered_responses)
+      assert_equal(['/threads/{id} get 200', '/posts get 404', '/posts get default', '/posts post 200', '/likes post 200', '/likes delete 200',], uncovered_responses)
 
       @schema_coverage.update_response_coverage!('/likes', 'post', '200')
       assert_equal(['/posts get 200', '/likes post 200',], covered_responses)
-      assert_equal([
-        '/threads/{id} get 200',
-        '/posts get 404',
-        '/posts get default',
-        '/posts post 200',
-        '/likes delete 200',
-      ], uncovered_responses)
+      assert_equal(['/threads/{id} get 200', '/posts get 404', '/posts get default', '/posts post 200', '/likes delete 200',], uncovered_responses)
 
       @schema_coverage.update_response_coverage!('/likes', 'delete', '200')
       assert_equal(['/posts get 200', '/likes post 200', '/likes delete 200',], covered_responses)
-      assert_equal([
-        '/threads/{id} get 200',
-        '/posts get 404',
-        '/posts get default',
-        '/posts post 200',
-      ], uncovered_responses)
+      assert_equal(['/threads/{id} get 200', '/posts get 404', '/posts get default', '/posts post 200',], uncovered_responses)
 
       @schema_coverage.update_response_coverage!('/posts', 'get', '422')
-      assert_equal([
-        '/posts get 200',
-        '/posts get default',
-        '/likes post 200',
-        '/likes delete 200',
-      ], covered_responses)
+      assert_equal(['/posts get 200', '/posts get default', '/likes post 200', '/likes delete 200',], covered_responses)
       assert_equal(['/threads/{id} get 200', '/posts get 404', '/posts post 200',], uncovered_responses)
 
-      assert_equal({
-        '/threads/{id}' => {
-          'get' => {
-            'responses' => {
-              '200' => false,
-            },
-          },
-        },
-        '/posts' => {
-          'get' => {
-            'responses' => {
-              '200' => true,
-              '404' => false,
-              'default' => true,
-            },
-          },
-          'post' => {
-            'responses' => {
-              '200' => false,
-            },
-          },
-        },
-        '/likes' => {
-          'post' => {
-            'responses' => {
-              '200' => true,
-            },
-          },
-          'delete' => {
-            'responses' => {
-              '200' => true,
-            },
-          },
-        },
-      }, @schema_coverage.report)
+      assert_equal({ '/threads/{id}' => { 'get' => { 'responses' => { '200' => false, }, }, }, '/posts' => { 'get' => { 'responses' => { '200' => true, '404' => false, 'default' => true, }, }, 'post' => { 'responses' => { '200' => false, }, }, }, '/likes' => { 'post' => { 'responses' => { '200' => true, }, }, 'delete' => { 'responses' => { '200' => true, }, }, }, }, @schema_coverage.report)
 
       @schema_coverage.update_response_coverage!('/posts', 'post', '200')
       @schema_coverage.update_response_coverage!('/posts', 'get', '404')
       @schema_coverage.update_response_coverage!('/threads/{id}', 'get', '200')
-      assert_equal([
-        '/threads/{id} get 200',
-        '/posts get 200',
-        '/posts get 404',
-        '/posts get default',
-        '/posts post 200',
-        '/likes post 200',
-        '/likes delete 200',
-      ], covered_responses)
+      assert_equal(['/threads/{id} get 200', '/posts get 200', '/posts get 404', '/posts get default', '/posts post 200', '/likes post 200', '/likes delete 200',], covered_responses)
       assert_equal([], uncovered_responses)
     end
   end
 
   describe '.merge_report' do
     it 'can merge 2 coverage reports together' do
-      report = Committee::Test::SchemaCoverage.merge_report(
-        {
-          '/posts' => {
-            'get' => {
-              'responses' => {
-                '200' => true,
-                '404' => false,
-              },
-            },
-            'post' => {
-              'responses' => {
-                '200' => false,
-              },
-            },
-          },
-          '/likes' => {
-            'post' => {
-              'responses' => {
-                '200' => true,
-              },
-            },
-          },
-        },
-        {
-          '/posts' => {
-            'get' => {
-              'responses' => {
-                '200' => true,
-                '404' => true,
-              },
-            },
-            'post' => {
-              'responses' => {
-                '200' => false,
-              },
-            },
-          },
-          '/likes' => {
-            'post' => {
-              'responses' => {
-                '200' => false,
-                '400' => false,
-              },
-            },
-          },
-          '/users' => {
-            'get' => {
-              'responses' => {
-                '200' => true,
-              },
-            },
-          },
-        },
-      )
+      report = Committee::Test::SchemaCoverage.merge_report({ '/posts' => { 'get' => { 'responses' => { '200' => true, '404' => false, }, }, 'post' => { 'responses' => { '200' => false, }, }, }, '/likes' => { 'post' => { 'responses' => { '200' => true, }, }, }, }, { '/posts' => { 'get' => { 'responses' => { '200' => true, '404' => true, }, }, 'post' => { 'responses' => { '200' => false, }, }, }, '/likes' => { 'post' => { 'responses' => { '200' => false, '400' => false, }, }, }, '/users' => { 'get' => { 'responses' => { '200' => true, }, }, }, },)
 
-      assert_equal({
-        '/posts' => {
-          'get' => {
-            'responses' => {
-              '200' => true,
-              '404' => true,
-            },
-          },
-          'post' => {
-            'responses' => {
-              '200' => false,
-            },
-          },
-        },
-        '/likes' => {
-          'post' => {
-            'responses' => {
-              '200' => true,
-              '400' => false,
-            },
-          },
-        },
-        '/users' => {
-          'get' => {
-            'responses' => {
-              '200' => true,
-            },
-          },
-        },
-      }, report)
+      assert_equal({ '/posts' => { 'get' => { 'responses' => { '200' => true, '404' => true, }, }, 'post' => { 'responses' => { '200' => false, }, }, }, '/likes' => { 'post' => { 'responses' => { '200' => true, '400' => false, }, }, }, '/users' => { 'get' => { 'responses' => { '200' => true, }, }, }, }, report)
     end
   end
 end

@@ -65,13 +65,7 @@ module Committee
       end
 
       def request_unpack(request)
-        unpacker = Committee::RequestUnpacker.new(
-          allow_form_params:  validator_option.allow_form_params,
-          allow_get_body:     validator_option.allow_get_body,
-          allow_query_params: validator_option.allow_query_params,
-          allow_non_get_query_params: validator_option.allow_non_get_query_params,
-          optimistic_json:    validator_option.optimistic_json,
-        )
+        unpacker = Committee::RequestUnpacker.new(allow_form_params: validator_option.allow_form_params, allow_get_body: validator_option.allow_get_body, allow_query_params: validator_option.allow_query_params, allow_non_get_query_params: validator_option.allow_non_get_query_params, optimistic_json: validator_option.optimistic_json,)
 
         request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
 
@@ -109,12 +103,7 @@ module Committee
       def parameter_coerce!(request, link, coerce_key)
         return unless link_exist?
 
-        Committee::SchemaValidator::HyperSchema::ParameterCoercer.
-          new(request.env[coerce_key],
-            link.schema,
-            coerce_date_times: validator_option.coerce_date_times,
-            coerce_recursive: validator_option.coerce_recursive).
-          call!
+        Committee::SchemaValidator::HyperSchema::ParameterCoercer.new(request.env[coerce_key], link.schema, coerce_date_times: validator_option.coerce_date_times, coerce_recursive: validator_option.coerce_recursive).call!
       end
     end
   end

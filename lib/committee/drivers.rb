@@ -61,9 +61,7 @@ module Committee
         # if it is not explicitly set. See: https://github.com/interagent/committee/issues/343#issuecomment-997400329
         opts = parser_options.dup
 
-        Committee.warn_deprecated_until_6(!opts.key?(:strict_reference_validation), 'openapi_parser will default to strict reference validation ' +
-        'from next version. Pass config `strict_reference_validation: true` (or false, if you must) ' +
-        'to quiet this warning.')
+        Committee.warn_deprecated_until_6(!opts.key?(:strict_reference_validation), 'openapi_parser will default to strict reference validation ' + 'from next version. Pass config `strict_reference_validation: true` (or false, if you must) ' + 'to quiet this warning.')
         opts[:strict_reference_validation] ||= false
 
         openapi = OpenAPIParser.parse_with_filepath(hash, schema_path, opts)

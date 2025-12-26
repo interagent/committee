@@ -101,10 +101,7 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
     end
 
     it "passes given an empty date string with allow_empty_date_and_datetime enabled" do
-      @validator_option = Committee::SchemaValidator::Option.new(
-        { allow_empty_date_and_datetime: true },
-        open_api_3_schema,
-        :open_api_3)
+      @validator_option = Committee::SchemaValidator::Option.new({ allow_empty_date_and_datetime: true }, open_api_3_schema, :open_api_3)
 
       @path = '/date_time'
       @method = 'get'
@@ -123,10 +120,7 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
     end
 
     it "passes given an empty date-time string with allow_empty_date_and_datetime enabled" do
-      @validator_option = Committee::SchemaValidator::Option.new(
-        { allow_empty_date_and_datetime: true },
-        open_api_3_schema,
-        :open_api_3)
+      @validator_option = Committee::SchemaValidator::Option.new({ allow_empty_date_and_datetime: true }, open_api_3_schema, :open_api_3)
 
       @path = '/date_time'
       @method = 'get'
@@ -149,8 +143,6 @@ describe Committee::SchemaValidator::OpenAPI3::ResponseValidator do
 
   def call_response_validator(strict = false)
     @operation_object = open_api_3_schema.operation_object(@path, @method)
-    Committee::SchemaValidator::OpenAPI3::ResponseValidator.
-        new(@operation_object, @validator_option).
-        call(@status, @headers, @data, strict)
+    Committee::SchemaValidator::OpenAPI3::ResponseValidator.new(@operation_object, @validator_option).call(@status, @headers, @data, strict)
   end
 end

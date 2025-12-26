@@ -4,23 +4,7 @@ module Committee
   module SchemaValidator
     class Option
       # Boolean Options
-      attr_reader :allow_blank_structures,
-                  :allow_empty_date_and_datetime,
-                  :allow_form_params,
-                  :allow_get_body,
-                  :allow_query_params,
-                  :allow_non_get_query_params,
-                  :check_content_type,
-                  :check_header,
-                  :coerce_date_times,
-                  :coerce_form_params,
-                  :coerce_path_params,
-                  :coerce_query_params,
-                  :coerce_recursive,
-                  :optimistic_json,
-                  :validate_success_only,
-                  :parse_response_by_content_type,
-                  :parameter_overwrite_by_rails_rule
+      attr_reader :allow_blank_structures, :allow_empty_date_and_datetime, :allow_form_params, :allow_get_body, :allow_query_params, :allow_non_get_query_params, :check_content_type, :check_header, :coerce_date_times, :coerce_form_params, :coerce_path_params, :coerce_query_params, :coerce_recursive, :optimistic_json, :validate_success_only, :parse_response_by_content_type, :parameter_overwrite_by_rails_rule
 
       # Non-boolean options:
       attr_reader :headers_key, :params_key, :query_hash_key, :request_body_hash_key, :path_hash_key, :prefix

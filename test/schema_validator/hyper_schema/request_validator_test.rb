@@ -11,11 +11,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
       @schema.expand_references!
       # POST /apps/:id
       @link = @schema.properties["app"].links[0]
-      @request = Rack::Request.new({
-                                     "CONTENT_TYPE"   => "application/json",
-                                     "rack.input"     => StringIO.new("{}"),
-                                     "REQUEST_METHOD" => "POST"
-                                   })
+      @request = Rack::Request.new({ "CONTENT_TYPE" => "application/json", "rack.input" => StringIO.new("{}"), "REQUEST_METHOD" => "POST" })
     end
 
     it "passes through a valid request with Content-Type options" do
@@ -29,22 +25,14 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
     end
 
     it "passes through a valid request with Content-Type options" do
-      @request =
-        Rack::Request.new({
-                            "CONTENT_TYPE" => "application/json; charset=utf-8",
-                            "rack.input"   => StringIO.new("{}"),
-                          })
+      @request = Rack::Request.new({ "CONTENT_TYPE" => "application/json; charset=utf-8", "rack.input" => StringIO.new("{}"), })
       data = { "name" => "heroku-api", }
       call(data)
     end
 
     it "detects an invalid request Content-Type" do
       e = assert_raises(Committee::InvalidRequest) {
-        @request =
-          Rack::Request.new({
-                              "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-                              "rack.input"   => StringIO.new("{}"),
-                            })
+        @request = Rack::Request.new({ "CONTENT_TYPE" => "application/x-www-form-urlencoded", "rack.input" => StringIO.new("{}"), })
         call({})
       }
       message = %{"Content-Type" request header must be set to "application/json".}
@@ -52,11 +40,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
     end
 
     it "allows skipping content_type check" do
-      @request =
-        Rack::Request.new({
-                            "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-                            "rack.input"   => StringIO.new("{}"),
-                          })
+      @request = Rack::Request.new({ "CONTENT_TYPE" => "application/x-www-form-urlencoded", "rack.input" => StringIO.new("{}"), })
       call({}, {}, check_content_type: false)
     end
 
@@ -73,11 +57,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
     end
 
     it "allows an invalid Content-Type with an empty body" do
-      @request =
-        Rack::Request.new({
-                            "CONTENT_TYPE" => "application/x-www-form-urlencoded",
-                            "rack.input"   => StringIO.new(""),
-                          })
+      @request = Rack::Request.new({ "CONTENT_TYPE" => "application/x-www-form-urlencoded", "rack.input" => StringIO.new(""), })
       call({})
     end
 
@@ -103,11 +83,7 @@ describe Committee::SchemaValidator::HyperSchema::RequestValidator do
     before do
       @schema = open_api_2_schema
       @link = @schema.routes['GET'][0][1]
-      @request = Rack::Request.new({
-                                     "CONTENT_TYPE"   => "application/json",
-                                     "rack.input"     => StringIO.new("{}"),
-                                     "REQUEST_METHOD" => "POST"
-                                   })
+      @request = Rack::Request.new({ "CONTENT_TYPE" => "application/json", "rack.input" => StringIO.new("{}"), "REQUEST_METHOD" => "POST" })
     end
 
     it "passes through a valid request" do

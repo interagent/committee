@@ -73,9 +73,7 @@ module Committee
             {}
 
           else
-            raise(%{At "#{link.method} #{link.href}" "#{schema.pointer}": no } +
-              %{"example" attribute and "null" } +
-              %{is not allowed; don't know how to generate property.})
+            raise(%{At "#{link.method} #{link.href}" "#{schema.pointer}": no } + %{"example" attribute and "null" } + %{is not allowed; don't know how to generate property.})
           end
         end
 

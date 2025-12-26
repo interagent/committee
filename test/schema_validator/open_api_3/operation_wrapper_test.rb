@@ -18,13 +18,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
     HEADER = { 'Content-Type' => 'application/json' }
 
-    SCHEMA_PROPERTIES_PAIR = [
-        ['string', 'str'],
-        ['integer', 1],
-        ['boolean', true],
-        ['boolean', false],
-        ['number', 0.1],
-    ]
+    SCHEMA_PROPERTIES_PAIR = [['string', 'str'], ['integer', 1], ['boolean', true], ['boolean', false], ['number', 0.1],]
 
     it 'correct data' do
       operation_object.validate_request_params({}, {}, SCHEMA_PROPERTIES_PAIR.to_h, HEADER, @validator_option)
@@ -32,20 +26,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
     end
 
     it 'correct object data' do
-      operation_object.validate_request_params(
-                                  {},
-                                  {},
-                                  {
-                                     "object_1" =>
-                                         {
-                                             "string_1" => nil,
-                                             "integer_1" => nil,
-                                             "boolean_1" => nil,
-                                             "number_1" => nil
-                                         }
-                                 },
-                                               HEADER,
-                                               @validator_option)
+      operation_object.validate_request_params({}, {}, { "object_1" => { "string_1" => nil, "integer_1" => nil, "boolean_1" => nil, "number_1" => nil } }, HEADER, @validator_option)
 
       assert true
     end
@@ -93,21 +74,9 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       end
 
       it 'correct' do
-        operation_object.validate_request_params(
-            {},
-            { "query_string" => "query", "query_integer_list" => [1, 2] },
-            {},
-            HEADER,
-            @validator_option
-        )
+        operation_object.validate_request_params({}, { "query_string" => "query", "query_integer_list" => [1, 2] }, {}, HEADER, @validator_option)
 
-        operation_object.validate_request_params(
-            {},
-            { "query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => 1 },
-            {},
-            HEADER,
-            @validator_option
-        )
+        operation_object.validate_request_params({}, { "query_string" => "query", "query_integer_list" => [1, 2], "optional_integer" => 1 }, {}, HEADER, @validator_option)
 
         assert true
       end
@@ -123,13 +92,7 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
 
       it 'invalid type' do
         e = assert_raises(Committee::InvalidRequest) {
-          operation_object.validate_request_params(
-              {},
-              { "query_string" => 1, "query_integer_list" => [1, 2], "optional_integer" => 1 },
-              {},
-              HEADER,
-              @validator_option
-          )
+          operation_object.validate_request_params({}, { "query_string" => 1, "query_integer_list" => [1, 2], "optional_integer" => 1 }, {}, HEADER, @validator_option)
         }
 
         assert_match(/expected string, but received Integer: 1/i, e.message)

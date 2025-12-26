@@ -34,9 +34,7 @@ module Committee
         def validate_response_params(status_code, headers, response_data, strict, check_header, validator_options: {})
           response_body = OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, response_data, headers)
 
-          return request_operation.validate_response_body(
-            response_body,
-            response_validate_options(strict, check_header, validator_options: validator_options))
+          return request_operation.validate_response_body(response_body, response_validate_options(strict, check_header, validator_options: validator_options))
         rescue OpenAPIParser::OpenAPIError => e
           raise Committee::InvalidResponse.new(e.message, original_error: e)
         end

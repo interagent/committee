@@ -40,8 +40,7 @@ describe Committee::SchemaValidator::OpenAPI3::RequestValidator do
       assert_equal 400, last_response.status
 
       body = JSON.parse(last_response.body)
-      message =
-        %{"Content-Type" request header must be set to any of the following: ["application/json", "application/binary"].}
+      message = %{"Content-Type" request header must be set to any of the following: ["application/json", "application/binary"].}
 
       assert_equal message, body['message']
     end
