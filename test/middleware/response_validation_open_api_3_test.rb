@@ -225,6 +225,36 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  describe 'response type validation' do
+    it "detects string value for number field when coerce_response_values is false" do
+      @app = new_response_rack({ integer: '726' }.to_json, {}, app_status: 400, schema: open_api_3_schema, raise: true, validate_success_only: false, coerce_response_values: false)
+
+      e = assert_raises(Committee::InvalidResponse) do
+        get "/characters"
+      end
+
+      assert_match(/expected integer, but received String/i, e.message)
+    end
+
+    it "passes string value for number field when coerce_response_values is true" do
+      @app = new_response_rack({ integer: '726' }.to_json, {}, app_status: 400, schema: open_api_3_schema, raise: true, validate_success_only: false, coerce_response_values: true)
+
+      get "/characters"
+
+      assert_equal 400, last_response.status
+    end
+
+    it "detects string value for number field by default (coerce_response_values defaults to false)" do
+      @app = new_response_rack({ integer: '726' }.to_json, {}, app_status: 400, schema: open_api_3_schema, raise: true, validate_success_only: false)
+
+      e = assert_raises(Committee::InvalidResponse) do
+        get "/characters"
+      end
+
+      assert_match(/expected integer, but received String/i, e.message)
+    end
+  end
+
   it 'does not suppress application error' do
     @app = Rack::Builder.new {
       use Committee::Middleware::ResponseValidation, { schema: open_api_3_schema, raise: true }
