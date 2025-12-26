@@ -5,3 +5,4 @@
 * Ricardo Chimal, Jr <kiwi@null.cx>
 * Wesley Beary <geemus+github@gmail.com>
 * geemus <geemus@gmail.com>
+* ydah <t.yudai92@gmail.com>
