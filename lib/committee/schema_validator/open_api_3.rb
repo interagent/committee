@@ -93,6 +93,21 @@ module Committee
 
         query_param = unpacker.unpack_query_params(request)
         query_param.merge!(request_param) if request.get? && validator_option.allow_get_body
+
+        if @operation_object && validator_option.deserialize_parameters
+          deserializer = ParameterDeserializer.new(@operation_object.request_operation)
+
+          query_param = deserializer.deserialize_query_params(query_param)
+
+          path_param = request.env[validator_option.path_hash_key]
+          path_param = deserializer.deserialize_path_params(path_param)
+          request.env[validator_option.path_hash_key] = path_param
+
+          headers = request.env[validator_option.headers_key]
+          headers = deserializer.deserialize_headers(headers)
+          request.env[validator_option.headers_key] = headers
+        end
+
         request.env[validator_option.query_hash_key] = query_param
       end
 
@@ -116,5 +131,6 @@ end
 
 require_relative "open_api_3/router"
 require_relative "open_api_3/operation_wrapper"
+require_relative "open_api_3/parameter_deserializer"
 require_relative "open_api_3/request_validator"
 require_relative "open_api_3/response_validator"
