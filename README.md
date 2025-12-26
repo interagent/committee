@@ -39,6 +39,7 @@ This piece of middleware validates the parameters of incoming requests to make s
 |coerce_path_params| false | true | The same as `coerce_form_params`, but tries to coerce parameters encoded in a request's URL path. |
 |coerce_query_params| false | true  | The same as `coerce_form_params`, but tries to coerce `GET` parameters encoded in a request's query string. |
 |coerce_recursive| false | always true | Coerce data in arrays and other nested objects |
+|coerce_response_values| false | false | Enable type coercion for response body validation. When `true`, allows string values like `"726"` to be coerced to numbers. When `false` (default), response bodies must match exact types defined in the schema. |
 |optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |

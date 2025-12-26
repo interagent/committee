@@ -138,11 +138,15 @@ module Committee
         def response_validate_options(strict, check_header, validator_options: {})
           options = { strict: strict, validate_header: check_header }
 
-          if OpenAPIParser::SchemaValidator::ResponseValidateOptions.method_defined?(:validator_options)
-            ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(**options, **validator_options)
-          else
-            ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(**options)
+          if validator_options[:coerce_value]
+            options[:coerce_value] = validator_options[:coerce_value]
           end
+
+          if validator_options[:allow_empty_date_and_datetime]
+            options[:allow_empty_date_and_datetime] = validator_options[:allow_empty_date_and_datetime]
+          end
+
+          ::OpenAPIParser::SchemaValidator::ResponseValidateOptions.new(**options)
         end
       end
     end
