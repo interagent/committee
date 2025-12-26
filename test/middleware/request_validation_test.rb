@@ -9,49 +9,7 @@ describe Committee::Middleware::RequestValidation do
     @app
   end
 
-  ARRAY_PROPERTY = [
-      {
-          "update_time" => "2016-04-01T16:00:00.000+09:00",
-          "per_page" => 1,
-          "nested_coercer_object" => {
-              "update_time" => "2016-04-01T16:00:00.000+09:00",
-              "threshold" => 1.5
-          },
-          "nested_no_coercer_object" => {
-              "per_page" => 1,
-              "threshold" => 1.5
-          },
-          "nested_coercer_array" => [
-              {
-                  "update_time" => "2016-04-01T16:00:00.000+09:00",
-                  "threshold" => 1.5
-              }
-          ],
-          "nested_no_coercer_array" => [
-              {
-                  "per_page" => 1,
-                  "threshold" => 1.5
-              }
-          ],
-          "integer_array" => [
-              1, 2, 3
-          ],
-          "datetime_array" => [
-              "2016-04-01T16:00:00.000+09:00",
-              "2016-04-01T17:00:00.000+09:00",
-              "2016-04-01T18:00:00.000+09:00"
-          ]
-      },
-      {
-          "update_time" => "2016-04-01T16:00:00.000+09:00",
-          "per_page" => 1,
-          "threshold" => 1.5
-      },
-      {
-          "threshold" => 1.5,
-          "per_page" => 1
-      }
-  ]
+  ARRAY_PROPERTY = [{ "update_time" => "2016-04-01T16:00:00.000+09:00", "per_page" => 1, "nested_coercer_object" => { "update_time" => "2016-04-01T16:00:00.000+09:00", "threshold" => 1.5 }, "nested_no_coercer_object" => { "per_page" => 1, "threshold" => 1.5 }, "nested_coercer_array" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", "threshold" => 1.5 }], "nested_no_coercer_array" => [{ "per_page" => 1, "threshold" => 1.5 }], "integer_array" => [1, 2, 3], "datetime_array" => ["2016-04-01T16:00:00.000+09:00", "2016-04-01T17:00:00.000+09:00", "2016-04-01T18:00:00.000+09:00"] }, { "update_time" => "2016-04-01T16:00:00.000+09:00", "per_page" => 1, "threshold" => 1.5 }, { "threshold" => 1.5, "per_page" => 1 }]
 
   it "passes through a valid request" do
     @app = new_rack_app(schema: hyper_schema)
@@ -98,11 +56,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes a nested object with recursive option" do
     key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium",
-        "array_property" => ARRAY_PROPERTY
-    }
+    params = { key_name => "2016-04-01T16:00:00.000+09:00", "query" => "cloudnasium", "array_property" => ARRAY_PROPERTY }
 
     check_parameter = lambda { |env|
       hash = env['rack.request.query_hash']
@@ -116,11 +70,7 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter,
-                                    coerce_query_params: true,
-                                    coerce_recursive: true,
-                                    coerce_date_times: true,
-                                    schema: hyper_schema)
+    @app = new_rack_app_with_lambda(check_parameter, coerce_query_params: true, coerce_recursive: true, coerce_date_times: true, schema: hyper_schema)
 
     get "/search/apps", params
     assert_equal 200, last_response.status
@@ -128,11 +78,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes a nested object with coerce_recursive false" do
     key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium",
-        "array_property" => ARRAY_PROPERTY
-    }
+    params = { key_name => "2016-04-01T16:00:00.000+09:00", "query" => "cloudnasium", "array_property" => ARRAY_PROPERTY }
 
     @app = new_rack_app(coerce_query_params: true, coerce_date_times: true, coerce_recursive: false, schema: hyper_schema)
 
@@ -142,11 +88,7 @@ describe Committee::Middleware::RequestValidation do
 
   it "passes a nested object with coerce_recursive default(true)" do
     key_name = "update_time"
-    params = {
-        key_name => "2016-04-01T16:00:00.000+09:00",
-        "query" => "cloudnasium",
-        "array_property" => ARRAY_PROPERTY
-    }
+    params = { key_name => "2016-04-01T16:00:00.000+09:00", "query" => "cloudnasium", "array_property" => ARRAY_PROPERTY }
 
     @app = new_rack_app(coerce_query_params: true, coerce_date_times: true, schema: hyper_schema)
 
@@ -429,13 +371,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "not exist path and options" do
-    options = {
-        coerce_form_params: true,
-        coerce_date_times: true,
-        coerce_query_params: true,
-        coerce_path_params: true,
-        coerce_recursive: true
-    }
+    options = { coerce_form_params: true, coerce_date_times: true, coerce_query_params: true, coerce_path_params: true, coerce_recursive: true }
 
     @app = new_rack_app({ schema: hyper_schema }.merge(options))
     header "Content-Type", "application/x-www-form-urlencoded"

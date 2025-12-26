@@ -199,10 +199,7 @@ describe Committee::Middleware::ResponseValidation do
   describe 'streaming response' do
     describe "text/event-stream; e.g. server-sent events" do
       it 'validates the response stream as a string' do
-        options = {
-          schema: open_api_3_streaming_response_schema,
-          streaming_content_parsers: { 'text/event-stream' => ->(body) { body } },
-        }
+        options = { schema: open_api_3_streaming_response_schema, streaming_content_parsers: { 'text/event-stream' => ->(body) { body } }, }
         status = 200
         headers = { 'content-type' => 'text/event-stream' }
         @app = Rack::Builder.new {
@@ -221,11 +218,7 @@ describe Committee::Middleware::ResponseValidation do
       it "successfully validates the response as a special stream using a customized parser" do
         error_handler_called = false
         error_handler = ->(_e, _env) { error_handler_called = true }
-        options = {
-          schema: open_api_3_streaming_response_schema,
-          streaming_content_parsers: { 'application/x-json-stream' => ->(body) { JSON.parse!(body) } },
-          error_handler: error_handler,
-        }
+        options = { schema: open_api_3_streaming_response_schema, streaming_content_parsers: { 'application/x-json-stream' => ->(body) { JSON.parse!(body) } }, error_handler: error_handler, }
         status = 200
         headers = { 'content-type' => 'application/x-json-stream' }
         @app = Rack::Builder.new {
@@ -243,11 +236,7 @@ describe Committee::Middleware::ResponseValidation do
       it "fails to validate the response as a special stream using a customized parser due to a schema mismatch" do
         error_handler_called = false
         error_handler = ->(_e, _env) { error_handler_called = true }
-        options = {
-          schema: open_api_3_streaming_response_schema,
-          streaming_content_parsers: { 'application/x-json-stream' => ->(body) { JSON.parse!(body) } },
-          error_handler: error_handler,
-        }
+        options = { schema: open_api_3_streaming_response_schema, streaming_content_parsers: { 'application/x-json-stream' => ->(body) { JSON.parse!(body) } }, error_handler: error_handler, }
         status = 200
         headers = { 'content-type' => 'application/x-json-stream' }
         @app = Rack::Builder.new {

@@ -227,122 +227,20 @@ describe Committee::Test::Methods do
         it 'records openapi coverage' do
           get "/posts"
           assert_response_schema_confirm(200)
-          assert_equal({
-            '/threads/{id}' => {
-              'get' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-            },
-            '/posts' => {
-              'get' => {
-                'responses' => {
-                  '200' => true,
-                  '404' => false,
-                  'default' => false,
-                },
-              },
-              'post' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-            },
-            '/likes' => {
-              'post' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-              'delete' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-            },
-          }, @schema_coverage.report)
+          assert_equal({ '/threads/{id}' => { 'get' => { 'responses' => { '200' => false, }, }, }, '/posts' => { 'get' => { 'responses' => { '200' => true, '404' => false, 'default' => false, }, }, 'post' => { 'responses' => { '200' => false, }, }, }, '/likes' => { 'post' => { 'responses' => { '200' => false, }, }, 'delete' => { 'responses' => { '200' => false, }, }, }, }, @schema_coverage.report)
         end
 
         it 'can record openapi coverage correctly when prefix is set' do
           @committee_options.merge!(prefix: '/api')
           post "/api/likes"
           assert_response_schema_confirm(200)
-          assert_equal({
-            '/threads/{id}' => {
-              'get' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-            },
-            '/posts' => {
-              'get' => {
-                'responses' => {
-                  '200' => false,
-                  '404' => false,
-                  'default' => false,
-                },
-              },
-              'post' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-            },
-            '/likes' => {
-              'post' => {
-                'responses' => {
-                  '200' => true,
-                },
-              },
-              'delete' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-            },
-          }, @schema_coverage.report)
+          assert_equal({ '/threads/{id}' => { 'get' => { 'responses' => { '200' => false, }, }, }, '/posts' => { 'get' => { 'responses' => { '200' => false, '404' => false, 'default' => false, }, }, 'post' => { 'responses' => { '200' => false, }, }, }, '/likes' => { 'post' => { 'responses' => { '200' => true, }, }, 'delete' => { 'responses' => { '200' => false, }, }, }, }, @schema_coverage.report)
         end
 
         it 'records openapi coverage correctly with path param' do
           get "/threads/asd"
           assert_response_schema_confirm(200)
-          assert_equal({
-            '/threads/{id}' => {
-              'get' => {
-                'responses' => {
-                  '200' => true,
-                },
-              },
-            },
-            '/posts' => {
-              'get' => {
-                'responses' => {
-                  '200' => false,
-                  '404' => false,
-                  'default' => false,
-                },
-              },
-              'post' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-            },
-            '/likes' => {
-              'post' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-              'delete' => {
-                'responses' => {
-                  '200' => false,
-                },
-              },
-            },
-          }, @schema_coverage.report)
+          assert_equal({ '/threads/{id}' => { 'get' => { 'responses' => { '200' => true, }, }, }, '/posts' => { 'get' => { 'responses' => { '200' => false, '404' => false, 'default' => false, }, }, 'post' => { 'responses' => { '200' => false, }, }, }, '/likes' => { 'post' => { 'responses' => { '200' => false, }, }, 'delete' => { 'responses' => { '200' => false, }, }, }, }, @schema_coverage.report)
         end
       end
     end

@@ -84,42 +84,14 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter,
-                                    schema: open_api_3_schema,
-                                    coerce_date_times: true,
-                                    allow_get_body: true)
+    @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, coerce_date_times: true, allow_get_body: true)
 
     get "/string_params_coercer", { no_problem: true }, { input: params.to_json }
     assert_equal 200, last_response.status
   end
 
   it "passes given a datetime and with coerce_date_times enabled on POST endpoint" do
-    params = {
-        "nested_array" => [
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-                "nested_coercer_object" => {
-                    "update_time" => "2016-04-01T16:00:00.000+09:00",
-                },
-                "nested_no_coercer_object" => {
-                    "update_time" => "2016-04-01T16:00:00.000+09:00",
-                },
-                "nested_coercer_array" => [
-                    {
-                        "update_time" => "2016-04-01T16:00:00.000+09:00",
-                    }
-                ],
-                "nested_no_coercer_array" => [
-                    {
-                        "update_time" => "2016-04-01T16:00:00.000+09:00",
-                    }
-                ]
-            },
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-            }
-        ]
-    }
+    params = { "nested_array" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", "nested_coercer_object" => { "update_time" => "2016-04-01T16:00:00.000+09:00", }, "nested_no_coercer_object" => { "update_time" => "2016-04-01T16:00:00.000+09:00", }, "nested_coercer_array" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", }], "nested_no_coercer_array" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", }] }, { "update_time" => "2016-04-01T16:00:00.000+09:00", }] }
 
     check_parameter = lambda { |env|
       nested_array = env['committee.params']["nested_array"]
@@ -166,11 +138,7 @@ describe Committee::Middleware::RequestValidation do
       [200, {}, []]
     }
 
-    @app = new_rack_app_with_lambda(check_parameter,
-                                    coerce_query_params: true,
-                                    coerce_recursive: true,
-                                    coerce_date_times: true,
-                                    schema: open_api_3_schema)
+    @app = new_rack_app_with_lambda(check_parameter, coerce_query_params: true, coerce_recursive: true, coerce_date_times: true, schema: open_api_3_schema)
 
     get "/string_params_coercer", params
 
@@ -178,51 +146,7 @@ describe Committee::Middleware::RequestValidation do
   end
 
   it "passes given a nested datetime and with coerce_recursive=true and coerce_date_times=true on POST endpoint" do
-    params = {
-        "nested_array" => [
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-                "per_page" => 1,
-                "nested_coercer_object" => {
-                    "update_time" => "2016-04-01T16:00:00.000+09:00",
-                    "threshold" => 1.5
-                },
-                "nested_no_coercer_object" => {
-                    "per_page" => 1,
-                    "threshold" => 1.5
-                },
-                "nested_coercer_array" => [
-                    {
-                        "update_time" => "2016-04-01T16:00:00.000+09:00",
-                        "threshold" => 1.5
-                    }
-                ],
-                "nested_no_coercer_array" => [
-                    {
-                        "per_page" => 1,
-                        "threshold" => 1.5
-                    }
-                ],
-                "integer_array" => [
-                    1, 2, 3
-                ],
-                "datetime_array" => [
-                    "2016-04-01T16:00:00.000+09:00",
-                    "2016-04-01T17:00:00.000+09:00",
-                    "2016-04-01T18:00:00.000+09:00"
-                ]
-            },
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-                "per_page" => 1,
-                "threshold" => 1.5
-            },
-            {
-                "threshold" => 1.5,
-                "per_page" => 1
-            }
-        ]
-    }
+    params = { "nested_array" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", "per_page" => 1, "nested_coercer_object" => { "update_time" => "2016-04-01T16:00:00.000+09:00", "threshold" => 1.5 }, "nested_no_coercer_object" => { "per_page" => 1, "threshold" => 1.5 }, "nested_coercer_array" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", "threshold" => 1.5 }], "nested_no_coercer_array" => [{ "per_page" => 1, "threshold" => 1.5 }], "integer_array" => [1, 2, 3], "datetime_array" => ["2016-04-01T16:00:00.000+09:00", "2016-04-01T17:00:00.000+09:00", "2016-04-01T18:00:00.000+09:00"] }, { "update_time" => "2016-04-01T16:00:00.000+09:00", "per_page" => 1, "threshold" => 1.5 }, { "threshold" => 1.5, "per_page" => 1 }] }
 
     check_parameter = lambda { |env|
       hash = env['committee.params']

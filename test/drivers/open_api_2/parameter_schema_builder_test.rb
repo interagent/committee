@@ -38,20 +38,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "reflects an array with an items schema into a schema" do
-    data = {
-      "parameters" => [
-        {
-          "name" => "tags",
-          "type" => "array",
-          "minItems" => 1,
-          "maxItems" => 10,
-          "uniqueItems" => true,
-          "items" => {
-            "type" => "string"
-          }
-        }
-      ]
-    }
+    data = { "parameters" => [{ "name" => "tags", "type" => "array", "minItems" => 1, "maxItems" => 10, "uniqueItems" => true, "items" => { "type" => "string" } }] }
     schema, schema_data = call(data)
 
     assert_nil schema_data
@@ -71,18 +58,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "reflects string properties into a schema" do
-    data = {
-      "parameters" => [
-        {
-          "name" => "password",
-          "type" => "string",
-          "format" => "password",
-          "pattern" => "[a-zA-Z0-9]+",
-          "minLength" => 6,
-          "maxLength" => 30
-        }
-      ]
-    }
+    data = { "parameters" => [{ "name" => "password", "type" => "string", "format" => "password", "pattern" => "[a-zA-Z0-9]+", "minLength" => 6, "maxLength" => 30 }] }
     schema, schema_data = call(data)
 
     assert_nil schema_data
@@ -93,19 +69,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "reflects number properties into a schema" do
-    data = {
-      "parameters" => [
-        {
-          "name" => "limit",
-          "type" => "integer",
-          "minimum" => 20,
-          "exclusiveMinimum" => true,
-          "maximum" => 100,
-          "exclusiveMaximum" => false,
-          "multipleOf" => 10
-        }
-      ]
-    }
+    data = { "parameters" => [{ "name" => "limit", "type" => "integer", "minimum" => 20, "exclusiveMinimum" => true, "maximum" => 100, "exclusiveMaximum" => false, "multipleOf" => 10 }] }
     schema, schema_data = call(data)
 
     assert_nil schema_data
@@ -117,17 +81,7 @@ describe Committee::Drivers::OpenAPI2::ParameterSchemaBuilder do
   end
 
   it "returns schema data for a body parameter" do
-    data = {
-      "parameters" => [
-        {
-          "name" => "payload",
-          "in" => "body",
-          "schema" => {
-            "$ref" => "#/definitions/foo",
-          }
-        }
-      ]
-    }
+    data = { "parameters" => [{ "name" => "payload", "in" => "body", "schema" => { "$ref" => "#/definitions/foo", } }] }
     schema, schema_data = call(data)
 
     assert_nil schema

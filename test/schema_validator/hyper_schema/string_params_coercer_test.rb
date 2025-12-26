@@ -53,43 +53,7 @@ describe Committee::SchemaValidator::HyperSchema::StringParamsCoercer do
   end
 
   it "pass array property" do
-    params = {
-        "array_property" => [
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-                "per_page" => "1",
-                "nested_coercer_object" => {
-                    "update_time" => "2016-04-01T16:00:00.000+09:00",
-                    "threshold" => "1.5"
-                },
-                "nested_no_coercer_object" => {
-                    "per_page" => "1",
-                    "threshold" => "1.5"
-                },
-                "nested_coercer_array" => [
-                    {
-                        "update_time" => "2016-04-01T16:00:00.000+09:00",
-                        "threshold" => "1.5"
-                    }
-                ],
-                "nested_no_coercer_array" => [
-                    {
-                        "per_page" => "1",
-                        "threshold" => "1.5"
-                    }
-                ]
-            },
-            {
-                "update_time" => "2016-04-01T16:00:00.000+09:00",
-                "per_page" => "1",
-                "threshold" => "1.5"
-            },
-            {
-                "threshold" => "1.5",
-                "per_page" => "1"
-            }
-        ],
-    }
+    params = { "array_property" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", "per_page" => "1", "nested_coercer_object" => { "update_time" => "2016-04-01T16:00:00.000+09:00", "threshold" => "1.5" }, "nested_no_coercer_object" => { "per_page" => "1", "threshold" => "1.5" }, "nested_coercer_array" => [{ "update_time" => "2016-04-01T16:00:00.000+09:00", "threshold" => "1.5" }], "nested_no_coercer_array" => [{ "per_page" => "1", "threshold" => "1.5" }] }, { "update_time" => "2016-04-01T16:00:00.000+09:00", "per_page" => "1", "threshold" => "1.5" }, { "threshold" => "1.5", "per_page" => "1" }], }
     call(params, coerce_recursive: true)
 
     first_data = params["array_property"][0]

@@ -50,10 +50,7 @@ describe Committee::Drivers::OpenAPI2::Driver do
   end
 
   it "prefers a 200 response first" do
-    schema_data = schema_data_with_responses({
-      '201' => { 'schema' => { 'description' => '201 response' } },
-      '200' => { 'schema' => { 'description' => '200 response' } },
-    })
+    schema_data = schema_data_with_responses({ '201' => { 'schema' => { 'description' => '201 response' } }, '200' => { 'schema' => { 'description' => '200 response' } }, })
 
     schema = @driver.parse(schema_data)
     link = schema.routes['GET'][0][1]
@@ -62,10 +59,7 @@ describe Committee::Drivers::OpenAPI2::Driver do
   end
 
   it "prefers a 201 response next" do
-    schema_data = schema_data_with_responses({
-      '302' => { 'schema' => { 'description' => '302 response' } },
-      '201' => { 'schema' => { 'description' => '201 response' } },
-    })
+    schema_data = schema_data_with_responses({ '302' => { 'schema' => { 'description' => '302 response' } }, '201' => { 'schema' => { 'description' => '201 response' } }, })
 
     schema = @driver.parse(schema_data)
     link = schema.routes['GET'][0][1]
@@ -74,10 +68,7 @@ describe Committee::Drivers::OpenAPI2::Driver do
   end
 
   it "prefers any three-digit response next" do
-    schema_data = schema_data_with_responses({
-      'default' => { 'schema' => { 'description' => 'default response' } },
-      '302' => { 'schema' => { 'description' => '302 response' } },
-    })
+    schema_data = schema_data_with_responses({ 'default' => { 'schema' => { 'description' => 'default response' } }, '302' => { 'schema' => { 'description' => '302 response' } }, })
 
     schema = @driver.parse(schema_data)
     link = schema.routes['GET'][0][1]
@@ -86,10 +77,7 @@ describe Committee::Drivers::OpenAPI2::Driver do
   end
 
   it "prefers any numeric three-digit response next" do
-    schema_data = schema_data_with_responses({
-      'default' => { 'schema' => { 'description' => 'default response' } },
-      302 => { 'schema' => { 'description' => '302 response' } },
-    })
+    schema_data = schema_data_with_responses({ 'default' => { 'schema' => { 'description' => 'default response' } }, 302 => { 'schema' => { 'description' => '302 response' } }, })
 
     schema = @driver.parse(schema_data)
     link = schema.routes['GET'][0][1]

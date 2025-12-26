@@ -43,9 +43,7 @@ module Committee
 
         # TODO: refactoring name
         strict = test_method
-        Committee::SchemaValidator::OpenAPI3::ResponseValidator.
-            new(@operation_object, validator_option).
-            call(status, headers, data, strict)
+        Committee::SchemaValidator::OpenAPI3::ResponseValidator.new(@operation_object, validator_option).call(status, headers, data, strict)
       end
 
       def link_exist?
@@ -85,14 +83,7 @@ module Committee
       end
 
       def request_unpack(request)
-        unpacker = Committee::RequestUnpacker.new(
-          allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime,
-          allow_form_params:  validator_option.allow_form_params,
-          allow_get_body:     validator_option.allow_get_body,
-          allow_query_params: validator_option.allow_query_params,
-          allow_non_get_query_params: validator_option.allow_non_get_query_params,
-          optimistic_json:    validator_option.optimistic_json,
-        )
+        unpacker = Committee::RequestUnpacker.new(allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime, allow_form_params: validator_option.allow_form_params, allow_get_body: validator_option.allow_get_body, allow_query_params: validator_option.allow_query_params, allow_non_get_query_params: validator_option.allow_non_get_query_params, optimistic_json: validator_option.optimistic_json,)
 
         request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
 

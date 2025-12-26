@@ -187,12 +187,7 @@ describe Committee::Middleware::ResponseValidation do
 
   describe 'validate error option' do
     it "detects an invalid response status code" do
-      @app = new_response_rack({ integer: '1' }.to_json,
-                               {},
-                               app_status: 400,
-                               schema: open_api_3_schema,
-                               raise: true,
-                               validate_success_only: false)
+      @app = new_response_rack({ integer: '1' }.to_json, {}, app_status: 400, schema: open_api_3_schema, raise: true, validate_success_only: false)
 
       e = assert_raises(Committee::InvalidResponse) do
         get "/characters"
@@ -202,12 +197,7 @@ describe Committee::Middleware::ResponseValidation do
     end
 
     it "detects an invalid response status code with validate_success_only=true" do
-      @app = new_response_rack({ string_1: :honoka }.to_json,
-                               {},
-                               app_status: 400,
-                               schema: open_api_3_schema,
-                               raise: true,
-                               validate_success_only: true)
+      @app = new_response_rack({ string_1: :honoka }.to_json, {}, app_status: 400, schema: open_api_3_schema, raise: true, validate_success_only: true)
 
       get "/characters"
 
@@ -269,11 +259,7 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   it "strict and invalid content type with raise" do
-    @app = new_response_rack("abc",
-      {},
-      { schema: open_api_3_schema, strict: true, raise: true },
-      { content_type: 'application/text' }
-    )
+    @app = new_response_rack("abc", {}, { schema: open_api_3_schema, strict: true, raise: true }, { content_type: 'application/text' })
 
     assert_raises(Committee::InvalidResponse) do
       get "/characters"
