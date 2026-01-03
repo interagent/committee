@@ -73,7 +73,6 @@ module Committee
                  (param_def.style.nil? || param_def.style == 'form') &&
                  (param_def.explode.nil? || param_def.explode)
                 param_def.schema.properties&.each_key do |prop_name|
-                  deserialized_keys.add(prop_name)
                   deserialized_keys.add(prop_name.to_s)
                 end
               end
