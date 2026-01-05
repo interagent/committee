@@ -551,6 +551,87 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  describe ':strict_query_params option' do
+    it 'allows unknown query params when strict_query_params is false' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: false)
+      get "/characters", { limit: 10, unknown_param: "value" }
+      assert_equal 200, last_response.status
+    end
+
+    it 'rejects unknown query params when strict_query_params is true' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      get "/characters", { limit: 10, unknown_param: "value" }
+      assert_equal 400, last_response.status
+      assert_match(/unknown_param/, last_response.body)
+    end
+
+    it 'allows defined query params when strict_query_params is true' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      get "/characters", { limit: 10, school_name: "test" }
+      assert_equal 200, last_response.status
+    end
+
+    it 'handles empty query params when strict_query_params is true' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      get "/characters"
+      assert_equal 200, last_response.status
+    end
+
+    it 'rejects multiple unknown query params' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      get "/characters", { limit: 10, unknown1: "a", unknown2: "b" }
+      assert_equal 400, last_response.status
+      assert_match(/unknown1/, last_response.body)
+      assert_match(/unknown2/, last_response.body)
+    end
+
+    it 'allows partial query params (only some defined params)' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      get "/characters", { limit: 10 }
+      assert_equal 200, last_response.status
+    end
+
+    it 'works with POST requests that have query params' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      header "Content-Type", "application/json"
+      post "/additional_properties?first_name=test&unknown=value", JSON.generate(last_name: "test")
+      assert_equal 400, last_response.status
+      assert_match(/unknown/, last_response.body)
+    end
+
+    it 'allows defined query params in POST requests' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      header "Content-Type", "application/json"
+      post "/additional_properties?first_name=test", JSON.generate(last_name: "test")
+      assert_equal 200, last_response.status
+    end
+
+    it 'works with DELETE requests' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      delete "/characters?limit=10"
+      assert_equal 200, last_response.status
+    end
+
+    it 'rejects unknown query params in DELETE requests' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      delete "/characters?limit=10&unknown=value"
+      assert_equal 400, last_response.status
+      assert_match(/unknown/, last_response.body)
+    end
+
+    it 'works with HEAD requests' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      head "/characters?limit=10"
+      assert_equal 200, last_response.status
+    end
+
+    it 'rejects unknown query params in HEAD requests' do
+      @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
+      head "/characters?limit=10&unknown=value"
+      assert_equal 400, last_response.status
+    end
+  end
+
   private
 
   def new_rack_app(options = {})
