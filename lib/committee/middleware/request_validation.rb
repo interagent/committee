@@ -6,7 +6,13 @@ module Committee
       def initialize(app, options = {})
         super
 
-        @strict = options[:strict]
+        @strict = @options.strict
+      end
+
+      private
+
+      def build_options(options)
+        Options::RequestValidation.from(options)
       end
 
       def handle(request)

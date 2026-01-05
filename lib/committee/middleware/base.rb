@@ -5,16 +5,17 @@ module Committee
     class Base
       def initialize(app, options = {})
         @app = app
+        @options = build_options(options)
 
-        @error_class = options.fetch(:error_class, Committee::ValidationError)
-        @error_handler = options[:error_handler]
-        @ignore_error = options.fetch(:ignore_error, false)
+        @error_class = @options.error_class
+        @error_handler = @options.error_handler
+        @ignore_error = @options.ignore_error
 
-        @raise = options[:raise]
+        @raise = @options.raise_error
         @schema = self.class.get_schema(options)
 
         @router = @schema.build_router(options)
-        @accept_request_filter = options[:accept_request_filter] || ->(_) { true }
+        @accept_request_filter = @options.accept_request_filter
       end
 
       def call(env)
@@ -48,6 +49,11 @@ module Committee
       end
 
       private
+
+      # Subclasses should override this method to use their specific Options class
+      def build_options(options)
+        Options::Base.from(options)
+      end
 
       def build_schema_validator(request)
         @router.build_schema_validator(request)
