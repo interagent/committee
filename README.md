@@ -43,6 +43,7 @@ This piece of middleware validates the parameters of incoming requests to make s
 |optimistic_json| false | false | Will attempt to parse JSON in the request body even without a `Content-Type: application/json` before falling back to other options. |
 |raise| false | false | Raise an exception on error instead of responding with a generic error body. |
 |strict| false | false | Puts the middleware into strict mode, meaning that paths which are not defined in the schema will be responded to with a 404 instead of being run. |
+|strict_query_params| not supported | false | Rejects requests with query parameters not defined in the schema. When enabled, any query parameter not explicitly defined in the OpenAPI specification will result in a 400 error. |
 |strict_reference_validation| always false | false | Raises an exception (`OpenAPIParser::MissingReferenceError`) on middleware load if the provided schema file contains unresolvable references (`$ref:"#/something/not/here"`). Not supported on Hyper-schema parser. Defaults to `false` on OpenAPI3 but will default to `true` in next major version. |
 |ignore_error| false | false | Validate and ignore result even if validation is error. So always return original data. |
 

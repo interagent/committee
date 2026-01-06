@@ -74,6 +74,13 @@ module Committee
         # @return [OpenAPIParser::RequestOperation]
         attr_reader :request_operation
 
+        # @return [Array<String>] names of query parameters defined in the schema
+        def query_parameter_names
+          return [] unless request_operation.operation_object&.parameters
+
+          request_operation.operation_object.parameters.select { |p| p.in == 'query' }.map(&:name)
+        end
+
         private
 
         # @return [OpenAPIParser::SchemaValidator::Options]
@@ -132,6 +139,19 @@ module Committee
             path_params[k] = v if path_keys.include?(k)
             query_params[k] = v if query_keys.include?(k)
           end
+
+          validate_no_unknown_query_params(query_params) if validator_option.strict_query_params
+        end
+
+        def validate_no_unknown_query_params(query_params)
+          return if query_params.nil? || query_params.empty?
+
+          defined_params = query_parameter_names
+          unknown_params = query_params.keys - defined_params
+
+          return if unknown_params.empty?
+
+          raise Committee::InvalidRequest.new("Unknown query parameter(s): #{unknown_params.join(', ')}")
         end
 
         def response_validate_options(strict, check_header, validator_options: {})
