@@ -30,10 +30,10 @@ end
 require_relative "committee/utils"
 require_relative "committee/drivers"
 require_relative "committee/errors"
+require_relative "committee/validation_error"
 require_relative "committee/middleware"
 require_relative "committee/request_unpacker"
 require_relative "committee/schema_validator"
-require_relative "committee/validation_error"
 
 require_relative "committee/bin/committee_stub"
 require_relative "committee/test/methods"

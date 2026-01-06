@@ -7,9 +7,9 @@ module Committee
 
       def initialize(app, options = {})
         super
-        @strict = options[:strict]
+        @strict = @options.strict
         @validate_success_only = @schema.validator_option.validate_success_only
-        @streaming_content_parsers = options[:streaming_content_parsers] || {}
+        @streaming_content_parsers = @options.streaming_content_parsers
       end
 
       def handle(request)
@@ -62,6 +62,10 @@ module Committee
       end
 
       private
+
+      def build_options(options)
+        Options::ResponseValidation.from(options)
+      end
 
       def validate(request, status, headers, response, streaming_content_parser = nil)
         v = build_schema_validator(request)

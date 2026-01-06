@@ -5,6 +5,7 @@ module Committee
   end
 end
 
+require_relative "middleware/options"
 require_relative "middleware/base"
 require_relative "middleware/request_validation"
 require_relative "middleware/response_validation"
