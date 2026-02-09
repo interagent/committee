@@ -19,20 +19,18 @@ module Committee
       # @return [void]
       def apply(except)
         except.each do |param_type, param_names|
+          @original_values[param_type] ||= {}
           handler = handler_for(param_type)
-          handler&.apply(param_names, @original_values)
+          handler&.apply(param_names, @original_values[param_type])
         end
       end
 
       # Restore original parameter values
       # @return [void]
       def restore
-        @original_values.each do |storage_key, value|
-          if storage_key.include?(':')
-            restore_namespaced_param(storage_key, value)
-          else
-            restore_env_param(storage_key, value)
-          end
+        @original_values.each do |param_type, params|
+          handler = handler_for(param_type)
+          handler&.restore(params)
         end
       end
 
@@ -45,28 +43,6 @@ module Committee
         when :path then PathHandler.new(@request)
         when :body then BodyHandler.new(@request, @committee_options)
         end
-      end
-
-      def restore_namespaced_param(storage_key, value)
-        prefix, param_name = storage_key.split(':', 2)
-        storage = storage_for_prefix(prefix)
-        set_or_delete(storage, param_name, value) if storage
-      end
-
-      def restore_env_param(storage_key, value)
-        set_or_delete(@request.env, storage_key, value)
-      end
-
-      def storage_for_prefix(prefix)
-        case prefix
-        when 'query' then @request.env['rack.request.query_hash']
-        when 'path' then @request.env['router.params']
-        when 'body' then @request.env[@committee_options.fetch(:request_body_hash_key, 'committee.request_body_hash')]
-        end
-      end
-
-      def set_or_delete(hash, key, value)
-        value.nil? ? hash.delete(key) : hash[key] = value
       end
 
       # Base handler for parameters stored in hash-like structures
@@ -87,8 +63,20 @@ module Committee
 
           param_names.each do |param_name|
             key = param_name.to_s
-            original_values["#{prefix}:#{key}"] = storage[key]
+            original_values[key] = storage[key]
             storage[key] ||= "dummy-#{param_name}"
+          end
+        end
+
+        # Restore original parameter values
+        # @param [Hash] original_values Hash containing original values to restore
+        # @return [void]
+        def restore(original_values)
+          storage = get_storage
+          return unless should_process?(storage)
+
+          original_values.each do |key, value|
+            set_or_delete(storage, key, value)
           end
         end
 
@@ -99,14 +87,13 @@ module Committee
           raise NotImplementedError, "#{self.class} must implement #get_storage"
         end
 
-        # Override in subclasses to specify the prefix for original_values keys
-        def prefix
-          raise NotImplementedError, "#{self.class} must implement #prefix"
-        end
-
         # Override in subclasses if custom validation is needed
         def should_process?(storage)
           !storage.nil?
+        end
+
+        def set_or_delete(hash, key, value)
+          value.nil? ? hash.delete(key) : hash[key] = value
         end
       end
 
@@ -128,6 +115,21 @@ module Committee
             @request.env[key] ||= "dummy-#{param_name}"
           end
         end
+
+        # Restore original header values
+        # @param [Hash] original_values Hash containing original values to restore
+        # @return [void]
+        def restore(original_values)
+          original_values.each do |key, value|
+            set_or_delete(@request.env, key, value)
+          end
+        end
+
+        private
+
+        def set_or_delete(hash, key, value)
+          value.nil? ? hash.delete(key) : hash[key] = value
+        end
       end
 
       # Handler for query parameters
@@ -138,10 +140,6 @@ module Committee
           # Initialize rack.request.query_hash if not yet initialized
           @request.env['rack.request.query_hash'] ||= {}
         end
-
-        def prefix
-          'query'
-        end
       end
 
       # Handler for path parameters
@@ -150,10 +148,6 @@ module Committee
 
         def get_storage
           @request.env['router.params']
-        end
-
-        def prefix
-          'path'
         end
       end
 
@@ -171,10 +165,6 @@ module Committee
         def get_storage
           body_key = @committee_options.fetch(:request_body_hash_key, 'committee.request_body_hash')
           @request.env[body_key]
-        end
-
-        def prefix
-          'body'
         end
 
         def should_process?(storage)
