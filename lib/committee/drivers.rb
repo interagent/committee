@@ -89,6 +89,7 @@ module Committee
 
       def cache_key(schema_path, parser_options)
         [
+          File.expand_path(schema_path),
           File.exist?(schema_path) ? Digest::MD5.hexdigest(File.read(schema_path)) : nil,
           parser_options.hash,
         ].join('_')

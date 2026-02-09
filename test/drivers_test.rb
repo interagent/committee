@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "tmpdir"
 
 describe Committee::Drivers do
   DRIVERS = [:hyper_schema, :open_api_2, :open_api_3,].freeze
@@ -87,6 +88,36 @@ describe Committee::Drivers do
           File.write(open_api_3_schema_path, original_file_contents + "\n")
           refute_equal(Committee::Drivers.load_from_file(open_api_3_schema_path, parser_options: { strict_reference_validation: true }).object_id, object_id,)
           File.write(open_api_3_schema_path, original_file_contents)
+        end
+      end
+
+      describe 'when loading different files with identical root schema content' do
+        it 'returns different objects because relative references are resolved from schema_path' do
+          parser_options = { strict_reference_validation: true }
+
+          Dir.mktmpdir("committee-cache-key-test") do |tmpdir|
+            first_dir = File.join(tmpdir, "first")
+            second_dir = File.join(tmpdir, "second")
+            Dir.mkdir(first_dir)
+            Dir.mkdir(second_dir)
+
+            root_schema = File.read(open_api_3_schema_path)
+            original_referee = File.read("test/data/openapi3/referee.yaml")
+            changed_referee = original_referee.sub("type: string", "type: integer")
+
+            first_root_path = File.join(first_dir, "normal.yaml")
+            second_root_path = File.join(second_dir, "normal.yaml")
+
+            File.write(first_root_path, root_schema)
+            File.write(second_root_path, root_schema)
+            File.write(File.join(first_dir, "referee.yaml"), original_referee)
+            File.write(File.join(second_dir, "referee.yaml"), changed_referee)
+
+            first_schema = Committee::Drivers.load_from_file(first_root_path, parser_options: parser_options)
+            second_schema = Committee::Drivers.load_from_file(second_root_path, parser_options: parser_options)
+
+            refute_equal(first_schema.object_id, second_schema.object_id)
+          end
         end
       end
     end
