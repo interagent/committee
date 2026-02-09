@@ -23,9 +23,10 @@ module Committee
 
         def coerce_path_parameter(validator_option)
           options = build_openapi_parser_path_option(validator_option)
+          validated_path_params = request_operation.validate_path_params(options)
           return {} unless options.coerce_value
 
-          request_operation.validate_path_params(options)
+          validated_path_params
         rescue OpenAPIParser::OpenAPIError => e
           raise Committee::InvalidRequest.new(e.message, original_error: e)
         end
@@ -90,6 +91,11 @@ module Committee
 
         # @return [OpenAPIParser::SchemaValidator::Options]
         def build_openapi_parser_path_option(validator_option)
+          build_openapi_parser_option(validator_option, validator_option.coerce_path_params)
+        end
+
+        # @return [OpenAPIParser::SchemaValidator::Options]
+        def build_openapi_parser_request_parameter_option(validator_option)
           build_openapi_parser_option(validator_option, validator_option.coerce_query_params)
         end
 
@@ -125,6 +131,9 @@ module Committee
         end
 
         def validate_path_and_query_params(path_params, query_params, headers, validator_option)
+          path_params ||= {}
+          query_params ||= {}
+
           # it's currently impossible to validate path params and query params separately
           # so we have to resort to this workaround
 
@@ -133,7 +142,7 @@ module Committee
 
           merged_params = query_params.merge(path_params)
 
-          request_operation.validate_request_parameter(merged_params, headers, build_openapi_parser_path_option(validator_option))
+          request_operation.validate_request_parameter(merged_params, headers, build_openapi_parser_request_parameter_option(validator_option))
 
           merged_params.each do |k, v|
             path_params[k] = v if path_keys.include?(k)

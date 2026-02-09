@@ -171,5 +171,39 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         assert_equal [], operation_object.request_content_types
       end
     end
+
+    describe 'coercion option wiring' do
+      before do
+        @path = '/coerce_path_params/1'
+        @method = 'get'
+      end
+
+      it 'uses coerce_path_params for explicit path coercion' do
+        disabled = Committee::SchemaValidator::Option.new({ coerce_path_params: false, coerce_query_params: true }, open_api_3_schema, :open_api_3)
+        enabled = Committee::SchemaValidator::Option.new({ coerce_path_params: true, coerce_query_params: false }, open_api_3_schema, :open_api_3)
+
+        error = assert_raises(Committee::InvalidRequest) do
+          operation_object.coerce_path_parameter(disabled)
+        end
+        assert_match(/expected integer, but received String: "1"/i, error.message)
+
+        coerced = operation_object.coerce_path_parameter(enabled)
+        assert_kind_of(Integer, coerced['integer'])
+      end
+
+      it 'uses coerce_query_params for request parameter validation' do
+        query_coercion_disabled = Committee::SchemaValidator::Option.new({ coerce_query_params: false }, open_api_3_schema, :open_api_3)
+        query_coercion_enabled = Committee::SchemaValidator::Option.new({ coerce_query_params: true }, open_api_3_schema, :open_api_3)
+
+        error = assert_raises(Committee::InvalidRequest) do
+          @path = '/characters'
+          operation_object.validate_request_params({}, { "limit" => "1" }, {}, HEADER, query_coercion_disabled)
+        end
+        assert_match(/expected integer, but received String: "1"/i, error.message)
+
+        @path = '/characters'
+        operation_object.validate_request_params({}, { "limit" => "1" }, {}, HEADER, query_coercion_enabled)
+      end
+    end
   end
 end

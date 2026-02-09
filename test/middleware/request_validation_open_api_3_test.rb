@@ -355,6 +355,26 @@ describe Committee::Middleware::RequestValidation do
     get "/coerce_path_params/1"
   end
 
+  it "coerces path params even when query param coercion is disabled" do
+    check_parameter_string = lambda { |env|
+      assert env['committee.path_hash']['integer'].is_a?(Integer)
+      assert env['committee.params']['integer'].is_a?(Integer)
+      [200, {}, []]
+    }
+
+    @app = new_rack_app_with_lambda(check_parameter_string, schema: open_api_3_schema, coerce_path_params: true, coerce_query_params: false)
+    get "/coerce_path_params/1"
+    assert_equal 200, last_response.status
+  end
+
+  it "does not coerce path params when path coercion is disabled even if query coercion is enabled" do
+    @app = new_rack_app(schema: open_api_3_schema, coerce_path_params: false, coerce_query_params: true)
+    get "/coerce_path_params/1"
+
+    assert_equal 400, last_response.status
+    assert_match(/integer/i, last_response.body)
+  end
+
   describe "overwrite same parameter (old rule)" do
     # (high priority) path_hash_key -> request_body_hash -> query_param
     it "set query parameter to committee.params and query hash" do
