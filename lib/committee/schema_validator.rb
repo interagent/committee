@@ -12,7 +12,11 @@ module Committee
       def build_prefix_regexp(prefix)
         return nil unless prefix
 
-        /\A#{Regexp.escape(prefix)}/.freeze
+        if prefix == "/" || prefix.end_with?("/")
+          /\A#{Regexp.escape(prefix)}/.freeze
+        else
+          /\A#{Regexp.escape(prefix)}(?=\/|\z)/.freeze
+        end
       end
     end
   end

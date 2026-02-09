@@ -20,4 +20,12 @@ describe Committee::SchemaValidator do
     media_type = Committee::SchemaValidator.request_media_type(request)
     assert_equal 'multipart/form-data', media_type
   end
+
+  it "builds prefix regexp with a path segment boundary" do
+    regexp = Committee::SchemaValidator.build_prefix_regexp("/v1")
+
+    assert regexp.match?("/v1")
+    assert regexp.match?("/v1/characters")
+    refute regexp.match?("/v11/characters")
+  end
 end
