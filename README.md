@@ -302,10 +302,66 @@ describe Committee::Middleware::Stub do
       get "/"
       assert_schema_conform(200)
     end
+
+    it "validates request with excepted parameters" do
+      # Test intentionally missing required header while validating other parameters
+      get "/resources", {}, { 'HTTP_ACCEPT' => 'application/json' }
+      assert_request_schema_confirm(
+        except: {
+          headers: ['content-type', 'authorization']
+        }
+      )
+      assert_response_schema_confirm(401) # Still expects 401 for missing auth
+    end
   end
 end
 ```
 
+### Excepting specific parameters from validation
+
+When testing error responses (like 401 Unauthorized or 400 Bad Request), you may want to intentionally omit required parameters while still validating the rest of the request schema. Use the `except` option with `assert_request_schema_confirm`:
+
+```ruby
+it "returns 401 when auth header is missing" do
+  # Intentionally omit 'authorization' header
+  get "/resources"
+
+  # Validate request schema, except the missing 'authorization' header
+  assert_request_schema_confirm(
+    except: {
+      headers: ['authorization']
+    }
+  )
+
+  # Validate response
+  assert_response_schema_confirm(401)
+end
+
+it "validates request with multiple parameter types excepted" do
+  get "/resources/123?filter=active"
+
+  assert_request_schema_confirm(
+    except: {
+      headers: ['authorization'],  # Except header parameters
+      query: ['page', 'limit'],    # Except query parameters
+      path: ['id'],                # Except path parameters
+      body: ['optional_field']     # Except body parameters
+    }
+  )
+end
+```
+
+The `except` option accepts a hash specifying which parameters to exclude from validation:
+- **headers**: Array of header names (e.g., `['content-type', 'authorization']`)
+- **query**: Array of query parameter names (e.g., `['page', 'limit']`)
+- **path**: Array of path parameter names (e.g., `['id', 'resource_id']`)
+- **body**: Array of request body parameter names (e.g., `['optional_field']`)
+
+This is particularly useful when:
+- Testing authentication/authorization failures (missing auth headers)
+- Testing validation errors (missing required query/path parameters)
+- Verifying error responses while ensuring other parameters are correctly formed
+- Testing partial request scenarios where some parameters are intentionally invalid or missing
 
 ## Tips
 
