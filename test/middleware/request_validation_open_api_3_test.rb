@@ -254,6 +254,14 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "ignores similar prefix paths outside the prefix in strict mode" do
+    @app = new_rack_app(prefix: "/v1", schema: open_api_3_schema, strict: true)
+    params = { "string_post_1" => 1 }
+    header "Content-Type", "application/json"
+    post "/v11/characters", JSON.generate(params)
+    assert_equal 200, last_response.status
+  end
+
   it "don't check prefix with no option" do
     @app = new_rack_app(schema: open_api_3_schema)
     params = { "string_post_1" => 1 }

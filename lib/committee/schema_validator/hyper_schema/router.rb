@@ -6,7 +6,7 @@ module Committee
       class Router
         def initialize(schema, validator_option)
           @prefix = validator_option.prefix
-          @prefix_regexp = /\A#{Regexp.escape(@prefix)}/.freeze if @prefix
+          @prefix_regexp = ::Committee::SchemaValidator.build_prefix_regexp(@prefix)
           @schema = schema
 
           @validator_option = validator_option

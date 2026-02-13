@@ -263,6 +263,13 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "ignores similar prefix paths outside the prefix in strict mode" do
+    @app = new_rack_app(prefix: "/v1", schema: hyper_schema, strict: true)
+    header "Content-Type", "application/json"
+    post "/v11/apps", JSON.generate({ "name" => 1 })
+    assert_equal 200, last_response.status
+  end
+
   it "routes to paths not in schema" do
     @app = new_rack_app(schema: hyper_schema)
     get "/not-a-resource"

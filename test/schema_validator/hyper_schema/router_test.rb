@@ -43,6 +43,11 @@ describe Committee::SchemaValidator::HyperSchema::Router do
     refute_nil link
   end
 
+  it "does not include a similar prefix path segment" do
+    link, _ = hyper_schema_router(prefix: "/kpi").includes?("/kpi2/apps")
+    assert_nil link
+  end
+
   it "provides named parameters" do
     link, param_matches = open_api_2_router.find_link("GET", "/api/pets/fido")
     refute_nil link
