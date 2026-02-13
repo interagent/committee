@@ -55,7 +55,6 @@ module Committee
       attr_reader :validator_option
 
       def coerce_path_params
-        return Committee::Utils.indifferent_hash unless validator_option.coerce_path_params
         Committee::RequestUnpacker.indifferent_params(@operation_object.coerce_path_parameter(@validator_option))
       end
 
