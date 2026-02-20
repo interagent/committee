@@ -169,6 +169,62 @@ describe Committee::Test::Methods do
         end
         assert_match(/`GET \/undefined` undefined in schema/i, e.message)
       end
+
+      describe "with except option" do
+        it "passes validation when required query parameter is excepted" do
+          @app = new_rack_app
+          # Missing required 'data' parameter, but except it
+          get "/get_endpoint_with_required_parameter"
+          assert_request_schema_confirm(except: { query: ['data'] })
+        end
+
+        it "still validates other parameters when some are excepted" do
+          @app = new_rack_app
+          # Missing required 'data' parameter, but except it
+          # This test verifies that the except option works
+          get "/get_endpoint_with_required_parameter"
+          assert_request_schema_confirm(except: { query: ['data'] })
+        end
+
+        it "works without except option (backward compatibility)" do
+          @app = new_rack_app
+          get "/characters"
+          assert_request_schema_confirm
+        end
+
+        it "supports multiple parameter types" do
+          @app = new_rack_app
+          # Can except headers, query, path, and body parameters
+          get "/get_endpoint_with_required_parameter"
+          assert_request_schema_confirm(except: {
+            headers: ['authorization'],
+            query: ['data']
+          })
+        end
+
+        it "supports multiple parameters in each type" do
+          @app = new_rack_app
+          # Can except multiple parameters in each type simultaneously
+          get "/get_endpoint_with_required_parameter"
+          assert_request_schema_confirm(except: {
+            headers: ['content-type', 'authorization', 'accept'],
+            query: ['data', 'page', 'limit']
+          })
+        end
+
+        it "raises error when non-excepted required parameter is missing" do
+          @app = new_rack_app
+          # Except only 'required_param_a', but 'required_param_b' is also required and missing
+          # This should raise an error for 'required_param_b'
+          get "/test_except_validation"
+
+          e = assert_raises(Committee::InvalidRequest) do
+            assert_request_schema_confirm(except: { query: ['required_param_a'] })
+          end
+          # Verify error is about the non-excepted missing parameter
+          assert_match(/required_param_b/i, e.message)
+        end
+      end
     end
 
     describe "#assert_response_schema_confirm" do

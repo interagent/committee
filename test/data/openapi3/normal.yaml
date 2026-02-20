@@ -671,6 +671,24 @@ paths:
         '204':
           description: no content
 
+  /test_except_validation:
+    get:
+      description: test endpoint for except option validation
+      parameters:
+      - name: required_param_a
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: required_param_b
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: no content
+
   /ref-sample:
     get:
       responses:
