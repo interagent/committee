@@ -196,24 +196,20 @@ describe Committee::Test::Methods do
           @app = new_rack_app
           # Can except headers, query, path, and body parameters
           get "/get_endpoint_with_required_parameter"
-          assert_request_schema_confirm(
-            except: {
-              headers: ['authorization'],
-              query: ['data']
-            }
-          )
+          assert_request_schema_confirm(except: {
+            headers: ['authorization'],
+            query: ['data']
+          })
         end
 
         it "supports multiple parameters in each type" do
           @app = new_rack_app
           # Can except multiple parameters in each type simultaneously
           get "/get_endpoint_with_required_parameter"
-          assert_request_schema_confirm(
-            except: {
-              headers: ['content-type', 'authorization', 'accept'],
-              query: ['data', 'page', 'limit']
-            }
-          )
+          assert_request_schema_confirm(except: {
+            headers: ['content-type', 'authorization', 'accept'],
+            query: ['data', 'page', 'limit']
+          })
         end
 
         it "raises error when non-excepted required parameter is missing" do
