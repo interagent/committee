@@ -305,6 +305,59 @@ describe Committee::Middleware::Stub do
 end
 ```
 
+### Excepting specific parameters from validation
+
+When testing error responses (like 401 Unauthorized or 400 Bad Request), you may want to intentionally omit required parameters. Use the `except` option with `assert_request_schema_confirm` to skip validation for those specific parameters while still validating the rest of the request:
+
+```ruby
+it "returns 401 when authorization header is missing" do
+  get "/resources"  # Intentionally omit authorization header
+
+  assert_request_schema_confirm(except: { headers: ['authorization'] })
+  assert_response_schema_confirm(401)
+end
+
+it "returns 422 when required body param is missing" do
+  post "/orders", JSON.generate({ quantity: 1 }), { "CONTENT_TYPE" => "application/json" }
+  # 'item_id' is required but intentionally omitted to test the error response
+
+  assert_request_schema_confirm(except: { body: ['item_id'] })
+  assert_response_schema_confirm(422)
+end
+```
+
+The `except` option accepts a hash with the following keys, each taking an array of parameter names:
+
+| Key | Target | Supported content types | Example |
+|---|---|---|---|
+| `headers` | HTTP request headers | — | `headers: ['authorization', 'content-type']` |
+| `query` | Query string parameters | — | `query: ['page', 'limit']` |
+| `body` | Request body parameters | `application/json` (including `+json` variants such as `application/vnd.api+json`), `application/x-www-form-urlencoded`, `multipart/form-data` | `body: ['required_field']` |
+
+Multiple parameter types can be excepted at once:
+
+```ruby
+assert_request_schema_confirm(
+  except: {
+    headers: ['authorization'],
+    query:   ['page'],
+    body:    ['required_field']
+  }
+)
+```
+
+Dummy values are injected **only when the parameter is absent** (nil) in the actual request. Parameters that already carry a value are left untouched. After validation completes (whether it raises or not), all injected values are automatically removed and the request is restored to its original state.
+
+The dummy value for each excepted parameter is chosen as follows:
+
+1. First value of `enum` if the parameter has an enum constraint
+2. Otherwise, determined by the declared `type`:
+   - `integer`, `number`, `boolean`, `array` — zero value; native types for JSON bodies (`0`, `0.0`, `false`, `[]`), string-encoded for query/header/form (`"0"`, `"true"`, `["0"]`)
+   - `object` — `{}` for JSON bodies only; falls back to `"dummy-{name}"` for query/header/form
+   - `string` type with a recognized format (`date-time`, `date`, `email`, `uuid`) gets a format-aware string
+   - Everything else falls back to `"dummy-{name}"`
+
+> **Note:** Type-aware dummy values require OpenAPI 3. For Hyper-Schema and OpenAPI 2, `"dummy-{name}"` is always used.
 
 ## Tips
 
