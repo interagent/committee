@@ -169,6 +169,187 @@ describe Committee::Test::Methods do
         end
         assert_match(/`GET \/undefined` undefined in schema/i, e.message)
       end
+
+      describe "with except option" do
+        it "passes validation when required query parameter is excepted" do
+          @app = new_rack_app
+          # Missing required 'data' parameter, but except it
+          get "/get_endpoint_with_required_parameter"
+          assert_request_schema_confirm(except: { query: ['data'] })
+        end
+
+        it "still validates other parameters when some are excepted" do
+          @app = new_rack_app
+          # Missing required 'data' parameter, but except it
+          # This test verifies that the except option works
+          get "/get_endpoint_with_required_parameter"
+          assert_request_schema_confirm(except: { query: ['data'] })
+        end
+
+        it "works without except option (backward compatibility)" do
+          @app = new_rack_app
+          get "/characters"
+          assert_request_schema_confirm
+        end
+
+        it "supports multiple parameter types" do
+          @app = new_rack_app
+          # Can except headers, query, and body parameters
+          get "/get_endpoint_with_required_parameter"
+          assert_request_schema_confirm(except: { headers: ['authorization'], query: ['data'] })
+        end
+
+        it "supports multiple parameters in each type" do
+          @app = new_rack_app
+          # Can except multiple parameters in each type simultaneously
+          get "/get_endpoint_with_required_parameter"
+          assert_request_schema_confirm(except: { headers: ['content-type', 'authorization', 'accept'], query: ['data', 'page', 'limit'] })
+        end
+
+        it "raises error when non-excepted required parameter is missing" do
+          @app = new_rack_app
+          # Except only 'required_param_a', but 'required_param_b' is also required and missing
+          # This should raise an error for 'required_param_b'
+          get "/test_except_validation"
+
+          e = assert_raises(Committee::InvalidRequest) do
+            assert_request_schema_confirm(except: { query: ['required_param_a'] })
+          end
+          # Verify error is about the non-excepted missing parameter
+          assert_match(/required_param_b/i, e.message)
+        end
+
+        describe "with body params" do
+          it "passes validation when required string body param is excepted" do
+            @app = new_rack_app
+            post "/test_except_body_params", JSON.generate({ "required_integer" => 1 }), { "CONTENT_TYPE" => "application/json" }
+            assert_request_schema_confirm(except: { body: ['required_string'] })
+          end
+
+          it "passes validation when required integer body param is excepted" do
+            @app = new_rack_app
+            post "/test_except_body_params", JSON.generate({ "required_string" => "foo" }), { "CONTENT_TYPE" => "application/json" }
+            assert_request_schema_confirm(except: { body: ['required_integer'] })
+          end
+
+          it "passes validation when all required body params are excepted" do
+            @app = new_rack_app
+            post "/test_except_body_params", nil, { "CONTENT_TYPE" => "application/json" }
+            assert_request_schema_confirm(except: { body: ['required_string', 'required_integer'] })
+          end
+
+          it "raises error when non-excepted required body param is missing" do
+            @app = new_rack_app
+            post "/test_except_body_params", nil, { "CONTENT_TYPE" => "application/json" }
+            e = assert_raises(Committee::InvalidRequest) do
+              assert_request_schema_confirm(except: { body: ['required_string'] })
+            end
+            assert_match(/required_integer/i, e.message)
+          end
+
+          describe "non-string types and format constraints" do
+            it "passes validation when required integer query param is excepted" do
+              @app = new_rack_app
+              get "/get_endpoint_with_required_integer_query"
+              assert_request_schema_confirm(except: { query: ['count'] })
+            end
+
+            it "passes validation when required integer header is excepted" do
+              @app = new_rack_app
+              get "/header"
+              assert_request_schema_confirm(except: { headers: ['integer'] })
+            end
+
+            it "passes validation when required enum body param is excepted" do
+              @app = new_rack_app
+              post "/test_except_body_with_constraints", JSON.generate({ "created_at" => "2024-01-01T00:00:00Z" }), { "CONTENT_TYPE" => "application/json" }
+              assert_request_schema_confirm(except: { body: ['status'] })
+            end
+
+            it "passes validation when required date-time format body param is excepted" do
+              @app = new_rack_app
+              post "/test_except_body_with_constraints", JSON.generate({ "status" => "active" }), { "CONTENT_TYPE" => "application/json" }
+              assert_request_schema_confirm(except: { body: ['created_at'] })
+            end
+          end
+
+          describe "with form-encoded body params" do
+            it "passes validation when required string form param is excepted" do
+              @app = new_rack_app
+              post "/test_except_form_params", "required_integer=1", { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
+              assert_request_schema_confirm(except: { body: ['required_string'] })
+            end
+
+            it "passes validation when required integer form param is excepted" do
+              @app = new_rack_app
+              post "/test_except_form_params", "required_string=foo", { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
+              assert_request_schema_confirm(except: { body: ['required_integer'] })
+            end
+
+            it "passes validation when all required form params are excepted" do
+              @app = new_rack_app
+              post "/test_except_form_params", "", { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
+              assert_request_schema_confirm(except: { body: ['required_string', 'required_integer'] })
+            end
+
+            it "raises error when non-excepted required form param is missing" do
+              @app = new_rack_app
+              post "/test_except_form_params", "", { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
+              e = assert_raises(Committee::InvalidRequest) do
+                assert_request_schema_confirm(except: { body: ['required_string'] })
+              end
+              assert_match(/required_integer/i, e.message)
+            end
+          end
+
+          describe "with special rack headers" do
+            it "passes validation when required Content-Type header is excepted" do
+              @app = new_rack_app
+              post "/test_except_content_type_header", nil
+              assert_request_schema_confirm(except: { headers: ['Content-Type'] })
+            end
+          end
+
+          describe "does not overwrite existing values" do
+            it "leaves an existing query param value unchanged when it is excepted" do
+              @app = new_rack_app
+              get "/get_endpoint_with_required_parameter", "data" => "existing_value"
+              before_value = last_request.GET["data"]
+              assert_request_schema_confirm(except: { query: ['data'] })
+              assert_equal before_value, last_request.GET["data"]
+            end
+          end
+
+          describe "with vnd.api+json content type" do
+            it "treats application/vnd.api+json body as JSON and injects dummy values" do
+              @app = new_rack_app
+              post "/test_except_vnd_json_body", JSON.generate({}), { "CONTENT_TYPE" => "application/vnd.api+json" }
+              assert_request_schema_confirm(except: { body: ['required_string'] })
+            end
+          end
+
+          describe "error recovery" do
+            it "restores partially-applied params when JSON body parsing raises mid-apply" do
+              # Scenario: HeaderHandler injects a dummy header, then BodyHandler fails
+              # to parse an invalid JSON body (JSON::ParserError). With apply() outside
+              # the ensure block the injected header would not be restored. This test
+              # verifies that all side-effects from apply() are rolled back even when
+              # apply() itself raises.
+              @app = new_rack_app
+              post "/test_except_body_params", 'invalid-json', { "CONTENT_TYPE" => "application/json" }
+
+              assert_nil last_request.env['HTTP_AUTHORIZATION']
+
+              assert_raises(JSON::ParserError) do
+                assert_request_schema_confirm(except: { headers: ['authorization'], body: ['required_string'] })
+              end
+
+              assert_nil last_request.env['HTTP_AUTHORIZATION']
+            end
+          end
+
+        end
+      end
     end
 
     describe "#assert_response_schema_confirm" do

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'except_parameter'
+
 module Committee
   module Test
     module Methods
@@ -8,13 +10,19 @@ module Committee
         assert_response_schema_confirm(expected_status)
       end
 
-      def assert_request_schema_confirm
+      def assert_request_schema_confirm(except: {})
         unless schema_validator.link_exist?
           request = "`#{request_object.request_method} #{request_object.path_info}` undefined in schema (prefix: #{committee_options[:prefix].inspect})."
           raise Committee::InvalidRequest.new(request)
         end
 
-        schema_validator.request_validate(request_object)
+        if except.empty?
+          schema_validator.request_validate(request_object)
+        else
+          with_except_params(except) do
+            schema_validator.request_validate(request_object)
+          end
+        end
       end
 
       def assert_response_schema_confirm(expected_status = nil)
@@ -78,6 +86,23 @@ module Committee
 
       def old_behavior
         committee_options.fetch(:old_assert_behavior, false)
+      end
+
+      private
+
+      # Temporarily adds dummy values for excepted parameters during validation
+      # @see ExceptParameter
+      def with_except_params(except)
+        return yield if except.empty?
+
+        except_handler = ExceptParameter.new(request_object, committee_options)
+
+        begin
+          except_handler.apply(except)
+          yield
+        ensure
+          except_handler.restore
+        end
       end
     end
   end

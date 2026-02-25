@@ -671,6 +671,131 @@ paths:
         '204':
           description: no content
 
+  /test_except_validation:
+    get:
+      description: test endpoint for except option validation
+      parameters:
+      - name: required_param_a
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: required_param_b
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: no content
+
+  /get_endpoint_with_required_integer_query:
+    get:
+      description: endpoint with required integer query param
+      parameters:
+      - name: count
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: no content
+
+  /test_except_body_with_constraints:
+    post:
+      description: test endpoint for except body params with format and enum constraints
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+                - created_at
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - active
+                    - inactive
+                created_at:
+                  type: string
+                  format: date-time
+      responses:
+        '204':
+          description: no content
+
+  /test_except_body_params:
+    post:
+      description: test endpoint for except body params option
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - required_string
+                - required_integer
+              properties:
+                required_string:
+                  type: string
+                required_integer:
+                  type: integer
+      responses:
+        '204':
+          description: no content
+
+  /test_except_form_params:
+    post:
+      description: test endpoint for except body params with form encoding
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - required_string
+                - required_integer
+              properties:
+                required_string:
+                  type: string
+                required_integer:
+                  type: integer
+      responses:
+        '204':
+          description: no content
+
+  /test_except_content_type_header:
+    post:
+      description: test endpoint for except Content-Type header
+      parameters:
+        - name: Content-Type
+          in: header
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: no content
+
+  /test_except_vnd_json_body:
+    post:
+      description: test endpoint that accepts application/vnd.api+json body
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              required:
+                - required_string
+              properties:
+                required_string:
+                  type: string
+      responses:
+        '204':
+          description: no content
+
   /ref-sample:
     get:
       responses:
