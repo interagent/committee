@@ -873,6 +873,44 @@ paths:
                 date: 2020-05-12
                 date-time: 2020-05-12T00:00:00.00Z
 
+  /test_path_level_required_integer:
+    parameters:
+    - name: count
+      in: query
+      required: true
+      schema:
+        type: integer
+    get:
+      description: endpoint with required integer query param defined at PATH ITEM level
+      responses:
+        '204':
+          description: no content
+
+  /test_multi_content_type_body:
+    post:
+      description: endpoint with same field name but different types per content type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  format: email
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: integer
+      responses:
+        '204':
+          description: no content
+
 components:
   schemas:
     nested_array:

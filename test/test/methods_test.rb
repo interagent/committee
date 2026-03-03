@@ -328,6 +328,44 @@ describe Committee::Test::Methods do
             end
           end
 
+          describe "with schema_path option" do
+            before do
+              @committee_options = { schema_path: open_api_3_schema_path }
+            end
+
+            it "passes validation when required integer query param is excepted" do
+              @app = new_rack_app
+              get "/get_endpoint_with_required_integer_query"
+              assert_request_schema_confirm(except: { query: ['count'] })
+            end
+          end
+
+          describe "with path item-level parameters" do
+            it "passes validation when required integer query param declared at path level is excepted" do
+              @app = new_rack_app
+              get "/test_path_level_required_integer"
+              assert_request_schema_confirm(except: { query: ['count'] })
+            end
+          end
+
+          describe "with multiple content-type body" do
+            it "uses the correct schema for form-urlencoded when excepting a body param" do
+              @app = new_rack_app
+              post "/test_multi_content_type_body", "", "CONTENT_TYPE" => "application/x-www-form-urlencoded"
+              assert_request_schema_confirm(except: { body: ['status'] })
+            end
+          end
+
+          describe "with non-hash JSON body" do
+            it "raises BadRequest when JSON body is an array" do
+              @app = new_rack_app
+              post "/test_except_body_params", "[1,2,3]", "CONTENT_TYPE" => "application/json"
+              assert_raises(Committee::BadRequest) do
+                assert_request_schema_confirm(except: { body: ['required_string'] })
+              end
+            end
+          end
+
           describe "error recovery" do
             it "restores partially-applied params when JSON body parsing raises mid-apply" do
               # Scenario: HeaderHandler injects a dummy header, then BodyHandler fails

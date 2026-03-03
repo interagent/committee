@@ -52,7 +52,7 @@ module Committee
         # Resolve the OpenAPI3 operation object for the current request.
         # Returns nil for non-OpenAPI3 schemas or any lookup failure.
         def resolve_operation
-          schema = @committee_options[:schema]
+          schema = Committee::Middleware::Base.get_schema(@committee_options)
           return nil unless schema.is_a?(Committee::Drivers::OpenAPI3::Schema)
 
           path = @request.path_info
@@ -65,12 +65,19 @@ module Committee
 
         # Find the OpenAPI3 schema object for a parameter by name and location.
         # Returns nil for non-OpenAPI3 schemas or any lookup failure.
+        #
+        # Searches both operation-level and path item-level parameters (OpenAPI 3 allows
+        # parameters to be declared on the path item and shared across operations).
+        # Operation-level parameters take precedence per the OpenAPI spec.
         def find_parameter_schema(key, location)
           operation = resolve_operation
           return nil unless operation
 
-          params = operation.request_operation.operation_object&.parameters
-          params&.find { |p| p.name&.casecmp?(key.to_s) && p.in == location }&.schema
+          op_object = operation.request_operation.operation_object
+          # Merge operation-level and path item-level parameters; operation level first
+          # so that overrides are respected when both define the same parameter.
+          params = Array(op_object&.parameters) + Array(op_object&.parent&.parameters)
+          params.find { |p| p.name&.casecmp?(key.to_s) && p.in == location }&.schema
         rescue StandardError
           nil
         end
@@ -270,6 +277,10 @@ module Committee
           original_body = read_body
           body_hash = parse_body(original_body)
 
+          # Non-Hash bodies (arrays, scalars) cannot have named fields injected.
+          # Skip injection and let the schema validator report the type mismatch.
+          return unless body_hash.is_a?(Hash)
+
           # Commit state only after successful parse so that restore_json is not
           # triggered unnecessarily when parse_body raises (e.g. invalid JSON).
           @original_body    = original_body
@@ -392,14 +403,10 @@ module Committee
           request_body = operation.request_operation.operation_object&.request_body
           return nil unless request_body
 
-          request_body.content&.each_value do |media_type|
-            next unless media_type.schema&.properties
+          content = request_body.content
+          return nil unless content
 
-            prop = media_type.schema.properties[key]
-            return prop if prop
-          end
-
-          nil
+          content[@request.media_type]&.schema&.properties&.[](key)
         rescue StandardError
           nil
         end
