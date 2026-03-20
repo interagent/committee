@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.6.2 - 2026-03-20
+
+- update .ruby-version to latest tested #456
+- bump actions/checkout from 5 to 6 #457
+- add ydah to contributors list #458
+- add coerce_response_values option to enable type coercion in response validation #461
+- move response validation logic from middleware to validator classes #462
+- add OpenAPI 3 parameter deserialization with style/explode support #460
+- add more straightforward options by type #463
+- add strict mode support for query parameters #464
+- add except option for testing error responses #465
+- fix OpenAPI schema cache collision by including schema_path in cache key #466
+- fix OpenAPI 3 path coercion to respect coerce_path_params independently of query coercion #467
+- fix prefix matching to respect path segment boundaries #468
+- add Ruby 4.0 to CI configuration and update README for supported versions #469
+
 ## 5.6.1 - 2025-10-30
 
 - fix content type parsing for complex types #455
