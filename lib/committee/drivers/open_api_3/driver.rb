@@ -8,7 +8,8 @@ module Committee
           true
         end
 
-        # Whether parameters that were form-encoded will be coerced by default.
+        # Historically named for form params, but in OpenAPI 3 this flag controls
+        # request body coercion more generally.
         def default_coerce_form_params
           true
         end
