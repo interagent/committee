@@ -660,6 +660,44 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  describe 'bracket-style query params' do
+    it 'validates query params declared with bracket notation names' do
+      check_parameter = lambda { |env|
+        assert_equal '/test', env['committee.query_hash']['filter[slug]']
+        refute env['committee.query_hash'].key?('filter')
+        [200, {}, []]
+      }
+
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(bracket_notation_query_parameter))
+
+      get '/events?filter[slug]=%2Ftest'
+
+      assert_equal 200, last_response.status
+    end
+
+    it 'rejects unknown nested query params with strict_query_params' do
+      @app = new_rack_app(schema: query_param_schema(bracket_notation_query_parameter), strict_query_params: true)
+
+      get '/events?filter[slug]=%2Ftest&filter[status]=active'
+
+      assert_equal 400, last_response.status
+      assert_match(/filter\[status\]/, last_response.body)
+    end
+
+    it 'continues to support deepObject query params from Rack nested hashes' do
+      check_parameter = lambda { |env|
+        assert_equal '/test', env['committee.query_hash']['filter']['slug']
+        [200, {}, []]
+      }
+
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(deep_object_query_parameter))
+
+      get '/events?filter[slug]=%2Ftest'
+
+      assert_equal 200, last_response.status
+    end
+  end
+
   private
 
   def new_rack_app(options = {})
@@ -672,6 +710,55 @@ describe Committee::Middleware::RequestValidation do
     Rack::Builder.new {
       use Committee::Middleware::RequestValidation, options
       run check_lambda
+    }
+  end
+
+  def query_param_schema(parameter)
+    Committee::Drivers.load_from_data(query_param_document(parameter), nil, parser_options: { strict_reference_validation: true })
+  end
+
+  def bracket_notation_query_parameter
+    {
+      'name' => 'filter[slug]',
+      'in' => 'query',
+      'required' => true,
+      'schema' => { 'type' => 'string' },
+    }
+  end
+
+  def deep_object_query_parameter
+    {
+      'name' => 'filter',
+      'in' => 'query',
+      'required' => true,
+      'style' => 'deepObject',
+      'explode' => true,
+      'schema' => {
+        'type' => 'object',
+        'required' => ['slug'],
+        'properties' => {
+          'slug' => { 'type' => 'string' },
+        },
+      },
+    }
+  end
+
+  def query_param_document(parameter)
+    {
+      'openapi' => '3.0.3',
+      'info' => { 'title' => 'test', 'version' => '1.0.0' },
+      'paths' => {
+        '/events' => {
+          'get' => {
+            'parameters' => [parameter],
+            'responses' => {
+              '200' => {
+                'description' => 'ok',
+              },
+            },
+          },
+        },
+      },
     }
   end
 end
