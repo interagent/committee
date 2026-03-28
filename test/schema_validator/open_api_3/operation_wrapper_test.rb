@@ -204,6 +204,24 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         @path = '/characters'
         operation_object.validate_request_params({}, { "limit" => "1" }, {}, HEADER, query_coercion_enabled)
       end
+
+      it 'uses coerce_form_params for JSON request bodies too' do
+        @path = '/validate'
+        @method = 'post'
+
+        body_coercion_disabled = Committee::SchemaValidator::Option.new({ coerce_form_params: false }, open_api_3_schema, :open_api_3)
+        body_coercion_enabled = Committee::SchemaValidator::Option.new({ coerce_form_params: true }, open_api_3_schema, :open_api_3)
+
+        error = assert_raises(Committee::InvalidRequest) do
+          operation_object.validate_request_params({}, {}, { "integer" => "1" }, HEADER, body_coercion_disabled)
+        end
+        assert_match(/expected integer, but received String: "1"/i, error.message)
+
+        body_params = { "integer" => "1" }
+        operation_object.validate_request_params({}, {}, body_params, HEADER, body_coercion_enabled)
+
+        assert_kind_of(Integer, body_params["integer"])
+      end
     end
   end
 end
