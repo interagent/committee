@@ -52,6 +52,8 @@ module Committee
           # If no parameters are defined for this location, return raw params as-is
           return raw_params if params_for_location.empty?
 
+          raw_params = normalize_raw_params(raw_params, location, params_for_location)
+
           # Collect parameter names that will be deserialized
           # This includes both the parameter name and any properties (for exploded objects)
           deserialized_keys = Set.new
@@ -103,6 +105,65 @@ module Committee
         def convert_to_indifferent_hash(hash)
           return hash unless hash.is_a?(Hash)
           Committee::Utils.indifferent_hash.merge(hash)
+        end
+
+        # Normalize Rack-style nested query hashes into bracket notation when the
+        # schema expects bracket-named params or deepObject query params.
+        # Example: { "filter" => { "slug" => "/test" } } => { "filter[slug]" => "/test" }
+        # @param [Hash] raw_params
+        # @param [String] location
+        # @param [Array<OpenAPIParser::Schemas::Parameter>] params_for_location
+        # @return [Hash]
+        def normalize_raw_params(raw_params, location, params_for_location)
+          return raw_params unless location == 'query'
+          return raw_params unless raw_params.values.any? { |value| value.is_a?(Hash) }
+          return raw_params unless requires_query_param_flattening?(params_for_location)
+
+          normalized = Committee::Utils.indifferent_hash
+
+          raw_params.each do |key, value|
+            if should_flatten_query_param?(key, value, params_for_location)
+              flatten_nested_query_param(normalized, key.to_s, value)
+            else
+              normalized[key] = value
+            end
+          end
+
+          normalized
+        end
+
+        # @param [Array<OpenAPIParser::Schemas::Parameter>] params_for_location
+        # @return [Boolean]
+        def requires_query_param_flattening?(params_for_location)
+          params_for_location.any? { |param_def| param_def.style == 'deepObject' || param_def.name.include?('[') }
+        end
+
+        # @param [String, Symbol] key
+        # @param [Object] value
+        # @param [Array<OpenAPIParser::Schemas::Parameter>] params_for_location
+        # @return [Boolean]
+        def should_flatten_query_param?(key, value, params_for_location)
+          return false unless value.is_a?(Hash)
+
+          key_name = key.to_s
+          params_for_location.any? do |param_def|
+            param_def.name == key_name || param_def.name.start_with?("#{key_name}[")
+          end
+        end
+
+        # @param [Hash] result
+        # @param [String] prefix
+        # @param [Object] value
+        # @return [void]
+        def flatten_nested_query_param(result, prefix, value)
+          case value
+          when Hash
+            value.each do |child_key, child_value|
+              flatten_nested_query_param(result, "#{prefix}[#{child_key}]", child_value)
+            end
+          else
+            result[prefix] = value
+          end
         end
 
         # Extract and deserialize a single parameter
