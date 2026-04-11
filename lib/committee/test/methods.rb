@@ -23,6 +23,8 @@ module Committee
             schema_validator.request_validate(request_object)
           end
         end
+
+        increment_assertion_count
       end
 
       def assert_response_schema_confirm(expected_status = nil)
@@ -46,6 +48,8 @@ module Committee
         end
 
         schema_validator.response_validate(status, headers, [body], true) if validate_response?(status)
+
+        increment_assertion_count
       end
 
       def committee_options
@@ -89,6 +93,13 @@ module Committee
       end
 
       private
+
+      # assert_*_schema_confirm signal failure by raising, not via `assert`,
+      # so Minitest would report "Test is missing assertions" on success.
+      # Bump the counter explicitly; no-op outside Minitest (e.g. RSpec).
+      def increment_assertion_count
+        assert true if respond_to?(:assertions)
+      end
 
       # Temporarily adds dummy values for excepted parameters during validation
       # @see ExceptParameter
