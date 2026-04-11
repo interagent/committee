@@ -151,6 +151,14 @@ describe Committee::Test::Methods do
         assert_request_schema_confirm
       end
 
+      it "increments the Minitest assertion count on success" do
+        @app = new_rack_app
+        get "/characters"
+        before_count = assertions
+        assert_request_schema_confirm
+        assert_equal before_count + 1, assertions
+      end
+
       it "not exist required" do
         @app = new_rack_app
         get "/validate", { "query_string" => "query", "query_integer_list" => [1, 2] }
@@ -395,6 +403,14 @@ describe Committee::Test::Methods do
         @app = new_rack_app(JSON.generate(@correct_response))
         get "/characters"
         assert_response_schema_confirm(200)
+      end
+
+      it "increments the Minitest assertion count on success" do
+        @app = new_rack_app(JSON.generate(@correct_response))
+        get "/characters"
+        before_count = assertions
+        assert_response_schema_confirm(200)
+        assert_equal before_count + 1, assertions
       end
 
       it "detects an invalid response Content-Type" do

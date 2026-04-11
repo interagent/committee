@@ -94,6 +94,9 @@ module Committee
 
       private
 
+      # assert_*_schema_confirm signal failure by raising, not via `assert`,
+      # so Minitest would report "Test is missing assertions" on success.
+      # Bump the counter explicitly; no-op outside Minitest (e.g. RSpec).
       def increment_assertion_count
         assert true if respond_to?(:assertions)
       end
