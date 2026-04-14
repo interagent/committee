@@ -33,6 +33,13 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "passes through a valid response with a +json content-type" do
+    @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), { "Content-Type" => "application/problem+json; charset=utf-8" }, schema: open_api_3_schema, parse_response_by_content_type: true,)
+
+    get "/characters"
+    assert_equal 200, last_response.status
+  end
+
   it "passes through a invalid json" do
     @app = new_response_rack("not_json", {}, schema: open_api_3_schema)
 

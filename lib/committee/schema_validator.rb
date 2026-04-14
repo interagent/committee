@@ -2,9 +2,16 @@
 
 module Committee
   module SchemaValidator
+    JSON_MEDIA_TYPE_PATTERN = %r{\Aapplication/(?:.+\+)?json\z}.freeze
+
     class << self
       def request_media_type(request)
         Rack::MediaType.type(request.env['CONTENT_TYPE'])
+      end
+
+      def json_media_type?(content_type)
+        normalized_content_type = Rack::MediaType.type(content_type)
+        normalized_content_type&.match?(JSON_MEDIA_TYPE_PATTERN) || false
       end
 
       # @param [String] prefix
