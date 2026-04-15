@@ -28,7 +28,7 @@ module Committee
 
         parse_to_json = if validator_option.parse_response_by_content_type
                           content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
-                          headers.fetch(content_type_key, nil)&.start_with?('application/json')
+                          Committee::SchemaValidator.json_media_type?(headers.fetch(content_type_key, nil))
                         else
                           true
                         end
