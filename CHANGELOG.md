@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.6.3 - 2026-04-17
+
+- clarify OpenAPI 3 coerce_form_params behavior #471
+- support bracket-style OpenAPI 3 query params #472
+- increment Minitest assertion count in assert_schema_conform methods #473
+- fix parsing of +json response content types #474
+
 ## 5.6.2 - 2026-03-20
 
 - update .ruby-version to latest tested #456
