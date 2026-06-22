@@ -6,7 +6,7 @@ jobs:
     name: CodeSpell
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: CodeSpell
         uses: codespell-project/actions-codespell@master
         with:
