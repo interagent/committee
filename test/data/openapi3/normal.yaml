@@ -473,6 +473,35 @@ paths:
               type: string
               format: binary
 
+  /no_content_schema:
+    get:
+      description: endpoint with no content schema on its response
+      responses:
+        '200':
+          description: success
+
+  /wildcard_response:
+    get:
+      description: endpoint with wildcard status code response
+      responses:
+        '4XX':
+          description: client error
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /default_response:
+    get:
+      description: endpoint with default response only
+      responses:
+        default:
+          description: any status
+          content:
+            application/json:
+              schema:
+                type: object
+
   /validate_no_parameter:
     patch:
       description: validate no body

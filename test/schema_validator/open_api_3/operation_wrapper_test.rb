@@ -223,5 +223,43 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
         assert_kind_of(Integer, body_params["integer"])
       end
     end
+
+    describe '#find_response_object_for_status' do
+      def responses_for(path, method = 'get')
+        open_api_3_schema.operation_object(path, method).request_operation.operation_object.responses
+      end
+
+      def find(path, status, method = 'get')
+        wrapper = open_api_3_schema.operation_object(path, method)
+        wrapper.send(:find_response_object_for_status, responses_for(path, method), status)
+      end
+
+      it 'returns nil when responses is nil' do
+        wrapper = open_api_3_schema.operation_object('/characters', 'get')
+        assert_nil wrapper.send(:find_response_object_for_status, nil, 200)
+      end
+
+      it 'returns exact status code match' do
+        result = find('/characters', 200)
+        assert_kind_of OpenAPIParser::Schemas::Response, result
+        assert result.content.key?('application/json')
+      end
+
+      it 'returns wildcard match when exact status not defined' do
+        result = find('/wildcard_response', 400)
+        assert_kind_of OpenAPIParser::Schemas::Response, result
+        assert result.content.key?('application/json')
+      end
+
+      it 'returns default when no exact or wildcard match' do
+        result = find('/default_response', 500)
+        assert_kind_of OpenAPIParser::Schemas::Response, result
+        assert result.content.key?('application/json')
+      end
+
+      it 'returns nil when no exact, wildcard, or default match' do
+        assert_nil find('/characters', 999)
+      end
+    end
   end
 end

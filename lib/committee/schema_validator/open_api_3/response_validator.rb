@@ -14,6 +14,7 @@ module Committee
           @check_header = validator_option.check_header
           @allow_empty_date_and_datetime = validator_option.allow_empty_date_and_datetime
           @coerce_response_values = validator_option.coerce_response_values
+          @strict_response_content_type = validator_option.strict_response_content_type
         end
 
         def call(status, headers, response_data, strict)
@@ -21,7 +22,7 @@ module Committee
 
           validator_options = { allow_empty_date_and_datetime: @allow_empty_date_and_datetime, coerce_value: @coerce_response_values }
 
-          operation_wrapper.validate_response_params(status, headers, response_data, strict, check_header, validator_options: validator_options)
+          operation_wrapper.validate_response_params(status, headers, response_data, strict, check_header, strict_response_content_type: @strict_response_content_type, validator_options: validator_options)
         end
 
         def validate?(status)
