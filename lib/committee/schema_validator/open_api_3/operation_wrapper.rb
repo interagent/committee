@@ -32,8 +32,22 @@ module Committee
         end
 
         # @param [Boolean] strict when not content_type or status code definition, raise error
-        def validate_response_params(status_code, headers, response_data, strict, check_header, validator_options: {})
+        def validate_response_params(status_code, headers, response_data, strict, check_header, strict_response_content_type: false, validator_options: {})
           response_body = OpenAPIParser::RequestOperation::ValidatableResponseBody.new(status_code, response_data, headers)
+
+          # When strict_response_content_type is enabled, reject responses whose Content-Type is not
+          # declared in the spec's content map for this status code. Responses with no content map
+          # (e.g. bare 204s) are skipped — openapi_parser's validate_response_body handles those.
+          if strict_response_content_type
+            response_object = find_response_object_for_status(request_operation.operation_object&.responses, status_code)
+            if response_object
+              content_type = Rack::MediaType.type(response_body.content_type)
+              matched = response_object.select_media_type(content_type)
+              if matched.nil? && response_object.content && !response_object.content.empty?
+                raise Committee::InvalidResponse, "Response Content-Type '#{content_type}' is not declared in the OpenAPI spec for this operation. Declared types: #{response_object.content.keys.join(', ')}"
+              end
+            end
+          end
 
           return request_operation.validate_response_body(response_body, response_validate_options(strict, check_header, validator_options: validator_options))
         rescue OpenAPIParser::OpenAPIError => e
@@ -161,6 +175,18 @@ module Committee
           return if unknown_params.empty?
 
           raise Committee::InvalidRequest.new("Unknown query parameter(s): #{unknown_params.join(', ')}")
+        end
+
+        def find_response_object_for_status(responses, status_code)
+          return nil unless responses&.response
+
+          response_hash = responses.response
+          return response_hash[status_code.to_s] if response_hash[status_code.to_s]
+
+          wild_card = "#{status_code.to_i / 100}XX"
+          return response_hash[wild_card] if response_hash[wild_card]
+
+          responses.default
         end
 
         def response_validate_options(strict, check_header, validator_options: {})

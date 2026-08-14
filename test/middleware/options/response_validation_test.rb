@@ -94,6 +94,16 @@ describe Committee::Middleware::Options::ResponseValidation do
       end
       assert_equal "streaming_content_parsers must be a Hash", e.message
     end
+
+    it "sets strict_response_content_type option with default false" do
+      options = Committee::Middleware::Options::ResponseValidation.new(schema: hyper_schema)
+      assert_equal false, options.strict_response_content_type
+    end
+
+    it "sets strict_response_content_type option when provided" do
+      options = Committee::Middleware::Options::ResponseValidation.new(schema: hyper_schema, strict_response_content_type: true)
+      assert_equal true, options.strict_response_content_type
+    end
   end
 
   describe "#to_h" do
@@ -102,6 +112,11 @@ describe Committee::Middleware::Options::ResponseValidation do
       hash = options.to_h
       assert_equal true, hash[:strict]
       assert_equal false, hash[:validate_success_only]
+    end
+
+    it "includes strict_response_content_type in hash" do
+      options = Committee::Middleware::Options::ResponseValidation.new(schema: hyper_schema, strict_response_content_type: true)
+      assert_equal true, options.to_h[:strict_response_content_type]
     end
   end
 

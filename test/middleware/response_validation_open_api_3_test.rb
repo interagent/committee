@@ -303,6 +303,68 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  describe "strict_response_content_type option" do
+    it "passes through with undeclared content type when strict_response_content_type: false (default)" do
+      @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), { "Content-Type" => "application/vnd.api+json" }, schema: open_api_3_schema)
+      get "/characters"
+      assert_equal 200, last_response.status
+    end
+
+    it "raises with undeclared content type when strict_response_content_type: true" do
+      @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), { "Content-Type" => "application/vnd.api+json" }, schema: open_api_3_schema, strict_response_content_type: true, raise: true)
+      assert_raises(Committee::InvalidResponse) do
+        get "/characters"
+      end
+    end
+
+    it "returns 500 with undeclared content type when strict_response_content_type: true without raise" do
+      @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), { "Content-Type" => "application/vnd.api+json" }, schema: open_api_3_schema, strict_response_content_type: true)
+      get "/characters"
+      assert_equal 500, last_response.status
+    end
+
+    it "passes through when response has no content schema with strict_response_content_type: true" do
+      @app = new_response_rack("", { "Content-Type" => "application/vnd.api+json" }, schema: open_api_3_schema, strict_response_content_type: true)
+      get "/no_content_schema"
+      assert_equal 200, last_response.status
+    end
+
+    it "passes through with declared content type and strict_response_content_type: true" do
+      @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), { "Content-Type" => "application/json" }, schema: open_api_3_schema, strict_response_content_type: true)
+      get "/characters"
+      assert_equal 200, last_response.status
+    end
+
+    it "passes through with declared content type and charset param with strict_response_content_type: true" do
+      @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), { "Content-Type" => "application/json; charset=utf-8" }, schema: open_api_3_schema, strict_response_content_type: true)
+      get "/characters"
+      assert_equal 200, last_response.status
+    end
+
+    it "raises with undeclared content type matched via wildcard status code with strict_response_content_type: true" do
+      @app = new_response_rack("{}", { "Content-Type" => "application/vnd.api+json" }, { schema: open_api_3_schema, strict_response_content_type: true, raise: true, validate_success_only: false }, { status: 400 })
+      assert_raises(Committee::InvalidResponse) do
+        get "/wildcard_response"
+      end
+    end
+
+    it "raises with undeclared content type matched via default response with strict_response_content_type: true" do
+      @app = new_response_rack("{}", { "Content-Type" => "application/vnd.api+json" }, { schema: open_api_3_schema, strict_response_content_type: true, raise: true, validate_success_only: false }, { status: 500 })
+      assert_raises(Committee::InvalidResponse) do
+        get "/default_response"
+      end
+    end
+
+    it "calls error_handler with strict_response_content_type: true and raise: false" do
+      called_err = nil
+      pr = ->(e, _env) { called_err = e }
+      @app = new_response_rack(JSON.generate(CHARACTERS_RESPONSE), { "Content-Type" => "application/vnd.api+json" }, schema: open_api_3_schema, strict_response_content_type: true, error_handler: pr)
+      get "/characters"
+      assert_equal 500, last_response.status
+      assert_kind_of Committee::InvalidResponse, called_err
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})
