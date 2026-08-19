@@ -10,6 +10,14 @@ describe Committee::RequestUnpacker do
     assert_equal([{ "x" => "y" }, false], unpacker.unpack_request_params(request))
   end
 
+  it "unpacks JSON on Content-Type: application/json if the body was not rewound first" do
+    env = { "CONTENT_TYPE" => "application/json", "rack.input" => StringIO.new('{"x":"y"}'), }
+    request = Rack::Request.new(env)
+    request.body.read
+    unpacker = Committee::RequestUnpacker.new
+    assert_equal([{ "x" => "y" }, false], unpacker.unpack_request_params(request))
+  end
+
   it "unpacks JSON on Content-Type: application/vnd.api+json" do
     env = { "CONTENT_TYPE" => "application/vnd.api+json", "rack.input" => StringIO.new('{"x":"y"}'), }
     request = Rack::Request.new(env)
