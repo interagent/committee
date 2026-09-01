@@ -50,6 +50,10 @@ module Committee
         !@operation_object.nil?
       end
 
+      # Expose the operation matched for the request, or nil if none matched
+      # @return [Committee::SchemaValidator::OpenAPI3::OperationWrapper, nil]
+      attr_reader :operation_object
+
       private
 
       attr_reader :validator_option
