@@ -156,6 +156,63 @@ describe Committee::SchemaValidator::OpenAPI3::OperationWrapper do
       assert_kind_of(OpenAPIParser::OpenAPIError, e.original_error)
     end
 
+    describe 'same-named path and query parameters' do
+      %w[get post].each do |method|
+        describe method do
+          before do
+            @path = '/overwrite_same_parameter/123'
+            @method = method
+            data = open_api_3_data
+            path_item = data['paths']['/overwrite_same_parameter/{integer}']
+            path_item[method] = path_item['post']
+            @open_api_3_schema = Committee::Drivers.load_from_data(data, open_api_3_schema_path, parser_options: { strict_reference_validation: true })
+          end
+
+          it 'rejects an invalid query value without overwriting it with the path value' do
+            path_params = { 'integer' => 123 }
+            query_params = { 'integer' => 'not-an-integer' }
+
+            error = assert_raises(Committee::InvalidRequest) do
+              operation_object.validate_request_params(path_params, query_params, {}, HEADER, @validator_option)
+            end
+
+            assert_match(/expected integer, but received String: "not-an-integer"/i, error.message)
+            assert_kind_of(OpenAPIParser::OpenAPIError, error.original_error)
+            assert_equal({ 'integer' => 'not-an-integer' }, query_params)
+            assert_equal({ 'integer' => 123 }, path_params)
+          end
+
+          it 'rejects a missing required query parameter even when the path parameter is present' do
+            error = assert_raises(Committee::InvalidRequest) do
+              operation_object.validate_request_params({ 'integer' => 123 }, {}, {}, HEADER, @validator_option)
+            end
+
+            assert_match(/missing required parameters: integer/i, error.message)
+          end
+
+          it 'coerces the query value independently of the path value' do
+            path_params = { 'integer' => 123 }
+            query_params = { 'integer' => '456' }
+
+            operation_object.validate_request_params(path_params, query_params, {}, HEADER, @validator_option)
+
+            assert_equal({ 'integer' => 123 }, path_params)
+            assert_equal({ 'integer' => 456 }, query_params)
+          end
+
+          it 'honors disabled query coercion even when the path value is already an integer' do
+            options = Committee::SchemaValidator::Option.new({ coerce_query_params: false }, open_api_3_schema, :open_api_3)
+
+            error = assert_raises(Committee::InvalidRequest) do
+              operation_object.validate_request_params({ 'integer' => 123 }, { 'integer' => '456' }, {}, HEADER, options)
+            end
+
+            assert_match(/expected integer, but received String: "456"/i, error.message)
+          end
+        end
+      end
+    end
+
     describe '#content_types' do
       it 'returns supported content types' do
         @path = '/validate_content_types'

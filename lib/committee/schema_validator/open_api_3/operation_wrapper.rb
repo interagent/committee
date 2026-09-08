@@ -54,12 +54,12 @@ module Committee
           raise Committee::InvalidResponse.new(e.message, original_error: e)
         end
 
-        def validate_request_params(path_params, query_params, body_params, headers, validator_option)
+        def validate_request_params(_path_params, query_params, body_params, headers, validator_option)
           ret, err = case request_operation.http_method
                 when 'get', 'delete', 'head'
-                  validate_get_request_params(path_params, query_params, headers, validator_option)
+                  validate_get_request_params(query_params, headers, validator_option)
                 when 'post', 'put', 'patch', 'options'
-                  validate_post_request_params(path_params, query_params, body_params, headers, validator_option)
+                  validate_post_request_params(query_params, body_params, headers, validator_option)
                 else
                   raise "Committee OpenAPI3 not support #{request_operation.http_method} method"
                 end
@@ -126,42 +126,27 @@ module Committee
           OpenAPIParser::SchemaValidator::Options.new(**parser_options)
         end
 
-        def validate_get_request_params(path_params, query_params, headers, validator_option)
-          # bad performance because when we coerce value, same check
-          validate_path_and_query_params(path_params, query_params, headers, validator_option)
+        def validate_get_request_params(query_params, headers, validator_option)
+          validate_query_params(query_params, headers, validator_option)
         rescue OpenAPIParser::OpenAPIError => e
           raise Committee::InvalidRequest.new(e.message, original_error: e)
         end
 
-        def validate_post_request_params(path_params, query_params, body_params, headers, validator_option)
+        def validate_post_request_params(query_params, body_params, headers, validator_option)
           content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
           content_type = Rack::MediaType.type(headers[content_type_key])
 
-          # bad performance because when we coerce value, same check
-          validate_path_and_query_params(path_params, query_params, headers, validator_option)
+          validate_query_params(query_params, headers, validator_option)
           request_operation.validate_request_body(content_type, body_params, build_openapi_parser_body_option(validator_option))
         rescue => e
           raise Committee::InvalidRequest.new(e.message, original_error: e)
         end
 
-        def validate_path_and_query_params(path_params, query_params, headers, validator_option)
-          path_params ||= {}
+        def validate_query_params(query_params, headers, validator_option)
           query_params ||= {}
 
-          # it's currently impossible to validate path params and query params separately
-          # so we have to resort to this workaround
-
-          path_keys = path_params.keys.to_set
-          query_keys = query_params.keys.to_set
-
-          merged_params = query_params.merge(path_params)
-
-          request_operation.validate_request_parameter(merged_params, headers, build_openapi_parser_request_parameter_option(validator_option))
-
-          merged_params.each do |k, v|
-            path_params[k] = v if path_keys.include?(k)
-            query_params[k] = v if query_keys.include?(k)
-          end
+          # Path parameters have already been validated by coerce_path_parameter.
+          request_operation.validate_request_parameter(query_params, headers, build_openapi_parser_request_parameter_option(validator_option))
 
           validate_no_unknown_query_params(query_params) if validator_option.strict_query_params
         end
