@@ -17,6 +17,29 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "preserves a one-shot response body after validation" do
+    content = JSON.generate(CHARACTERS_RESPONSE)
+    chunks = [content]
+    each_calls = 0
+    body = Rack::BodyProxy.new(Enumerator.new do |yielder|
+      each_calls += 1
+      chunks.each { |chunk| yielder << chunk }
+      chunks.clear
+    end) {}
+    @app = Rack::Builder.new {
+      use Committee::Middleware::ResponseValidation, { schema: open_api_3_schema }
+      run ->(_) { [200, { "Content-Type" => "application/json" }, body] }
+    }
+
+    status, _headers, response_body = @app.call(Rack::MockRequest.env_for("/characters"))
+
+    assert_equal 200, status
+    assert_equal content, response_body.each.to_a.join
+    assert_equal 1, each_calls
+    response_body.close if response_body.respond_to?(:close)
+    assert body.closed?
+  end
+
   it "passes through a valid response with content-type (lower-case)" do
     status = 200
     headers = { "content-type" => "application/json" }
