@@ -28,8 +28,19 @@ module Committee
             end
           end
         else
+          validator = response_validator(request, status)
+          if validator
+            original_response = response
+            response = []
+            begin
+              original_response.each { |chunk| response << chunk }
+            ensure
+              original_response.close if original_response.respond_to?(:close)
+            end
+          end
+
           begin
-            validate(request, status, headers, response)
+            validator&.response_validate(status, headers, response, @strict)
           rescue Committee::InvalidResponse
             handle_exception($!, request.env)
 
@@ -68,10 +79,12 @@ module Committee
       end
 
       def validate(request, status, headers, response, streaming_content_parser = nil)
-        v = build_schema_validator(request)
-        if v.link_exist? && self.class.validate?(status, validate_success_only)
-          v.response_validate(status, headers, response, @strict, streaming_content_parser)
-        end
+        response_validator(request, status)&.response_validate(status, headers, response, @strict, streaming_content_parser)
+      end
+
+      def response_validator(request, status)
+        validator = build_schema_validator(request)
+        validator if validator.link_exist? && self.class.validate?(status, validate_success_only)
       end
 
       def retrieve_streaming_content_parser(headers)
