@@ -15,7 +15,7 @@ module Committee
           @validators = {}
           if link.is_a? Drivers::OpenAPI2::Link
             link.target_schemas.each do |status, schema|
-              @validators[status] = JsonSchema::Validator.new(target_schema(link))
+              @validators[status] = JsonSchema::Validator.new(schema)
             end
           else
             @validator = JsonSchema::Validator.new(target_schema(link))
