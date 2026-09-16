@@ -212,6 +212,31 @@ describe Committee::Middleware::ResponseValidation do
         get "/events/stream"
         assert_equal 200, last_response.status
       end
+
+      it 'validates the chunks sent from a body that cannot be read after close' do
+        closed = false
+        body = Object.new
+        body.define_singleton_method(:each) do |&block|
+          raise IOError, "body is closed" if closed
+
+          ["hello"].each(&block)
+        end
+        body.define_singleton_method(:close) { closed = true }
+        validated_body = nil
+        options = { schema: open_api_3_streaming_response_schema, streaming_content_parsers: { 'text/event-stream' => ->(body) { validated_body = body } }, raise: true, }
+        @app = Rack::Builder.new {
+          use Committee::Middleware::ResponseValidation, options
+          run ->(_) { [200, { 'content-type' => 'text/event-stream' }, body] }
+        }
+
+        status, _headers, response_body = @app.call(Rack::MockRequest.env_for("/events/stream"))
+
+        assert_equal 200, status
+        assert_equal ["hello"], response_body.each.to_a
+        response_body.close
+        assert closed
+        assert_equal "hello", validated_body
+      end
     end
 
     describe 'application/x-json-stream; customized streaming event' do
