@@ -77,7 +77,7 @@ module Committee
       end
 
       def schema_validator
-        @schema_validator ||= router.build_schema_validator(request_object)
+        router.build_schema_validator(request_object)
       end
 
       def schema_coverage
