@@ -424,7 +424,7 @@ describe Committee::Middleware::RequestValidation do
         assert_equal env['committee.path_hash'][:integer], 84
         assert_equal env['committee.request_body_hash']['integer'], 21
         assert_equal env['committee.request_body_hash'][:integer], 21
-        assert_equal env['committee.query_hash']['integer'], 84 # we can't use query_parameter :(
+        assert_equal env['committee.query_hash']['integer'], 42
         # assert_equal env['rack.request.query_hash'][:integer], 21 # this isn't hash indifferent hash because we use rack.request.query_hash
         [204, {}, []]
       end, schema: open_api_3_schema, parameter_overwrite_by_rails_rule: false)
@@ -478,7 +478,7 @@ describe Committee::Middleware::RequestValidation do
         assert_equal env['committee.params'][:integer], 84
         assert_equal env['committee.request_body_hash']['integer'], 21
         assert_equal env['committee.request_body_hash'][:integer], 21
-        assert_equal env['committee.query_hash']['integer'], 84 # we can't use query_parameter :(
+        assert_equal env['committee.query_hash']['integer'], 42
         assert_equal env['committee.path_hash']['integer'], 84
         assert_equal env['committee.path_hash'][:integer], 84
         [204, {}, []]
