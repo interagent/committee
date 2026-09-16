@@ -112,6 +112,22 @@ describe Committee::SchemaValidator::HyperSchema::ResponseValidator do
     assert_equal message, e.message
   end
 
+  it "validates OpenAPI 2 responses against the schema for their status" do
+    link = Committee::Drivers::OpenAPI2::Link.new
+    link.href = "/apps"
+    link.media_type = "application/json"
+    link.status_success = 200
+    success_schema = JsonSchema.parse!({ "type" => "object", "required" => ["id"], "properties" => { "id" => { "type" => "integer" } } })
+    error_schema = JsonSchema.parse!({ "type" => "object", "required" => ["error"], "properties" => { "error" => { "type" => "string" } } })
+    link.target_schemas = { 200 => success_schema, 400 => error_schema }
+    validator = Committee::SchemaValidator::HyperSchema::ResponseValidator.new(link, validate_success_only: false)
+
+    validator.call(200, @headers, { "id" => 1 })
+    validator.call(400, @headers, { "error" => "invalid request" })
+    assert_raises(Committee::InvalidResponse) { validator.call(200, @headers, { "error" => "invalid request" }) }
+    assert_raises(Committee::InvalidResponse) { validator.call(400, @headers, { "id" => 1, "error" => 1 }) }
+  end
+
   private
 
   def call
