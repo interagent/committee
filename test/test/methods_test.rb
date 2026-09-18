@@ -123,6 +123,18 @@ describe Committee::Test::Methods do
         assert_schema_conform(200)
       end
 
+      it "uses each request's operation for consecutive responses" do
+        responses = { "/characters" => JSON.generate(@correct_response), "/validate_response_array" => JSON.generate(["honoka"]), }
+        @app = Rack::Builder.new {
+          run ->(env) { [200, { "Content-Type" => "application/json" }, [responses.fetch(env["PATH_INFO"])]] }
+        }
+
+        get "/characters"
+        assert_schema_conform(200)
+        get "/validate_response_array"
+        assert_schema_conform(200)
+      end
+
       it "detects an invalid response Content-Type" do
         @app = new_rack_app(JSON.generate([@correct_response]), {})
         get "/characters"
