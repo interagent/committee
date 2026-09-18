@@ -18,13 +18,25 @@ module Committee
         streaming_content_parser = retrieve_streaming_content_parser(headers)
 
         if streaming_content_parser
+          original_response = response
+          streamed_response = []
+          response = Enumerator.new do |yielder|
+            original_response.each do |chunk|
+              streamed_response << chunk
+              yielder << chunk
+            end
+          end
           response = Rack::BodyProxy.new(response) do
             begin
-              validate(request, status, headers, response, streaming_content_parser)
-            rescue => e
-              handle_exception(e, request.env)
+              original_response.close if original_response.respond_to?(:close)
+            ensure
+              begin
+                validate(request, status, headers, streamed_response, streaming_content_parser)
+              rescue => e
+                handle_exception(e, request.env)
 
-              raise e if @raise
+                raise e if @raise
+              end
             end
           end
         else
