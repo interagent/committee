@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.6.4 - 2026-09-21
+
+- bump actions/checkout from 6 to 7 #475
+- improve code quality #476
+- add strict_response_content_type to ResponseValidation middleware #478
+- bump sqlite3 in example to clear security warning #480
+- expose matched operation on SchemaValidator::OpenAPI3 #479
+- prevent path params from masking invalid query params #481
+- validate openapi 2 responses against status-specific schemas #482
+- preserve one-shot response bodies after validation #482
+- validate each test request against in's operation #485
+
 ## 5.6.3 - 2026-04-17
 
 - clarify OpenAPI 3 coerce_form_params behavior #471
