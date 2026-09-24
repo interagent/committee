@@ -661,6 +661,15 @@ describe Committee::Middleware::RequestValidation do
   end
 
   describe 'bracket-style query params' do
+    it 'returns a bad request for query parameters with invalid UTF-8 bytes' do
+      parameter = { 'name' => 'query_string', 'in' => 'query', 'required' => true, 'schema' => { 'type' => 'string', 'maxLength' => 10, 'pattern' => '^[A-Z]+$' }, }
+      @app = new_rack_app(schema: query_param_schema(parameter))
+
+      get '/events?query_string=%c0%af'
+
+      assert_equal 400, last_response.status
+    end
+
     it 'validates query params declared with bracket notation names' do
       check_parameter = lambda { |env|
         assert_equal '/test', env['committee.query_hash']['filter[slug]']
