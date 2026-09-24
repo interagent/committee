@@ -128,7 +128,7 @@ module Committee
 
         def validate_get_request_params(query_params, headers, validator_option)
           validate_query_params(query_params, headers, validator_option)
-        rescue OpenAPIParser::OpenAPIError => e
+        rescue OpenAPIParser::OpenAPIError, ArgumentError => e
           raise Committee::InvalidRequest.new(e.message, original_error: e)
         end
 
