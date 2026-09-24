@@ -19,7 +19,7 @@ module Committee
 
         if streaming_content_parser
           original_response = response
-          streamed_response = []
+          streamed_response = +""
           response = Enumerator.new do |yielder|
             original_response.each do |chunk|
               streamed_response << chunk

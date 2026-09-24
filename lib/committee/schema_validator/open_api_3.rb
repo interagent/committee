@@ -21,10 +21,11 @@ module Committee
       end
 
       def response_validate(status, headers, response, test_method = false, custom_body_parser = nil)
-        full_body = +""
-        response.each do |chunk|
-          full_body << chunk
-        end
+        full_body = if response.is_a?(String)
+                      response
+                    else
+                      response.each_with_object(+"") { |chunk, body| body << chunk }
+                    end
 
         parse_to_json = if validator_option.parse_response_by_content_type
                           content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
