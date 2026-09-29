@@ -456,6 +456,43 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
     end
   end
 
+  describe 'array-form type (OpenAPI 3.1)' do
+    it 'deserializes form style array with explode=false' do
+      param = nullable(create_param('ids', 'query', 'form', false, 'array', 'integer'))
+      result = create_deserializer([param]).deserialize_query_params({ 'ids' => '1,2,3' })
+
+      assert_equal({ 'ids' => ['1', '2', '3'] }, result)
+    end
+
+    it 'deserializes form style object with explode=true' do
+      param = nullable(create_param('filter', 'query', 'form', true, 'object', { 'role' => 'string' }))
+      result = create_deserializer([param]).deserialize_query_params({ 'role' => 'admin' })
+
+      assert_equal({ 'filter' => { 'role' => 'admin' } }, result)
+    end
+
+    it 'deserializes simple style array' do
+      param = nullable(create_param('ids', 'path', 'simple', false, 'array', 'integer'))
+      result = create_deserializer([param]).deserialize_path_params({ 'ids' => '1,2,3' })
+
+      assert_equal({ 'ids' => ['1', '2', '3'] }, result)
+    end
+
+    it 'deserializes label style array' do
+      param = nullable(create_param('ids', 'path', 'label', false, 'array', 'integer'))
+      result = create_deserializer([param]).deserialize_path_params({ 'ids' => '.1,2,3' })
+
+      assert_equal({ 'ids' => ['1', '2', '3'] }, result)
+    end
+
+    it 'deserializes matrix style array' do
+      param = nullable(create_param('ids', 'path', 'matrix', false, 'array', 'integer'))
+      result = create_deserializer([param]).deserialize_path_params({ 'ids' => ';ids=1,2,3' })
+
+      assert_equal({ 'ids' => ['1', '2', '3'] }, result)
+    end
+  end
+
   private
 
   def create_deserializer(params)
@@ -476,5 +513,10 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
     else
       Struct.new(:type, :properties, :items).new(type, nil, nil)
     end
+  end
+
+  def nullable(param)
+    param.schema.type = [param.schema.type, "null"]
+    param
   end
 end

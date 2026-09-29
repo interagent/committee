@@ -41,6 +41,9 @@ ValidApp = { "maintenance" => false, "name" => "example", }.freeze
 # For our OpenAPI example.
 ValidPet = { "id" => 123, "name" => "example", "tag" => "tag-123", }.freeze
 
+# For our OpenAPI 3.1 example.
+ValidItem = { "kind" => "widget", "name" => nil, "rating" => 4.5, "point" => [1.5, "a"], }.freeze
+
 def hyper_schema
   @hyper_schema ||= Committee::Drivers.load_from_json(hyper_schema_schema_path)
 end
@@ -63,6 +66,10 @@ end
 
 def open_api_3_streaming_response_schema
   @open_api_3_streaming_response_schema ||= Committee::Drivers.load_from_file(open_api_3_streaming_response_schema_path, parser_options: { strict_reference_validation: true })
+end
+
+def open_api_3_1_schema
+  @open_api_3_1_schema ||= Committee::Drivers.load_from_file(open_api_3_1_schema_path, parser_options: { strict_reference_validation: true })
 end
 
 # Don't cache this because we'll often manipulate the created hash in tests.

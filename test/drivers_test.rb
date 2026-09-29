@@ -45,11 +45,9 @@ describe Committee::Drivers do
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
-    it 'fails to load OpenAPI 3.1+' do
-      e = assert_raises(Committee::OpenAPI3Unsupported) do
-        Committee::Drivers.load_from_file(open_api_3_1_schema_path, parser_options: { strict_reference_validation: true })
-      end
-      assert_equal 'Committee does not support OpenAPI 3.1+ yet', e.message
+    it 'loads OpenAPI 3.1' do
+      s = Committee::Drivers.load_from_file(open_api_3_1_schema_path, parser_options: { strict_reference_validation: true })
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
     it 'fails to load OpenAPI 3 with invalid reference' do
@@ -164,11 +162,29 @@ describe Committee::Drivers do
       assert_kind_of Committee::Drivers::HyperSchema::Schema, s
     end
 
-    it 'fails to load OpenAPI 3.1+' do
+    it 'loads OpenAPI 3.1' do
+      s = Committee::Drivers.load_from_data(open_api_3_1_data, nil, parser_options: { strict_reference_validation: true })
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+
+    it 'fails to load OpenAPI 3.2+' do
       e = assert_raises(Committee::OpenAPI3Unsupported) do
-        Committee::Drivers.load_from_data(open_api_3_1_data)
+        Committee::Drivers.load_from_data(open_api_3_1_data.merge('openapi' => '3.2.0'))
       end
-      assert_equal 'Committee does not support OpenAPI 3.1+ yet', e.message
+      assert_equal 'Committee does not support OpenAPI 3.2+ yet', e.message
+    end
+
+    it 'fails to load an OpenAPI 3.2 prerelease' do
+      assert_raises(Committee::OpenAPI3Unsupported) do
+        Committee::Drivers.load_from_data(open_api_3_1_data.merge('openapi' => '3.2.0-rc1'))
+      end
+    end
+
+    it 'loads OpenAPI 3.1 without a patch version or as a YAML number' do
+      ['3.1', 3.1].each do |version|
+        s = Committee::Drivers.load_from_data(open_api_3_1_data.merge('openapi' => version), nil, parser_options: { strict_reference_validation: true })
+        assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+      end
     end
   end
 end

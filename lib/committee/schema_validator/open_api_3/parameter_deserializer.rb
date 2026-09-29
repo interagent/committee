@@ -78,7 +78,7 @@ module Committee
               deserialized_keys.add(param_def.name)
 
               # For form-style exploded objects, mark the property keys as deserialized
-              if param_def.schema&.type == 'object' &&
+              if Committee::Utils.schema_type(param_def.schema) == 'object' &&
                  (param_def.style.nil? || param_def.style == 'form') &&
                  (param_def.explode.nil? || param_def.explode)
                 param_def.schema.properties&.each_key do |prop_name|
@@ -258,7 +258,7 @@ module Committee
           schema = param_def.schema
           return nil unless schema
 
-          case schema.type
+          case Committee::Utils.schema_type(schema)
           when 'object'
             deserialize_form_object(param_name, schema, raw_params, explode)
           when 'array'
@@ -380,7 +380,7 @@ module Committee
           schema = param_def.schema
           return value unless schema
 
-          case schema.type
+          case Committee::Utils.schema_type(schema)
           when 'array'
             # Both explode true/false use comma separation for simple style
             # Example: "1,2,3" → ["1", "2", "3"]
@@ -414,7 +414,7 @@ module Committee
           schema = param_def.schema
           return value unless schema
 
-          case schema.type
+          case Committee::Utils.schema_type(schema)
           when 'array'
             if explode
               # explode=true: .3.4.5 → ["3", "4", "5"]
@@ -449,7 +449,7 @@ module Committee
           schema = param_def.schema
           return value unless schema
 
-          case schema.type
+          case Committee::Utils.schema_type(schema)
           when 'array'
             if explode
               # explode=true: ;id=3;id=4 (multiple occurrences)

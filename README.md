@@ -416,6 +416,31 @@ use Committee::Middleware::RequestValidation, schema: schema
 * Stub servers are not yet supported, so neither `Committee::Middleware::Stub` or `Committee::Bin::CommitteeStub` are functional.
 * Changing `coerce_recursive` isn't supported. This option is always on.
 
+### OpenAPI 3.1
+
+OpenAPI 3.0 and 3.1 documents both use the OpenAPI 3 driver.
+
+Supported 3.1 additions:
+
+- array-form `type` (including `"null"`, with coercion of string params)
+- `const`
+- `prefixItems`
+- numeric `exclusiveMinimum`/`exclusiveMaximum`
+- `components.pathItems`
+- `webhooks`/`jsonSchemaDialect` (parsed but not routed)
+- `contentMediaType`/`contentEncoding`/`contentSchema` (parsed but not validated)
+
+Like openapi_parser, committee also honors these in 3.0 documents. Pass `strict_specification_version: :warn` (or `:raise`) in `parser_options` to flag keywords that don't match the declared version.
+
+Not yet supported:
+
+- `$dynamicRef`/`$dynamicAnchor`
+- `if`/`then`/`else`
+- `unevaluatedProperties`
+- `dependentRequired`
+- `patternProperties`
+- `$ref` siblings
+
 ### Upgrading from Committee 2.* to 3.*
 
 Committee 3.* has many breaking changes so we recommend upgrading to the latest release on 2.* and fixing any deprecation errors you see before upgrading to 3.*. The steps would be roughly as follows:

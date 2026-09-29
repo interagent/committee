@@ -24,5 +24,11 @@ module Committee
 
         return from
     end
+
+    # OpenAPI 3.1 allows `type: [x, "null"]`; returns the first non-null type.
+    def self.schema_type(schema)
+      type = schema&.type
+      type.is_a?(Array) ? (type - ['null']).first : type
+    end
   end
 end

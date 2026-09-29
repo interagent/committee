@@ -3,6 +3,18 @@ info:
   version: 1.0.0
   title: OpenAPI 3.1 Test
   description: A Sample file
+jsonSchemaDialect: https://spec.openapis.org/oas/3.1/dialect/base
+webhooks:
+  newItem:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '200':
+          description: ok
 paths:
   /characters:
     get:
@@ -24,3 +36,105 @@ paths:
             application/json:
               schema:
                 type: object
+  /search:
+    get:
+      parameters:
+      - name: limit
+        in: query
+        schema:
+          type: [integer, "null"]
+          minimum: 1
+      - name: ids
+        in: query
+        style: form
+        explode: false
+        schema:
+          type: [array, "null"]
+          items:
+            type: integer
+      responses:
+        '200':
+          description: ok
+  /items/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: [integer, "null"]
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+  /items:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '201':
+          description: created
+  /reusable:
+    $ref: '#/components/pathItems/Reusable'
+  /except:
+    get:
+      parameters:
+      - name: count
+        in: query
+        required: true
+        schema:
+          type: [integer, "null"]
+      responses:
+        200:
+          description: ok
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [count]
+              properties:
+                count:
+                  type: [integer, "null"]
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [count]
+              properties:
+                count:
+                  type: [integer, "null"]
+      responses:
+        200:
+          description: ok
+components:
+  schemas:
+    Item:
+      type: object
+      required: [kind, point]
+      properties:
+        kind:
+          const: widget
+        name:
+          type: [string, "null"]
+        rating:
+          type: number
+          exclusiveMinimum: 0
+          exclusiveMaximum: 5
+        point:
+          type: array
+          prefixItems:
+          - type: number
+          - type: string
+  pathItems:
+    Reusable:
+      get:
+        responses:
+          '200':
+            description: ok
