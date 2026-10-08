@@ -674,7 +674,7 @@ describe Committee::Middleware::RequestValidation do
 
       assert_equal 200, last_response.status
     end
-    
+
     it 'returns a bad request for query parameters with invalid UTF-8 bytes' do
       parameter = { 'name' => 'query_string', 'in' => 'query', 'required' => true, 'schema' => { 'type' => 'string', 'maxLength' => 10, 'pattern' => '^[A-Z]+$' }, }
       @app = new_rack_app(schema: query_param_schema(parameter))
