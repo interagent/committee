@@ -21,10 +21,11 @@ module Committee
       def response_validate(status, headers, response, _test_method = false, custom_body_parser = nil)
         return unless link_exist?
 
-        full_body = +""
-        response.each do |chunk|
-          full_body << chunk
-        end
+        full_body = if response.is_a?(String)
+                      response
+                    else
+                      response.each_with_object(+"") { |chunk, body| body << chunk }
+                    end
 
         data = if custom_body_parser
                  custom_body_parser.call(full_body)
