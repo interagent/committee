@@ -116,6 +116,19 @@ module Committee
         # @return [Hash]
         def normalize_raw_params(raw_params, location, params_for_location)
           return raw_params unless location == 'query'
+
+          normalized = raw_params
+          params_for_location.each do |param_def|
+            next unless param_def.name.end_with?('[]') && param_def.schema&.type == 'array'
+
+            raw_name = param_def.name.delete_suffix('[]')
+            next unless normalized[raw_name].is_a?(Array)
+
+            normalized = raw_params.dup if normalized.equal?(raw_params)
+            normalized[param_def.name] = normalized.delete(raw_name)
+          end
+
+          raw_params = normalized
           return raw_params unless raw_params.values.any? { |value| value.is_a?(Hash) }
           return raw_params unless requires_query_param_flattening?(params_for_location)
 

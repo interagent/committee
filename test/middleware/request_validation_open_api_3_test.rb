@@ -661,6 +661,20 @@ describe Committee::Middleware::RequestValidation do
   end
 
   describe 'bracket-style query params' do
+    it 'deserializes array params whose name ends with brackets' do
+      parameter = { 'name' => 'ids[]', 'in' => 'query', 'required' => true, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
+      check_parameter = lambda { |env|
+        assert_equal [1, 2], env['committee.query_hash']['ids[]']
+        assert_equal ['1', '2'], env['rack.request.query_hash']['ids']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(parameter))
+
+      get '/events?ids[]=1&ids[]=2'
+
+      assert_equal 200, last_response.status
+    end
+
     it 'returns a bad request for query parameters with invalid UTF-8 bytes' do
       parameter = { 'name' => 'query_string', 'in' => 'query', 'required' => true, 'schema' => { 'type' => 'string', 'maxLength' => 10, 'pattern' => '^[A-Z]+$' }, }
       @app = new_rack_app(schema: query_param_schema(parameter))
