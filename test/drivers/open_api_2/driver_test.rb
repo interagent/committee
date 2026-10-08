@@ -44,6 +44,19 @@ describe Committee::Drivers::OpenAPI2::Driver do
     end
   end
 
+  it "resolves references to reusable parameters" do
+    schema_data = schema_data_with_responses({ '200' => { 'description' => 'ok' } })
+    schema_data['parameters'] = { 'limit' => { 'name' => 'limit', 'in' => 'query', 'type' => 'integer' }, 'authorization' => { 'name' => 'Authorization', 'in' => 'header', 'type' => 'string' }, }
+    schema_data['paths']['/foos']['get']['parameters'] = [{ '$ref' => '#/parameters/limit' }, { '$ref' => '#/parameters/authorization' },]
+
+    schema = @driver.parse(schema_data)
+
+    link = schema.routes['GET'][0][1]
+    assert_equal ['limit'], link.schema.properties.keys
+    assert_equal ['integer'], link.schema.properties['limit'].type
+    assert_equal ['Authorization'], link.header_schema.properties.keys
+  end
+
   it "names capture groups into href regexes" do
     schema = @driver.parse(open_api_2_data)
     assert_equal %r{^\/api\/pets\/(?<id>[^\/]+)$}.inspect, schema.routes["DELETE"][0][0].inspect

@@ -127,6 +127,20 @@ module Committee
           [schema, store]
         end
 
+        def resolve_parameter_references(link_data, data)
+          return link_data unless link_data["parameters"]
+
+          parameters = link_data["parameters"].map do |parameter|
+            ref = parameter["$ref"]
+            next parameter unless ref
+
+            name = ref.delete_prefix("#/parameters/").gsub("~1", "/").gsub("~0", "~")
+            data.fetch("parameters").fetch(name)
+          end
+
+          link_data.merge("parameters" => parameters)
+        end
+
         def parse_routes!(data, schema, store)
           routes = {}
 
@@ -152,6 +166,7 @@ module Committee
               link.href = href
               link.media_type = schema.produces
               link.method = method
+              link_data = resolve_parameter_references(link_data, data)
 
               # Convert the spec's parameter pseudo-schemas into JSON schemas that
               # we can use for some basic request validation.
