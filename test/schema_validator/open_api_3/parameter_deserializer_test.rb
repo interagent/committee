@@ -174,6 +174,30 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
       assert_equal({ 'ids' => ['1', '2', '3'] }, result)
     end
 
+    it 'deserializes repeated matrix path segments into an array' do
+      raw_params = { 'ids' => ';ids=1;ids=2' }
+      param = create_param('ids', 'path', 'matrix', true, 'array', 'integer')
+      deserializer = create_deserializer([param])
+
+      assert_equal({ 'ids' => ['1', '2'] }, deserializer.deserialize_path_params(raw_params))
+    end
+
+    it 'deserializes an empty matrix array' do
+      param = create_param('ids', 'path', 'matrix', true, 'array', 'integer')
+      deserializer = create_deserializer([param])
+
+      assert_equal({ 'ids' => [] }, deserializer.deserialize_path_params('ids' => ';ids'))
+    end
+
+    it 'rejects other names inside an exploded matrix array' do
+      param = create_param('ids', 'path', 'matrix', true, 'array', 'string')
+      deserializer = create_deserializer([param])
+
+      assert_raises(Committee::ParameterDeserializationError) do
+        deserializer.deserialize_path_params('ids' => ';ids=1;other=2')
+      end
+    end
+
     it 'deserializes matrix style object with explode=false' do
       raw_params = { 'filter' => ';filter=role,admin,status,active' }
       param = create_param('filter', 'path', 'matrix', false, 'object', { 'role' => 'string', 'status' => 'string' })

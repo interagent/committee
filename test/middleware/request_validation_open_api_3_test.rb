@@ -383,6 +383,80 @@ describe Committee::Middleware::RequestValidation do
     assert_match(/integer/i, last_response.body)
   end
 
+  describe 'serialized path parameters' do
+    [
+      ['simple', false, '1,2'],
+      ['label', false, '.1,2'],
+      ['label', true, '.1.2'],
+      ['matrix', false, ';ids=1,2'],
+      ['matrix', true, ';ids=1;ids=2'],
+    ].each do |style, explode, value|
+      it "deserializes and validates #{style} array with explode=#{explode}" do
+        parameter = { 'name' => 'ids', 'in' => 'path', 'required' => true, 'style' => style, 'explode' => explode, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
+        check_parameter = lambda { |env|
+          assert_equal [1, 2], env['committee.path_hash']['ids']
+          assert_equal [1, 2], env['committee.params']['ids']
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_parameter, schema: path_param_schema(parameter))
+
+        get "/paths/#{value}"
+
+        assert_equal 200, last_response.status
+      end
+    end
+
+    [
+      ['simple', false, 'role,admin,status,active'],
+      ['simple', true, 'role=admin,status=active'],
+      ['label', false, '.role,admin,status,active'],
+      ['label', true, '.role=admin.status=active'],
+      ['matrix', false, ';filter=role,admin,status,active'],
+      ['matrix', true, ';role=admin;status=active'],
+    ].each do |style, explode, value|
+      it "deserializes and validates #{style} object with explode=#{explode}" do
+        parameter = { 'name' => 'filter', 'in' => 'path', 'required' => true, 'style' => style, 'explode' => explode, 'schema' => { 'type' => 'object', 'required' => ['role', 'status'], 'properties' => { 'role' => { 'type' => 'string' }, 'status' => { 'type' => 'string' } } }, }
+        check_parameter = lambda { |env|
+          assert_equal({ 'role' => 'admin', 'status' => 'active' }, env['committee.path_hash']['filter'])
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_parameter, schema: path_param_schema(parameter))
+
+        get "/paths/#{value}"
+
+        assert_equal 200, last_response.status
+      end
+    end
+
+    it 'rejects an invalid item after deserialization' do
+      parameter = { 'name' => 'ids', 'in' => 'path', 'required' => true, 'style' => 'simple', 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
+      @app = new_rack_app(schema: path_param_schema(parameter))
+
+      get '/paths/1,invalid'
+
+      assert_equal 400, last_response.status
+      assert_match(/integer/, last_response.body)
+    end
+
+    it 'deserializes a path item parameter before validation' do
+      parameter = { 'name' => 'ids', 'in' => 'path', 'required' => true, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
+      document = query_param_document(parameter)
+      path_item = document['paths'].delete('/events')
+      path_item['parameters'] = path_item['get'].delete('parameters')
+      document['paths']['/paths/{ids}'] = path_item
+      schema = Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+      check_parameter = lambda { |env|
+        assert_equal [1, 2], env['committee.path_hash']['ids']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: schema)
+
+      get '/paths/1,2'
+
+      assert_equal 200, last_response.status
+    end
+  end
+
   describe "overwrite same parameter (old rule)" do
     # (high priority) path_hash_key -> request_body_hash -> query_param
     it "set query parameter to committee.params and query hash" do
@@ -738,6 +812,12 @@ describe Committee::Middleware::RequestValidation do
 
   def query_param_schema(parameter)
     Committee::Drivers.load_from_data(query_param_document(parameter), nil, parser_options: { strict_reference_validation: true })
+  end
+
+  def path_param_schema(parameter)
+    document = query_param_document(parameter)
+    document['paths']["/paths/{#{parameter['name']}}"] = document['paths'].delete('/events')
+    Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
   end
 
   def bracket_notation_query_parameter

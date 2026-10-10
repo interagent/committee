@@ -48,6 +48,9 @@ module Committee
 
           result = Committee::Utils.indifferent_hash
           params_for_location = @parameters.select { |p| p.in == location }
+          if location == 'path' && @request_operation.respond_to?(:path_item) && @request_operation.path_item
+            params_for_location += (@request_operation.path_item.parameters || []).select { |p| p.in == 'path' }
+          end
 
           # If no parameters are defined for this location, return raw params as-is
           return raw_params if params_for_location.empty?
@@ -437,9 +440,19 @@ module Committee
           case schema.type
           when 'array'
             if explode
-              # explode=true: ;id=3;id=4 (multiple occurrences)
-              # Rack should have already collected these into an array
-              Array(value)
+              if value.is_a?(String)
+                prefix = "#{param_name}="
+                return [] if value == ";#{param_name}"
+                raise ArgumentError, 'invalid matrix array' unless value.start_with?(";#{prefix}")
+
+                value.split(';', -1).drop(1).map do |part|
+                  raise ArgumentError, 'invalid matrix array' unless part.start_with?(prefix)
+
+                  part.delete_prefix(prefix)
+                end
+              else
+                Array(value)
+              end
             else
               # explode=false: ;id=3,4,5
               extract_matrix_array_compact(value, param_name)

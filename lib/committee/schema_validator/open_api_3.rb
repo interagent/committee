@@ -59,8 +59,9 @@ module Committee
 
       attr_reader :validator_option
 
-      def coerce_path_params
-        Committee::RequestUnpacker.indifferent_params(@operation_object.coerce_path_parameter(@validator_option))
+      def coerce_path_params(deserializer)
+        path_params = deserializer&.deserialize_path_params(@operation_object.path_params)
+        Committee::RequestUnpacker.indifferent_params(@operation_object.coerce_path_parameter(@validator_option, path_params))
       end
 
       def request_schema_validation(request)
@@ -93,19 +94,14 @@ module Committee
 
         request_param, _is_form_params = unpacker.unpack_request_params(request)
         request.env[validator_option.request_body_hash_key] = request_param
-        request.env[validator_option.path_hash_key] = coerce_path_params
+        deserializer = ParameterDeserializer.new(@operation_object.request_operation) if validator_option.deserialize_parameters
+        request.env[validator_option.path_hash_key] = coerce_path_params(deserializer)
 
         query_param = unpacker.unpack_query_params(request)
         query_param.merge!(request_param) if request.get? && validator_option.allow_get_body
 
-        if @operation_object && validator_option.deserialize_parameters
-          deserializer = ParameterDeserializer.new(@operation_object.request_operation)
-
+        if deserializer
           query_param = deserializer.deserialize_query_params(query_param)
-
-          path_param = request.env[validator_option.path_hash_key]
-          path_param = deserializer.deserialize_path_params(path_param)
-          request.env[validator_option.path_hash_key] = path_param
 
           headers = request.env[validator_option.headers_key]
           headers = deserializer.deserialize_headers(headers)
