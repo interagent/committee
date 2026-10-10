@@ -660,6 +660,105 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  describe 'exploded array query params' do
+    before do
+      @parameter = { 'name' => 'ids', 'in' => 'query', 'required' => true, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
+    end
+
+    it 'preserves repeated values with the default serialization' do
+      check_parameter = lambda { |env|
+        assert_equal [1, 2], env['committee.query_hash']['ids']
+        assert_equal '2', env['rack.request.query_hash']['ids']
+        assert_equal 'last', env['committee.query_hash']['unknown']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(@parameter))
+
+      get '/events?ids=1&ids=2&unknown=first&unknown=last'
+
+      assert_equal 200, last_response.status
+    end
+
+    it 'preserves decoded values with explicit form style and explode=true' do
+      @parameter.merge!('style' => 'form', 'explode' => true, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'string' } })
+      check_parameter = lambda { |env|
+        assert_equal ['a,b', 'c&d', 'a b', ''], env['committee.query_hash']['ids']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(@parameter))
+
+      get '/events?%69ds=a%2Cb&ids=c%26d&ids=a+b&ids='
+
+      assert_equal 200, last_response.status
+    end
+
+    it 'validates every repeated value' do
+      @app = new_rack_app(schema: query_param_schema(@parameter))
+
+      get '/events?ids=invalid&ids=2'
+
+      assert_equal 400, last_response.status
+    end
+
+    it 'continues to support single values and Rack array notation' do
+      expected = nil
+      check_parameter = lambda { |env|
+        assert_equal expected, env['committee.query_hash']['ids']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(@parameter))
+
+      { 'ids=1' => [1], 'ids[]=1&ids[]=2' => [1, 2] }.each do |query, values|
+        expected = values
+        get "/events?#{query}"
+        assert_equal 200, last_response.status
+      end
+    end
+
+    it 'does not deserialize repeated values when deserialization is disabled' do
+      @app = new_rack_app(schema: query_param_schema(@parameter), deserialize_parameters: false)
+
+      get '/events?ids=1&ids=2'
+
+      assert_equal 400, last_response.status
+    end
+
+    it 'does not restore query parameters when query parameters are disabled' do
+      @app = new_rack_app(schema: query_param_schema(@parameter), allow_query_params: false)
+
+      get '/events?ids=1&ids=2'
+
+      assert_equal 400, last_response.status
+    end
+
+    it 'preserves GET body precedence with allow_get_body' do
+      check_parameter = lambda { |env|
+        assert_equal [3], env['committee.query_hash']['ids']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(@parameter), allow_get_body: true)
+
+      get '/events?ids=1&ids=2', {}, { input: { ids: '3' }.to_json, 'CONTENT_TYPE' => 'application/json' }
+
+      assert_equal 200, last_response.status
+    end
+
+    it 'preserves form body precedence with allow_non_get_query_params' do
+      document = query_param_document(@parameter)
+      document['paths']['/events']['post'] = document['paths']['/events'].delete('get')
+      schema = Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+      check_parameter = lambda { |env|
+        assert_equal [3], env['committee.query_hash']['ids']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: schema, allow_non_get_query_params: true)
+
+      post '/events?ids=1&ids=2', { ids: '3' }
+
+      assert_equal 200, last_response.status
+    end
+  end
+
   describe 'bracket-style query params' do
     it 'deserializes array params whose name ends with brackets' do
       parameter = { 'name' => 'ids[]', 'in' => 'query', 'required' => true, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }

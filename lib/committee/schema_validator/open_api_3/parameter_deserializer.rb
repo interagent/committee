@@ -18,9 +18,10 @@ module Committee
 
         # Deserialize query parameters
         # @param [Hash] raw_params Raw query parameters from Rack
+        # @param [Hash] query_values Query parameters with repeated keys preserved
         # @return [Hash] Deserialized parameters according to OpenAPI schema
-        def deserialize_query_params(raw_params)
-          deserialize_params_by_location(raw_params, 'query')
+        def deserialize_query_params(raw_params, query_values = {})
+          deserialize_params_by_location(raw_params, 'query', query_values)
         end
 
         # Deserialize path parameters
@@ -42,8 +43,9 @@ module Committee
         # Deserialize parameters for a specific location (query, path, header)
         # @param [Hash] raw_params Raw parameters
         # @param [String] location Parameter location ('query', 'path', 'header')
+        # @param [Hash] query_values Query parameters with repeated keys preserved
         # @return [Hash] Deserialized parameters
-        def deserialize_params_by_location(raw_params, location)
+        def deserialize_params_by_location(raw_params, location, query_values = {})
           return raw_params if raw_params.nil? || raw_params.empty?
 
           result = Committee::Utils.indifferent_hash
@@ -52,7 +54,7 @@ module Committee
           # If no parameters are defined for this location, return raw params as-is
           return raw_params if params_for_location.empty?
 
-          raw_params = normalize_raw_params(raw_params, location, params_for_location)
+          raw_params = normalize_raw_params(raw_params, location, params_for_location, query_values)
 
           # Collect parameter names that will be deserialized
           # This includes both the parameter name and any properties (for exploded objects)
@@ -107,19 +109,28 @@ module Committee
           Committee::Utils.indifferent_hash.merge(hash)
         end
 
-        # Normalize Rack-style nested query hashes into bracket notation when the
-        # schema expects bracket-named params or deepObject query params.
+        # Restore repeated array values and normalize Rack-style nested query hashes
+        # when the schema expects bracket-named params or deepObject query params.
         # Example: { "filter" => { "slug" => "/test" } } => { "filter[slug]" => "/test" }
         # @param [Hash] raw_params
         # @param [String] location
         # @param [Array<OpenAPIParser::Schemas::Parameter>] params_for_location
+        # @param [Hash] query_values Query parameters with repeated keys preserved
         # @return [Hash]
-        def normalize_raw_params(raw_params, location, params_for_location)
+        def normalize_raw_params(raw_params, location, params_for_location, query_values)
           return raw_params unless location == 'query'
 
           normalized = raw_params
           params_for_location.each do |param_def|
-            next unless param_def.name.end_with?('[]') && param_def.schema&.type == 'array'
+            next unless param_def.schema&.type == 'array'
+
+            if (param_def.style.nil? || param_def.style == 'form') &&
+               param_def.explode != false && query_values[param_def.name].is_a?(Array)
+              normalized = raw_params.dup if normalized.equal?(raw_params)
+              normalized[param_def.name] = query_values[param_def.name]
+            end
+
+            next unless param_def.name.end_with?('[]')
 
             raw_name = param_def.name.delete_suffix('[]')
             next unless normalized[raw_name].is_a?(Array)
@@ -283,8 +294,7 @@ module Committee
           return nil unless value
 
           if explode
-            # explode=true: Rack already collects ?id=1&id=2 into an array
-            # Just ensure it's an array
+            # Repeated query values are collected before deserialization.
             Array(value)
           else
             # explode=false: comma-separated values
