@@ -18,6 +18,29 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "accepts a JSON array request body declared by OpenAPI3" do
+    check_body = lambda { |env|
+      assert_equal [1, 2], env['committee.request_body_hash']
+      assert_equal({ 'source' => 'test' }, env['committee.params'])
+      [200, {}, []]
+    }
+    @app = new_rack_app_with_lambda(check_body, schema: array_body_schema)
+
+    header "Content-Type", "application/json"
+    post "/numbers?source=test", '[1,2]'
+
+    assert_equal 200, last_response.status
+  end
+
+  it "validates items in a JSON array request body" do
+    @app = new_rack_app(schema: array_body_schema)
+
+    header "Content-Type", "application/json"
+    post "/numbers", '[1,"invalid"]'
+
+    assert_equal 400, last_response.status
+  end
+
   it "not parameter request" do
     check_parameter_string = lambda { |_|
       [200, { integer: 1 }, []]
@@ -738,6 +761,30 @@ describe Committee::Middleware::RequestValidation do
 
   def query_param_schema(parameter)
     Committee::Drivers.load_from_data(query_param_document(parameter), nil, parser_options: { strict_reference_validation: true })
+  end
+
+  def array_body_schema
+    Committee::Drivers.load_from_data(array_body_document, nil, parser_options: { strict_reference_validation: true })
+  end
+
+  def array_body_document
+    {
+      'openapi' => '3.0.3',
+      'info' => { 'title' => 'test', 'version' => '1.0.0' },
+      'paths' => {
+        '/numbers' => {
+          'post' => {
+            'requestBody' => {
+              'required' => true,
+              'content' => {
+                'application/json' => { 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } } },
+              },
+            },
+            'responses' => { '200' => { 'description' => 'ok' } },
+          },
+        },
+      },
+    }
   end
 
   def bracket_notation_query_parameter
