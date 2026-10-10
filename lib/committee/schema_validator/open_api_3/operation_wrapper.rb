@@ -21,9 +21,13 @@ module Committee
           request_operation.http_method
         end
 
-        def coerce_path_parameter(validator_option)
+        def coerce_path_parameter(validator_option, path_params = nil)
           options = build_openapi_parser_path_option(validator_option)
-          validated_path_params = request_operation.validate_path_params(options)
+          validated_path_params = if path_params
+                                    request_operation.operation_object.validate_path_params(path_params, options)
+                                  else
+                                    request_operation.validate_path_params(options)
+                                  end
           return {} unless options.coerce_value
 
           validated_path_params
