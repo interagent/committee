@@ -57,6 +57,18 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
       assert_equal({ 'ids' => ['1', '2', '3'] }, result)
     end
 
+    it 'only restores repeated values for form-style exploded arrays' do
+      params = [create_param('exploded', 'query', 'form', true, 'array', 'integer'), create_param('compact', 'query', 'form', false, 'array', 'integer'), create_param('spaced', 'query', 'spaceDelimited', false, 'array', 'integer'), create_param('scalar', 'query', 'form', true, 'string', nil)]
+      raw_params = { 'exploded' => '2', 'compact' => '2,3', 'spaced' => '2 3', 'scalar' => '2' }.freeze
+      query_values = { 'exploded' => ['1', '2'], 'compact' => ['1', '2,3'], 'spaced' => ['1', '2 3'], 'scalar' => ['1', '2'] }
+      deserializer = create_deserializer(params)
+
+      result = deserializer.deserialize_query_params(raw_params, query_values)
+
+      assert_equal({ 'exploded' => ['1', '2'], 'compact' => ['2', '3'], 'spaced' => ['2', '3'], 'scalar' => '2' }, result)
+      assert_equal '2', raw_params['exploded']
+    end
+
     it 'deserializes deepObject style' do
       raw_params = { 'filter[role]' => 'admin', 'filter[status]' => 'active' }
       param = create_param('filter', 'query', 'deepObject', true, 'object', { 'role' => 'string', 'status' => 'string' })
