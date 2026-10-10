@@ -87,7 +87,9 @@ module Committee
       end
 
       def request_unpack(request)
-        unpacker = Committee::RequestUnpacker.new(allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime, allow_form_params: validator_option.allow_form_params, allow_get_body: validator_option.allow_get_body, allow_query_params: validator_option.allow_query_params, allow_non_get_query_params: validator_option.allow_non_get_query_params, optimistic_json: validator_option.optimistic_json,)
+        media_type = @operation_object.request_operation.operation_object.request_body&.select_media_type(request.media_type)
+        allow_json_array = media_type&.schema&.type == 'array'
+        unpacker = Committee::RequestUnpacker.new(allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime, allow_form_params: validator_option.allow_form_params, allow_get_body: validator_option.allow_get_body, allow_json_array: allow_json_array, allow_query_params: validator_option.allow_query_params, allow_non_get_query_params: validator_option.allow_non_get_query_params, optimistic_json: validator_option.optimistic_json,)
 
         request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
 
@@ -96,7 +98,7 @@ module Committee
         request.env[validator_option.path_hash_key] = coerce_path_params
 
         query_param = unpacker.unpack_query_params(request)
-        query_param.merge!(request_param) if request.get? && validator_option.allow_get_body
+        query_param.merge!(request_param) if request.get? && validator_option.allow_get_body && request_param.is_a?(Hash)
 
         if @operation_object && validator_option.deserialize_parameters
           deserializer = ParameterDeserializer.new(@operation_object.request_operation)
@@ -126,7 +128,8 @@ module Committee
 
         request.env[validator_option.params_key] = Committee::Utils.indifferent_hash
         order.each do |key|
-          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(request.env[key]))
+          value = request.env[key]
+          request.env[validator_option.params_key].merge!(Committee::Utils.deep_copy(value)) if value.is_a?(Hash)
         end
       end
     end
