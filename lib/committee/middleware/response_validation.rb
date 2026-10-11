@@ -14,6 +14,8 @@ module Committee
 
       def handle(request)
         status, headers, response = @app.call(request.env)
+        # Rack 3 streams call-only bodies after the middleware returns.
+        return [status, headers, response] if response.respond_to?(:call) && !response.respond_to?(:each)
 
         streaming_content_parser = retrieve_streaming_content_parser(headers)
 

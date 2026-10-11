@@ -51,7 +51,7 @@ module Committee
         begin
           return [request.POST, true] if request.POST
         ensure
-          request.body.rewind
+          request.body.rewind if request.body.respond_to?(:rewind)
         end
       end
 
@@ -87,12 +87,13 @@ module Committee
     def parse_json(request)
       return nil if request.request_method == "GET" && !@allow_get_body
 
-      return nil if request.body.nil?
-      body = request.body.read
+      input = request.body
+      return nil if input.nil?
+      body = input.read
       # if request body is empty, we just have empty params
       return nil if body.length == 0
 
-      request.body.rewind
+      input.rewind if input.respond_to?(:rewind)
       hash = JSON.parse(body)
       # We want a hash specifically. '42', 42, and [42] will all be
       # decoded properly, but we can't use them here.

@@ -18,7 +18,7 @@ module Committee
     def render
       [
         status,
-        { "Content-Type" => "application/json" },
+        { "content-type" => "application/json" },
         [JSON.generate(error_body)]
       ]
     end
