@@ -58,6 +58,25 @@ describe Committee::RequestUnpacker do
     end
   end
 
+  it "uses raw bodies only when optimistic JSON parsing fails" do
+    [['hello', 'hello'], ['{"x":"y"}', { 'x' => 'y' }]].each do |body, expected|
+      request = Rack::Request.new({ "CONTENT_TYPE" => "text/plain", "rack.input" => StringIO.new(body) })
+      unpacker = Committee::RequestUnpacker.new(allow_raw_body: true, optimistic_json: true)
+
+      assert_equal [expected, false], unpacker.unpack_request_params(request)
+      assert_equal body, request.body.read
+    end
+  end
+
+  it "does not treat JSON or disabled forms as raw bodies" do
+    [['application/json', ''], ['application/x-www-form-urlencoded', 'x=y'], ['multipart/form-data', 'x=y']].each do |content_type, body|
+      request = Rack::Request.new({ "CONTENT_TYPE" => content_type, "rack.input" => StringIO.new(body) })
+      unpacker = Committee::RequestUnpacker.new(allow_raw_body: true)
+
+      assert_equal [{}, false], unpacker.unpack_request_params(request)
+    end
+  end
+
   it "unpacks an empty hash on an empty request body" do
     env = { "CONTENT_TYPE" => "application/json", "rack.input" => StringIO.new(""), }
     request = Rack::Request.new(env)

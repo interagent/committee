@@ -61,7 +61,7 @@ Non-boolean options:
 |headers_key| String | supported | supported | Save checked header value to request.env using this key. Default value is `committee.headers` |
 |query_hash_key| String | supported | supported | Save checked query parameter value to request.env using this key. Default value is `rack.request.query_hash` but we will change  `committee.query_hash` in next version |
 |path_hash_key| String | supported | supported | Save checked path parameter value to request.env using this key. Default value is `committee.path_hash` |
-|request_body_hash_key| String | supported | supported | Save checked request body parameter (json, form) value to request.env using this key. Default value is `committee.request_body_hash` |
+|request_body_hash_key| String | supported | supported | Save checked request body parameters (JSON, form) to request.env using this key. For other OpenAPI 3 content types, the value is the raw body string and is not merged into `params_key`. Default value is `committee.request_body_hash` |
 
 
 Note that Hyper-Schema and OpenAPI 2 get the same defaults for options.

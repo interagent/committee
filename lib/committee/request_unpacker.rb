@@ -24,6 +24,7 @@ module Committee
       @allow_empty_date_and_datetime = options[:allow_empty_date_and_datetime]
       @allow_form_params             = options[:allow_form_params]
       @allow_get_body                = options[:allow_get_body]
+      @allow_raw_body                = options[:allow_raw_body]
       @allow_query_params            = options[:allow_query_params]
       @allow_non_get_query_params    = options[:allow_non_get_query_params]
       @optimistic_json               = options[:optimistic_json]
@@ -33,7 +34,8 @@ module Committee
     def unpack_request_params(request)
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON
-      params = if !request.media_type || request.media_type =~ %r{application/(?:.*\+)?json}
+      json_body = !request.media_type || request.media_type =~ %r{application/(?:.*\+)?json}
+      params = if json_body
                  parse_json(request)
       elsif @optimistic_json
         begin
@@ -45,7 +47,8 @@ module Committee
 
       return [params, false] if params
 
-      if @allow_form_params && %w[application/x-www-form-urlencoded multipart/form-data].include?(request.media_type)
+      form_body = %w[application/x-www-form-urlencoded multipart/form-data].include?(request.media_type)
+      if @allow_form_params && form_body
         # Actually, POST means anything in the request body, could be from
         # PUT or PATCH too. Silly Rack.
         begin
@@ -53,6 +56,13 @@ module Committee
         ensure
           request.body.rewind
         end
+      end
+
+      if @allow_raw_body && !json_body && !form_body && (!request.get? || @allow_get_body)
+        input = request.body
+        body = input ? input.read : ""
+        input.rewind if input.respond_to?(:rewind)
+        return [body, false]
       end
 
       [{}, false]
