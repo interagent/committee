@@ -8,6 +8,7 @@ describe Committee::RequestUnpacker do
     request = Rack::Request.new(env)
     unpacker = Committee::RequestUnpacker.new
     assert_equal([{ "x" => "y" }, false], unpacker.unpack_request_params(request))
+    assert_equal '{"x":"y"}', env["rack.input"].read
   end
 
   it "unpacks JSON on Content-Type: application/vnd.api+json" do
@@ -72,6 +73,20 @@ describe Committee::RequestUnpacker do
       unpacker = Committee::RequestUnpacker.new
       assert_equal([{}, false], unpacker.unpack_request_params(request))
     end
+  end
+
+  it "unpacks form params through Rack::Lint without a rewindable input" do
+    app = Rack::Lint.new(lambda { |env|
+      params, is_form_params = Committee::RequestUnpacker.new(allow_form_params: true).unpack_request_params(Rack::Request.new(env))
+      assert_equal({ "x" => "y" }, params)
+      assert is_form_params
+      [200, {}, []]
+    })
+    env = Rack::MockRequest.env_for("/", method: "POST", input: "x=y", "CONTENT_TYPE" => "application/x-www-form-urlencoded")
+
+    status, _headers, _body = app.call(env)
+
+    assert_equal 200, status
   end
 
   it "unpacks form params with allow_form_params" do
