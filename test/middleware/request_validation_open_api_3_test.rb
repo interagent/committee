@@ -18,6 +18,65 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  describe "raw request bodies" do
+    it "validates text and preserves the body for the application" do
+      check_body = lambda { |env|
+        assert_equal "hello", env['committee.request_body_hash']
+        assert_equal({ "source" => "test" }, env['committee.params'])
+        assert_equal "hello", env['rack.input'].read
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_body, schema: text_body_schema)
+
+      header "Content-Type", "text/plain; charset=utf-8"
+      post "/characters?source=test", "hello"
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+
+    it "rejects text that violates the string schema" do
+      @app = new_rack_app(schema: text_body_schema)
+
+      header "Content-Type", "text/plain"
+      ["hi", ""].each do |body|
+        post "/characters", body
+
+        assert_equal 400, last_response.status
+        assert_match(/shorter than min length/, last_response.body)
+      end
+    end
+
+    it "accepts a binary string request body" do
+      content = "\x00\xFF".b
+      check_body = lambda { |env|
+        assert_equal content, env['committee.request_body_hash']
+        assert_equal content, env['rack.input'].read
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_body, schema: open_api_3_schema)
+
+      header "Content-Type", "application/binary"
+      post "/validate_content_types", content
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+
+    it "respects allow_get_body without merging text into query params" do
+      [false, true].each do |allow_get_body|
+        check_body = lambda { |env|
+          assert_equal(allow_get_body ? "hello" : {}, env['committee.request_body_hash'])
+          assert_equal({ "source" => "test" }, env['committee.params'])
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_body, schema: open_api_3_schema, allow_get_body: allow_get_body)
+
+        get "/characters", { source: "test" }, { input: "hello", "CONTENT_TYPE" => "text/plain" }
+
+        assert_equal 200, last_response.status
+      end
+    end
+  end
+
   it "accepts an empty optional body through Rack::Lint" do
     app = Rack::Lint.new(new_rack_app(schema: open_api_3_schema))
     env = Rack::MockRequest.env_for("/characters", method: "POST", input: "", "CONTENT_TYPE" => "text/plain")
@@ -886,6 +945,12 @@ describe Committee::Middleware::RequestValidation do
 
   def query_param_schema(parameter)
     Committee::Drivers.load_from_data(query_param_document(parameter), nil, parser_options: { strict_reference_validation: true })
+  end
+
+  def text_body_schema
+    document = open_api_3_data
+    document['paths']['/characters']['post']['requestBody']['content'] = { 'text/plain' => { 'schema' => { 'type' => 'string', 'minLength' => 3 } } }
+    Committee::Drivers.load_from_data(document, open_api_3_schema_path, parser_options: { strict_reference_validation: true })
   end
 
   def array_body_schema

@@ -89,7 +89,7 @@ module Committee
       def request_unpack(request)
         media_type = @operation_object.request_operation.operation_object.request_body&.select_media_type(request.media_type)
         allow_json_array = media_type&.schema&.type == 'array'
-        unpacker = Committee::RequestUnpacker.new(allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime, allow_form_params: validator_option.allow_form_params, allow_get_body: validator_option.allow_get_body, allow_json_array: allow_json_array, allow_query_params: validator_option.allow_query_params, allow_non_get_query_params: validator_option.allow_non_get_query_params, optimistic_json: validator_option.optimistic_json,)
+        unpacker = Committee::RequestUnpacker.new(allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime, allow_form_params: validator_option.allow_form_params, allow_get_body: validator_option.allow_get_body, allow_raw_body: true, allow_json_array: allow_json_array, allow_query_params: validator_option.allow_query_params, allow_non_get_query_params: validator_option.allow_non_get_query_params, optimistic_json: validator_option.optimistic_json,)
 
         request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
 
