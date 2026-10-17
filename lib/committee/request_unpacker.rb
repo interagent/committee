@@ -24,6 +24,7 @@ module Committee
       @allow_empty_date_and_datetime = options[:allow_empty_date_and_datetime]
       @allow_form_params             = options[:allow_form_params]
       @allow_get_body                = options[:allow_get_body]
+      @allow_json_array              = options[:allow_json_array]
       @allow_query_params            = options[:allow_query_params]
       @allow_non_get_query_params    = options[:allow_non_get_query_params]
       @optimistic_json               = options[:optimistic_json]
@@ -94,9 +95,7 @@ module Committee
 
       request.body.rewind
       hash = JSON.parse(body)
-      # We want a hash specifically. '42', 42, and [42] will all be
-      # decoded properly, but we can't use them here.
-      if !hash.is_a?(Hash)
+      if !hash.is_a?(Hash) && !(@allow_json_array && hash.is_a?(Array))
         raise BadRequest, "Invalid JSON input. Require object with parameters as keys."
       end
       self.class.indifferent_params(hash)
