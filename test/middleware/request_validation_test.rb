@@ -19,6 +19,37 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "accepts a JSON request through Rack::Lint" do
+    app = Rack::Lint.new(new_rack_app(schema: hyper_schema))
+    env = Rack::MockRequest.env_for("/apps", method: "POST", input: '{"name":"cloudnasium"}', "CONTENT_TYPE" => "application/json")
+
+    status, _headers, body = app.call(env)
+
+    assert_equal 200, status
+    body.close if body.respond_to?(:close)
+  end
+
+  it "returns a validation error through Rack::Lint" do
+    app = Rack::Lint.new(new_rack_app(schema: hyper_schema))
+    env = Rack::MockRequest.env_for("/apps", method: "POST", input: "{", "CONTENT_TYPE" => "application/json")
+
+    status, headers, body = app.call(env)
+
+    assert_equal 400, status
+    assert_equal "application/json", headers["content-type"]
+    body.close if body.respond_to?(:close)
+  end
+
+  it "accepts an empty optional body through Rack::Lint" do
+    app = Rack::Lint.new(new_rack_app(schema: hyper_schema))
+    env = Rack::MockRequest.env_for("/apps", method: "POST", input: "", "CONTENT_TYPE" => "text/plain")
+
+    status, _headers, body = app.call(env)
+
+    assert_equal 200, status
+    body.close if body.respond_to?(:close)
+  end
+
   it "doesn't call error_handler (has a arg) when request is valid" do
     called_error = false
     pr = ->(_e) { called_error = true }

@@ -17,6 +17,23 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "passes through a Rack 3 call-only response body" do
+    content = JSON.generate(CHARACTERS_RESPONSE)
+    body = Object.new
+    body.define_singleton_method(:call) { |stream| stream.write(content) }
+    @app = Rack::Builder.new {
+      use Committee::Middleware::ResponseValidation, { schema: open_api_3_schema }
+      run ->(_) { [200, { "content-type" => "application/json" }, body] }
+    }
+
+    status, _headers, response_body = @app.call(Rack::MockRequest.env_for("/characters"))
+    output = StringIO.new
+    response_body.call(output)
+
+    assert_equal 200, status
+    assert_equal content, output.string
+  end
+
   it "preserves a one-shot response body after validation" do
     content = JSON.generate(CHARACTERS_RESPONSE)
     chunks = [content]
