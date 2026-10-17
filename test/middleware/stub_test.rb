@@ -17,6 +17,16 @@ describe Committee::Middleware::Stub do
     assert_equal ValidApp.keys.sort, data.keys.sort
   end
 
+  it "returns Rack 3 compliant response headers" do
+    app = Rack::Lint.new(new_rack_app(schema: hyper_schema))
+
+    status, headers, body = app.call(Rack::MockRequest.env_for("/apps/heroku-api"))
+
+    assert_equal 200, status
+    assert_equal "application/json", headers["content-type"]
+    body.close if body.respond_to?(:close)
+  end
+
   it "responds with 201 on create actions" do
     @app = new_rack_app(schema: hyper_schema)
     post "/apps"

@@ -18,6 +18,16 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  it "accepts an empty optional body through Rack::Lint" do
+    app = Rack::Lint.new(new_rack_app(schema: open_api_3_schema))
+    env = Rack::MockRequest.env_for("/characters", method: "POST", input: "", "CONTENT_TYPE" => "text/plain")
+
+    status, _headers, body = app.call(env)
+
+    assert_equal 200, status
+    body.close if body.respond_to?(:close)
+  end
+
   it "accepts a JSON array request body declared by OpenAPI3" do
     check_body = lambda { |env|
       assert_equal [1, 2], env['committee.request_body_hash']

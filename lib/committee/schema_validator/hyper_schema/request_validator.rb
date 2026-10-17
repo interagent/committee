@@ -45,7 +45,7 @@ module Committee
           return true if request.get? || request.delete? || !request.body
 
           data = request.body.read
-          request.body.rewind
+          request.body.rewind if request.body.respond_to?(:rewind)
           data.empty?
         end
       end

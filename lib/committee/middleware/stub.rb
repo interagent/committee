@@ -24,7 +24,7 @@ module Committee
       def handle(request)
         link, _ = @router.find_request_link(request)
         if link
-          headers = { "Content-Type" => "application/json" }
+          headers = { "content-type" => "application/json" }
 
           data, schema = cache(link) do
             Committee::SchemaValidator::HyperSchema::ResponseGenerator.new.call(link)
