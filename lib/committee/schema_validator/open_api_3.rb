@@ -101,7 +101,11 @@ module Committee
         if @operation_object && validator_option.deserialize_parameters
           deserializer = ParameterDeserializer.new(@operation_object.request_operation)
 
-          query_param = deserializer.deserialize_query_params(query_param)
+          query_values = validator_option.allow_query_params ? Rack::Utils.parse_query(request.query_string, '&') : {}
+          # Do not restore query values that were overridden by the request body.
+          query_values.reject! { |name, _| request.POST.key?(name) } if validator_option.allow_non_get_query_params
+          query_values.reject! { |name, _| request_param.key?(name) } if request.get? && validator_option.allow_get_body
+          query_param = deserializer.deserialize_query_params(query_param, query_values)
 
           path_param = request.env[validator_option.path_hash_key]
           path_param = deserializer.deserialize_path_params(path_param)
