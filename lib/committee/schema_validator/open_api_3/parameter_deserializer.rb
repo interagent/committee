@@ -34,6 +34,11 @@ module Committee
         # @param [Hash] raw_headers Raw headers
         # @return [Hash] Deserialized headers according to OpenAPI schema
         def deserialize_headers(raw_headers)
+          return raw_headers if raw_headers.nil? || raw_headers.empty?
+
+          raw_headers = raw_headers.transform_keys do |name|
+            @parameters.find { |param| param.in == 'header' && param.name.casecmp?(name.to_s) }&.name || name
+          end
           deserialize_params_by_location(raw_headers, 'header')
         end
 

@@ -210,6 +210,17 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
       assert_equal({ 'X-Filter' => { 'role' => 'admin', 'status' => 'active' } }, result)
     end
 
+    it 'matches header names without regard to case' do
+      raw_headers = { 'x-filter' => 'role,admin,status,active', 'X-Other' => 'untouched' }
+      param = create_param('X-Filter', 'header', 'simple', false, 'object', { 'role' => 'string', 'status' => 'string' })
+      deserializer = create_deserializer([param])
+
+      result = deserializer.deserialize_headers(raw_headers)
+
+      assert_equal({ 'X-Filter' => { 'role' => 'admin', 'status' => 'active' }, 'X-Other' => 'untouched' }, result)
+      assert_equal 'role,admin,status,active', raw_headers['x-filter']
+    end
+
     it 'handles empty params gracefully' do
       raw_params = {}
       param = create_param('filter', 'query', 'form', true, 'object', { 'role' => 'string' })

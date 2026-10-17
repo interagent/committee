@@ -550,6 +550,22 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  it 'deserializes header arrays regardless of the case used in the schema' do
+    parameter = { 'name' => 'X-Ids', 'in' => 'header', 'required' => true, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
+    check_parameter = lambda { |env|
+      assert_equal [1, 2], env['committee.headers']['X-Ids']
+      refute env['committee.headers'].key?('X-IDS')
+      assert_equal '1,2', env['HTTP_X_IDS']
+      [200, {}, []]
+    }
+    @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(parameter))
+
+    header 'X-Ids', '1,2'
+    get '/events'
+
+    assert_equal 200, last_response.status
+  end
+
   describe ':accept_request_filter' do
     [
       { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 400 } },
