@@ -55,7 +55,13 @@ module Committee
     # @param [Hash] hash
     # @return [Committee::Driver]
     def self.load_from_data(hash, schema_path = nil, parser_options: {})
-      if hash['openapi']&.start_with?('3.0.')
+      if (version = hash['openapi'])
+        # release drops prerelease tags, so 3.2.0-rc1 counts as 3.2
+        version = Gem::Version.new(version).release
+        raise OpenAPI3Unsupported.new('Committee does not support OpenAPI 3.2+ yet') if version >= Gem::Version.new("3.2")
+      end
+
+      if version && version >= Gem::Version.new("3.0")
         # From the next major version, we want to ensure `{ strict_reference_validation: true }`
         # as a parser option here, but since it may break existing implementations, just warn
         # if it is not explicitly set. See: https://github.com/interagent/committee/issues/343#issuecomment-997400329
@@ -66,12 +72,6 @@ module Committee
 
         openapi = OpenAPIParser.parse_with_filepath(hash, schema_path, opts)
         return Committee::Drivers::OpenAPI3::Driver.new.parse(openapi)
-      end
-
-      if (version = hash['openapi'])
-        if Gem::Version.new(version) >= Gem::Version.new("3.1")
-          raise OpenAPI3Unsupported.new('Committee does not support OpenAPI 3.1+ yet')
-        end
       end
 
       driver = if hash['swagger'] == '2.0'

@@ -1002,6 +1002,97 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  describe "OpenAPI 3.1" do
+    it "coerces query params with array-form type" do
+      check_parameter = lambda { |env|
+        assert_equal 5, env['committee.query_hash']['limit']
+        assert_equal [1, 2], env['committee.query_hash']['ids']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_1_schema)
+
+      get "/search", limit: "5", ids: "1,2"
+
+      assert_equal 200, last_response.status
+    end
+
+    it "applies constraints after coercing array-form type" do
+      @app = new_rack_app(schema: open_api_3_1_schema, raise: true)
+      assert_raises(Committee::InvalidRequest) { get "/search", limit: "0" }
+    end
+
+    it "coerces path params with array-form type" do
+      check_parameter = lambda { |env|
+        assert_equal 42, env['committee.path_hash']['id']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_1_schema)
+
+      get "/items/42"
+
+      assert_equal 200, last_response.status
+    end
+
+    it "accepts a valid request body" do
+      @app = new_rack_app(schema: open_api_3_1_schema)
+      header "Content-Type", "application/json"
+      post "/items", JSON.generate(ValidItem)
+      assert_equal 200, last_response.status
+    end
+
+    it "rejects a const mismatch" do
+      @app = new_rack_app(schema: open_api_3_1_schema, raise: true)
+      header "Content-Type", "application/json"
+      e = assert_raises(Committee::InvalidRequest) { post "/items", JSON.generate(ValidItem.merge("kind" => "gadget")) }
+      assert_match(/const/, e.message)
+    end
+
+    it "rejects a value at a numeric exclusive bound" do
+      @app = new_rack_app(schema: open_api_3_1_schema, raise: true)
+      header "Content-Type", "application/json"
+      assert_raises(Committee::InvalidRequest) { post "/items", JSON.generate(ValidItem.merge("rating" => 5)) }
+    end
+
+    it "rejects a prefixItems position mismatch" do
+      @app = new_rack_app(schema: open_api_3_1_schema, raise: true)
+      header "Content-Type", "application/json"
+      assert_raises(Committee::InvalidRequest) { post "/items", JSON.generate(ValidItem.merge("point" => ["a", "b"])) }
+    end
+
+    it "rejects a non-null value outside array-form type" do
+      @app = new_rack_app(schema: open_api_3_1_schema, raise: true)
+      header "Content-Type", "application/json"
+      assert_raises(Committee::InvalidRequest) { post "/items", JSON.generate(ValidItem.merge("name" => 1)) }
+    end
+
+    it "routes a path item referenced from components.pathItems" do
+      @app = new_rack_app(schema: open_api_3_1_schema, strict: true)
+      get "/reusable"
+      assert_equal 200, last_response.status
+    end
+
+    it "does not route webhooks" do
+      @app = new_rack_app(schema: open_api_3_1_schema, strict: true)
+      header "Content-Type", "application/json"
+      post "/newItem", JSON.generate(ValidItem)
+      assert_equal 404, last_response.status
+    end
+
+    # array-form type is a 3.1 form, but openapi_parser validates it in any version
+    it "deserializes array-form type in 3.0 documents" do
+      check_parameter = lambda { |env|
+        assert_equal [1, 2], env['committee.query_hash']['ids']
+        [200, {}, []]
+      }
+      parameter = { 'name' => 'ids', 'in' => 'query', 'style' => 'form', 'explode' => false, 'schema' => { 'type' => ['array', 'null'], 'items' => { 'type' => 'integer' } } }
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(parameter))
+
+      get "/events?ids=1,2"
+
+      assert_equal 200, last_response.status
+    end
+  end
+
   private
 
   def new_rack_app(options = {})

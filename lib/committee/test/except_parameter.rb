@@ -89,7 +89,7 @@ module Committee
           return "dummy-#{key}" unless param_schema
           return param_schema.enum.first.to_s if param_schema.enum&.any?
 
-          case param_schema.type
+          case Committee::Utils.schema_type(param_schema)
           when 'integer', 'number' then '0'
           when 'boolean'           then 'true'
           when 'array'             then ['0']
@@ -367,7 +367,7 @@ module Committee
 
           return prop_schema.enum.first if prop_schema.enum&.any?
 
-          case prop_schema.type
+          case Committee::Utils.schema_type(prop_schema)
           when 'integer' then 0
           when 'number'  then 0.0
           when 'boolean' then false
@@ -387,7 +387,7 @@ module Committee
 
           return prop_schema.enum.first.to_s if prop_schema.enum&.any?
 
-          case prop_schema.type
+          case Committee::Utils.schema_type(prop_schema)
           when 'integer', 'number' then '0'
           when 'boolean'           then 'true'
           when 'array'             then ['0']

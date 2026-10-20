@@ -405,6 +405,19 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  describe "OpenAPI 3.1" do
+    it "accepts a valid response" do
+      @app = new_response_rack(JSON.generate(ValidItem), {}, schema: open_api_3_1_schema, raise: true)
+      get "/items/1"
+      assert_equal 200, last_response.status
+    end
+
+    it "rejects an invalid response" do
+      @app = new_response_rack(JSON.generate(ValidItem.merge("name" => 1)), {}, schema: open_api_3_1_schema, raise: true)
+      assert_raises(Committee::InvalidResponse) { get "/items/1" }
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})

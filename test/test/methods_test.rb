@@ -495,6 +495,32 @@ describe Committee::Test::Methods do
 
   private
 
+  describe "OpenAPI 3.1" do
+    before do
+      @committee_options.merge!({ schema: open_api_3_1_schema })
+    end
+
+    describe "assert_request_schema_confirm with except option" do
+      it "uses a typed dummy for an array-form type query param" do
+        @app = new_rack_app
+        get "/except"
+        assert_request_schema_confirm(except: { query: ['count'] })
+      end
+
+      it "uses a typed dummy for an array-form type JSON body param" do
+        @app = new_rack_app
+        post "/except", JSON.generate({}), { "CONTENT_TYPE" => "application/json" }
+        assert_request_schema_confirm(except: { body: ['count'] })
+      end
+
+      it "uses a typed dummy for an array-form type form param" do
+        @app = new_rack_app
+        post "/except", "", { "CONTENT_TYPE" => "application/x-www-form-urlencoded" }
+        assert_request_schema_confirm(except: { body: ['count'] })
+      end
+    end
+  end
+
   def new_rack_app(response = nil, headers = { "Content-Type" => "application/json" }, status_code = 200)
     Rack::Builder.new {
       run lambda { |_|
