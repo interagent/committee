@@ -50,6 +50,11 @@ describe Committee::Drivers do
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
+    it 'loads OpenAPI 3.2' do
+      s = Committee::Drivers.load_from_file(open_api_3_2_schema_path, parser_options: { strict_reference_validation: true })
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+
     it 'fails to load OpenAPI 3 with invalid reference' do
       parser_options = { strict_reference_validation: true }
       assert_raises(OpenAPIParser::MissingReferenceError) do
@@ -167,16 +172,26 @@ describe Committee::Drivers do
       assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
-    it 'fails to load OpenAPI 3.2+' do
-      e = assert_raises(Committee::OpenAPI3Unsupported) do
-        Committee::Drivers.load_from_data(open_api_3_1_data.merge('openapi' => '3.2.0'))
-      end
-      assert_equal 'Committee does not support OpenAPI 3.2+ yet', e.message
+    it 'loads OpenAPI 3.2' do
+      s = Committee::Drivers.load_from_data(open_api_3_2_data, nil, parser_options: { strict_reference_validation: true })
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
     end
 
-    it 'fails to load an OpenAPI 3.2 prerelease' do
+    it 'loads an OpenAPI 3.2 prerelease' do
+      s = Committee::Drivers.load_from_data(open_api_3_2_data.merge('openapi' => '3.2.0-rc1'), nil, parser_options: { strict_reference_validation: true })
+      assert_kind_of Committee::Drivers::OpenAPI3::Schema, s
+    end
+
+    it 'fails to load OpenAPI 3.3+' do
+      e = assert_raises(Committee::OpenAPI3Unsupported) do
+        Committee::Drivers.load_from_data(open_api_3_2_data.merge('openapi' => '3.3.0'))
+      end
+      assert_equal 'Committee does not support OpenAPI 3.3+ yet', e.message
+    end
+
+    it 'fails to load an OpenAPI 3.3 prerelease' do
       assert_raises(Committee::OpenAPI3Unsupported) do
-        Committee::Drivers.load_from_data(open_api_3_1_data.merge('openapi' => '3.2.0-rc1'))
+        Committee::Drivers.load_from_data(open_api_3_2_data.merge('openapi' => '3.3.0-rc1'))
       end
     end
 

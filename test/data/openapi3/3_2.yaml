@@ -1,0 +1,148 @@
+openapi: 3.2.0
+info:
+  version: 1.0.0
+  title: OpenAPI 3.2 Test
+  description: A Sample file
+paths:
+  /items:
+    query:
+      description: search items with a request body
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemQuery'
+      responses:
+        '200':
+          summary: matching items
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+    additionalOperations:
+      PURGE:
+        description: purge cached items
+        parameters:
+        - name: older_than
+          in: query
+          required: false
+          schema:
+            type: integer
+        responses:
+          '204':
+            description: purged
+      SEARCH:
+        description: search items with a custom method
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemQuery'
+        responses:
+          '200':
+            description: success
+  /pets:
+    post:
+      description: create a pet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+      responses:
+        '200':
+          description: success
+  /shared:
+    post:
+      description: request and response bodies from components.mediaTypes
+      requestBody:
+        content:
+          application/json:
+            $ref: '#/components/mediaTypes/ItemJson'
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/ItemJson'
+  /filter:
+    get:
+      description: whole query string as one parameter
+      parameters:
+      - name: filter
+        in: querystring
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+              - q
+      responses:
+        '200':
+          description: success
+  /events:
+    get:
+      description: server-sent events
+      responses:
+        '200':
+          description: event stream
+          content:
+            text/event-stream:
+              itemSchema:
+                type: object
+                required:
+                - data
+components:
+  mediaTypes:
+    ItemJson:
+      schema:
+        $ref: '#/components/schemas/Item'
+  schemas:
+    Item:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+    ItemQuery:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+        limit:
+          type: integer
+          minimum: 1
+    Pet:
+      oneOf:
+      - $ref: '#/components/schemas/Cat'
+      - $ref: '#/components/schemas/Dog'
+      discriminator:
+        propertyName: pet_type
+        defaultMapping: Cat
+    Cat:
+      type: object
+      required:
+      - name
+      properties:
+        pet_type:
+          type: string
+        name:
+          type: string
+    Dog:
+      type: object
+      required:
+      - bark
+      properties:
+        pet_type:
+          type: string
+        bark:
+          type: boolean

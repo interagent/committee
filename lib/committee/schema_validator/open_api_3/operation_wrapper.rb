@@ -59,14 +59,24 @@ module Committee
         end
 
         def validate_request_params(_path_params, query_params, body_params, headers, validator_option)
+          if body_method?
+            validate_post_request_params(query_params, body_params, headers, validator_option)
+          else
+            validate_get_request_params(query_params, headers, validator_option)
+          end
+        end
+
+        # query (3.2) carries a body like post; other methods (trace, 3.2 additionalOperations)
+        # do when the operation defines a requestBody
+        def body_method?
           case request_operation.http_method
-                when 'get', 'delete', 'head'
-                  validate_get_request_params(query_params, headers, validator_option)
-                when 'post', 'put', 'patch', 'options'
-                  validate_post_request_params(query_params, body_params, headers, validator_option)
-                else
-                  raise "Committee OpenAPI3 not support #{request_operation.http_method} method"
-                end
+          when 'get', 'delete', 'head'
+            false
+          when 'post', 'put', 'patch', 'options', 'query'
+            true
+          else
+            !request_operation.operation_object&.request_body.nil?
+          end
         end
 
         def optional_body?

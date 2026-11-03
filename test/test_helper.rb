@@ -72,6 +72,10 @@ def open_api_3_1_schema
   @open_api_3_1_schema ||= Committee::Drivers.load_from_file(open_api_3_1_schema_path, parser_options: { strict_reference_validation: true })
 end
 
+def open_api_3_2_schema
+  @open_api_3_2_schema ||= Committee::Drivers.load_from_file(open_api_3_2_schema_path, parser_options: { strict_reference_validation: true })
+end
+
 # Don't cache this because we'll often manipulate the created hash in tests.
 def hyper_schema_data
   JSON.parse(File.read(hyper_schema_schema_path))
@@ -102,6 +106,14 @@ def open_api_3_1_data
   end
 end
 
+def open_api_3_2_data
+  if YAML.respond_to?(:unsafe_load_file)
+    YAML.unsafe_load_file(open_api_3_2_schema_path)
+  else
+    YAML.load_file(open_api_3_2_schema_path)
+  end
+end
+
 def hyper_schema_schema_path
   "./test/data/hyperschema/paas.json"
 end
@@ -128,6 +140,10 @@ end
 
 def open_api_3_1_schema_path
   "./test/data/openapi3/3_1.yaml"
+end
+
+def open_api_3_2_schema_path
+  "./test/data/openapi3/3_2.yaml"
 end
 
 def open_api_3_invalid_reference_path
