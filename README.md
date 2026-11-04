@@ -306,6 +306,41 @@ describe Committee::Middleware::Stub do
 end
 ```
 
+### Reporting failures through your test framework
+
+When validation fails, the assertions raise `Committee::InvalidRequest`, `Committee::InvalidResponse`, or `Committee::BadRequest`.
+Test frameworks do not treat these errors as assertion failures.
+RSpec's `aggregate_failures` stops at them, and Minitest reports them as errors.
+
+Set `test_failure_handler` in `committee_options` to report them in your own way.
+It is a proc that takes the error as its argument.
+When it is set, the assertions call it instead of raising.
+
+With RSpec:
+
+``` ruby
+let(:committee_options) do
+  {
+    schema_path: "docs/openapi.yaml",
+    test_failure_handler: ->(error) { RSpec::Expectations.fail_with(error.message) },
+  }
+end
+```
+
+With Minitest:
+
+``` ruby
+def committee_options
+  {
+    schema_path: "docs/openapi.yaml",
+    test_failure_handler: ->(error) { flunk(error.message) },
+  }
+end
+```
+
+If the handler returns, the assertion returns too.
+In that case, `assert_schema_conform` still checks the response after the request check fails, so the handler can be called twice.
+
 ### Excepting specific parameters from validation
 
 When testing error responses (like 401 Unauthorized or 400 Bad Request), you may want to intentionally omit required parameters. Use the `except` option with `assert_request_schema_confirm` to skip validation for those specific parameters while still validating the rest of the request:

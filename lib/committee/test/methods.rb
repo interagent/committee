@@ -25,6 +25,8 @@ module Committee
         end
 
         increment_assertion_count
+      rescue Committee::InvalidRequest, Committee::BadRequest => e
+        handle_test_failure(e)
       end
 
       def assert_response_schema_confirm(expected_status = nil)
@@ -50,6 +52,8 @@ module Committee
         schema_validator.response_validate(status, headers, [body], true) if validate_response?(status)
 
         increment_assertion_count
+      rescue Committee::InvalidResponse => e
+        handle_test_failure(e)
       end
 
       def committee_options
@@ -93,6 +97,15 @@ module Committee
       end
 
       private
+
+      # Passes a validation failure to the test_failure_handler option instead of
+      # raising it, so that the test framework can report it as a failure.
+      def handle_test_failure(error)
+        handler = committee_options.fetch(:test_failure_handler, nil)
+        raise error unless handler
+
+        handler.call(error)
+      end
 
       # assert_*_schema_confirm signal failure by raising, not via `assert`,
       # so Minitest would report "Test is missing assertions" on success.

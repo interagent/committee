@@ -521,6 +521,130 @@ describe Committee::Test::Methods do
     end
   end
 
+  describe "with test_failure_handler" do
+    before do
+      @handled_errors = []
+      @correct_response = { string_1: :honoka }
+      @committee_options.merge!({ schema: open_api_3_schema, test_failure_handler: ->(error) { @handled_errors << error } })
+    end
+
+    describe "#assert_schema_conform" do
+      it "passes an invalid response to the handler instead of raising" do
+        @app = new_rack_app(JSON.generate([@correct_response]), {})
+        get "/characters"
+        assert_schema_conform(200)
+        assert_equal 1, @handled_errors.size
+        assert_instance_of Committee::InvalidResponse, @handled_errors.first
+        assert_match(/response definition does not exist/i, @handled_errors.first.message)
+      end
+
+      it "does not call the handler when the request and the response conform" do
+        @app = new_rack_app(JSON.generate(@correct_response))
+        get "/characters"
+        assert_schema_conform(200)
+        assert_empty @handled_errors
+      end
+
+      it "passes both failures to the handler when the request and the response are invalid" do
+        @app = new_rack_app(nil, { "Content-Type" => "application/json" }, 500)
+        get "/validate", { "query_integer_list" => [1, 2] }
+        assert_schema_conform(200)
+        assert_equal [Committee::InvalidRequest, Committee::InvalidResponse], @handled_errors.map(&:class)
+        assert_match(/missing required parameters: query_string/i, @handled_errors.first.message)
+        assert_match(/Expected `200` status code, but it was `500`/, @handled_errors.last.message)
+      end
+    end
+
+    describe "#assert_request_schema_confirm" do
+      it "passes an invalid request to the handler instead of raising" do
+        @app = new_rack_app
+        get "/validate", { "query_integer_list" => [1, 2] }
+        assert_request_schema_confirm
+        assert_equal [Committee::InvalidRequest], @handled_errors.map(&:class)
+        assert_match(/missing required parameters: query_string/i, @handled_errors.first.message)
+      end
+
+      it "passes a path undefined in schema to the handler" do
+        @app = new_rack_app
+        get "/undefined"
+        assert_request_schema_confirm
+        assert_equal [Committee::InvalidRequest], @handled_errors.map(&:class)
+        assert_match(/`GET \/undefined` undefined in schema/i, @handled_errors.first.message)
+      end
+
+      it "passes a non-object JSON body to the handler" do
+        @app = new_rack_app
+        post "/test_except_body_params", "[1,2,3]", "CONTENT_TYPE" => "application/json"
+        assert_request_schema_confirm(except: { body: ['required_string'] })
+        assert_equal [Committee::BadRequest], @handled_errors.map(&:class)
+      end
+
+      it "restores the excepted parameters when the handler is called" do
+        @app = new_rack_app
+        post "/test_except_body_params", "[1,2,3]", "CONTENT_TYPE" => "application/json"
+        assert_request_schema_confirm(except: { headers: ['authorization'], body: ['required_string'] })
+        assert_equal 1, @handled_errors.size
+        assert_nil last_request.env['HTTP_AUTHORIZATION']
+      end
+    end
+
+    describe "#assert_response_schema_confirm" do
+      it "passes an invalid response to the handler instead of raising" do
+        @app = new_rack_app(JSON.generate([@correct_response]), {})
+        get "/characters"
+        assert_response_schema_confirm(200)
+        assert_equal [Committee::InvalidResponse], @handled_errors.map(&:class)
+        assert_match(/response definition does not exist/i, @handled_errors.first.message)
+      end
+
+      it "passes an unexpected status code to the handler" do
+        @app = new_rack_app(JSON.generate(@correct_response), { "Content-Type" => "application/json" }, 500)
+        get "/characters"
+        assert_response_schema_confirm(200)
+        assert_equal [Committee::InvalidResponse], @handled_errors.map(&:class)
+        assert_match(/Expected `200` status code, but it was `500`/, @handled_errors.first.message)
+      end
+
+      it "passes a path undefined in schema to the handler" do
+        @app = new_rack_app
+        get "/undefined"
+        assert_response_schema_confirm(200)
+        assert_equal [Committee::InvalidResponse], @handled_errors.map(&:class)
+        assert_match(/`GET \/undefined` undefined in schema/i, @handled_errors.first.message)
+      end
+    end
+
+    it "lets an error raised by the handler reach the caller" do
+      @committee_options[:test_failure_handler] = ->(error) { flunk(error.message) }
+      @app = new_rack_app(nil, { "Content-Type" => "application/json" }, 500)
+      get "/validate", { "query_integer_list" => [1, 2] }
+      e = assert_raises(Minitest::Assertion) do
+        assert_schema_conform(200)
+      end
+      assert_match(/missing required parameters: query_string/i, e.message)
+    end
+
+    it "raises errors other than validation failures" do
+      @app = new_rack_app
+      post "/test_except_body_params", "invalid-json", "CONTENT_TYPE" => "application/json"
+      assert_raises(JSON::ParserError) do
+        assert_request_schema_confirm(except: { body: ['required_string'] })
+      end
+      assert_empty @handled_errors
+    end
+
+    it "works with Hyper-Schema" do
+      sc = JsonSchema.parse!(hyper_schema_data)
+      sc.expand_references!
+      @committee_options[:schema] = Committee::Drivers::HyperSchema::Driver.new.parse(sc)
+      @app = new_rack_app(JSON.generate([ValidApp]), {})
+      get "/apps"
+      assert_schema_conform(200)
+      assert_equal [Committee::InvalidResponse], @handled_errors.map(&:class)
+      assert_match(/response header must be set to/i, @handled_errors.first.message)
+    end
+  end
+
   def new_rack_app(response = nil, headers = { "Content-Type" => "application/json" }, status_code = 200)
     Rack::Builder.new {
       run lambda { |_|
