@@ -25,6 +25,8 @@ module Committee
         end
 
         increment_assertion_count
+      rescue Committee::InvalidRequest => e
+        handle_test_failure(e)
       end
 
       def assert_response_schema_confirm(expected_status = nil)

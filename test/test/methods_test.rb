@@ -538,8 +538,21 @@ describe Committee::Test::Methods do
         assert_match(/response definition does not exist/i, @handled_errors.first.message)
       end
 
-      it "does not call the handler when the request and the response conform"
-      it "passes both failures to the handler when the request and the response are invalid"
+      it "does not call the handler when the request and the response conform" do
+        @app = new_rack_app(JSON.generate(@correct_response))
+        get "/characters"
+        assert_schema_conform(200)
+        assert_empty @handled_errors
+      end
+
+      it "passes both failures to the handler when the request and the response are invalid" do
+        @app = new_rack_app(nil, { "Content-Type" => "application/json" }, 500)
+        get "/validate", { "query_integer_list" => [1, 2] }
+        assert_schema_conform(200)
+        assert_equal [Committee::InvalidRequest, Committee::InvalidResponse], @handled_errors.map(&:class)
+        assert_match(/missing required parameters: query_string/i, @handled_errors.first.message)
+        assert_match(/Expected `200` status code, but it was `500`/, @handled_errors.last.message)
+      end
     end
 
     describe "#assert_request_schema_confirm" do
