@@ -25,7 +25,7 @@ module Committee
         end
 
         increment_assertion_count
-      rescue Committee::InvalidRequest => e
+      rescue Committee::InvalidRequest, Committee::BadRequest => e
         handle_test_failure(e)
       end
 
