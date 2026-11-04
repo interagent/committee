@@ -521,6 +521,36 @@ describe Committee::Test::Methods do
     end
   end
 
+  describe "with test_failure_handler" do
+    before do
+      @failures = []
+      @committee_options.merge!({ schema: open_api_3_schema, test_failure_handler: ->(error) { @failures << error } })
+    end
+
+    describe "#assert_schema_conform" do
+      it "passes an invalid response to the handler instead of raising"
+      it "does not call the handler when the request and the response conform"
+      it "passes both failures to the handler when the request and the response are invalid"
+    end
+
+    describe "#assert_request_schema_confirm" do
+      it "passes an invalid request to the handler instead of raising"
+      it "passes a path undefined in schema to the handler"
+      it "passes a non-object JSON body to the handler"
+      it "restores the excepted parameters when the handler is called"
+    end
+
+    describe "#assert_response_schema_confirm" do
+      it "passes an invalid response to the handler instead of raising"
+      it "passes an unexpected status code to the handler"
+      it "passes a path undefined in schema to the handler"
+    end
+
+    it "lets an error raised by the handler reach the caller"
+    it "raises errors other than validation failures"
+    it "works with Hyper-Schema"
+  end
+
   def new_rack_app(response = nil, headers = { "Content-Type" => "application/json" }, status_code = 200)
     Rack::Builder.new {
       run lambda { |_|
