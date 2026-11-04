@@ -523,12 +523,21 @@ describe Committee::Test::Methods do
 
   describe "with test_failure_handler" do
     before do
-      @failures = []
-      @committee_options.merge!({ schema: open_api_3_schema, test_failure_handler: ->(error) { @failures << error } })
+      @handled_errors = []
+      @correct_response = { string_1: :honoka }
+      @committee_options.merge!({ schema: open_api_3_schema, test_failure_handler: ->(error) { @handled_errors << error } })
     end
 
     describe "#assert_schema_conform" do
-      it "passes an invalid response to the handler instead of raising"
+      it "passes an invalid response to the handler instead of raising" do
+        @app = new_rack_app(JSON.generate([@correct_response]), {})
+        get "/characters"
+        assert_schema_conform(200)
+        assert_equal 1, @handled_errors.size
+        assert_instance_of Committee::InvalidResponse, @handled_errors.first
+        assert_match(/response definition does not exist/i, @handled_errors.first.message)
+      end
+
       it "does not call the handler when the request and the response conform"
       it "passes both failures to the handler when the request and the response are invalid"
     end
