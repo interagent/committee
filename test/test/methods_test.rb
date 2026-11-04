@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "rspec/expectations"
 
 describe Committee::Test::Methods do
   include Committee::Test::Methods
@@ -536,6 +537,25 @@ describe Committee::Test::Methods do
         assert_equal 1, @handled_errors.size
         assert_instance_of Committee::InvalidResponse, @handled_errors.first
         assert_match(/response definition does not exist/i, @handled_errors.first.message)
+      end
+
+      it "aggregates schema and subsequent RSpec expectation failures" do
+        @committee_options[:test_failure_handler] = ->(error) { RSpec::Expectations.fail_with(error.message) }
+        @app = new_rack_app(JSON.generate({ string_1: 123 }))
+        get "/characters"
+        rspec = Object.new.extend(RSpec::Matchers)
+
+        e = assert_raises(RSpec::Expectations::MultipleExpectationsNotMetError) do
+          rspec.aggregate_failures do
+            assert_schema_conform(200)
+            rspec.expect(last_response.status).to rspec.eq(201)
+          end
+        end
+
+        assert_equal 2, e.failures.size
+        assert_empty e.other_errors
+        assert_match(/string_1.*expected string/, e.failures.first.message)
+        assert_match(/expected: 201/, e.failures.last.message)
       end
 
       it "does not call the handler when the request and the response conform" do
