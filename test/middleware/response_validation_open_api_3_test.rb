@@ -418,6 +418,39 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
+  describe "OpenAPI 3.2" do
+    it "accepts a valid query response" do
+      @app = new_response_rack(JSON.generate([{ "name" => "a" }]), {}, schema: open_api_3_2_schema, raise: true)
+      custom_request("QUERY", "/items", {}, { input: JSON.generate("name" => "a"), "CONTENT_TYPE" => "application/json" })
+      assert_equal 200, last_response.status
+    end
+
+    it "rejects an invalid query response" do
+      @app = new_response_rack(JSON.generate([{ "name" => 1 }]), {}, schema: open_api_3_2_schema, raise: true)
+      assert_raises(Committee::InvalidResponse) do
+        custom_request("QUERY", "/items", {}, { input: JSON.generate("name" => "a"), "CONTENT_TYPE" => "application/json" })
+      end
+    end
+
+    it "accepts a valid response body referenced from components.mediaTypes" do
+      @app = new_response_rack(JSON.generate("name" => "a"), {}, schema: open_api_3_2_schema, raise: true)
+      post "/shared"
+      assert_equal 200, last_response.status
+    end
+
+    it "rejects an invalid response body referenced from components.mediaTypes" do
+      @app = new_response_rack(JSON.generate("name" => 1), {}, schema: open_api_3_2_schema, raise: true)
+      assert_raises(Committee::InvalidResponse) { post "/shared" }
+    end
+
+    # openapi_parser doesn't validate itemSchema yet
+    it "skips a streaming response described by itemSchema" do
+      @app = new_response_rack("data: {}\n\n", {}, { schema: open_api_3_2_schema, raise: true }, { content_type: "text/event-stream" })
+      get "/events"
+      assert_equal 200, last_response.status
+    end
+  end
+
   private
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})

@@ -21,8 +21,7 @@ module Committee
         private
 
         def check_content_type(request, content_type)
-          # support post, put, patch, options only
-          return true unless request.post? || request.put? || request.patch? || request.options?
+          return true unless @operation_object.body_method?
           return true if @operation_object.valid_request_content_type?(content_type)
           return true if @operation_object.optional_body? && empty_request?(request)
 
