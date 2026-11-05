@@ -66,11 +66,11 @@ module Committee
           end
         end
 
-        # query (3.2) carries a body like post; other methods (trace, 3.2 additionalOperations)
-        # do when the operation defines a requestBody
+        # query (3.2) carries a body like post. trace never does (RFC 9110 §9.3.8), so its
+        # requestBody is ignored. 3.2 additionalOperations do when they define a requestBody
         def body_method?
           case request_operation.http_method
-          when 'get', 'delete', 'head'
+          when 'get', 'delete', 'head', 'trace'
             false
           when 'post', 'put', 'patch', 'options', 'query'
             true

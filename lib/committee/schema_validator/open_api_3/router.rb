@@ -27,7 +27,7 @@ module Committee
           path = request.path
           path = path.gsub(@prefix_regexp, '') if @prefix_regexp
 
-          request_method = request.request_method.downcase
+          request_method = Committee::Utils.operation_method(request.request_method)
 
           @schema.operation_object(path, request_method)
         end

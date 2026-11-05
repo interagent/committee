@@ -483,7 +483,7 @@ OpenAPI 3.2 documents also use the OpenAPI 3 driver.
 Supported 3.2 additions:
 
 - the `query` operation (`QUERY` requests are validated like `POST`, including the request body and `Content-Type`)
-- `additionalOperations` (custom methods are matched case-insensitively)
+- `additionalOperations` (custom methods are matched by exact case, so `PURGE` and `purge` are different operations)
 - `components.mediaTypes` `$ref`s in request and response `content`
 - Discriminator `defaultMapping`
 

@@ -46,7 +46,7 @@ module Committee
       end
 
       def update_response_coverage!(path, method, response_status)
-        method = method.to_s.downcase
+        method = Committee::Utils.operation_method(method)
         response_status = response_status.to_s
 
         @covered[path] ||= {}
@@ -63,8 +63,10 @@ module Committee
           path_item._openapi_all_child_objects.each do |object_name, object|
             next unless object.is_a?(OpenAPIParser::Schemas::Operation)
 
-            method = object_name.split('/').last&.downcase
+            method = object_name.split('/').last
             next unless method
+
+            method = Committee::Utils.operation_method(method)
 
             report[path_name][method] ||= {}
 

@@ -35,6 +35,17 @@ paths:
         responses:
           '204':
             description: purged
+      purge:
+        description: a distinct operation, since method names are case-sensitive
+        parameters:
+        - name: scope
+          in: query
+          required: true
+          schema:
+            type: string
+        responses:
+          '204':
+            description: purged
       SEARCH:
         description: search items with a custom method
         requestBody:
@@ -46,6 +57,17 @@ paths:
         responses:
           '200':
             description: success
+    trace:
+      description: a requestBody that must be ignored, since TRACE carries no content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemQuery'
+      responses:
+        '200':
+          description: success
   /pets:
     post:
       description: create a pet

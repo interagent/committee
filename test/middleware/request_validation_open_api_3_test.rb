@@ -1113,12 +1113,20 @@ describe Committee::Middleware::RequestValidation do
       assert_match(/Content-Type/, e.message)
     end
 
-    it "routes additionalOperations case-insensitively" do
+    it "routes additionalOperations by exact method case" do
       @app = new_rack_app(schema: open_api_3_2_schema, raise: true, strict: true)
-      %w[PURGE purge].each do |method|
-        custom_request(method, "/items?older_than=5")
-        assert_equal 200, last_response.status
-      end
+      custom_request("PURGE", "/items?older_than=5")
+      assert_equal 200, last_response.status
+      # rack-test upcases the method unless REQUEST_METHOD is set directly
+      custom_request("purge", "/items?scope=all", {}, { "REQUEST_METHOD" => "purge" })
+      assert_equal 200, last_response.status
+      assert_raises(Committee::InvalidRequest) { custom_request("purge", "/items?older_than=5", {}, { "REQUEST_METHOD" => "purge" }) }
+    end
+
+    it "ignores a trace requestBody" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true, strict: true)
+      custom_request("TRACE", "/items")
+      assert_equal 200, last_response.status
     end
 
     it "validates additionalOperations parameters" do
