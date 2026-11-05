@@ -49,10 +49,12 @@ describe Committee::Test::SchemaCoverage do
   describe 'OpenAPI 3.2' do
     it 'reports query and additionalOperations operations' do
       schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_2_schema)
-      schema_coverage.update_response_coverage!('/items', 'query', '200')
+      schema_coverage.update_response_coverage!('/items', 'QUERY', '200')
+      schema_coverage.update_response_coverage!('/items', 'PURGE', '204')
 
       report = schema_coverage.report
       assert_equal({ 'responses' => { '200' => true } }, report['/items']['query'])
+      assert_equal({ 'responses' => { '204' => true } }, report['/items']['PURGE'])
       assert_equal({ 'responses' => { '204' => false } }, report['/items']['purge'])
     end
   end

@@ -60,7 +60,7 @@ module Committee
             path = path.gsub(Regexp.new("\\A#{Regexp.escape(prefix)}"), '')
           end
 
-          schema.operation_object(path, @request.request_method.downcase)
+          schema.operation_object(path, Committee::Utils.operation_method(@request.request_method))
         end
 
         # Find the OpenAPI3 schema object for a parameter by name and location.
