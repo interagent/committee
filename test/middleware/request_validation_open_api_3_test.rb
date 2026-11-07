@@ -1123,6 +1123,12 @@ describe Committee::Middleware::RequestValidation do
       assert_raises(Committee::InvalidRequest) { custom_request("purge", "/items?older_than=5", {}, { "REQUEST_METHOD" => "purge" }) }
     end
 
+    it "does not route a custom method that differs only in case" do
+      @app = new_rack_app(schema: open_api_3_2_schema, strict: true)
+      custom_request("search", "/items", {}, { "REQUEST_METHOD" => "search" })
+      assert_equal 404, last_response.status
+    end
+
     it "ignores a trace requestBody" do
       @app = new_rack_app(schema: open_api_3_2_schema, raise: true, strict: true)
       custom_request("TRACE", "/items")
