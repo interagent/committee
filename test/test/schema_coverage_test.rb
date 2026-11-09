@@ -57,6 +57,27 @@ describe Committee::Test::SchemaCoverage do
       assert_equal({ 'responses' => { '204' => true } }, report['/items']['PURGE'])
       assert_equal({ 'responses' => { '204' => false } }, report['/items']['purge'])
     end
+
+    it 'keeps an additionalOperations method apart from a standard one that differs only in case' do
+      schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_2_schema)
+      schema_coverage.update_response_coverage!('/versions', 'Get', '200')
+
+      report = schema_coverage.report
+      assert_equal({ 'responses' => { '200' => true } }, report['/versions']['Get'])
+      assert_equal({ 'responses' => { '200' => false } }, report['/versions']['get'])
+
+      schema_coverage.update_response_coverage!('/versions', 'GET', '200')
+      assert_equal({ 'responses' => { '200' => true } }, schema_coverage.report['/versions']['get'])
+    end
+
+    it 'reports a method name containing ~ as covered' do
+      schema_coverage = Committee::Test::SchemaCoverage.new(open_api_3_2_schema)
+      schema_coverage.update_response_coverage!('/versions', 'SYNC~V2', '200')
+
+      report = schema_coverage.report
+      assert_equal({ 'responses' => { '200' => true } }, report['/versions']['SYNC~V2'])
+      refute report['/versions'].key?('SYNC~0V2')
+    end
   end
 
   describe '.merge_report' do
