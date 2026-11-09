@@ -46,7 +46,7 @@ module Committee
       end
 
       def update_response_coverage!(path, method, response_status)
-        method = Committee::Utils.operation_method(method)
+        method = coverage_method(path, method)
         response_status = response_status.to_s
 
         @covered[path] ||= {}
@@ -63,10 +63,9 @@ module Committee
           path_item._openapi_all_child_objects.each do |object_name, object|
             next unless object.is_a?(OpenAPIParser::Schemas::Operation)
 
-            method = object_name.split('/').last
+            # JSON Pointer segment (RFC 6901), so `SYNC~V2` appears as `SYNC~0V2`
+            method = object_name.split('/').last&.gsub('~1', '/')&.gsub('~0', '~')
             next unless method
-
-            method = Committee::Utils.operation_method(method)
 
             report[path_name][method] ||= {}
 
@@ -91,6 +90,14 @@ module Committee
 
       def report_flatten
         self.class.flatten_report(report)
+      end
+
+      private
+
+      # an exact additionalOperations key keeps its case; anything else is a lowercase standard method
+      def coverage_method(path, method)
+        method = method.to_s
+        schema.open_api.paths.path[path]&.additional_operations&.key?(method) ? method : method.downcase
       end
     end
   end

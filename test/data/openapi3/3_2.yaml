@@ -92,6 +92,35 @@ paths:
           content:
             application/json:
               $ref: '#/components/mediaTypes/ItemJson'
+  /versions:
+    get:
+      description: the standard GET
+      parameters:
+      - name: standard
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: success
+    additionalOperations:
+      Get:
+        description: a distinct method from GET, since method names are case-sensitive
+        parameters:
+        - name: custom
+          in: query
+          required: true
+          schema:
+            type: string
+        responses:
+          '200':
+            description: success
+      SYNC~V2:
+        description: a method name with a character escaped in JSON Pointers
+        responses:
+          '200':
+            description: success
   /filter:
     get:
       description: whole query string as one parameter
