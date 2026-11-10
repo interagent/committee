@@ -104,7 +104,7 @@ module Committee
       def retrieve_streaming_content_parser(headers)
         content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
         content_type = headers.fetch(content_type_key, nil)
-        @streaming_content_parsers[content_type]
+        @streaming_content_parsers[content_type] || @streaming_content_parsers[Rack::MediaType.type(content_type)]
       end
 
       def handle_exception(e, env)

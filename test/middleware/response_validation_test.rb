@@ -213,6 +213,49 @@ describe Committee::Middleware::ResponseValidation do
         assert_equal 200, last_response.status
       end
 
+      it 'streams a response with content-type parameters without eagerly reading its body' do
+        each_calls = 0
+        body = Enumerator.new do |yielder|
+          each_calls += 1
+          yielder << "data: hello\n\n"
+        end
+        validated_body = nil
+        options = { schema: open_api_3_streaming_response_schema, streaming_content_parsers: { 'text/event-stream' => ->(body) { validated_body = body } }, raise: true }
+        headers = { 'content-type' => 'text/event-stream; charset=utf-8' }
+        @app = Rack::Builder.new {
+          use Committee::Middleware::ResponseValidation, options
+          run ->(_) { [200, headers, body] }
+        }
+
+        status, response_headers, response_body = @app.call(Rack::MockRequest.env_for("/events/stream"))
+
+        assert_equal 200, status
+        assert_equal 0, each_calls
+        assert_equal headers, response_headers
+        assert_nil validated_body
+        assert_equal ["data: hello\n\n"], response_body.each.to_a
+        assert_equal 1, each_calls
+        assert_nil validated_body
+        response_body.close
+        assert_equal "data: hello\n\n", validated_body
+      end
+
+      it 'prefers an exact streaming parser over the normalized media type' do
+        validated_body = nil
+        content_type = 'text/event-stream; charset=utf-8'
+        parsers = { 'text/event-stream' => ->(_) { flunk "the exact parser should take precedence" }, content_type => ->(body) { validated_body = body } }
+        options = { schema: open_api_3_streaming_response_schema, streaming_content_parsers: parsers, raise: true }
+        @app = Rack::Builder.new {
+          use Committee::Middleware::ResponseValidation, options
+          run ->(_) { [200, { 'Content-Type' => content_type }, ["hello"]] }
+        }
+
+        _status, _headers, response_body = @app.call(Rack::MockRequest.env_for("/events/stream"))
+        assert_equal ["hello"], response_body.each.to_a
+        response_body.close
+        assert_equal "hello", validated_body
+      end
+
       it 'validates the chunks sent from a body that cannot be read after close' do
         closed = false
         body = Object.new
