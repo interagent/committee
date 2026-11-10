@@ -549,6 +549,35 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  describe 'path item parameters' do
+    [
+      ['query', 'form', 'committee.query_hash'],
+      ['header', 'simple', 'committee.headers'],
+    ].each do |location, style, hash_key|
+      it "deserializes and validates a path item #{location} array" do
+        parameter = { 'name' => 'ids', 'in' => location, 'required' => true, 'style' => style, 'explode' => false, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
+        document = query_param_document(parameter)
+        path_item = document['paths']['/events']
+        path_item['parameters'] = path_item['get'].delete('parameters')
+        schema = Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+        check_parameter = lambda { |env|
+          assert_equal [1, 2, 3], env[hash_key]['ids']
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_parameter, schema: schema, check_header: true)
+
+        if location == 'query'
+          get '/events?ids=1,2,3'
+        else
+          header 'ids', '1,2,3'
+          get '/events'
+        end
+
+        assert_equal 200, last_response.status
+      end
+    end
+  end
+
   describe "overwrite same parameter (old rule)" do
     # (high priority) path_hash_key -> request_body_hash -> query_param
     it "set query parameter to committee.params and query hash" do

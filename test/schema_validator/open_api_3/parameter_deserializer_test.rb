@@ -480,6 +480,33 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
     end
   end
 
+  describe 'path item parameters' do
+    [
+      ['query', 'form', :deserialize_query_params],
+      ['header', 'simple', :deserialize_headers],
+      ['path', 'simple', :deserialize_path_params],
+    ].each do |location, style, method|
+      it "prefers the operation definition for a #{location} parameter" do
+        parameter = create_param('ids', location, style, false, 'array', 'integer')
+        inherited = create_param('ids', location, style, false, 'string', nil)
+        deserializer = create_deserializer([parameter], [inherited])
+
+        result = deserializer.public_send(method, { 'ids' => '1,2,3' })
+
+        assert_equal({ 'ids' => ['1', '2', '3'] }, result)
+      end
+    end
+
+    it 'keeps parameters with the same name in different locations' do
+      query_parameter = create_param('ids', 'query', 'form', false, 'array', 'integer')
+      header_parameter = create_param('ids', 'header', 'simple', false, 'array', 'integer')
+      deserializer = create_deserializer([header_parameter], [query_parameter])
+
+      assert_equal({ 'ids' => ['1', '2'] }, deserializer.deserialize_query_params({ 'ids' => '1,2' }))
+      assert_equal({ 'ids' => ['3', '4'] }, deserializer.deserialize_headers({ 'ids' => '3,4' }))
+    end
+  end
+
   describe 'array-form type (OpenAPI 3.1)' do
     it 'deserializes form style array with explode=false' do
       param = nullable(create_param('ids', 'query', 'form', false, 'array', 'integer'))
@@ -519,8 +546,9 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
 
   private
 
-  def create_deserializer(params)
-    operation = Struct.new(:operation_object).new(Struct.new(:parameters).new(params))
+  def create_deserializer(params, path_item_params = nil)
+    path_item = Struct.new(:parameters).new(path_item_params)
+    operation = Struct.new(:operation_object, :path_item).new(Struct.new(:parameters).new(params), path_item)
     Committee::SchemaValidator::OpenAPI3::ParameterDeserializer.new(operation)
   end
 
