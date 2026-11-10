@@ -17,6 +17,20 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  it "passes through mixed encoding chunks" do
+    chunks = ['{"Otonokizaka":["あ'.freeze, "い".b.freeze, 'う"]}'.freeze]
+    @app = Rack::Builder.new {
+      use Committee::Middleware::ResponseValidation, schema: open_api_3_schema, raise: true
+      run ->(_) { [200, { "content-type" => "application/json" }, chunks] }
+    }
+
+    status, _headers, response_body = @app.call(Rack::MockRequest.env_for("/characters"))
+
+    assert_equal 200, status
+    response_body.each_with_index { |chunk, index| assert_same chunks[index], chunk }
+    assert_equal [Encoding::UTF_8, Encoding::BINARY, Encoding::UTF_8], chunks.map(&:encoding)
+  end
+
   it "passes through a Rack 3 call-only response body" do
     content = JSON.generate(CHARACTERS_RESPONSE)
     body = Object.new
