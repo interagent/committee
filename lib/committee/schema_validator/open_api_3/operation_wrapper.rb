@@ -5,8 +5,9 @@ module Committee
     class OpenAPI3
       class OperationWrapper
         # # @param request_operation [OpenAPIParser::RequestOperation]
-        def initialize(request_operation)
+        def initialize(request_operation, schema_locations = nil)
           @request_operation = request_operation
+          @schema_locations = schema_locations
         end
 
         def path_params
@@ -48,14 +49,20 @@ module Committee
               content_type = Rack::MediaType.type(response_body.content_type)
               matched = response_object.select_media_type(content_type)
               if matched.nil? && response_object.content && !response_object.content.empty?
-                raise Committee::InvalidResponse, "Response Content-Type '#{content_type}' is not declared in the OpenAPI spec for this operation. Declared types: #{response_object.content.keys.join(', ')}"
+                message = "Response Content-Type '#{content_type}' is not declared in the OpenAPI spec for this operation. Declared types: #{response_object.content.keys.join(', ')}"
+                message = @schema_locations.open_api_3_message(message, response_object, response_object.object_reference) if @schema_locations
+                raise Committee::InvalidResponse, message
               end
             end
           end
 
           return request_operation.validate_response_body(response_body, response_validate_options(strict, check_header, validator_options: validator_options))
         rescue OpenAPIParser::OpenAPIError => e
-          raise Committee::InvalidResponse.new(e.message, original_error: e)
+          responses = request_operation.operation_object&.responses
+          response = find_response_object_for_status(responses, status_code) || responses
+          # openapi_parser has no public reader for an error's schema reference.
+          message = @schema_locations ? @schema_locations.open_api_3_message(e.message, response, e.instance_variable_get(:@reference)) : e.message
+          raise Committee::InvalidResponse.new(message, original_error: e)
         end
 
         def validate_request_params(_path_params, query_params, body_params, headers, validator_option)

@@ -28,6 +28,7 @@ module Committee
 end
 
 require_relative "committee/utils"
+require_relative "committee/schema_locations"
 require_relative "committee/drivers"
 require_relative "committee/errors"
 require_relative "committee/validation_error"

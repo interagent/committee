@@ -31,7 +31,14 @@ module Committee
     # @return [Committee::Driver]
     def self.load_from_yaml(schema_path, parser_options: {})
       data = YAML.respond_to?(:unsafe_load_file) ? YAML.unsafe_load_file(schema_path) : YAML.load_file(schema_path)
-      load_from_data(data, schema_path, parser_options: parser_options)
+      locations = Committee::SchemaLocations.new(schema_path, data)
+      schema = load_from_data(data, schema_path, parser_options: parser_options)
+      if schema.is_a?(Committee::Drivers::OpenAPI3::Schema)
+        schema.schema_locations = locations
+      elsif schema.is_a?(Committee::Drivers::OpenAPI2::Schema)
+        schema.routes.each_value { |routes| routes.each { |_, link| link.schema_locations = locations } }
+      end
+      schema
     end
 
     # load and build drive from file

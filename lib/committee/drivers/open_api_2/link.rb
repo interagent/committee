@@ -26,6 +26,8 @@ module Committee
         attr_accessor :target_schemas
 
         attr_accessor :header_schema
+        attr_accessor :schema_locations
+        attr_accessor :response_definition
 
         def rel
           raise "Committee: rel not implemented for OpenAPI"
