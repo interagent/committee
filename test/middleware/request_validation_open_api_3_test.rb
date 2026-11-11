@@ -110,6 +110,30 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 400, last_response.status
   end
 
+  [
+    ['application/json', '[1,2]', [1, 2], { 'type' => 'array', 'items' => { 'type' => 'integer' } }],
+    ['text/plain', 'hello', 'hello', { 'type' => 'string' }],
+  ].each do |content_type, body, expected_body, body_schema|
+    it "preserves query parameters with an allowed GET #{content_type} body" do
+      parameter = { 'name' => 'ids', 'in' => 'query', 'required' => true, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
+      document = query_param_document(parameter)
+      document['paths']['/events']['get']['requestBody'] = { 'required' => true, 'content' => { content_type => { 'schema' => body_schema } } }
+      schema = Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+      check_parameter = lambda { |env|
+        assert_equal expected_body, env['committee.request_body_hash']
+        assert_equal [3, 4], env['committee.query_hash']['ids']
+        assert_equal({ 'ids' => [3, 4] }, env['committee.params'])
+        assert_equal body, env['rack.input'].read
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: schema, allow_get_body: true)
+
+      get '/events?ids=3&ids=4', {}, { input: body, 'CONTENT_TYPE' => content_type }
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+  end
+
   it "not parameter request" do
     check_parameter_string = lambda { |_|
       [200, { integer: 1 }, []]

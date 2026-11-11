@@ -106,7 +106,7 @@ module Committee
           query_values = validator_option.allow_query_params ? Rack::Utils.parse_query(request.query_string, '&') : {}
           # Do not restore query values that were overridden by the request body.
           query_values.reject! { |name, _| request.POST.key?(name) } if validator_option.allow_non_get_query_params
-          query_values.reject! { |name, _| request_param.key?(name) } if request.get? && validator_option.allow_get_body
+          query_values.reject! { |name, _| request_param.key?(name) } if request.get? && validator_option.allow_get_body && request_param.is_a?(Hash)
           query_param = deserializer.deserialize_query_params(query_param, query_values)
 
           headers = request.env[validator_option.headers_key]
