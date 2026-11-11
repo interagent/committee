@@ -12,8 +12,10 @@ module Committee
       class ParameterDeserializer
         # @param [OpenAPIParser::RequestOperation] request_operation
         def initialize(request_operation)
-          @request_operation = request_operation
           @parameters = request_operation.operation_object.parameters || []
+          if request_operation.respond_to?(:path_item) && request_operation.path_item
+            @parameters = (@parameters + (request_operation.path_item.parameters || [])).uniq { |param| [param.in, param.name] }
+          end
         end
 
         # Deserialize query parameters
@@ -55,9 +57,6 @@ module Committee
 
           result = Committee::Utils.indifferent_hash
           params_for_location = @parameters.select { |p| p.in == location }
-          if location == 'path' && @request_operation.respond_to?(:path_item) && @request_operation.path_item
-            params_for_location += (@request_operation.path_item.parameters || []).select { |p| p.in == 'path' }
-          end
 
           # If no parameters are defined for this location, return raw params as-is
           return raw_params if params_for_location.empty?
