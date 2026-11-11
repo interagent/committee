@@ -148,6 +148,23 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  [
+    [:hyper_schema, "apps"],
+    [:open_api_2_schema, "api/pets"],
+    [:open_api_3_schema, "characters"],
+  ].each do |schema_method, path|
+    ["/v1/", "/"].each do |prefix|
+      it "validates #{schema_method} responses with prefix #{prefix.inspect}" do
+        @app = new_rack_app("not_json", {}, prefix: prefix, schema: send(schema_method))
+
+        get "#{prefix}#{path}"
+
+        assert_equal 500, last_response.status
+        assert_match(/valid JSON/i, last_response.body)
+      end
+    end
+  end
+
   it "rescues JSON errors" do
     @app = new_rack_app("[{x:y}]", {}, raise: true, schema: hyper_schema)
     assert_raises(Committee::InvalidResponse) do

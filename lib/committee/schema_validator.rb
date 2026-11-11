@@ -19,11 +19,7 @@ module Committee
       def build_prefix_regexp(prefix)
         return nil unless prefix
 
-        if prefix == "/" || prefix.end_with?("/")
-          /\A#{Regexp.escape(prefix)}/.freeze
-        else
-          /\A#{Regexp.escape(prefix)}(?=\/|\z)/.freeze
-        end
+        /\A#{Regexp.escape(prefix.chomp("/"))}(?=\/|\z)/.freeze
       end
     end
   end

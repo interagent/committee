@@ -61,4 +61,14 @@ describe Committee::SchemaValidator do
     assert regexp.match?("/v1/characters")
     refute regexp.match?("/v11/characters")
   end
+
+  ["/v1/", "/"].each do |prefix|
+    it "preserves the path's leading slash after removing prefix #{prefix.inspect}" do
+      regexp = Committee::SchemaValidator.build_prefix_regexp(prefix)
+
+      assert_equal "/characters", "#{prefix}characters".sub(regexp, "")
+      assert_equal "/", prefix.sub(regexp, "")
+      refute regexp.match?("/v11/characters") unless prefix == "/"
+    end
+  end
 end

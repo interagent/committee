@@ -287,6 +287,25 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  [
+    [:hyper_schema, "apps", "name"],
+    [:open_api_2_schema, "api/pets", "name"],
+    [:open_api_3_schema, "characters", "string_post_1"],
+  ].each do |schema_method, path, property|
+    ["/v1/", "/"].product([false, true]).each do |prefix, strict|
+      it "validates #{schema_method} requests with prefix #{prefix.inspect} and strict #{strict}" do
+        @app = new_rack_app(prefix: prefix, schema: send(schema_method), strict: strict)
+        header "Content-Type", "application/json"
+
+        post "#{prefix}#{path}", JSON.generate({ property => "cloudnasium" })
+        assert_equal 200, last_response.status
+
+        post "#{prefix}#{path}", JSON.generate({ property => 1 })
+        assert_equal 400, last_response.status
+      end
+    end
+  end
+
   it "ignores paths outside the prefix" do
     @app = new_rack_app(prefix: "/v1", schema: hyper_schema)
     header "Content-Type", "text/html"
