@@ -24,7 +24,7 @@ module Committee
         full_body = if response.is_a?(String)
                       response
                     else
-                      response.each_with_object(+"") { |chunk, body| body << chunk }
+                      response.each_with_object(String.new(encoding: Encoding::BINARY)) { |chunk, body| body << chunk.b }.force_encoding(Encoding::UTF_8)
                     end
 
         parse_to_json = if validator_option.parse_response_by_content_type

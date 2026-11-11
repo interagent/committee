@@ -21,10 +21,10 @@ module Committee
 
         if streaming_content_parser
           original_response = response
-          streamed_response = +""
+          streamed_response = String.new(encoding: Encoding::BINARY)
           response = Enumerator.new do |yielder|
             original_response.each do |chunk|
-              streamed_response << chunk
+              streamed_response << chunk.b
               yielder << chunk
             end
           end
@@ -33,7 +33,7 @@ module Committee
               original_response.close if original_response.respond_to?(:close)
             ensure
               begin
-                validate(request, status, headers, streamed_response, streaming_content_parser)
+                validate(request, status, headers, streamed_response.force_encoding(Encoding::UTF_8), streaming_content_parser)
               rescue => e
                 handle_exception(e, request.env)
 

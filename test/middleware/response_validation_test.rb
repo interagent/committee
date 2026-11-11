@@ -15,6 +15,27 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  [
+    [:hyper_schema, "/apps", ValidApp],
+    [:open_api_2_schema, "/api/pets", ValidPet],
+  ].each do |schema_method, path, valid_object|
+    it "passes through mixed encoding chunks for #{schema_method}" do
+      prefix, suffix = JSON.generate([valid_object.merge("message" => "あいう")]).split("い")
+      chunks = [prefix.freeze, "い".b.freeze, suffix.freeze]
+      schema = send(schema_method)
+      @app = Rack::Builder.new {
+        use Committee::Middleware::ResponseValidation, schema: schema, raise: true
+        run ->(_) { [200, { "content-type" => "application/json" }, chunks] }
+      }
+
+      status, _headers, response_body = @app.call(Rack::MockRequest.env_for(path))
+
+      assert_equal 200, status
+      response_body.each_with_index { |chunk, index| assert_same chunks[index], chunk }
+      assert_equal [Encoding::UTF_8, Encoding::BINARY, Encoding::UTF_8], chunks.map(&:encoding)
+    end
+  end
+
   it "passes through a valid response with content-type (lower-case)" do
     options = { schema: hyper_schema }
     status = 200
@@ -254,6 +275,34 @@ describe Committee::Middleware::ResponseValidation do
         assert_equal ["hello"], response_body.each.to_a
         response_body.close
         assert_equal "hello", validated_body
+      end
+
+      [
+        ["non-ASCII characters", ["data: あ", "い".b, "う\n\n"]],
+        ["a split UTF-8 character", ["data: あ\xE3", "\x81".b, "\x84う\n\n"]],
+      ].each do |description, chunks|
+        it "delivers mixed encoding chunks with #{description} unchanged before validation" do
+          chunks.each(&:freeze)
+          validated_body = nil
+          parser = ->(body) { validated_body = body }
+          @app = Rack::Builder.new {
+            use Committee::Middleware::ResponseValidation, schema: open_api_3_streaming_response_schema, streaming_content_parsers: { 'text/event-stream' => parser }, raise: true
+            run ->(_) { [200, { 'content-type' => 'text/event-stream' }, chunks] }
+          }
+
+          status, _headers, response_body = @app.call(Rack::MockRequest.env_for("/events/stream"))
+          delivered_chunks = response_body.each.to_a
+
+          assert_equal 200, status
+          assert_equal chunks.length, delivered_chunks.length
+          delivered_chunks.each_with_index { |chunk, i| assert_same chunks[i], chunk }
+          assert_nil validated_body
+          response_body.close
+          assert_equal "data: あいう\n\n", validated_body
+          assert_equal Encoding::UTF_8, validated_body.encoding
+          assert validated_body.valid_encoding?
+          assert_equal [Encoding::UTF_8, Encoding::BINARY, Encoding::UTF_8], chunks.map(&:encoding)
+        end
       end
 
       it 'validates the chunks sent from a body that cannot be read after close' do
