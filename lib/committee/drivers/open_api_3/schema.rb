@@ -6,6 +6,7 @@ module Committee
       class Schema < ::Committee::Drivers::Schema
         attr_reader :open_api
         attr_reader :validator_option
+        attr_accessor :schema_locations
 
         # @!attribute [r] open_api
         #   @return [OpenAPIParser::Schemas::OpenAPI]
@@ -33,7 +34,7 @@ module Committee
           request_operation = open_api.request_operation(method, path)
           return nil unless request_operation
 
-          Committee::SchemaValidator::OpenAPI3::OperationWrapper.new(request_operation)
+          Committee::SchemaValidator::OpenAPI3::OperationWrapper.new(request_operation, schema_locations)
         end
       end
     end

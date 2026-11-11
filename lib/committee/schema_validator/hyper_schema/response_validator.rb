@@ -55,9 +55,15 @@ module Committee
           begin
             if validate?(status)
               if @link.is_a?(Drivers::OpenAPI2::Link)
-                raise InvalidResponse, "Invalid response.#{@link.href} status code #{status} definition does not exist" if @validators[status].nil?
+                if @validators[status].nil?
+                  message = "Invalid response.#{@link.href} status code #{status} definition does not exist"
+                  message = @link.schema_locations.message(message, @link.response_definition) if @link.schema_locations
+                  raise InvalidResponse, message
+                end
                 if !@validators[status].validate(data)
-                  errors = JsonSchema::SchemaError.aggregate(@validators[status].errors).join("\n")
+                  errors = @validators[status].errors.map do |error|
+                    @link.schema_locations ? @link.schema_locations.message(error.to_s, error.schema.data) : error.to_s
+                  end.join("\n")
                   raise InvalidResponse, "Invalid response.\n\n#{errors}"
                 end
               else
@@ -100,7 +106,11 @@ module Committee
         def check_content_type!(response)
           if @link.media_type
             unless Rack::Mime.match?(response_media_type(response), @link.media_type)
-              raise Committee::InvalidResponse, %{"Content-Type" response header must be set to "#{@link.media_type}".}
+              message = %{"Content-Type" response header must be set to "#{@link.media_type}".}
+              if @link.is_a?(Drivers::OpenAPI2::Link) && @link.schema_locations
+                message = @link.schema_locations.message(message, nil, '#/produces')
+              end
+              raise Committee::InvalidResponse, message
             end
           end
         end

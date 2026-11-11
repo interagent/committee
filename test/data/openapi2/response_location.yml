@@ -1,0 +1,28 @@
+swagger: '2.0'
+info:
+  title: Response locations
+  version: '1.0'
+basePath: /api
+consumes: [application/json]
+produces: [application/json]
+paths:
+  /widgets:
+    get:
+      responses:
+        '200':
+          description: Inline response
+          schema:
+            type: object
+            properties:
+              count:
+                type: integer
+        '400':
+          description: Referenced response
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Error:
+    type: object
+    properties:
+      message:
+        type: string

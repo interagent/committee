@@ -167,6 +167,7 @@ module Committee
               link.media_type = schema.produces
               link.method = method
               link_data = resolve_parameter_references(link_data, data)
+              link.response_definition = link_data['responses']
 
               # Convert the spec's parameter pseudo-schemas into JSON schemas that
               # we can use for some basic request validation.

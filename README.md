@@ -204,6 +204,10 @@ $ curl -X GET http://localhost:9292/apps
 
 If you want to take log only (for example avoiding false-positive in production), use `ignore_error` and `error_handler` option.
 
+When an OpenAPI 2 or 3 schema is loaded from a `.yaml` or `.yml` file using `schema_path`, `Committee::Drivers.load_from_file`, or `Committee::Drivers.load_from_yaml`, response validation errors append the source path and a 1-based line number, for example `expected string, but received Integer: 1 (docs/openapi.yaml:42)`.
+The line identifies the start of the violated schema definition. OpenAPI 3 references to local YAML files report the referenced definition's location.
+Schemas loaded from JSON or a Hash retain their original messages. If a source location cannot be found, the original validation message is used.
+
 ## Validation Errors
 
 Committee will by default respond with a generic error JSON body for validation errors (when the `raise` middleware option is `false`).
