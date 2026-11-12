@@ -31,6 +31,10 @@ module Committee
 
         # OpenAPI3 only
         def operation_object(path, method)
+          # 3.2 lookups keep the case to tell additionalOperations apart (`Get` vs `GET`);
+          # earlier documents only have lowercase method fields
+          method = method.to_s
+          method = method.downcase unless open_api.use_3_2_features?
           request_operation = open_api.request_operation(method, path)
           return nil unless request_operation
 

@@ -18,8 +18,10 @@ module Committee
           request_operation.original_path
         end
 
+        # lowercase for standard methods; additionalOperations keep their case
         def http_method
-          request_operation.http_method
+          method = request_operation.http_method
+          custom_operation? ? method : method.downcase
         end
 
         def coerce_path_parameter(validator_option, path_params = nil)
@@ -66,14 +68,24 @@ module Committee
         end
 
         def validate_request_params(_path_params, query_params, body_params, headers, validator_option)
-          case request_operation.http_method
-                when 'get', 'delete', 'head'
-                  validate_get_request_params(query_params, headers, validator_option)
-                when 'post', 'put', 'patch', 'options'
-                  validate_post_request_params(query_params, body_params, headers, validator_option)
-                else
-                  raise "Committee OpenAPI3 not support #{request_operation.http_method} method"
-                end
+          if body_method?
+            validate_post_request_params(query_params, body_params, headers, validator_option)
+          else
+            validate_get_request_params(query_params, headers, validator_option)
+          end
+        end
+
+        # query (3.2) carries a body like post. trace never does (RFC 9110 §9.3.8), so its
+        # requestBody is ignored. 3.2 additionalOperations do when they define a requestBody
+        def body_method?
+          case http_method
+          when 'get', 'delete', 'head', 'trace'
+            false
+          when 'post', 'put', 'patch', 'options', 'query'
+            true
+          else
+            !request_operation.operation_object&.request_body.nil?
+          end
         end
 
         def optional_body?
@@ -106,6 +118,10 @@ module Committee
         end
 
         private
+
+        def custom_operation?
+          request_operation.path_item&.additional_operations&.value?(request_operation.operation_object) || false
+        end
 
         # @return [OpenAPIParser::SchemaValidator::Options]
         def build_openapi_parser_body_option(validator_option)

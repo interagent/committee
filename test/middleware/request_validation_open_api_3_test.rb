@@ -725,14 +725,12 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 204, last_response.status
   end
 
-  it "OpenAPI3 raise not support method" do
-    @app = new_rack_app(schema: open_api_3_schema)
+  it "OpenAPI3 validates a trace request" do
+    @app = new_rack_app(schema: open_api_3_schema, raise: true)
 
-    e = assert_raises(RuntimeError) {
-      custom_request('TRACE', "/characters")
-    }
+    custom_request('TRACE', "/characters")
 
-    assert_equal 'Committee OpenAPI3 not support trace method', e.message
+    assert_equal 200, last_response.status
   end
 
   describe 'check header' do
@@ -1146,6 +1144,113 @@ describe Committee::Middleware::RequestValidation do
     end
   end
 
+  describe "OpenAPI 3.2" do
+    it "accepts a valid query request body" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      custom_request("QUERY", "/items", {}, { input: JSON.generate("name" => "a", "limit" => 1), "CONTENT_TYPE" => "application/json" })
+      assert_equal 200, last_response.status
+    end
+
+    it "rejects an invalid query request body" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      assert_raises(Committee::InvalidRequest) do
+        custom_request("QUERY", "/items", {}, { input: JSON.generate("name" => "a", "limit" => 0), "CONTENT_TYPE" => "application/json" })
+      end
+    end
+
+    it "checks the Content-Type of a query request" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      e = assert_raises(Committee::InvalidRequest) do
+        custom_request("QUERY", "/items", {}, { input: "name=a", "CONTENT_TYPE" => "text/plain" })
+      end
+      assert_match(/Content-Type/, e.message)
+    end
+
+    it "routes additionalOperations by exact method case" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true, strict: true)
+      custom_request("PURGE", "/items?older_than=5")
+      assert_equal 200, last_response.status
+      # rack-test upcases the method unless REQUEST_METHOD is set directly
+      custom_request("purge", "/items?scope=all", {}, { "REQUEST_METHOD" => "purge" })
+      assert_equal 200, last_response.status
+      assert_raises(Committee::InvalidRequest) { custom_request("purge", "/items?older_than=5", {}, { "REQUEST_METHOD" => "purge" }) }
+    end
+
+    it "does not route a custom method that differs only in case" do
+      @app = new_rack_app(schema: open_api_3_2_schema, strict: true)
+      custom_request("search", "/items", {}, { "REQUEST_METHOD" => "search" })
+      assert_equal 404, last_response.status
+    end
+
+    it "ignores a trace requestBody" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true, strict: true)
+      custom_request("TRACE", "/items")
+      assert_equal 200, last_response.status
+    end
+
+    it "validates additionalOperations parameters" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      assert_raises(Committee::InvalidRequest) { custom_request("PURGE", "/items?older_than=x") }
+    end
+
+    it "validates the body of an additionalOperations request" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      custom_request("SEARCH", "/items", {}, { input: JSON.generate("name" => "a"), "CONTENT_TYPE" => "application/json" })
+      assert_equal 200, last_response.status
+      assert_raises(Committee::InvalidRequest) do
+        custom_request("SEARCH", "/items", {}, { input: JSON.generate("name" => "a", "limit" => 0), "CONTENT_TYPE" => "application/json" })
+      end
+    end
+
+    it "checks the Content-Type of an additionalOperations request" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      e = assert_raises(Committee::InvalidRequest) do
+        custom_request("SEARCH", "/items", {}, { input: "name=a", "CONTENT_TYPE" => "text/plain" })
+      end
+      assert_match(/Content-Type/, e.message)
+    end
+
+    it "falls back to the discriminator defaultMapping" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      header "Content-Type", "application/json"
+      post "/pets", JSON.generate("name" => "felix")
+      assert_equal 200, last_response.status
+      assert_raises(Committee::InvalidRequest) { post "/pets", JSON.generate("bark" => true) }
+    end
+
+    it "validates a request body referenced from components.mediaTypes" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      header "Content-Type", "application/json"
+      post "/shared", JSON.generate("name" => "a")
+      assert_equal 200, last_response.status
+      assert_raises(Committee::InvalidRequest) { post "/shared", JSON.generate("name" => 1) }
+    end
+
+    # openapi_parser doesn't validate in: querystring yet
+    it "skips querystring parameters" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true)
+      get "/filter"
+      assert_equal 200, last_response.status
+    end
+
+    it "does not route query or additionalOperations in earlier documents" do
+      @app = new_rack_app(schema: open_api_3_2_as_3_1_schema, strict: true)
+      header "Content-Type", "application/json"
+      custom_request("QUERY", "/items", {}, { input: JSON.generate("name" => "a") })
+      assert_equal 404, last_response.status
+      custom_request("PURGE", "/items")
+      assert_equal 404, last_response.status
+    end
+
+    it "routes query and additionalOperations in earlier documents with allow_3_2_features" do
+      @app = new_rack_app(schema: open_api_3_2_as_3_1_schema(allow_3_2_features: true), raise: true, strict: true)
+      header "Content-Type", "application/json"
+      assert_raises(Committee::InvalidRequest) { custom_request("QUERY", "/items", {}, { input: JSON.generate("name" => "a", "limit" => 0) }) }
+      custom_request("PURGE", "/items")
+      assert_equal 200, last_response.status
+    end
+  end
+
   private
 
   def new_rack_app(options = {})
@@ -1159,6 +1264,10 @@ describe Committee::Middleware::RequestValidation do
       use Committee::Middleware::RequestValidation, options
       run check_lambda
     }
+  end
+
+  def open_api_3_2_as_3_1_schema(parser_options = {})
+    Committee::Drivers.load_from_data(open_api_3_2_data.merge("openapi" => "3.1.0"), nil, parser_options: { strict_reference_validation: true }.merge(parser_options))
   end
 
   def query_param_schema(parameter)
