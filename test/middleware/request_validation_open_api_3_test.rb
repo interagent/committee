@@ -1182,6 +1182,16 @@ describe Committee::Middleware::RequestValidation do
       assert_equal 404, last_response.status
     end
 
+    it "routes a custom method that differs from a standard method only in case" do
+      @app = new_rack_app(schema: open_api_3_2_schema, raise: true, strict: true)
+      custom_request("Get", "/versions?custom=a", {}, { "REQUEST_METHOD" => "Get" })
+      assert_equal 200, last_response.status
+      assert_raises(Committee::InvalidRequest) { custom_request("Get", "/versions?standard=a", {}, { "REQUEST_METHOD" => "Get" }) }
+      get "/versions?standard=a"
+      assert_equal 200, last_response.status
+      assert_raises(Committee::InvalidRequest) { get "/versions?custom=a" }
+    end
+
     it "ignores a trace requestBody" do
       @app = new_rack_app(schema: open_api_3_2_schema, raise: true, strict: true)
       custom_request("TRACE", "/items")
