@@ -63,9 +63,9 @@ module Committee
     # @return [Committee::Driver]
     def self.load_from_data(hash, schema_path = nil, parser_options: {})
       if (version = hash['openapi'])
-        # release drops prerelease tags, so 3.2.0-rc1 counts as 3.2
+        # release drops prerelease tags, so 3.3.0-rc1 counts as 3.3
         version = Gem::Version.new(version).release
-        raise OpenAPI3Unsupported.new('Committee does not support OpenAPI 3.2+ yet') if version >= Gem::Version.new("3.2")
+        raise OpenAPI3Unsupported.new('Committee does not support OpenAPI 3.3+ yet') if version >= Gem::Version.new("3.3")
       end
 
       if version && version >= Gem::Version.new("3.0")

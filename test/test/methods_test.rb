@@ -665,6 +665,24 @@ describe Committee::Test::Methods do
     end
   end
 
+  describe "OpenAPI 3.2" do
+    before do
+      @committee_options.merge!({ schema: open_api_3_2_schema })
+    end
+
+    it "passes assert_schema_conform for a query request" do
+      @app = new_rack_app(JSON.generate([{ "name" => "a" }]))
+      custom_request("QUERY", "/items", {}, { input: JSON.generate("name" => "a"), "CONTENT_TYPE" => "application/json" })
+      assert_schema_conform(200)
+    end
+
+    it "passes assert_schema_conform for an additionalOperations request" do
+      @app = new_rack_app(nil, {}, 204)
+      custom_request("PURGE", "/items")
+      assert_schema_conform(204)
+    end
+  end
+
   def new_rack_app(response = nil, headers = { "Content-Type" => "application/json" }, status_code = 200)
     Rack::Builder.new {
       run lambda { |_|

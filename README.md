@@ -480,6 +480,25 @@ Not yet supported:
 - `patternProperties`
 - `$ref` siblings
 
+### OpenAPI 3.2
+
+OpenAPI 3.2 documents also use the OpenAPI 3 driver.
+
+Supported 3.2 additions:
+
+- the `query` operation (`QUERY` requests are validated like `POST`, including the request body and `Content-Type`)
+- `additionalOperations` (custom methods are matched by exact case, so `PURGE` and `purge` are different operations)
+- `components.mediaTypes` `$ref`s in request and response `content`
+- Discriminator `defaultMapping`
+
+These apply only to documents that declare 3.2. Pass `allow_3_2_features: true` in `parser_options` to apply them to earlier documents. `strict_specification_version` (see above) also flags 3.2 additions in earlier documents.
+
+Parsed but not validated:
+
+- `itemSchema` (streaming response bodies such as `text/event-stream`)
+- parameters with `in: querystring`
+- `$self` (not used as the base URI for `$ref`s)
+
 ### Upgrading from Committee 2.* to 3.*
 
 Committee 3.* has many breaking changes so we recommend upgrading to the latest release on 2.* and fixing any deprecation errors you see before upgrading to 3.*. The steps would be roughly as follows:
