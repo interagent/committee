@@ -492,12 +492,14 @@ module Committee
         # @param [String] param_name Parameter name
         # @return [Array] Extracted array
         def extract_matrix_array_compact(value, param_name)
+          return [] if value == ";#{param_name}"
+
           # ;id=3,4,5 → ["3", "4", "5"]
           prefix = ";#{param_name}="
           if value.start_with?(prefix)
             value[prefix.length..-1].split(',')
           else
-            []
+            raise ArgumentError, 'invalid matrix array'
           end
         end
 
@@ -524,12 +526,14 @@ module Committee
         # @param [String] param_name Parameter name
         # @return [Hash] Extracted object
         def extract_matrix_object_compact(value, param_name)
+          return {} if value == ";#{param_name}"
+
           # ;id=role,admin,status,active → { "role" => "admin", "status" => "active" }
           prefix = ";#{param_name}="
           if value.start_with?(prefix)
             parse_comma_separated_object(value[prefix.length..-1])
           else
-            {}
+            raise ArgumentError, 'invalid matrix object'
           end
         end
 

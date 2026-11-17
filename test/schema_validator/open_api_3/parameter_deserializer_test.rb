@@ -374,22 +374,28 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
       assert_equal({ 'id' => '123' }, result)
     end
 
-    it 'handles matrix style with missing prefix' do
+    it 'rejects a matrix array with a missing prefix' do
       raw_params = { 'ids' => 'invalid' }
       param = create_param('ids', 'path', 'matrix', false, 'array', 'integer')
       deserializer = create_deserializer([param])
-      result = deserializer.deserialize_path_params(raw_params)
 
-      assert_equal({ 'ids' => [] }, result)
+      error = assert_raises(Committee::ParameterDeserializationError) do
+        deserializer.deserialize_path_params(raw_params)
+      end
+      assert_equal 'ids', error.parameter_name
+      assert_equal 'invalid', error.raw_value
     end
 
-    it 'handles matrix style object with missing prefix' do
+    it 'rejects a matrix object with a missing prefix' do
       raw_params = { 'filter' => 'invalid' }
       param = create_param('filter', 'path', 'matrix', false, 'object', { 'role' => 'string' })
       deserializer = create_deserializer([param])
-      result = deserializer.deserialize_path_params(raw_params)
 
-      assert_equal({ 'filter' => {} }, result)
+      error = assert_raises(Committee::ParameterDeserializationError) do
+        deserializer.deserialize_path_params(raw_params)
+      end
+      assert_equal 'filter', error.parameter_name
+      assert_equal 'invalid', error.raw_value
     end
 
     it 'handles matrix style primitive without prefix' do
