@@ -544,6 +544,38 @@ describe Committee::Middleware::RequestValidation do
       end
     end
 
+    [
+      ['array', { 'type' => 'array', 'items' => { 'type' => 'integer' } }, '1,2,3', []],
+      ['object', { 'type' => 'object', 'properties' => { 'role' => { 'type' => 'string' } } }, 'role,admin', {}],
+    ].each do |type, schema, value, empty_value|
+      it "rejects a compact matrix #{type} with a missing or incorrect prefix" do
+        parameter = { 'name' => 'id', 'in' => 'path', 'required' => true, 'style' => 'matrix', 'explode' => false, 'schema' => schema }
+        @app = new_rack_app(schema: path_param_schema(parameter))
+
+        [value, ";other=#{value}", ";id-other=#{value}"].each do |invalid_value|
+          get "/paths/#{invalid_value}"
+
+          assert_equal 400, last_response.status, last_response.body
+          assert_match(/invalid matrix #{type}/, last_response.body)
+        end
+      end
+
+      it "accepts an empty compact matrix #{type}" do
+        parameter = { 'name' => 'id', 'in' => 'path', 'required' => true, 'style' => 'matrix', 'explode' => false, 'schema' => schema }
+        check_parameter = lambda { |env|
+          assert_equal empty_value, env['committee.path_hash']['id']
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_parameter, schema: path_param_schema(parameter))
+
+        [';id', ';id='].each do |empty_parameter|
+          get "/paths/#{empty_parameter}"
+
+          assert_equal 200, last_response.status, last_response.body
+        end
+      end
+    end
+
     it 'rejects an invalid item after deserialization' do
       parameter = { 'name' => 'ids', 'in' => 'path', 'required' => true, 'style' => 'simple', 'schema' => { 'type' => 'array', 'items' => { 'type' => 'integer' } }, }
       @app = new_rack_app(schema: path_param_schema(parameter))
