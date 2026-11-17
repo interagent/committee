@@ -912,6 +912,33 @@ describe Committee::Middleware::RequestValidation do
       assert_equal 200, last_response.status
     end
 
+    ['array', ['array', 'null']].each do |type|
+      [[nil, nil], ['form', true], ['pipeDelimited', true], ['spaceDelimited', true]].each do |style, explode|
+        it "preserves repeated query values for type=#{type.inspect}, style=#{style.inspect}, explode=#{explode.inspect}" do
+          @parameter.merge!('style' => style, 'explode' => explode)
+          @parameter['schema']['type'] = type
+          document = query_param_document(@parameter)
+          document['openapi'] = '3.1.0'
+          schema = Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+          check_parameter = lambda { |env|
+            assert_equal [1, 2], env['committee.query_hash']['ids']
+            assert_equal [1, 2], env['committee.params']['ids']
+            assert_equal '2', env['rack.request.query_hash']['ids']
+            [200, {}, []]
+          }
+          @app = new_rack_app_with_lambda(check_parameter, schema: schema)
+
+          get '/events?ids=1&ids=2'
+
+          assert_equal 200, last_response.status, last_response.body
+
+          get '/events?ids=invalid&ids=2'
+
+          assert_equal 400, last_response.status
+        end
+      end
+    end
+
     it 'preserves decoded values with explicit form style and explode=true' do
       @parameter.merge!('style' => 'form', 'explode' => true, 'schema' => { 'type' => 'array', 'items' => { 'type' => 'string' } })
       check_parameter = lambda { |env|

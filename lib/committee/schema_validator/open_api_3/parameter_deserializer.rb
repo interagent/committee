@@ -129,10 +129,12 @@ module Committee
 
           normalized = raw_params
           params_for_location.each do |param_def|
-            next unless param_def.schema&.type == 'array'
+            next unless Committee::Utils.schema_type(param_def.schema) == 'array'
 
-            if (param_def.style.nil? || param_def.style == 'form') &&
-               param_def.explode != false && query_values[param_def.name].is_a?(Array)
+            style = param_def.style || default_style(location)
+            explode = param_def.explode.nil? ? default_explode(style) : param_def.explode
+
+            if explode && query_values[param_def.name].is_a?(Array)
               normalized = raw_params.dup if normalized.equal?(raw_params)
               normalized[param_def.name] = query_values[param_def.name]
             end

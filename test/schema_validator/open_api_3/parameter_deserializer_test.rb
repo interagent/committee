@@ -57,7 +57,7 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
       assert_equal({ 'ids' => ['1', '2', '3'] }, result)
     end
 
-    it 'only restores repeated values for form-style exploded arrays' do
+    it 'only restores repeated values for exploded arrays' do
       params = [create_param('exploded', 'query', 'form', true, 'array', 'integer'), create_param('compact', 'query', 'form', false, 'array', 'integer'), create_param('spaced', 'query', 'spaceDelimited', false, 'array', 'integer'), create_param('scalar', 'query', 'form', true, 'string', nil)]
       raw_params = { 'exploded' => '2', 'compact' => '2,3', 'spaced' => '2 3', 'scalar' => '2' }.freeze
       query_values = { 'exploded' => ['1', '2'], 'compact' => ['1', '2,3'], 'spaced' => ['1', '2 3'], 'scalar' => ['1', '2'] }
@@ -67,6 +67,20 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
 
       assert_equal({ 'exploded' => ['1', '2'], 'compact' => ['2', '3'], 'spaced' => ['2', '3'], 'scalar' => '2' }, result)
       assert_equal '2', raw_params['exploded']
+    end
+
+    [['spaceDelimited', '2 3'], ['pipeDelimited', '2|3']].each do |style, value|
+      [nil, false].each do |explode|
+        it "uses the last #{style} query value with explode=#{explode.inspect}" do
+          param = create_param('ids', 'query', style, explode, 'array', 'integer')
+          raw_params = { 'ids' => value }.freeze
+
+          result = create_deserializer([param]).deserialize_query_params(raw_params, { 'ids' => ['1', value] })
+
+          assert_equal({ 'ids' => ['2', '3'] }, result)
+          assert_equal value, raw_params['ids']
+        end
+      end
     end
 
     it 'deserializes deepObject style' do
