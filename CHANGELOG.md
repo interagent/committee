@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 5.7.0 - 2026-11-18
+
+- add OpenAPI 3.1 support #495
+- add OpenAPI 3.2 support and require openapi_parser ~> 2.8 #499
+- add test_failure_handler to report validation failures through test frameworks #497 #498
+- include YAML source locations in OpenAPI response validation errors #505
+- validate streaming responses against the chunks sent to the client #484
+- prevent mixed-encoding response chunks from interrupting delivery #500
+- select streaming content parsers for Content-Type headers with parameters #501
+- handle Rack 3 request inputs, response headers, and streaming bodies #493
+- return 400 for invalid UTF-8 query parameters #486
+- resolve OpenAPI 2 parameter references #487
+- deserialize bracket-suffixed array query parameters #488
+- preserve repeated values in exploded array query parameters #489 #507
+- deserialize header parameters regardless of casing #490
+- support OpenAPI 3 JSON array request bodies #492
+- validate raw OpenAPI 3 request bodies #494
+- deserialize serialized array and object path parameters #491
+- keep validation active for prefixes ending in a slash #502
+- deserialize query and header parameters declared on path items #503
+- prevent GET array and raw bodies from crashing query parameter validation #504
+- reject matrix arrays and objects with invalid prefixes #508
+
 ## 5.6.4 - 2026-09-21
 
 - bump actions/checkout from 6 to 7 #475

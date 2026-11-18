@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Committee
-  VERSION = '5.6.4'.freeze
+  VERSION = '5.7.0'.freeze
 end
