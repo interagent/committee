@@ -12,7 +12,7 @@ jobs:
         with:
           persist-credentials: false
       - name: CodeSpell
-        uses: codespell-project/actions-codespell@7a64013caa0f0380e61c5d9c66b25d82b3ae6f18 # master
+        uses: codespell-project/actions-codespell@e3258cca84ce02b0bb36a3d41f2c18f719a0cc1a # v2.4.3
         with:
           check_filenames: true
           ignore_words_file: .codespellignore
