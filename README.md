@@ -670,14 +670,30 @@ bundle exec ruby -Ilib -Itest test/router_test.rb -n /prefix/
 
 ## Release
 
+Before the first automated release, create a GitHub environment named `release`
+and configure a [RubyGems trusted publisher](https://guides.rubygems.org/trusted-publishing/)
+for the `committee` gem with owner `interagent`, repository `committee`, workflow
+filename `release.yml`, and environment `release`.
+
 1. Update the version in `lib/committee/version.rb` as appropriate for [semantic
    versioning](http://semver.org) and add details to `CHANGELOG.md`.
-2. Commit those changes. Use a commit message like `Bump version to 1.2.3`.
-3. Run the `release` task:
+2. Commit those changes and merge them into `master`. Use a commit message like
+   `Bump version to 1.2.3`.
+3. From the updated `master` branch, create and push the matching version tag:
 
     ```
-    bundle exec rake release
+    git tag v1.2.3
+    git push origin v1.2.3
     ```
+
+The release workflow verifies that the tagged commit is on `master` and that the
+tag matches the gem version, then runs lint and tests and builds the gem. Separate
+jobs publish that verified gem to RubyGems and create a GitHub release from the
+matching version section in `CHANGELOG.md`.
+
+If GitHub release creation fails after the gem has been published, rerun only the
+failed GitHub release job. Rerunning the whole workflow would attempt to publish
+the same gem version again.
 
 ## Tutorials
 
