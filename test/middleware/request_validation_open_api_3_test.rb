@@ -858,10 +858,133 @@ describe Committee::Middleware::RequestValidation do
       assert_match(/unknown_param/, last_response.body)
     end
 
+    it 'preserves query params for the error handler and app when ignoring strict errors' do
+      observed_values = []
+      error_handler = lambda { |_error, env|
+        observed_values << env.fetch('committee.query_hash', {})['unknown']
+      }
+      check_parameter = lambda { |env|
+        observed_values << env.fetch('committee.query_hash', {})['unknown']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: open_api_3_schema, strict_query_params: true, ignore_error: true, error_handler: error_handler)
+
+      get '/characters?limit=10&unknown=value'
+
+      assert_equal 200, last_response.status
+      assert_equal ['value', 'value'], observed_values
+    end
+
     it 'allows defined query params when strict_query_params is true' do
       @app = new_rack_app(schema: open_api_3_schema, strict_query_params: true)
       get "/characters", { limit: 10, school_name: "test" }
       assert_equal 200, last_response.status
+    end
+
+    it 'allows query params declared on the path item' do
+      parameter = { 'name' => 'page', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
+      document = query_param_document(parameter)
+      path_item = document['paths']['/events']
+      path_item['parameters'] = path_item['get'].delete('parameters')
+      schema = Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+      check_parameter = lambda { |env|
+        assert_equal 2, env['committee.query_hash']['page']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: schema, strict_query_params: true)
+
+      get '/events?page=2'
+      assert_equal 200, last_response.status, last_response.body
+
+      get '/events?page=2&unknown=value'
+      assert_equal 400, last_response.status
+      assert_match(/Unknown query parameter\(s\): unknown/, last_response.body)
+    end
+
+    [true, false].each do |deserialize_parameters|
+      it "does not treat GET body keys as unknown query params with deserialize_parameters=#{deserialize_parameters}" do
+        parameter = { 'name' => 'page', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
+        check_parameter = lambda { |env|
+          assert_equal 2, env['committee.query_hash']['page']
+          assert_equal 'value', env['committee.request_body_hash']['body_only']
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(parameter), strict_query_params: true, allow_get_body: true, deserialize_parameters: deserialize_parameters)
+        header 'Content-Type', 'application/json'
+        body = JSON.generate(page: 2, body_only: 'value')
+
+        get '/events?page=1', {}, { input: body }
+        assert_equal 200, last_response.status, last_response.body
+
+        get '/events?page=1&body_only=from_query', {}, { input: body }
+        assert_equal 400, last_response.status
+        assert_match(/Unknown query parameter\(s\): body_only/, last_response.body)
+      end
+    end
+
+    it 'does not treat form body keys as unknown query params' do
+      parameter = { 'name' => 'page', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
+      document = query_param_document(parameter)
+      path_item = document['paths']['/events']
+      path_item['post'] = path_item.delete('get')
+      path_item['post']['requestBody'] = { 'content' => { 'application/x-www-form-urlencoded' => { 'schema' => { 'type' => 'object', 'properties' => { 'body_only' => { 'type' => 'string' } } }, }, }, }
+      schema = Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+      check_parameter = lambda { |env|
+        assert_equal 2, env['committee.query_hash']['page']
+        assert_equal 'value', env['committee.request_body_hash']['body_only']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: schema, strict_query_params: true, allow_non_get_query_params: true)
+      header 'Content-Type', 'application/x-www-form-urlencoded'
+
+      post '/events?page=1', 'page=2&body_only=value'
+      assert_equal 200, last_response.status, last_response.body
+
+      post '/events?page=1&body_only=from_query', 'page=2&body_only=value'
+      assert_equal 400, last_response.status
+      assert_match(/Unknown query parameter\(s\): body_only/, last_response.body)
+    end
+
+    it 'allows deserialized bracket-named query params' do
+      check_parameter = lambda { |env|
+        assert_equal '/test', env['committee.query_hash']['filter[slug]']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(bracket_notation_query_parameter), strict_query_params: true)
+
+      get '/events?filter[slug]=/test'
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+
+    { 'filter' => 'filter[a]=bad', 'filter[slug]' => 'filter[slug][]=bad' }.each do |name, query|
+      it "preserves body overrides while checking serialized query param #{name}" do
+        parameter = { 'name' => name, 'in' => 'query', 'style' => 'form', 'explode' => false, 'schema' => { 'type' => 'object', 'properties' => { 'a' => { 'type' => 'string' } } }, }
+        check_parameter = lambda { |env|
+          assert_equal({ 'a' => 'ok' }, env['committee.query_hash'][name])
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(parameter), strict_query_params: true, allow_get_body: true)
+        header 'Content-Type', 'application/json'
+
+        get "/events?#{query}", {}, { input: JSON.generate(name => 'a,ok') }
+
+        assert_equal 200, last_response.status, last_response.body
+      end
+    end
+
+    it 'does not check unknown query params when query params are disabled' do
+      parameter = { 'name' => 'page', 'in' => 'query', 'schema' => { 'type' => 'integer' } }
+      check_parameter = lambda { |env|
+        assert_equal({ 'body_only' => 'value' }, env['committee.query_hash'])
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: query_param_schema(parameter), strict_query_params: true, allow_query_params: false, allow_get_body: true)
+      header 'Content-Type', 'application/json'
+
+      get '/events?unknown=value', {}, { input: JSON.generate(body_only: 'value') }
+
+      assert_equal 200, last_response.status, last_response.body
     end
 
     it 'handles empty query params when strict_query_params is true' do

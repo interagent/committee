@@ -112,9 +112,20 @@ module Committee
 
         # @return [Array<String>] names of query parameters defined in the schema
         def query_parameter_names
-          return [] unless request_operation.operation_object&.parameters
+          parameters = (request_operation.operation_object&.parameters || []) + (request_operation.path_item&.parameters || [])
 
-          request_operation.operation_object.parameters.select { |p| p.in == 'query' }.map(&:name)
+          parameters.select { |p| p.in == 'query' }.map(&:name)
+        end
+
+        def validate_no_unknown_query_params(query_params)
+          return if query_params.nil? || query_params.empty?
+
+          defined_params = query_parameter_names
+          unknown_params = query_params.keys - defined_params
+
+          return if unknown_params.empty?
+
+          raise Committee::InvalidRequest.new("Unknown query parameter(s): #{unknown_params.join(', ')}")
         end
 
         private
@@ -172,19 +183,6 @@ module Committee
 
           # Path parameters have already been validated by coerce_path_parameter.
           request_operation.validate_request_parameter(query_params, headers, build_openapi_parser_request_parameter_option(validator_option))
-
-          validate_no_unknown_query_params(query_params) if validator_option.strict_query_params
-        end
-
-        def validate_no_unknown_query_params(query_params)
-          return if query_params.nil? || query_params.empty?
-
-          defined_params = query_parameter_names
-          unknown_params = query_params.keys - defined_params
-
-          return if unknown_params.empty?
-
-          raise Committee::InvalidRequest.new("Unknown query parameter(s): #{unknown_params.join(', ')}")
         end
 
         def find_response_object_for_status(responses, status_code)
