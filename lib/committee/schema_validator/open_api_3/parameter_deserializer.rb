@@ -26,6 +26,10 @@ module Committee
           deserialize_params_by_location(raw_params, 'query', query_values)
         end
 
+        def normalize_query_params(raw_params)
+          normalize_raw_params(raw_params, 'query', @parameters.select { |p| p.in == 'query' }, {})
+        end
+
         # Deserialize path parameters
         # @param [Hash] raw_params Raw path parameters
         # @return [Hash] Deserialized parameters according to OpenAPI schema
