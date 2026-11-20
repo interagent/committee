@@ -177,10 +177,32 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
-  it "optionally validates non-2xx blank responses" do
-    @app = new_response_rack("", {}, schema: open_api_3_schema, validate_success_only: false)
-    get "/characters"
+  ['/characters', '/validate_response_array'].each do |path|
+    it "rejects empty JSON responses for #{path}" do
+      @app = new_response_rack("", {}, schema: open_api_3_schema, validate_success_only: false)
+      get path
+
+      assert_equal 500, last_response.status
+      assert_equal "Response wasn't valid JSON.", JSON.parse(last_response.body)['message']
+    end
+  end
+
+  it "preserves empty HEAD responses and validates their headers" do
+    document = open_api_3_data
+    document['paths']['/characters']['head']['responses']['200']['headers'] = { 'X-Status' => { 'required' => true, 'schema' => { 'type' => 'string', 'enum' => ['ok'] } }, }
+    schema = Committee::Drivers.load_from_data(document, open_api_3_schema_path, parser_options: { strict_reference_validation: true })
+    response_headers = { 'Content-Type' => 'application/json', 'X-Status' => 'ok' }
+    @app = Rack::Builder.new {
+      use Committee::Middleware::ResponseValidation, schema: schema
+      run ->(_) { [200, response_headers, []] }
+    }
+
+    head '/characters'
     assert_equal 200, last_response.status
+
+    response_headers['X-Status'] = 'invalid'
+    head '/characters'
+    assert_equal 500, last_response.status
   end
 
   it "optionally validates non-2xx invalid responses with invalid json" do
@@ -378,7 +400,7 @@ describe Committee::Middleware::ResponseValidation do
     end
 
     it "passes through when response has no content schema with strict_response_content_type: true" do
-      @app = new_response_rack("", { "Content-Type" => "application/vnd.api+json" }, schema: open_api_3_schema, strict_response_content_type: true)
+      @app = new_response_rack("{}", { "Content-Type" => "application/vnd.api+json" }, schema: open_api_3_schema, strict_response_content_type: true)
       get "/no_content_schema"
       assert_equal 200, last_response.status
     end
