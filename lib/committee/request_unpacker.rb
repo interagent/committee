@@ -35,7 +35,7 @@ module Committee
     def unpack_request_params(request)
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON
-      json_body = !request.media_type || request.media_type =~ %r{application/(?:.*\+)?json}
+      json_body = !request.media_type || Committee::SchemaValidator.json_media_type?(request.media_type)
       params = if json_body
                  parse_json(request)
       elsif @optimistic_json

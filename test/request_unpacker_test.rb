@@ -32,6 +32,16 @@ describe Committee::RequestUnpacker do
     assert_equal([{}, false], unpacker.unpack_request_params(request))
   end
 
+  describe "JSON media type boundaries" do
+    %w[application/json-seq application/problem+json-seq x-application/json].each do |content_type|
+      it "does not unpack JSON on #{content_type}" do
+        request = Rack::Request.new({ "CONTENT_TYPE" => content_type, "rack.input" => StringIO.new('{"x":"y"}') })
+
+        assert_equal [{}, false], Committee::RequestUnpacker.new.unpack_request_params(request)
+      end
+    end
+  end
+
   it "doesn't unpack JSON under other Content-Types" do
     %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
       env = { "CONTENT_TYPE" => content_type, "rack.input" => StringIO.new('{"x":"y"}'), }

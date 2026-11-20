@@ -349,6 +349,19 @@ describe Committee::Test::Methods do
             end
           end
 
+          it "leaves application/json-seq bodies unchanged when excepting named fields" do
+            body = '{ "existing": "value" }'
+            request = Rack::Request.new(Rack::MockRequest.env_for('/characters', method: 'POST', input: body, 'CONTENT_TYPE' => 'application/json-seq'))
+            handler = Committee::Test::ExceptParameter.new(request, @committee_options)
+
+            handler.apply(body: ['required_string'])
+
+            assert_equal body, request.body.read
+            request.body.rewind
+            handler.restore
+            assert_equal body, request.body.read
+          end
+
           describe "with schema_path option" do
             before do
               @committee_options = { schema_path: open_api_3_schema_path }
