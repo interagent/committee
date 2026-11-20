@@ -4,6 +4,8 @@ module Committee
   module Middleware
     module Options
       class Base
+        attr_reader :original_options
+
         # Common options
         attr_reader :schema
         attr_reader :schema_path
