@@ -2,7 +2,25 @@
 
 module Committee
   class RequestUnpacker
+    # Rack 1.5 uses standard exceptions; older Rack 2.x uses RangeError for depth limits.
+    PARAMETER_ERRORS = if defined?(Rack::QueryParser)
+                         [
+                           Rack::QueryParser::ParameterTypeError,
+                           Rack::QueryParser::InvalidParameterError,
+                           defined?(Rack::QueryParser::ParamsTooDeepError) ? Rack::QueryParser::ParamsTooDeepError : RangeError,
+                         ]
+                       else
+                         [TypeError, ArgumentError, RangeError]
+                       end.freeze
+    private_constant :PARAMETER_ERRORS
+
     class << self
+      def parse_params
+        yield
+      rescue *PARAMETER_ERRORS => e
+        raise Committee::BadRequest, e.message
+      end
+
       # Enable string or symbol key access to the nested params hash.
       #
       # (Copied from Sinatra)
@@ -53,7 +71,8 @@ module Committee
         # Actually, POST means anything in the request body, could be from
         # PUT or PATCH too. Silly Rack.
         begin
-          return [request.POST, true] if request.POST
+          params = self.class.parse_params { request.POST }
+          return [params, true] if params
         ensure
           request.body.rewind if request.body.respond_to?(:rewind)
         end
@@ -74,11 +93,12 @@ module Committee
         return {}
       end
 
-      if @allow_non_get_query_params
-        self.class.indifferent_params(request.params)
-      else
-        self.class.indifferent_params(request.GET)
+      params = self.class.parse_params do
+        @allow_non_get_query_params ? request.params : request.GET
+      ensure
+        request.body.rewind if @allow_non_get_query_params && request.body.respond_to?(:rewind)
       end
+      self.class.indifferent_params(params)
     end
 
     def unpack_headers(request)
