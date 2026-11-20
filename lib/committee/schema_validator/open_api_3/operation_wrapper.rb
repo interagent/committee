@@ -79,8 +79,10 @@ module Committee
         # requestBody is ignored. 3.2 additionalOperations do when they define a requestBody
         def body_method?
           case http_method
-          when 'get', 'delete', 'head', 'trace'
+          when 'get', 'head', 'trace'
             false
+          when 'delete'
+            !request_operation.operation_object&.request_body.nil? && request_operation.operation_object.root.use_3_1_features?
           when 'post', 'put', 'patch', 'options', 'query'
             true
           else

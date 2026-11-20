@@ -18,6 +18,75 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  describe "DELETE request bodies" do
+    %w[3.1.0 3.2.0].each do |version|
+      describe "OpenAPI #{version}" do
+        it "validates the body and preserves it and query parameters for the application" do
+          body = JSON.generate("reason" => "cleanup")
+          check_body = lambda { |env|
+            assert_equal({ "reason" => "cleanup" }, env['committee.request_body_hash'])
+            assert_equal({ "limit" => 2 }, env['committee.query_hash'])
+            assert_equal body, env['rack.input'].read
+            [200, {}, []]
+          }
+          @app = new_rack_app_with_lambda(check_body, schema: delete_body_schema(version))
+
+          header "Content-Type", "application/json"
+          delete "/events?limit=2", body
+
+          assert_equal 200, last_response.status, last_response.body
+        end
+
+        [
+          ["a property of the wrong type", '{"reason":123}', "application/json"],
+          ["a missing required property", '{}', "application/json"],
+          ["an unsupported media type", '{"reason":"cleanup"}', "text/plain"],
+          ["a missing required body", '', "application/json"],
+        ].each do |description, body, content_type|
+          it "rejects #{description}" do
+            @app = new_rack_app(schema: delete_body_schema(version))
+
+            header "Content-Type", content_type
+            delete "/events?limit=2", body
+
+            assert_equal 400, last_response.status, last_response.body
+          end
+        end
+
+        it "accepts an empty optional body" do
+          @app = new_rack_app(schema: delete_body_schema(version, required: false))
+
+          header "Content-Type", "text/plain"
+          delete "/events?limit=2", ""
+
+          assert_equal 200, last_response.status, last_response.body
+        end
+
+        it "preserves query validation without a declared request body" do
+          @app = new_rack_app(schema: delete_body_schema(version, declared: false))
+
+          header "Content-Type", "text/plain"
+          delete "/events?limit=2", "unchecked body"
+          assert_equal 200, last_response.status, last_response.body
+
+          delete "/events?limit=invalid", "unchecked body"
+          assert_equal 400, last_response.status, last_response.body
+        end
+      end
+    end
+
+    it "ignores a declared body in OpenAPI 3.0" do
+      @app = new_rack_app(schema: delete_body_schema('3.0.3'))
+
+      ["application/json", "text/plain"].each do |content_type|
+        header "Content-Type", content_type
+        delete "/events?limit=2", JSON.generate("reason" => 123)
+
+        assert_equal 200, last_response.status, last_response.body
+      end
+    end
+  end
+
   describe "raw request bodies" do
     it "validates text and preserves the body for the application" do
       check_body = lambda { |env|
@@ -1341,6 +1410,17 @@ describe Committee::Middleware::RequestValidation do
 
   def query_param_schema(parameter)
     Committee::Drivers.load_from_data(query_param_document(parameter), nil, parser_options: { strict_reference_validation: true })
+  end
+
+  def delete_body_schema(version, required: true, declared: true)
+    document = query_param_document('name' => 'limit', 'in' => 'query', 'schema' => { 'type' => 'integer' })
+    document['openapi'] = version
+    operation = document['paths']['/events'].delete('get')
+    document['paths']['/events']['delete'] = operation
+    if declared
+      operation['requestBody'] = { 'required' => required, 'content' => { 'application/json' => { 'schema' => { 'type' => 'object', 'required' => ['reason'], 'properties' => { 'reason' => { 'type' => 'string' } } }, }, }, }
+    end
+    Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
   end
 
   def text_body_schema
