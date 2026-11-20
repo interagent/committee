@@ -37,7 +37,8 @@ module Committee
         data = if custom_body_parser
                  custom_body_parser.call(full_body)
                elsif parse_to_json
-                 full_body.empty? ? {} : JSON.parse(full_body)
+                 # HEAD responses have no body, but still require header validation.
+                 full_body.empty? && @request.head? ? {} : JSON.parse(full_body)
                else
                  full_body
                end
