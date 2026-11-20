@@ -6,6 +6,8 @@ module Committee
       def initialize(app, options = {})
         @app = app
         @options = build_options(options)
+        # Preserve driver defaults for options that were not explicitly set.
+        options = @options.original_options
 
         @error_class = @options.error_class
         @error_handler = @options.error_handler
