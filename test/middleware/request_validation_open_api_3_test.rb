@@ -19,6 +19,26 @@ describe Committee::Middleware::RequestValidation do
   end
 
   describe "raw request bodies" do
+    ['application/json-seq', 'application/json-seq; charset=utf-8'].each do |content_type|
+      it "validates #{content_type} as a raw body and preserves it for the application" do
+        body = "\x1e{\"x\":\"y\"}\n\x1e{\"a\":\"b\"}\n"
+        document = open_api_3_data
+        document['paths']['/characters']['post']['requestBody']['content'] = { 'application/json-seq' => { 'schema' => { 'type' => 'string' } } }
+        schema = Committee::Drivers.load_from_data(document, open_api_3_schema_path, parser_options: { strict_reference_validation: true })
+        check_body = lambda { |env|
+          assert_equal body, env['committee.request_body_hash']
+          assert_equal body, env['rack.input'].read
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_body, schema: schema)
+
+        header 'Content-Type', content_type
+        post '/characters', body
+
+        assert_equal 200, last_response.status, last_response.body
+      end
+    end
+
     it "validates text and preserves the body for the application" do
       check_body = lambda { |env|
         assert_equal "hello", env['committee.request_body_hash']
