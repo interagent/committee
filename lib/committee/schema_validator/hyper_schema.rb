@@ -15,7 +15,9 @@ module Committee
 
         request_schema_validation(request)
         parameter_coerce!(request, link, validator_option.params_key)
-        parameter_coerce!(request, link, "rack.request.query_hash") if link_exist? && !request.GET.nil? && !link.schema.nil?
+        if link_exist? && !Committee::RequestUnpacker.parse_params { request.GET }.nil? && !link.schema.nil?
+          parameter_coerce!(request, link, "rack.request.query_hash")
+        end
       end
 
       def response_validate(status, headers, response, _test_method = false, custom_body_parser = nil)
@@ -60,9 +62,10 @@ module Committee
 
       def coerce_query_params(request)
         return unless link_exist?
-        return if request.GET.nil? || link.schema.nil?
+        query_params = Committee::RequestUnpacker.parse_params { request.GET }
+        return if query_params.nil? || link.schema.nil?
 
-        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(request.GET, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
+        Committee::SchemaValidator::HyperSchema::StringParamsCoercer.new(query_params, link.schema, coerce_recursive: validator_option.coerce_recursive).call!
       end
 
       def request_unpack(request)
