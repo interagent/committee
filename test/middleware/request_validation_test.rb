@@ -332,12 +332,19 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 404, last_response.status
   end
 
-  it "optionally raises an error" do
-    @app = new_rack_app(raise: true, schema: hyper_schema)
+  it "preserves JSON parser details when raising errors" do
+    called_err = nil
+    pr = ->(e, _env) { called_err = e }
+    @app = new_rack_app(raise: true, schema: hyper_schema, error_handler: pr)
     header "Content-Type", "application/json"
-    assert_raises(Committee::InvalidRequest) do
+    error = assert_raises(Committee::InvalidRequest) do
       post "/apps", "{x:y}"
     end
+
+    assert_kind_of JSON::ParserError, called_err
+    assert_equal called_err.message, error.message
+    assert_same called_err, error.original_error
+    assert_same called_err, error.cause
   end
 
   it "optionally skip content_type check" do
