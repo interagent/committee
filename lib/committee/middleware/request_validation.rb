@@ -31,7 +31,7 @@ module Committee
           return @error_class.new(404, :not_found, e.message, request).render unless @ignore_error
         rescue JSON::ParserError
           handle_exception($!, request.env)
-          raise Committee::InvalidRequest if @raise
+          raise Committee::InvalidRequest.new($!.message, original_error: $!) if @raise
           return @error_class.new(400, :bad_request, "Request body wasn't valid JSON.", request).render unless @ignore_error
         end
 

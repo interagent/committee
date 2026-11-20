@@ -172,14 +172,18 @@ describe Committee::Middleware::ResponseValidation do
     end
   end
 
-  it "calls error_handler (has two args) when it rescues JSON errors" do
+  it "preserves JSON parser details when raising errors" do
     called_err = nil
     pr = ->(e, _env) { called_err = e }
     @app = new_rack_app("[{x:y}]", {}, raise: true, schema: hyper_schema, error_handler: pr)
-    assert_raises(Committee::InvalidResponse) do
+    error = assert_raises(Committee::InvalidResponse) do
       get "/apps"
-      assert_kind_of JSON::ParserError, called_err
     end
+
+    assert_kind_of JSON::ParserError, called_err
+    assert_equal called_err.message, error.message
+    assert_same called_err, error.original_error
+    assert_same called_err, error.cause
   end
 
   it "passes through a valid response for OpenAPI" do
