@@ -103,6 +103,19 @@ module Committee
         query_param = unpacker.unpack_query_params(request)
         query_param.merge!(request_param) if request.get? && validator_option.allow_get_body && request_param.is_a?(Hash)
 
+        if validator_option.strict_query_params && validator_option.allow_query_params
+          actual_query_params = Committee::RequestUnpacker.indifferent_params(request.GET)
+          if deserializer
+            actual_query_params = deserializer.normalize_query_params(actual_query_params)
+            merged_query_params = deserializer.normalize_query_params(query_param)
+            # Preserve body overrides for declared parameters without hiding unknown query keys.
+            @operation_object.query_parameter_names.each do |name|
+              actual_query_params[name] = merged_query_params[name] if actual_query_params.key?(name)
+            end
+            actual_query_params = deserializer.deserialize_query_params(actual_query_params)
+          end
+        end
+
         if deserializer
           query_values = validator_option.allow_query_params ? Rack::Utils.parse_query(request.query_string, '&') : {}
           # Do not restore query values that were overridden by the request body.
@@ -116,6 +129,7 @@ module Committee
         end
 
         request.env[validator_option.query_hash_key] = query_param
+        @operation_object.validate_no_unknown_query_params(actual_query_params) if actual_query_params
       end
 
       def copy_coerced_data_to_params(request)
