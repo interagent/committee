@@ -259,7 +259,7 @@ module Committee
 
         def json_content_type?
           mt = @request.media_type
-          mt.nil? || mt.match?(%r{application/(?:.*\+)?json})
+          mt.nil? || Committee::SchemaValidator.json_media_type?(mt)
         end
 
         def form_content_type?
