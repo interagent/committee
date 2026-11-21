@@ -436,6 +436,147 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  describe "Rack parameter parsing" do
+    [
+      [:hyper_schema, "/search/apps", "/apps"],
+      [:open_api_2_schema, "/api/pets", "/api/pets"],
+      [:open_api_3_schema, "/characters", "/characters"],
+    ].each do |schema_method, query_path, form_path|
+      { query: query_path, form: form_path }.each do |source, path|
+        {
+          "conflicting types" => "limit=1&limit[a]=2",
+          "invalid percent encoding" => "limit=%",
+        }.each do |description, parameters|
+          it "returns bad_request for #{description} in #{schema_method} #{source} parameters" do
+            errors = []
+            error_handler = ->(error, env) { errors << [error, env] }
+            app = new_rack_app(schema: send(schema_method), check_content_type: false, coerce_query_params: true, error_handler: error_handler)
+            env = parameter_env(path, source, parameters)
+
+            status, _headers, body = app.call(env)
+
+            assert_equal 400, status
+            assert_equal "bad_request", JSON.parse(body.join).fetch("id")
+            assert_equal 1, errors.size
+            assert_kind_of Committee::BadRequest, errors.first[0]
+            assert_same env, errors.first[1]
+          end
+        end
+      end
+    end
+
+    [
+      [:hyper_schema, "/search/apps", :query, "limit=1&limit[a]=2"],
+      [:open_api_3_schema, "/characters", :form, "limit=%"],
+    ].each do |schema_method, path, source, parameters|
+      it "raises the handled error for malformed #{source} parameters with raise: true" do
+        errors = []
+        error_handler = ->(error, env) { errors << [error, env] }
+        app = new_rack_app(schema: send(schema_method), check_content_type: false, coerce_query_params: true, raise: true, error_handler: error_handler)
+        env = parameter_env(path, source, parameters)
+
+        error = assert_raises(Committee::BadRequest) { app.call(env) }
+
+        assert_equal 1, errors.size
+        assert_same error, errors.first[0]
+        assert_same env, errors.first[1]
+      end
+
+      it "calls the app for malformed #{source} parameters with ignore_error: true" do
+        errors = []
+        requests = []
+        error_handler = ->(error, env) { errors << [error, env] }
+        check_parameter = lambda { |env|
+          requests << env
+          [200, {}, []]
+        }
+        app = new_rack_app_with_lambda(check_parameter, schema: send(schema_method), check_content_type: false, coerce_query_params: true, ignore_error: true, error_handler: error_handler)
+        env = parameter_env(path, source, parameters)
+
+        status, _headers, _body = app.call(env)
+
+        assert_equal 200, status
+        assert_equal 1, requests.size
+        assert_same env, requests.first
+        assert_equal 1, errors.size
+        assert_kind_of Committee::BadRequest, errors.first[0]
+        assert_same env, errors.first[1]
+      end
+    end
+
+    it "handles malformed form parameters parsed by allow_non_get_query_params" do
+      app = new_rack_app(schema: hyper_schema, check_content_type: false, allow_form_params: false, allow_non_get_query_params: true)
+      env = parameter_env("/apps", :form, "limit=1&limit[a]=2")
+
+      status, _headers, body = app.call(env)
+
+      assert_equal 400, status
+      assert_equal "bad_request", JSON.parse(body.join).fetch("id")
+    end
+
+    it "preserves malformed form input for the app with ignore_error and allow_non_get_query_params" do
+      parameters = "limit=1&limit[a]=2"
+      check_parameter = lambda { |env|
+        assert_equal parameters, env["rack.input"].read
+        [200, {}, []]
+      }
+      app = new_rack_app_with_lambda(check_parameter, schema: hyper_schema, check_content_type: false, ignore_error: true, allow_non_get_query_params: true)
+
+      status, _headers, _body = app.call(parameter_env("/apps", :form, parameters))
+
+      assert_equal 200, status
+    end
+
+    it "handles query parameters exceeding Rack's depth limit" do
+      errors = []
+      app = new_rack_app(schema: open_api_3_schema, error_handler: ->(error, _env) { errors << error })
+      parameters = "limit#{'[a]' * (Rack::Utils.param_depth_limit + 1)}=1"
+
+      status, _headers, body = app.call(parameter_env("/characters", :query, parameters))
+
+      assert_equal 400, status
+      assert_equal "bad_request", JSON.parse(body.join).fetch("id")
+      assert_equal 1, errors.size
+      assert_kind_of Committee::BadRequest, errors.first
+    end
+
+    it "handles malformed query parameters parsed after HyperSchema validation" do
+      errors = []
+      app = new_rack_app(schema: hyper_schema, allow_query_params: false, coerce_query_params: false, error_handler: ->(error, _env) { errors << error })
+
+      status, _headers, body = app.call(parameter_env("/apps", :query, "limit=%"))
+
+      assert_equal 400, status
+      assert_equal "bad_request", JSON.parse(body.join).fetch("id")
+      assert_equal 1, errors.size
+      assert_kind_of Committee::BadRequest, errors.first
+    end
+
+    it "does not parse disabled query and form parameters in OpenAPI3 deserialization" do
+      errors = []
+      app = new_rack_app(schema: open_api_3_schema, check_content_type: false, allow_form_params: false, allow_query_params: false, allow_non_get_query_params: true, error_handler: ->(error, _env) { errors << error })
+      env = parameter_env("/characters", :form, "limit=1&limit[a]=2").merge("QUERY_STRING" => "limit=%")
+
+      status, _headers, _body = app.call(env)
+
+      assert_equal 200, status
+      assert_empty errors
+    end
+
+    [ArgumentError, TypeError].each do |error_class|
+      it "propagates #{error_class} raised by the app" do
+        error = error_class.new("application error")
+        errors = []
+        app = new_rack_app_with_lambda(->(_env) { raise error }, schema: hyper_schema, error_handler: ->(handled_error, _env) { errors << handled_error })
+
+        raised_error = assert_raises(error_class) { app.call(Rack::MockRequest.env_for("/apps")) }
+
+        assert_same error, raised_error
+        assert_empty errors
+      end
+    end
+  end
+
   describe ':accept_request_filter' do
     [
       { description: 'when not specified, includes everything', accept_request_filter: nil, expected: { status: 400 } },
@@ -456,6 +597,14 @@ describe Committee::Middleware::RequestValidation do
   end
 
   private
+
+  def parameter_env(path, source, parameters)
+    if source == :query
+      Rack::MockRequest.env_for(path).merge("QUERY_STRING" => parameters)
+    else
+      Rack::MockRequest.env_for(path, method: "POST", input: parameters, "CONTENT_TYPE" => "application/x-www-form-urlencoded")
+    end
+  end
 
   def new_rack_app(options = {})
     new_rack_app_with_lambda(lambda { |_|
