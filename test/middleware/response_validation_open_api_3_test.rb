@@ -17,6 +17,84 @@ describe Committee::Middleware::ResponseValidation do
     assert_equal 200, last_response.status
   end
 
+  describe "sequential JSON response bodies" do
+    [
+      ['application/jsonl', '', "\n"],
+      ['application/x-ndjson', '', "\r\n"],
+      ['application/json-seq', "\x1e", "\n\x1e"],
+      ['application/geo+json-seq', "\x1e", "\n\x1e"],
+    ].each do |content_type, prefix, separator|
+      it "validates each #{content_type} record and the complete array" do
+        encode = ->(records) { "#{prefix}#{records.join(separator)}\n" }
+        first = prefix.empty? ? '{"a":1}' : JSON.pretty_generate('a' => 1)
+        body = encode.call([first, '{"a":2}'])
+        chunks = [body[0, 5].freeze, body[5..].b.freeze]
+        schema = sequential_response_schema(content_type)
+        @app = Rack::Builder.new {
+          use Committee::Middleware::ResponseValidation, schema: schema
+          run ->(_) { [200, { 'content-type' => "#{content_type}; charset=utf-8" }, chunks] }
+        }
+
+        status, _headers, response = @app.call(Rack::MockRequest.env_for('/records'))
+        assert_equal 200, status
+        response.each_with_index { |chunk, index| assert_same chunks[index], chunk }
+
+        chunks.replace([encode.call([first, '{}'])])
+        status, _headers, response = @app.call(Rack::MockRequest.env_for('/records'))
+        assert_equal 500, status
+        assert_match(/required.*a/i, response.join)
+
+        chunks.replace([encode.call([first, '{'])])
+        status, _headers, response = @app.call(Rack::MockRequest.env_for('/records'))
+        assert_equal 500, status
+        assert_equal "Response wasn't valid JSON.", JSON.parse(response.join)['message']
+
+        chunks.replace([encode.call([first, '{"a":2}', '{"a":3}'])])
+        status, _headers, _response = @app.call(Rack::MockRequest.env_for('/records'))
+        assert_equal 500, status
+      end
+    end
+
+    it "treats an empty sequential JSON response as an empty array" do
+      @app = new_response_rack('', {}, { schema: sequential_response_schema('application/jsonl') }, { content_type: 'application/jsonl' })
+
+      get '/records'
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+
+    it "keeps sequential JSON response bodies raw before OpenAPI 3.2" do
+      body = "{\"a\":1}\n{\"a\":2}\n"
+      @app = new_response_rack(body, {}, { schema: sequential_response_schema('application/jsonl', version: '3.1.0', type: 'string') }, { content_type: 'application/jsonl' })
+
+      get '/records'
+
+      assert_equal 200, last_response.status, last_response.body
+      assert_equal body, last_response.body
+    end
+
+    it "uses sequential JSON mapping when parse_response_by_content_type is false" do
+      body = "{\"a\":1}\n{\"a\":2}\n"
+      @app = new_response_rack(body, {}, { schema: sequential_response_schema('application/jsonl'), parse_response_by_content_type: false }, { content_type: 'application/jsonl' })
+
+      get '/records'
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+
+    it "lets custom parsers handle sequential JSON responses" do
+      parsed_body = nil
+      parser = ->(body) { parsed_body = body; [{ 'a' => 1 }] }
+      @app = new_response_rack('custom format', {}, { schema: sequential_response_schema('application/jsonl'), streaming_content_parsers: { 'application/jsonl' => parser } }, { content_type: 'application/jsonl' })
+
+      get '/records'
+
+      assert_equal 200, last_response.status
+      assert_equal 'custom format', last_response.body
+      assert_equal 'custom format', parsed_body
+    end
+  end
+
   it "passes through mixed encoding chunks" do
     chunks = ['{"Otonokizaka":["あ'.freeze, "い".b.freeze, 'う"]}'.freeze]
     @app = Rack::Builder.new {
@@ -488,6 +566,13 @@ describe Committee::Middleware::ResponseValidation do
   end
 
   private
+
+  def sequential_response_schema(content_type, version: '3.2.0', type: 'array')
+    body_schema = { 'type' => type }
+    body_schema.merge!('maxItems' => 2, 'items' => { 'type' => 'object', 'required' => ['a'] }) if type == 'array'
+    document = { 'openapi' => version, 'info' => { 'title' => 'test', 'version' => '1.0.0' }, 'paths' => { '/records' => { 'get' => { 'responses' => { '200' => { 'description' => 'ok', 'content' => { content_type => { 'schema' => body_schema } } } } } } } }
+    Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+  end
 
   def new_response_rack(response, headers = {}, options = {}, rack_options = {})
     status = rack_options[:status] || 200
