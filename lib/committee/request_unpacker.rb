@@ -44,6 +44,7 @@ module Committee
       @allow_get_body                = options[:allow_get_body]
       @allow_raw_body                = options[:allow_raw_body]
       @allow_json_array              = options[:allow_json_array]
+      @allow_sequential_json         = options[:allow_sequential_json]
       @allow_query_params            = options[:allow_query_params]
       @allow_non_get_query_params    = options[:allow_non_get_query_params]
       @optimistic_json               = options[:optimistic_json]
@@ -54,8 +55,10 @@ module Committee
       # if Content-Type is empty or JSON, and there was a request body, try to
       # interpret it as JSON
       json_body = !request.media_type || Committee::SchemaValidator.json_media_type?(request.media_type)
-      params = if json_body
-                 parse_json(request)
+      params = if @allow_sequential_json && Committee::SchemaValidator.sequential_json_media_type?(request.media_type)
+                 parse_sequential_json(request)
+      elsif json_body
+        parse_json(request)
       elsif @optimistic_json
         begin
           parse_json(request)
@@ -114,6 +117,15 @@ module Committee
     end
 
     private
+
+    def parse_sequential_json(request)
+      return nil if request.get? && !@allow_get_body
+
+      input = request.body
+      body = input ? input.read : ""
+      input.rewind if input.respond_to?(:rewind)
+      self.class.indifferent_params(Committee::SchemaValidator.parse_sequential_json(body, request.media_type))
+    end
 
     def parse_json(request)
       return nil if request.request_method == "GET" && !@allow_get_body

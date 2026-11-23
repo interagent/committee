@@ -18,6 +18,84 @@ describe Committee::Middleware::RequestValidation do
     assert_equal 200, last_response.status
   end
 
+  describe "sequential JSON request bodies" do
+    [
+      ['application/jsonl', '', "\n"],
+      ['application/x-ndjson', '', "\r\n"],
+      ['application/json-seq', "\x1e", "\n\x1e"],
+      ['application/geo+json-seq', "\x1e", "\n\x1e"],
+    ].each do |content_type, prefix, separator|
+      it "validates each #{content_type} record and the complete array" do
+        encode = ->(records) { "#{prefix}#{records.join(separator)}\n" }
+        first = prefix.empty? ? '{"a":1}' : JSON.pretty_generate('a' => 1)
+        body = encode.call([first, '{"a":2}'])
+        check_body = lambda { |env|
+          assert_equal [{ 'a' => 1 }, { 'a' => 2 }], env['committee.request_body_hash']
+          assert_equal body, env['rack.input'].read
+          [200, {}, []]
+        }
+        @app = new_rack_app_with_lambda(check_body, schema: sequential_request_schema(content_type))
+        header 'Content-Type', "#{content_type}; charset=utf-8"
+
+        post '/numbers', body
+        assert_equal 200, last_response.status, last_response.body
+
+        post '/numbers', encode.call([first, '{}'])
+        assert_equal 400, last_response.status
+        assert_match(/required.*a/i, last_response.body)
+
+        post '/numbers', encode.call([first, '{'])
+        assert_equal 400, last_response.status
+        assert_equal "Request body wasn't valid JSON.", JSON.parse(last_response.body)['message']
+
+        post '/numbers', encode.call([first, '{"a":2}', '{"a":3}'])
+        assert_equal 400, last_response.status
+      end
+    end
+
+    it "treats an empty sequential JSON request as an empty array" do
+      check_body = lambda { |env|
+        assert_equal [], env['committee.request_body_hash']
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_body, schema: sequential_request_schema('application/jsonl'))
+      header 'Content-Type', 'application/jsonl'
+
+      post '/numbers', ''
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+
+    it "keeps sequential JSON request bodies raw before OpenAPI 3.2" do
+      body = "{\"a\":1}\n{\"a\":2}\n"
+      check_body = lambda { |env|
+        assert_equal body, env['committee.request_body_hash']
+        assert_equal body, env['rack.input'].read
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_body, schema: sequential_request_schema('application/jsonl', version: '3.1.0', type: 'string'))
+      header 'Content-Type', 'application/jsonl'
+
+      post '/numbers', body
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+
+    it "respects allow_get_body for sequential JSON requests" do
+      body = "{\"a\":1}\n"
+      check_body = lambda { |env|
+        assert_equal({}, env['committee.request_body_hash'])
+        assert_equal body, env['rack.input'].read
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_body, schema: sequential_request_schema('application/jsonl', method: 'get'))
+
+      get '/numbers', {}, { input: body, 'CONTENT_TYPE' => 'application/jsonl' }
+
+      assert_equal 200, last_response.status, last_response.body
+    end
+  end
+
   describe "DELETE request bodies" do
     %w[3.1.0 3.2.0].each do |version|
       describe "OpenAPI #{version}" do
@@ -1574,6 +1652,17 @@ describe Committee::Middleware::RequestValidation do
 
   def array_body_schema
     Committee::Drivers.load_from_data(array_body_document, nil, parser_options: { strict_reference_validation: true })
+  end
+
+  def sequential_request_schema(content_type, version: '3.2.0', type: 'array', method: 'post')
+    document = array_body_document
+    document['openapi'] = version
+    operation = document['paths']['/numbers'].delete('post')
+    document['paths']['/numbers'][method] = operation
+    body_schema = { 'type' => type }
+    body_schema.merge!('maxItems' => 2, 'items' => { 'type' => 'object', 'required' => ['a'] }) if type == 'array'
+    operation['requestBody']['content'] = { content_type => { 'schema' => body_schema } }
+    Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
   end
 
   def array_body_document

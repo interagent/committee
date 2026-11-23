@@ -95,6 +95,15 @@ describe Committee::RequestUnpacker do
     assert_equal([{}, false], unpacker.unpack_request_params(request))
   end
 
+  it "rewinds sequential JSON bodies before parsing errors" do
+    body = "{\"a\":1}\n{\n"
+    request = Rack::Request.new({ 'REQUEST_METHOD' => 'POST', 'CONTENT_TYPE' => 'application/jsonl', 'rack.input' => StringIO.new(body) })
+    unpacker = Committee::RequestUnpacker.new(allow_sequential_json: true)
+
+    assert_raises(JSON::ParserError) { unpacker.unpack_request_params(request) }
+    assert_equal body, request.body.read
+  end
+
   it "doesn't unpack form params" do
     %w[application/x-www-form-urlencoded multipart/form-data].each do |content_type|
       env = { "CONTENT_TYPE" => content_type, "rack.input" => StringIO.new("x=y"), }

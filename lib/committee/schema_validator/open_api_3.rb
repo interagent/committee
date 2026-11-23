@@ -27,15 +27,18 @@ module Committee
                       response.each_with_object(String.new(encoding: Encoding::BINARY)) { |chunk, body| body << chunk.b }.force_encoding(Encoding::UTF_8)
                     end
 
+        content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
+        content_type = headers.fetch(content_type_key, nil)
         parse_to_json = if validator_option.parse_response_by_content_type
-                          content_type_key = headers.keys.detect { |k| k.casecmp?('Content-Type') }
-                          Committee::SchemaValidator.json_media_type?(headers.fetch(content_type_key, nil))
+                          Committee::SchemaValidator.json_media_type?(content_type)
                         else
                           true
                         end
 
         data = if custom_body_parser
                  custom_body_parser.call(full_body)
+               elsif use_3_2_features? && Committee::SchemaValidator.sequential_json_media_type?(content_type)
+                 Committee::SchemaValidator.parse_sequential_json(full_body, content_type)
                elsif parse_to_json
                  # HEAD responses have no body, but still require header validation.
                  full_body.empty? && @request.head? ? {} : JSON.parse(full_body)
@@ -59,6 +62,10 @@ module Committee
       private
 
       attr_reader :validator_option
+
+      def use_3_2_features?
+        @operation_object.request_operation.operation_object.root.use_3_2_features?
+      end
 
       def coerce_path_params(deserializer)
         path_params = deserializer&.deserialize_path_params(@operation_object.path_params)
@@ -91,7 +98,7 @@ module Committee
       def request_unpack(request)
         media_type = @operation_object.request_operation.operation_object.request_body&.select_media_type(request.media_type)
         allow_json_array = media_type&.schema&.type == 'array'
-        unpacker = Committee::RequestUnpacker.new(allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime, allow_form_params: validator_option.allow_form_params, allow_get_body: validator_option.allow_get_body, allow_raw_body: true, allow_json_array: allow_json_array, allow_query_params: validator_option.allow_query_params, allow_non_get_query_params: validator_option.allow_non_get_query_params, optimistic_json: validator_option.optimistic_json,)
+        unpacker = Committee::RequestUnpacker.new(allow_empty_date_and_datetime: validator_option.allow_empty_date_and_datetime, allow_form_params: validator_option.allow_form_params, allow_get_body: validator_option.allow_get_body, allow_raw_body: true, allow_json_array: allow_json_array, allow_sequential_json: use_3_2_features?, allow_query_params: validator_option.allow_query_params, allow_non_get_query_params: validator_option.allow_non_get_query_params, optimistic_json: validator_option.optimistic_json,)
 
         request.env[validator_option.headers_key] = unpacker.unpack_headers(request)
 
