@@ -1068,6 +1068,30 @@ describe Committee::Middleware::RequestValidation do
       assert_match(/Unknown query parameter\(s\): unknown/, last_response.body)
     end
 
+    it 'assigns query params matching patternProperties to an exploded object param' do
+      document = query_param_document({ 'name' => 'page', 'in' => 'query', 'schema' => { 'type' => 'integer' } })
+      document['openapi'] = '3.1.0'
+      filters = { 'type' => 'object', 'patternProperties' => { '^score_(gteq|lteq)$' => { 'type' => 'integer' } }, 'additionalProperties' => false }
+      document['paths']['/events']['get']['parameters'] << { 'name' => 'filters', 'in' => 'query', 'style' => 'form', 'explode' => true, 'schema' => filters }
+      schema = Committee::Drivers.load_from_data(document, nil, parser_options: { strict_reference_validation: true })
+      check_parameter = lambda { |env|
+        assert_equal({ 'page' => 1, 'filters' => { 'score_gteq' => 50 } }, env['committee.query_hash'])
+        [200, {}, []]
+      }
+      @app = new_rack_app_with_lambda(check_parameter, schema: schema, strict_query_params: true, coerce_query_params: true)
+
+      get '/events?page=1&score_gteq=50'
+      assert_equal 200, last_response.status, last_response.body
+
+      get '/events?page=1&score_gteq=abc'
+      assert_equal 400, last_response.status
+      assert_match(/expected integer, but received String: \\"abc\\"/, last_response.body)
+
+      get '/events?page=1&score_gteq=50&foo=1'
+      assert_equal 400, last_response.status
+      assert_match(/Unknown query parameter\(s\): foo\b/, last_response.body)
+    end
+
     [true, false].each do |deserialize_parameters|
       it "does not treat GET body keys as unknown query params with deserialize_parameters=#{deserialize_parameters}" do
         parameter = { 'name' => 'page', 'in' => 'query', 'schema' => { 'type' => 'integer' } }

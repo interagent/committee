@@ -500,6 +500,44 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
     end
   end
 
+  describe 'form style object with patternProperties' do
+    it 'assigns keys matching a pattern to the exploded object' do
+      param = pattern_param('filters', { 'role' => 'string' }, ['^score_'])
+      result = create_deserializer([param]).deserialize_query_params({ 'role' => 'admin', 'score_gteq' => '50', 'other' => 'x' })
+
+      assert_equal({ 'filters' => { 'role' => 'admin', 'score_gteq' => '50' }, 'other' => 'x' }, result)
+    end
+
+    it 'collects pattern keys when no declared property is present' do
+      param = pattern_param('filters', {}, ['^score_'])
+      result = create_deserializer([param]).deserialize_query_params({ 'score_gteq' => '50' })
+
+      assert_equal({ 'filters' => { 'score_gteq' => '50' } }, result)
+    end
+
+    it 'keeps keys declared by other parameters or properties' do
+      params = [pattern_param('filters', {}, ['^score']), create_param('score', 'query', 'form', true, 'integer', nil), create_param('ranges', 'query', 'form', true, 'object', { 'score_max' => 'integer' }),]
+      result = create_deserializer(params).deserialize_query_params({ 'score' => '1', 'score_max' => '2', 'score_gteq' => '3' })
+
+      assert_equal({ 'score' => '1', 'ranges' => { 'score_max' => '2' }, 'filters' => { 'score_gteq' => '3' } }, result)
+    end
+
+    it 'leaves a key unassigned when patterns of two parameters match it' do
+      params = [pattern_param('filters', {}, ['^score_']), pattern_param('sorts', {}, ['_gteq$'])]
+      result = create_deserializer(params).deserialize_query_params({ 'score_gteq' => '50' })
+
+      assert_equal({ 'score_gteq' => '50' }, result)
+    end
+
+    it 'does not assign keys to a non-exploded object' do
+      param = pattern_param('filters', {}, ['^score_'])
+      param.explode = false
+      result = create_deserializer([param]).deserialize_query_params({ 'score_gteq' => '50' })
+
+      assert_equal({ 'score_gteq' => '50' }, result)
+    end
+  end
+
   describe 'path item parameters' do
     [
       ['query', 'form', :deserialize_query_params],
@@ -585,6 +623,13 @@ describe Committee::SchemaValidator::OpenAPI3::ParameterDeserializer do
     else
       Struct.new(:type, :properties, :items).new(type, nil, nil)
     end
+  end
+
+  def pattern_param(name, properties, patterns)
+    props = properties.transform_values { |v| Struct.new(:type).new(v) }
+    pattern_properties = patterns.to_h { |pattern| [pattern, Struct.new(:type).new('string')] }
+    schema = Struct.new(:type, :properties, :pattern_properties, :items).new('object', props, pattern_properties, nil)
+    Struct.new(:name, :in, :style, :explode, :schema, :required).new(name, 'query', 'form', true, schema, false)
   end
 
   def nullable(param)
