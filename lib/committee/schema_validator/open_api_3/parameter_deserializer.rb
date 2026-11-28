@@ -70,10 +70,12 @@ module Committee
           # Collect parameter names that will be deserialized
           # This includes both the parameter name and any properties (for exploded objects)
           deserialized_keys = Set.new
+          pattern_keys = pattern_property_keys(params_for_location, raw_params)
 
           # Deserialize each parameter defined in the schema
           params_for_location.each do |param_def|
             value = extract_and_deserialize(param_def, raw_params)
+            value = merge_pattern_keys(value, pattern_keys[param_def.name], raw_params) if pattern_keys.key?(param_def.name)
 
             # Only include non-nil values
             if !value.nil?
@@ -84,12 +86,11 @@ module Committee
               deserialized_keys.add(param_def.name)
 
               # For form-style exploded objects, mark the property keys as deserialized
-              if Committee::Utils.schema_type(param_def.schema) == 'object' &&
-                 (param_def.style.nil? || param_def.style == 'form') &&
-                 (param_def.explode.nil? || param_def.explode)
+              if exploded_form_object?(param_def)
                 param_def.schema.properties&.each_key do |prop_name|
                   deserialized_keys.add(prop_name.to_s)
                 end
+                deserialized_keys.merge(pattern_keys.fetch(param_def.name, []))
               end
 
               # For deep object style, mark the bracket-notation keys as deserialized
@@ -110,6 +111,61 @@ module Committee
           end
 
           result
+        end
+
+        # Assign keys that no parameter or property declares to the form-exploded
+        # object parameter whose patternProperties match them.
+        # A key that matches the patterns of more than one parameter stays unassigned.
+        # Example: patternProperties { "^score_" => ... } on "filters", ?score_gteq=50
+        #   → { "filters" => ["score_gteq"] }
+        # @param [Array<OpenAPIParser::Schemas::Parameter>] params_for_location
+        # @param [Hash] raw_params
+        # @return [Hash{String => Array}] parameter name → assigned raw keys
+        def pattern_property_keys(params_for_location, raw_params)
+          exploded = params_for_location.select { |param_def| exploded_form_object?(param_def) }
+          with_patterns = exploded.reject { |param_def| pattern_properties(param_def.schema).empty? }
+          return {} if with_patterns.empty?
+
+          declared = Set.new(params_for_location.map(&:name))
+          exploded.each { |param_def| param_def.schema.properties&.each_key { |name| declared.add(name.to_s) } }
+          deep_object_prefixes = params_for_location.select { |param_def| param_def.style == 'deepObject' }.map { |param_def| "#{param_def.name}[" }
+
+          assigned = {}
+          raw_params.each_key do |key|
+            key_str = key.to_s
+            next if declared.include?(key_str)
+            next if deep_object_prefixes.any? { |prefix| key_str.start_with?(prefix) }
+
+            owners = with_patterns.select do |param_def|
+              pattern_properties(param_def.schema).each_key.any? { |pattern| key_str =~ /#{pattern}/ }
+            end
+            (assigned[owners.first.name] ||= []) << key if owners.size == 1
+          end
+          assigned
+        end
+
+        # @param [Hash, nil] value Object collected from the declared properties
+        # @param [Array] keys Raw keys assigned through patternProperties
+        # @param [Hash] raw_params
+        # @return [Hash]
+        def merge_pattern_keys(value, keys, raw_params)
+          result = value || Committee::Utils.indifferent_hash
+          keys.each { |key| result[key] = raw_params[key] }
+          result
+        end
+
+        # @param [OpenAPIParser::Schemas::Parameter] param_def
+        # @return [Boolean]
+        def exploded_form_object?(param_def)
+          Committee::Utils.schema_type(param_def.schema) == 'object' &&
+            (param_def.style.nil? || param_def.style == 'form') &&
+            (param_def.explode.nil? || param_def.explode)
+        end
+
+        # @param [OpenAPIParser::Schemas::Schema] schema
+        # @return [Hash{String => OpenAPIParser::Schemas::Schema}]
+        def pattern_properties(schema)
+          (schema.respond_to?(:pattern_properties) && schema.pattern_properties) || {}
         end
 
         # Convert a hash to an indifferent hash (supports both string and symbol keys)
